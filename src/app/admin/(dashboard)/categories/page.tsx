@@ -30,6 +30,9 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+
 
 interface ArtCategoryItem {
   id: string;
@@ -51,6 +54,11 @@ export default function AdminCategoriesPage() {
   const [editingCategory, setEditingCategory] = React.useState<ArtCategoryItem | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Delete Confirmation State
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [targetDelete, setTargetDelete] = React.useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
 
   // Form fields
   const [formData, setFormData] = React.useState({
@@ -139,34 +147,46 @@ export default function AdminCategoriesPage() {
         throw new Error(data.error || "Failed to save category");
       }
 
+      toast.success(isEdit ? "Category updated successfully" : "Category created successfully");
       setModalOpen(false);
       fetchCategories();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error saving category");
+      const msg = err instanceof Error ? err.message : "Error saving category";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"? This cannot be undone.`)) {
-      return;
-    }
+  const handleDeleteClick = (id: string, name: string) => {
+    setTargetDelete({ id, name });
+    setDeleteDialogOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!targetDelete) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/categories?id=${id}`, {
+      const res = await fetch(`/api/admin/categories?id=${targetDelete.id}`, {
         method: "DELETE",
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Failed to delete category");
+        toast.error(data.error || "Failed to delete category");
         return;
       }
+      toast.success(`Deleted category "${targetDelete.name}" successfully`);
+      setDeleteDialogOpen(false);
+      setTargetDelete(null);
       fetchCategories();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Error deleting category");
+      toast.error(err instanceof Error ? err.message : "Error deleting category");
+    } finally {
+      setDeleting(false);
     }
   };
+
 
   const filtered = categories.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -278,12 +298,13 @@ export default function AdminCategoriesPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleDelete(cat.id, cat.name)}
+                      onClick={() => handleDeleteClick(cat.id, cat.name)}
                       className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                       title="Delete Category"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
+
                   </div>
                 </div>
               </CardContent>
@@ -393,6 +414,23 @@ export default function AdminCategoriesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Art Category"
+        description={
+          targetDelete
+            ? `Are you sure you want to delete "${targetDelete.name}"? This action cannot be undone and will permanently remove this category.`
+            : "Are you sure you want to delete this category?"
+        }
+        confirmText="Delete Category"
+        isDestructive={true}
+        isLoading={deleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
+

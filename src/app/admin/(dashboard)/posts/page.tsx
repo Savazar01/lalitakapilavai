@@ -34,6 +34,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+
 
 interface BlogPostItem {
   id: string;
@@ -63,6 +66,12 @@ export default function AdminPostsPage() {
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadingImage, setUploadingImage] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Delete Confirmation State
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [targetDeletePost, setTargetDeletePost] = React.useState<{ id: string; title: string } | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
+
 
   // Form State
   const [formData, setFormData] = React.useState({
@@ -164,12 +173,18 @@ export default function AdminPostsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
+      const imgUrl =
+        data.watermarkedUrl ||
+        data.publicUrl ||
+        data.primaryImageUrl ||
+        data.rawUrl;
       setFormData((prev) => ({
         ...prev,
-        featuredImageUrl: data.watermarkedUrl || data.rawUrl,
+        featuredImageUrl: imgUrl,
       }));
+      toast.success("Cover image uploaded successfully!");
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Image upload failed");
+      toast.error(err instanceof Error ? err.message : "Image upload failed");
     } finally {
       setUploadingImage(false);
     }
@@ -196,25 +211,45 @@ export default function AdminPostsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save post");
 
+      toast.success(isEdit ? "Article updated successfully" : "Article created successfully");
       setModalOpen(false);
       fetchPosts();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error saving post");
+      const msg = err instanceof Error ? err.message : "Error saving post";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Delete article "${title}"?`)) return;
+  const handleDeleteClick = (id: string, title: string) => {
+    setTargetDeletePost({ id, title });
+    setDeleteDialogOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!targetDeletePost) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/posts/${id}`, { method: "DELETE" });
-      if (res.ok) fetchPosts();
+      const res = await fetch(`/api/admin/posts/${targetDeletePost.id}`, { method: "DELETE" });
+      if (res.ok) {
+        toast.success(`Deleted article "${targetDeletePost.title}"`);
+        setDeleteDialogOpen(false);
+        setTargetDeletePost(null);
+        fetchPosts();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to delete article");
+      }
     } catch (err) {
       console.error("Failed to delete post:", err);
+      toast.error("Error deleting post");
+    } finally {
+      setDeleting(false);
     }
   };
+
 
   return (
     <div className="space-y-6">
@@ -366,12 +401,13 @@ export default function AdminPostsPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleDelete(post.id, post.title)}
+                      onClick={() => handleDeleteClick(post.id, post.title)}
                       className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                       title="Delete Article"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
+
                   </div>
                 </div>
               </CardContent>
@@ -456,7 +492,7 @@ export default function AdminPostsPage() {
                       {uploadingImage ? "Uploading..." : "Upload via Media Vault"}
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
                         onChange={handleImageUpload}
                         className="hidden"
                         disabled={uploadingImage}
@@ -603,6 +639,22 @@ export default function AdminPostsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Article"
+        description={
+          targetDeletePost
+            ? `Are you sure you want to delete the article "${targetDeletePost.title}"? This will permanently delete the post and its AEO schema. This action cannot be undone.`
+            : "Are you sure you want to delete this article?"
+        }
+        confirmText="Delete Article"
+        isDestructive={true}
+        isLoading={deleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

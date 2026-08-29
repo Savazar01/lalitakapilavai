@@ -117,3 +117,31 @@ graph TD
     MultiRowPartition -->|Sequential Block Serialization| PublicSSR
     ArtisticFraming -->|CSS Box Models & Ornamental Gold Fillets| PublicSSR
 ```
+
+---
+
+## 4. Multi-Format Media Vault & Global Interaction Architecture
+
+```mermaid
+graph TD
+    ClientUpload["Multi-Format Dropzone & File Pickers (JPEG, JPG, PNG, WEBP, GIF, TIFF)"]
+    UploadAPI["POST /api/admin/media/upload"]
+    SharpEngine["Sharp Ingestion & Processing Pipeline"]
+    MasterVault["Original Master Asset Vault (Preserved Format)"]
+    WatermarkDeriv["Semi-Transparent Copyright Watermarked WebP (85% Quality)"]
+    NormalizedPayload["Normalized Response Payload (watermarkedUrl, publicUrl, primaryImageUrl, protectedS3Key, vaultKey)"]
+    
+    SonnerToaster["Global Sonner Toaster (UI-UX-Pro-Max Warm Parchment & Obsidian Gold)"]
+    ConfirmModal["Radix ConfirmDialog (Destructive Actions: Artworks, Events, Categories, Pages, Posts, Nav)"]
+    TiptapModal["Radix Dialog Link Editor (Zero Browser Prompts)"]
+
+    ClientUpload --> UploadAPI
+    UploadAPI --> SharpEngine
+    SharpEngine --> MasterVault
+    SharpEngine --> WatermarkDeriv
+    UploadAPI --> NormalizedPayload
+    NormalizedPayload --> SonnerToaster
+    ConfirmModal -->|Safe Interactive Confirmations| Admin_Control_Plane
+    TiptapModal -->|Visual Hyperlink Management| Builder
+```
+

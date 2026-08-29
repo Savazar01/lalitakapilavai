@@ -31,6 +31,9 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+
 
 interface PageItem {
   id: string;
@@ -48,6 +51,11 @@ export default function PagesAdminPage() {
   const [loading, setLoading] = React.useState(true);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [creating, setCreating] = React.useState(false);
+
+  // Delete Confirmation State
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [targetDeletePage, setTargetDeletePage] = React.useState<{ id: string; title: string } | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
 
   // Form State
   const [title, setTitle] = React.useState("");
@@ -98,34 +106,48 @@ export default function PagesAdminPage() {
 
       if (res.ok) {
         const newPage = await res.json();
+        toast.success("Page created successfully! Launching visual builder...");
         setDialogOpen(false);
         router.push(`/admin/pages/${newPage.id}/builder`);
       } else {
-        const err = await res.json();
-        alert(err.error || "Failed to create page");
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to create page");
       }
     } catch (e) {
       console.error(e);
-      alert("Error creating page");
+      toast.error("Error creating page");
     } finally {
       setCreating(false);
     }
   };
 
-  const handleDelete = async (id: string, pageTitle: string) => {
-    if (!confirm(`Are you sure you want to delete "${pageTitle}"?`)) {
-      return;
-    }
+  const handleDeleteClick = (id: string, pageTitle: string) => {
+    setTargetDeletePage({ id, title: pageTitle });
+    setDeleteDialogOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!targetDeletePage) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/pages/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/pages/${targetDeletePage.id}`, { method: "DELETE" });
       if (res.ok) {
-        setPages((prev) => prev.filter((p) => p.id !== id));
+        setPages((prev) => prev.filter((p) => p.id !== targetDeletePage.id));
+        toast.success(`Deleted page "${targetDeletePage.title}" successfully`);
+        setDeleteDialogOpen(false);
+        setTargetDeletePage(null);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to delete page");
       }
     } catch (e) {
       console.error(e);
+      toast.error("Error deleting page");
+    } finally {
+      setDeleting(false);
     }
   };
+
 
   return (
     <div className="space-y-6">
@@ -288,7 +310,7 @@ export default function PagesAdminPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(p.id, p.title)}
+                    onClick={() => handleDeleteClick(p.id, p.title)}
                     className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 cursor-pointer"
                     title="Delete Page"
                   >
@@ -307,6 +329,23 @@ export default function PagesAdminPage() {
           ))}
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Custom Page"
+        description={
+          targetDeletePage
+            ? `Are you sure you want to delete "${targetDeletePage.title}"? This will permanently delete the page layout, blocks, and routing. This action cannot be undone.`
+            : "Are you sure you want to delete this page?"
+        }
+        confirmText="Delete Page"
+        isDestructive={true}
+        isLoading={deleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
+

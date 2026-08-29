@@ -25,6 +25,16 @@ import {
   Unlink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
 
 export interface TiptapEditorProps {
   content?: Record<string, unknown> | string;
@@ -81,25 +91,35 @@ export function TiptapEditor({
     },
   });
 
+  const [linkModalOpen, setLinkModalOpen] = React.useState(false);
+  const [linkUrl, setLinkUrl] = React.useState("");
+
   if (!editor) {
     return null;
   }
 
-  const setLink = () => {
-    const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt("Enter Target URL:", previousUrl);
+  const openLinkModal = () => {
+    const previousUrl = (editor.getAttributes("link").href as string) || "";
 
-    if (url === null) {
-      return;
-    }
-
-    if (url === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
-      return;
-    }
-
-    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+    setLinkUrl(previousUrl);
+    setLinkModalOpen(true);
   };
+
+  const handleApplyLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!linkUrl.trim()) {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    } else {
+      editor.chain().focus().extendMarkRange("link").setLink({ href: linkUrl.trim() }).run();
+    }
+    setLinkModalOpen(false);
+  };
+
+  const handleRemoveLink = () => {
+    editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    setLinkModalOpen(false);
+  };
+
 
   const btnInactiveClass = isLight
     ? "text-stone-700 hover:text-stone-950 hover:bg-stone-200/60"
@@ -317,7 +337,7 @@ export function TiptapEditor({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={setLink}
+            onClick={openLinkModal}
             className={`h-7 w-7 p-0 ${
               editor.isActive("link") ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
@@ -343,6 +363,65 @@ export function TiptapEditor({
 
       {/* Live Content Surface */}
       <EditorContent editor={editor} />
+
+      {/* Styled Link Modal Dialog */}
+      <Dialog open={linkModalOpen} onOpenChange={setLinkModalOpen}>
+        <DialogContent className="max-w-md border-border bg-card">
+          <form onSubmit={handleApplyLink} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle className="text-base font-serif font-bold text-foreground">
+                Insert / Edit Hyperlink
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Enter target destination (e.g. /gallery, https://lalitakapilavai.com/about)
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-2 py-1">
+              <Input
+                type="text"
+                placeholder="https://..."
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                className="text-xs font-mono"
+                autoFocus
+              />
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              {editor.isActive("link") && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRemoveLink}
+                  className="text-xs text-destructive hover:text-destructive mr-auto"
+                >
+                  Unlink
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setLinkModalOpen(false)}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="gold"
+                size="sm"
+                className="text-xs"
+              >
+                Apply Link
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

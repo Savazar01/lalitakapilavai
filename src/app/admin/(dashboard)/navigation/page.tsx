@@ -30,6 +30,9 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+
 
 interface MenuItemNode {
   id: string;
@@ -64,6 +67,11 @@ export default function NavigationManagerPage() {
   const [path, setPath] = React.useState("");
   const [openInNewTab, setOpenInNewTab] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
+
+  // Delete Confirmation State
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [targetDeleteNav, setTargetDeleteNav] = React.useState<{ id: string; label: string } | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
 
   const reloadMenu = React.useCallback(() => {
     fetch(`/api/admin/navigation?position=${selectedPosition}`)
@@ -109,7 +117,7 @@ export default function NavigationManagerPage() {
 
   const openEditDialog = (item: MenuItemNode) => {
     setEditingItem(item);
-    setParentTargetId(item.parentId);
+    setParentTargetId(null);
     setLabel(item.label);
     setPath(item.path);
     setOpenInNewTab(item.openInNewTab);
@@ -134,8 +142,12 @@ export default function NavigationManagerPage() {
           }),
         });
         if (res.ok) {
+          toast.success("Navigation item updated");
           setDialogOpen(false);
           reloadMenu();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          toast.error(err.error || "Failed to update navigation item");
         }
       } else {
         // Create new
@@ -151,32 +163,48 @@ export default function NavigationManagerPage() {
           }),
         });
         if (res.ok) {
+          toast.success("Navigation item created");
           setDialogOpen(false);
           reloadMenu();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          toast.error(err.error || "Failed to create navigation item");
         }
       }
     } catch (e) {
       console.error(e);
-      alert("Error saving navigation item");
+      toast.error("Error saving navigation item");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDelete = async (id: string, itemLabel: string) => {
-    if (!confirm(`Delete "${itemLabel}" and all associated sub-items?`)) {
-      return;
-    }
+  const handleDeleteClick = (id: string, itemLabel: string) => {
+    setTargetDeleteNav({ id, label: itemLabel });
+    setDeleteDialogOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!targetDeleteNav) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/navigation?id=${id}`, {
+      const res = await fetch(`/api/admin/navigation?id=${targetDeleteNav.id}`, {
         method: "DELETE",
       });
       if (res.ok) {
+        toast.success(`Deleted "${targetDeleteNav.label}" successfully`);
+        setDeleteDialogOpen(false);
+        setTargetDeleteNav(null);
         reloadMenu();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to delete navigation item");
       }
     } catch (e) {
       console.error(e);
+      toast.error("Error deleting navigation item");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -352,7 +380,7 @@ export default function NavigationManagerPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(root.id, root.label)}
+                    onClick={() => handleDeleteClick(root.id, root.label)}
                     className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -426,10 +454,10 @@ export default function NavigationManagerPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(tier2.id, tier2.label)}
+                          onClick={() => handleDeleteClick(tier2.id, tier2.label)}
                           className="h-7 w-7 p-0 text-destructive"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
 
@@ -448,7 +476,7 @@ export default function NavigationManagerPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleDelete(tier3.id, tier3.label)}
+                                onClick={() => handleDeleteClick(tier3.id, tier3.label)}
                                 className="h-6 w-6 p-0 text-destructive"
                               >
                                 <Trash2 className="w-3 h-3" />
@@ -460,6 +488,7 @@ export default function NavigationManagerPage() {
                     </div>
                   ))}
                 </CardContent>
+
               )}
             </Card>
           ))}
@@ -543,6 +572,23 @@ export default function NavigationManagerPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Navigation Item"
+        description={
+          targetDeleteNav
+            ? `Are you sure you want to delete "${targetDeleteNav.label}" and all its associated sub-links? This action cannot be undone.`
+            : "Are you sure you want to delete this navigation item?"
+        }
+        confirmText="Delete Link"
+        isDestructive={true}
+        isLoading={deleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
+

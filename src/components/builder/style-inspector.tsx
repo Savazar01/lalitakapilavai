@@ -23,6 +23,8 @@ import {
   Volume2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+
 import {
   Select,
   SelectContent,
@@ -140,13 +142,20 @@ export function StyleInspector({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
-      update("mediaUrl", data.watermarkedUrl || data.rawUrl);
+      const imgUrl =
+        data.watermarkedUrl ||
+        data.publicUrl ||
+        data.primaryImageUrl ||
+        data.rawUrl;
+      update("mediaUrl", imgUrl);
+      toast.success("Media uploaded successfully!");
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Media upload failed");
+      toast.error(err instanceof Error ? err.message : "Media upload failed");
     } finally {
       setUploadingImage(false);
     }
   };
+
 
   return (
     <aside className="w-80 border-l border-border bg-card/60 backdrop-blur-md p-4 overflow-y-auto max-h-screen text-xs space-y-5">
@@ -221,7 +230,7 @@ export function StyleInspector({
                     {uploadingImage ? "Uploading..." : "Upload File"}
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
                       onChange={handleFileUpload}
                       className="hidden"
                       disabled={uploadingImage}

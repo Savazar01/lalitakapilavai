@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/formatters";
+import { toast } from "sonner";
+
 
 interface EventRsvpFormProps {
   eventId: string;
@@ -60,17 +62,19 @@ export function EventRsvpForm({
       });
 
       if (res.ok) {
+        toast.success("Registration confirmed! We look forward to welcoming you.");
         setRegistered(true);
       } else {
-        const err = await res.json();
-        alert(err.error || "Failed to submit RSVP");
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to submit RSVP");
       }
     } catch (e) {
       console.error(e);
-      alert("Error submitting registration");
+      toast.error("Error submitting registration");
     } finally {
       setSubmitting(false);
     }
+
   };
 
   if (registered) {

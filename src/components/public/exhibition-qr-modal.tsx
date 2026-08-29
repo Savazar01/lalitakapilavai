@@ -13,6 +13,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
+
 
 interface ExhibitionQrModalProps {
   artworkId: string;
@@ -60,18 +62,20 @@ export function ExhibitionQrModal({
 
       if (res.ok) {
         sessionStorage.setItem(`qr_visitor_${artworkId}`, "true");
+        toast.success("Welcome! Exhibition provenance unlocked.");
         setUnlocked(true);
         setTimeout(() => {
           setIsOpen(false);
         }, 1800);
       } else {
-        alert("Thank you! Proceeding to exhibition details.");
+        toast.info("Thank you! Proceeding to exhibition details.");
         setIsOpen(false);
       }
     } catch (e) {
       console.error(e);
       setIsOpen(false);
     } finally {
+
       setSubmitting(false);
     }
   };

@@ -31,6 +31,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+
 import {
   Select,
   SelectContent,
@@ -75,6 +78,11 @@ export default function AdminLeadsPage() {
   const [statusFilter, setStatusFilter] = React.useState<string>("ALL");
   const [search, setSearch] = React.useState("");
   const [selectedLead, setSelectedLead] = React.useState<LeadItem | null>(null);
+
+  // Delete Confirmation State
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [targetDeleteLead, setTargetDeleteLead] = React.useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
 
   const fetchLeads = React.useCallback(() => {
     const url = new URL("/api/admin/leads", window.location.origin);
@@ -124,27 +132,47 @@ export default function AdminLeadsPage() {
             prev ? { ...prev, status: newStatus as LeadItem["status"] } : null
           );
         }
+        toast.success(`Lead status updated to ${newStatus}`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to update lead status");
       }
     } catch (err) {
       console.error("Failed to update status:", err);
+      toast.error("Error updating status");
     }
   };
 
-  const handleDelete = async (leadId: string, leadName: string) => {
-    if (!confirm(`Delete lead record for "${leadName}"?`)) return;
+  const handleDeleteClick = (leadId: string, leadName: string) => {
+    setTargetDeleteLead({ id: leadId, name: leadName });
+    setDeleteDialogOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!targetDeleteLead) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}`, {
+      const res = await fetch(`/api/admin/leads/${targetDeleteLead.id}`, {
         method: "DELETE",
       });
       if (res.ok) {
-        setLeads((prev) => prev.filter((l) => l.id !== leadId));
-        if (selectedLead?.id === leadId) setSelectedLead(null);
+        setLeads((prev) => prev.filter((l) => l.id !== targetDeleteLead.id));
+        if (selectedLead?.id === targetDeleteLead.id) setSelectedLead(null);
+        toast.success(`Deleted lead record for "${targetDeleteLead.name}"`);
+        setDeleteDialogOpen(false);
+        setTargetDeleteLead(null);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to delete lead");
       }
     } catch (err) {
       console.error("Failed to delete lead:", err);
+      toast.error("Error deleting lead");
+    } finally {
+      setDeleting(false);
     }
   };
+
 
   const handleExportCsv = () => {
     const url = new URL("/api/admin/leads", window.location.origin);
@@ -364,12 +392,13 @@ export default function AdminLeadsPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDelete(lead.id, lead.name)}
+                            onClick={() => handleDeleteClick(lead.id, lead.name)}
                             className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                             title="Delete Lead"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
+
                         </div>
                       </td>
                     </tr>
@@ -503,6 +532,23 @@ export default function AdminLeadsPage() {
           </DialogContent>
         )}
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Patron Lead Record"
+        description={
+          targetDeleteLead
+            ? `Are you sure you want to delete the acquisition lead record for "${targetDeleteLead.name}"? This action cannot be undone.`
+            : "Are you sure you want to delete this lead record?"
+        }
+        confirmText="Delete Lead"
+        isDestructive={true}
+        isLoading={deleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
+

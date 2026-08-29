@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-08-29)
 
 ## Corpus Check
-- 81 files · ~33,461 words
+- 97 files · ~93,138 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 461 nodes · 716 edges · 29 communities (23 shown, 6 thin omitted)
+- 530 nodes · 987 edges · 42 communities (33 shown, 9 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fd57aa05`
+- Built from commit: `6d3fcfb5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -40,18 +40,22 @@
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 41|Community 41]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Button` - 18 edges
-2. `cn()` - 18 edges
-3. `compilerOptions` - 16 edges
-4. `Badge()` - 15 edges
-5. `auth` - 12 edges
-6. `Card` - 9 edges
-7. `CardContent` - 9 edges
-8. `Input` - 9 edges
-9. `scripts` - 8 edges
-10. `CardTitle` - 8 edges
+1. `Button` - 25 edges
+2. `Badge()` - 20 edges
+3. `auth` - 19 edges
+4. `cn()` - 18 edges
+5. `compilerOptions` - 16 edges
+6. `Input` - 16 edges
+7. `Card` - 15 edges
+8. `CardTitle` - 14 edges
+9. `CardContent` - 14 edges
+10. `DialogHeader()` - 14 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `POST()` --calls--> `generateAndStoreArtworkQR()`  [EXTRACTED]
@@ -65,43 +69,43 @@
 - `DialogFooter()` --calls--> `cn()`  [EXTRACTED]
   src/components/ui/dialog.tsx → src/lib/utils.ts
 
-## Communities (29 total, 6 thin omitted)
+## Communities (42 total, 9 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.09
-Nodes (36): Artwork, Category, ArtworkSummary, EventItem, IANA_TIMEZONES, metadata, Registration, MenuItemNode (+28 more)
+Cohesion: 0.08
+Nodes (55): Artwork, Category, TiptapEditorProps, ArtCategoryItem, ArtworkSummary, EventItem, IANA_TIMEZONES, Registration (+47 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.05
-Nodes (18): { GET, POST }, POST(), auth, AuthSession, globalForPrisma, generateAndStoreArtworkQR(), generateQRCodeBuffer(), QRCodeOptions (+10 more)
+Cohesion: 0.19
+Nodes (14): POST(), generateAndStoreArtworkQR(), generateQRCodeBuffer(), QRCodeOptions, generatePresignedDownloadUrl(), generatePresignedUploadUrl(), getMediaStream(), getStorageClient() (+6 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.04
-Nodes (44): dependencies, @aws-sdk/client-s3, @aws-sdk/s3-request-presigner, better-auth, class-variance-authority, clsx, @dnd-kit/core, @dnd-kit/sortable (+36 more)
+Cohesion: 0.06
+Nodes (34): dependencies, @aws-sdk/client-s3, @aws-sdk/s3-request-presigner, better-auth, class-variance-authority, clsx, @dnd-kit/core, @dnd-kit/sortable (+26 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.07
-Nodes (27): 1. Architectural Stack, 2. Quickstart & Local Development, 3. Docker Containerization & Production Build, 4. Coolify VPS Deployment Workflow, 5. Architectural Documentation & Skills, code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git), code:bash (curl http://localhost:3000/api/health), code:bash (docker compose down) (+19 more)
+Cohesion: 0.08
+Nodes (30): 1. Architectural Stack, 2. Quickstart & Local Development, 3. Docker Containerization & Production Build, 4. Coolify VPS Deployment Workflow, 5. Architectural Documentation & Skills, code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git), code:bash (docker compose down), code:bash (npm run lint) (+22 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.08
-Nodes (25): NavItem, navItems, authClient, cn(), DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel (+17 more)
+Cohesion: 0.09
+Nodes (21): NavItem, navItems, cn(), DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioItem (+13 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.17
-Nodes (12): devDependencies, eslint, eslint-config-next, prisma, tailwindcss, @tailwindcss/postcss, tsx, @types/node (+4 more)
+Cohesion: 0.08
+Nodes (23): devDependencies, eslint, eslint-config-next, prisma, tailwindcss, @tailwindcss/postcss, tsx, @types/node (+15 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.09
-Nodes (25): metadata, AnimatedSection(), AnimatedSectionProps, EventRsvpForm(), Footer(), Artwork, Category, GalleryGrid() (+17 more)
+Cohesion: 0.07
+Nodes (36): metadata, metadata, formatCurrency(), formatLocalizedDateTime(), getOrdinalSuffix(), SUPPORTED_CURRENCIES, SupportedCurrency, globalForPrisma (+28 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.07
-Nodes (32): columnPresets, PageData, SectionData, SubSectionData, colorPresets, fontFamilies, SectionStyle, StyleInspector() (+24 more)
+Cohesion: 0.08
+Nodes (29): columnPresets, isLightColor(), PageData, SectionData, SortableSection(), SubSectionData, artisticBorderPresets, availableIcons (+21 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.14
@@ -132,36 +136,40 @@ Cohesion: 0.20
 Nodes (9): 1. Philosophy & Aesthetic Direction, 2. Master Color Tokens (Dual Theme), 3. Typography Architecture, 4. Critical UX Rules (Priority-Ranked), Dark Mode ("Sanctum Obsidian & Luminous Gold"), Light Mode ("Sacred Parchment & Antique Gold"), Priority 1: Accessibility (CRITICAL), Priority 2: Interaction & Responsive Layout (+1 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.29
-Nodes (6): 1. Cultural & Domain Entity Knowledge Graph, 2. Codebase Architecture & Route Mapping, code:mermaid (graph TD), code:mermaid (graph LR), Lalita Kapilavai — Multi-Layered Knowledge Graph, Relational & Cultural Topology
+Cohesion: 0.18
+Nodes (10): 1. Cultural & Domain Entity Knowledge Graph, 2. Codebase Architecture & Route Mapping, 3. Visual Page Builder & Luxury Framing Engine, 4. Multi-Format Media Vault & Global Interaction Architecture, code:mermaid (graph TD), code:mermaid (graph LR), code:mermaid (graph TD), code:mermaid (graph TD) (+2 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.25
 Nodes (7): 1. React Server Component (RSC) Boundaries, 2. Server-Side Data Fetching & Deduplication, 3. Zero-FOUC Theming & Hydration Safeguards, 4. Performance & Re-render Prevention, code:typescript (export async function getDashboardData() {), code:tsx (<ThemeProvider), Skill: Vercel React & Next.js 16 Best Practices
 
 ### Community 18 - "Community 18"
-Cohesion: 0.33
-Nodes (4): geistMono, geistSans, metadata, ThemeProvider()
+Cohesion: 0.28
+Nodes (5): geistMono, geistSans, metadata, ThemeProvider(), Toaster()
+
+### Community 29 - "Community 29"
+Cohesion: 0.21
+Nodes (3): { GET, POST }, auth, AuthSession
 
 ## Knowledge Gaps
-- **211 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+206 more)
+- **221 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+216 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Button` connect `Community 8` to `Community 0`, `Community 4`, `Community 7`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 4` to `Community 0`, `Community 8`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
-- **Why does `Badge()` connect `Community 0` to `Community 8`, `Community 4`, `Community 7`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+- **Why does `Button` connect `Community 0` to `Community 8`, `Community 4`, `Community 7`?**
+  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Why does `Badge()` connect `Community 7` to `Community 0`, `Community 8`, `Community 4`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `cn()` connect `Community 4` to `Community 0`, `Community 8`, `Community 7`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _211 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _221 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.0925589836660617 - nodes in this community are weakly interconnected._
-- **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.053763440860215055 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07835642618251314 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.044444444444444446 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.058823529411764705 - nodes in this community are weakly interconnected._
+- **Should `Community 3` be split into smaller, more focused modules?**
+  _Cohesion score 0.07741935483870968 - nodes in this community are weakly interconnected._

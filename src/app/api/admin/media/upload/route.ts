@@ -53,18 +53,29 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const inputBuffer = Buffer.from(arrayBuffer);
 
-    // 3. Extract Image Metadata via Sharp
+    // 3. Extract Image Metadata via Sharp & Validate Format
+    const allowedFormats = ["jpeg", "jpg", "png", "webp", "gif", "tiff", "tif"];
     const metadata = await sharp(inputBuffer).metadata();
-    if (!metadata.width || !metadata.height) {
+    if (!metadata.width || !metadata.height || !metadata.format) {
       return NextResponse.json(
-        { error: "Failed to read image dimensions" },
+        { error: "Failed to read image dimensions or unsupported format" },
         { status: 422 }
+      );
+    }
+
+    const detectedFormat = metadata.format.toLowerCase();
+    if (!allowedFormats.includes(detectedFormat)) {
+      return NextResponse.json(
+        {
+          error: `Unsupported image format (${detectedFormat}). Please upload JPEG, PNG, WebP, GIF, or TIFF.`,
+        },
+        { status: 400 }
       );
     }
 
     const width = metadata.width;
     const height = metadata.height;
-    const origExtension = metadata.format || "jpg";
+    const origExtension = detectedFormat === "jpeg" ? "jpg" : detectedFormat;
     const assetId = crypto.randomUUID();
 
     // 4. Save Untouched Master Asset to Protected Vault
@@ -138,8 +149,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       assetId,
+      publicUrl: watermarkedUpload.publicUrl,
       watermarkedUrl: watermarkedUpload.publicUrl,
+      primaryImageUrl: watermarkedUpload.publicUrl,
       protectedS3Key: masterUpload.key,
+      vaultKey: masterUpload.key,
+      masterKey: masterUpload.key,
       width,
       height,
       format: "webp",

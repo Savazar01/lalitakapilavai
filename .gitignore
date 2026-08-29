@@ -32,7 +32,9 @@
 /uploads
 /storage
 /public/uploads
+/public/media/
 /tmp
+
 
 # Local Database persistence
 postgres_data/

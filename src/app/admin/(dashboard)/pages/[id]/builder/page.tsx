@@ -38,6 +38,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
 import { ViewportSwitcher, ViewportMode } from "@/components/builder/viewport-switcher";
 import { StyleInspector, SectionStyle } from "@/components/builder/style-inspector";
 import { TiptapEditor } from "@/components/builder/tiptap-editor";
@@ -892,13 +894,16 @@ export default function VisualPageBuilder() {
         setPage({ ...page, isPublished });
         setSavedSuccess(true);
         setTimeout(() => setSavedSuccess(false), 2500);
+        toast.success("Page layout saved successfully!");
       } else {
-        alert("Failed to save changes");
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to save changes");
       }
     } catch (e) {
       console.error(e);
-      alert("Error saving page");
+      toast.error("Error saving page");
     } finally {
+
       setSaving(false);
     }
   };

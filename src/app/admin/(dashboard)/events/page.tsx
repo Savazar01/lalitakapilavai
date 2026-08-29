@@ -28,6 +28,9 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+
 import {
   Select,
   SelectContent,
@@ -143,6 +146,12 @@ export default function EventsAdminPage() {
 
   // Artwork Linker Modal
   const [linkerModalOpen, setLinkerModalOpen] = React.useState(false);
+
+  // Delete Confirmation State
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [targetDeleteEvent, setTargetDeleteEvent] = React.useState<{ id: string; title: string } | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
+
 
   const reloadEvents = React.useCallback(() => {
     Promise.all([
@@ -301,8 +310,12 @@ export default function EventsAdminPage() {
           body: JSON.stringify(payload),
         });
         if (res.ok) {
+          toast.success("Event updated successfully!");
           setDialogOpen(false);
           reloadEvents();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          toast.error(err.error || "Failed to update event");
         }
       } else {
         const res = await fetch("/api/admin/events", {
@@ -311,30 +324,49 @@ export default function EventsAdminPage() {
           body: JSON.stringify(payload),
         });
         if (res.ok) {
+          toast.success("Event scheduled successfully!");
           setDialogOpen(false);
           reloadEvents();
         } else {
-          const err = await res.json();
-          alert(err.error || "Failed to create event");
+          const err = await res.json().catch(() => ({}));
+          toast.error(err.error || "Failed to create event");
         }
       }
     } catch (e) {
       console.error(e);
-      alert("Error saving event");
+      toast.error("Error saving event");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id: string, evTitle: string) => {
-    if (!confirm(`Delete event "${evTitle}"?`)) return;
+  const handleDeleteClick = (id: string, evTitle: string) => {
+    setTargetDeleteEvent({ id, title: evTitle });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!targetDeleteEvent) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/events/${id}`, { method: "DELETE" });
-      if (res.ok) reloadEvents();
+      const res = await fetch(`/api/admin/events/${targetDeleteEvent.id}`, { method: "DELETE" });
+      if (res.ok) {
+        toast.success(`Deleted event "${targetDeleteEvent.title}" successfully`);
+        setDeleteDialogOpen(false);
+        setTargetDeleteEvent(null);
+        reloadEvents();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to delete event");
+      }
     } catch (e) {
       console.error(e);
+      toast.error("Error deleting event");
+    } finally {
+      setDeleting(false);
     }
   };
+
 
   const handleViewAttendees = async (ev: EventItem) => {
     setAttendeeEventTitle(ev.title);
@@ -491,12 +523,13 @@ export default function EventsAdminPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(ev.id, ev.title)}
+                    onClick={() => handleDeleteClick(ev.id, ev.title)}
                     className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
                     title="Delete Event"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
+
                 </div>
               </div>
             </Card>
@@ -897,6 +930,23 @@ export default function EventsAdminPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Event Record"
+        description={
+          targetDeleteEvent
+            ? `Are you sure you want to delete the event "${targetDeleteEvent.title}"? This will also remove its associated attendee registrations. This action cannot be undone.`
+            : "Are you sure you want to delete this event?"
+        }
+        confirmText="Delete Event"
+        isDestructive={true}
+        isLoading={deleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
+

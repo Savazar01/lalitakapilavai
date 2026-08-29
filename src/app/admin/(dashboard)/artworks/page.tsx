@@ -18,7 +18,12 @@ import {
   Loader2,
   Download,
   FolderTree,
+  RefreshCw,
+  X,
+  CheckCircle2,
 } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -119,6 +124,18 @@ export default function ArtworksAdminPage() {
   const [qrArtworkTitle, setQrArtworkTitle] = React.useState("");
   const [qrTargetSlug, setQrTargetSlug] = React.useState("");
 
+  // Delete Confirmation Modal State
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [targetDeleteArtwork, setTargetDeleteArtwork] = React.useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
+
+  // File Upload Ref & Drag State
+  const [isDragOver, setIsDragOver] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   // Category Manager Modal
   const [categoryModalOpen, setCategoryModalOpen] = React.useState(false);
   const [newCatName, setNewCatName] = React.useState("");
@@ -207,10 +224,21 @@ export default function ArtworksAdminPage() {
     setDialogOpen(true);
   };
 
-  // Handle File Upload to Sharp Pipeline
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Process Upload with format validation and defensive key resolution
+  const processUpload = async (file: File) => {
+    const validMimes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "image/tiff",
+    ];
+    const hasValidExt = /\.(jpe?g|png|webp|gif|tiff?)$/i.test(file.name);
+    if (!validMimes.includes(file.type.toLowerCase()) && !hasValidExt) {
+      toast.error("Unsupported format. Please upload JPEG, PNG, WebP, GIF, or TIFF.");
+      return;
+    }
 
     setUploadingImage(true);
     const formData = new FormData();
@@ -224,19 +252,53 @@ export default function ArtworksAdminPage() {
 
       if (res.ok) {
         const data = await res.json();
-        setPrimaryImageUrl(data.publicUrl);
-        setWatermarkedWebpUrl(data.publicUrl);
-        setProtectedS3Key(data.vaultKey);
+        const uploadedUrl =
+          data.watermarkedUrl || data.publicUrl || data.primaryImageUrl;
+        const s3Key =
+          data.protectedS3Key || data.vaultKey || data.masterKey || "";
+
+        if (!uploadedUrl) {
+          toast.error("Upload succeeded but image URL was not returned.");
+          return;
+        }
+
+        setPrimaryImageUrl(uploadedUrl);
+        setWatermarkedWebpUrl(uploadedUrl);
+        setProtectedS3Key(s3Key);
+        toast.success("Artwork image uploaded & watermarked successfully!");
       } else {
-        const err = await res.json();
-        alert(err.error || "Upload failed");
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Upload failed");
       }
     } catch (err) {
-      console.error(err);
-      alert("Error uploading image");
+      console.error("Upload exception:", err);
+      toast.error("Error uploading image to server");
     } finally {
       setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processUpload(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processUpload(file);
+  };
+
+  const handleRemoveImage = () => {
+    setPrimaryImageUrl("");
+    setWatermarkedWebpUrl("");
+    setProtectedS3Key("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    toast.info("Image removed from draft");
   };
 
   // Auto-slug
@@ -256,7 +318,7 @@ export default function ArtworksAdminPage() {
   const handleSaveArtwork = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!primaryImageUrl) {
-      alert("Please upload a primary image for the artwork.");
+      toast.error("Please upload a primary image for the artwork.");
       return;
     }
 
@@ -276,7 +338,7 @@ export default function ArtworksAdminPage() {
       isAvailable,
       isFeatured,
       primaryImageUrl,
-      watermarkedWebpUrl,
+      watermarkedWebpUrl: watermarkedWebpUrl || primaryImageUrl,
       protectedS3Key,
     };
 
@@ -288,8 +350,12 @@ export default function ArtworksAdminPage() {
           body: JSON.stringify(payload),
         });
         if (res.ok) {
+          toast.success("Masterwork updated successfully!");
           setDialogOpen(false);
           reloadData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          toast.error(err.error || "Failed to update artwork");
         }
       } else {
         const res = await fetch("/api/admin/artworks", {
@@ -298,29 +364,49 @@ export default function ArtworksAdminPage() {
           body: JSON.stringify(payload),
         });
         if (res.ok) {
+          toast.success("Masterwork cataloged successfully!");
           setDialogOpen(false);
           reloadData();
         } else {
-          const err = await res.json();
-          alert(err.error || "Failed to create artwork");
+          const err = await res.json().catch(() => ({}));
+          toast.error(err.error || "Failed to create artwork");
         }
       }
     } catch (e) {
       console.error(e);
-      alert("Error saving artwork");
+      toast.error("Error saving artwork");
     } finally {
       setSaving(false);
     }
   };
 
-  // Delete Artwork
-  const handleDeleteArtwork = async (id: string, artTitle: string) => {
-    if (!confirm(`Are you sure you want to delete "${artTitle}"?`)) return;
+  // Delete Artwork Handlers (Confirm Dialog)
+  const handleDeleteArtworkClick = (id: string, artTitle: string) => {
+    setTargetDeleteArtwork({ id, title: artTitle });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!targetDeleteArtwork) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/artworks/${id}`, { method: "DELETE" });
-      if (res.ok) reloadData();
+      const res = await fetch(`/api/admin/artworks/${targetDeleteArtwork.id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        toast.success(`Deleted "${targetDeleteArtwork.title}" successfully`);
+        setDeleteDialogOpen(false);
+        setTargetDeleteArtwork(null);
+        reloadData();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to delete artwork");
+      }
     } catch (e) {
       console.error(e);
+      toast.error("Error deleting artwork");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -345,14 +431,20 @@ export default function ArtworksAdminPage() {
       if (res.ok) {
         setNewCatName("");
         setNewCatSlug("");
+        toast.success("Category created successfully!");
         reloadData();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to create category");
       }
     } catch (e) {
       console.error(e);
+      toast.error("Error creating category");
     } finally {
       setCreatingCat(false);
     }
   };
+
 
   // Filter artworks
   const filteredArtworks = artworks.filter((art) => {
@@ -586,7 +678,7 @@ export default function ArtworksAdminPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteArtwork(art.id, art.title)}
+                      onClick={() => handleDeleteArtworkClick(art.id, art.title)}
                       className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
                       title="Delete Artwork"
                     >
@@ -671,7 +763,7 @@ export default function ArtworksAdminPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteArtwork(art.id, art.title)}
+                        onClick={() => handleDeleteArtworkClick(art.id, art.title)}
                         className="h-7 w-7 p-0 text-destructive"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -701,39 +793,119 @@ export default function ArtworksAdminPage() {
             <div className="space-y-4 py-4 text-left">
               {/* Image Upload Area */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-foreground">
-                  Masterwork High-Res Image (Watermarked Automatically)
-                </label>
-                <div className="flex items-center gap-4">
-                  <div className="w-24 h-28 rounded-lg border-2 border-dashed border-border bg-muted/30 relative flex items-center justify-center overflow-hidden shrink-0">
-                    {uploadingImage ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                    ) : primaryImageUrl ? (
-                      <Image
-                        src={primaryImageUrl}
-                        alt="Preview"
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <Upload className="w-5 h-5 text-muted-foreground" />
-                    )}
-                  </div>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                    Masterwork Image (JPEG, PNG, WebP, GIF, TIFF)
+                  </label>
+                  {primaryImageUrl && (
+                    <span className="text-[11px] font-mono text-primary flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-[#D4AF37]" />
+                      Watermarked Derivative Ready
+                    </span>
+                  )}
+                </div>
 
-                  <div className="flex-1 space-y-1.5">
-                    <input
-                      type="file"
-                      id="artworkImage"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="text-xs file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30 cursor-pointer"
-                    />
-                    <p className="text-[11px] text-muted-foreground">
-                      Original master is secured in private vault. Public WebP is stamped with &quot;© Lalita Kapilavai&quot;.
-                    </p>
-                  </div>
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(true);
+                  }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={handleDrop}
+                  className={`rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
+                    isDragOver
+                      ? "border-primary bg-primary/10"
+                      : primaryImageUrl
+                      ? "border-border bg-card/60"
+                      : "border-border/80 bg-muted/20 hover:border-primary/50"
+                  }`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    id="artworkImage"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+
+                  {uploadingImage ? (
+                    <div className="py-6 flex flex-col items-center justify-center gap-2 text-center">
+                      <Loader2 className="w-7 h-7 animate-spin text-primary" />
+                      <p className="text-xs font-medium text-foreground">
+                        Processing image via Sharp &amp; applying watermark...
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Generating public WebP derivative and securing master asset in vault.
+                      </p>
+                    </div>
+                  ) : primaryImageUrl ? (
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <div className="w-28 h-32 rounded-md border border-border overflow-hidden relative shrink-0 bg-black/40">
+                        <Image
+                          src={primaryImageUrl}
+                          alt="Artwork Preview"
+                          fill
+                          className="object-contain"
+                          sizes="112px"
+                        />
+                      </div>
+
+                      <div className="flex-1 space-y-2 text-left">
+                        <div className="space-y-0.5">
+                          <p className="text-xs font-semibold text-foreground">
+                            Artwork Asset Loaded
+                          </p>
+                          <p className="text-[11px] text-muted-foreground break-all line-clamp-2">
+                            {watermarkedWebpUrl || primaryImageUrl}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-1">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="text-xs h-7 gap-1"
+                          >
+                            <RefreshCw className="w-3 h-3" />
+                            Replace Image
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleRemoveImage}
+                            className="text-xs h-7 gap-1 text-destructive hover:text-destructive"
+                          >
+                            <X className="w-3 h-3" />
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="cursor-pointer py-6 flex flex-col items-center justify-center gap-2 text-center"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <Upload className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-foreground">
+                          Click to upload or drag and drop artwork
+                        </p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          Supports high-resolution JPEG, PNG, WebP, GIF, or TIFF
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
+
 
               {/* Title & Slug */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1024,6 +1196,25 @@ export default function ArtworksAdminPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Masterwork Record"
+        description={
+          targetDeleteArtwork
+            ? `Are you sure you want to delete "${targetDeleteArtwork.title}"? This will permanently remove the artwork, its provenance records, and exhibition QR codes. This action cannot be undone.`
+            : "Are you sure you want to delete this artwork?"
+        }
+        confirmText="Delete Masterwork"
+        isDestructive={true}
+        isLoading={deleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
+
