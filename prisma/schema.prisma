@@ -328,6 +328,7 @@ enum EventType {
   ONLINE_CLASSROOM
   EXHIBITION
   CONCERT
+  OTHER
 }
 
 model Event {
