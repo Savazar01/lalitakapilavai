@@ -1,118 +1,270 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import prisma from "@/lib/prisma";
+import { Navbar } from "@/components/public/navbar";
+import { Footer } from "@/components/public/footer";
+import { AnimatedSection } from "@/components/public/animated-section";
+import { TiptapRenderer } from "@/components/public/tiptap-renderer";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Palette, Music, BookOpen, ArrowRight } from "lucide-react";
+
 export const dynamic = "force-dynamic";
 
-export default function Home() {
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const page = await prisma.page.findFirst({
+      where: {
+        OR: [{ slug: "home" }, { slug: "index" }],
+        isPublished: true,
+      },
+    });
+
+    if (page) {
+      return {
+        title: page.title.includes("Lalita Kapilavai")
+          ? page.title
+          : `${page.title} — Lalita Kapilavai`,
+        description:
+          page.metaDescription ||
+          "Sacred Tanjore 22k gold leaf paintings, Mysore classical fine art, and Carnatic music archives.",
+      };
+    }
+  } catch (error) {
+    console.warn("Could not query metadata for home page:", error);
+  }
+
+  return {
+    title: "Lalita Kapilavai — Sacred Art & Classical Carnatic Music",
+    description:
+      "Living digital archive of traditional Indian Tanjore paintings with 22k gold foil, Mysore classical fine art, and Carnatic classical vocal recitals.",
+  };
+}
+
+export default async function HomePage() {
+  let homePage = null;
+
+  try {
+    homePage = await prisma.page.findFirst({
+      where: {
+        OR: [{ slug: "home" }, { slug: "index" }],
+        isPublished: true,
+      },
+      include: {
+        sections: {
+          orderBy: { orderIndex: "asc" },
+          include: {
+            subSections: {
+              orderBy: { orderIndex: "asc" },
+            },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.warn("Database query for home page failed or tables initializing:", error);
+  }
+
+  // 1. If an admin-published dynamic page exists, render via visual builder engine
+  if (homePage && homePage.sections.length > 0) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+        <Navbar />
+
+        <main className="flex-1">
+          {homePage.sections.map((section) => {
+            return (
+              <AnimatedSection
+                key={section.id}
+                className={`w-full relative ${section.customCssClass || ""}`}
+                style={{
+                  backgroundColor: section.backgroundColor || undefined,
+                  paddingTop: "48px",
+                  paddingBottom: "48px",
+                }}
+              >
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="grid grid-cols-12 gap-6 items-start">
+                    {section.subSections.map((col, colIdx) => {
+                      const colSpanClass =
+                        col.gridSpan === 12
+                          ? "col-span-12"
+                          : col.gridSpan === 8
+                          ? "col-span-12 md:col-span-8"
+                          : col.gridSpan === 7
+                          ? "col-span-12 md:col-span-7"
+                          : col.gridSpan === 6
+                          ? "col-span-12 md:col-span-6"
+                          : col.gridSpan === 5
+                          ? "col-span-12 md:col-span-5"
+                          : col.gridSpan === 4
+                          ? "col-span-12 md:col-span-4"
+                          : col.gridSpan === 3
+                          ? "col-span-12 md:col-span-3"
+                          : "col-span-12";
+
+                      const colObj = col.content as Record<string, unknown>;
+                      const colStyle = (colObj?._style || {}) as {
+                        borderColor?: string;
+                        borderWidth?: number;
+                        borderStyle?: string;
+                        borderRadius?: string;
+                        boxShadow?: string;
+                        ornamentalFrame?: boolean;
+                      };
+
+                      const borderStyleObj: React.CSSProperties = {
+                        borderColor:
+                          colStyle.borderColor && colStyle.borderColor !== "transparent"
+                            ? colStyle.borderColor
+                            : undefined,
+                        borderWidth: colStyle.borderWidth ? `${colStyle.borderWidth}px` : undefined,
+                        borderStyle: (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
+                      };
+
+                      let radiusClass = "";
+                      if (colStyle.borderRadius === "rounded-md") radiusClass = "rounded-md";
+                      if (colStyle.borderRadius === "rounded-2xl") radiusClass = "rounded-2xl";
+                      if (colStyle.borderRadius === "rounded-t-full")
+                        radiusClass = "rounded-t-full overflow-hidden";
+
+                      let glowClass = "";
+                      if (colStyle.boxShadow === "gold-glow")
+                        glowClass = "shadow-[0_0_25px_rgba(212,175,55,0.25)]";
+                      if (colStyle.boxShadow === "soft") glowClass = "shadow-lg";
+
+                      const hasCustomStyling = !!(
+                        colStyle.borderColor ||
+                        colStyle.borderWidth ||
+                        colStyle.borderRadius ||
+                        colStyle.boxShadow ||
+                        colStyle.ornamentalFrame
+                      );
+
+                      return (
+                        <div
+                          key={col.id || `col-${colIdx}`}
+                          className={`${colSpanClass} w-full relative ${radiusClass} ${glowClass} ${
+                            hasCustomStyling ? "p-6" : ""
+                          }`}
+                          style={borderStyleObj}
+                        >
+                          {colStyle.ornamentalFrame && (
+                            <div className="absolute inset-0 border-2 border-primary/20 pointer-events-none rounded-lg -m-1" />
+                          )}
+                          <TiptapRenderer content={col.content as Record<string, unknown>} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </AnimatedSection>
+            );
+          })}
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
+
+  // 2. Curated Luxury Default Home Page Fallback
   return (
-    <div className="min-h-screen flex flex-col items-center justify-between p-6 sm:p-12 lg:p-20 selection:bg-primary selection:text-stone-950">
-      {/* Decorative Gold Header Bar */}
-      <header className="w-full max-w-6xl flex items-center justify-between py-6 border-b border-border">
-        <div className="flex flex-col">
-          <span className="text-xs uppercase tracking-[0.3em] text-primary font-semibold">
-            Sacred Art & Classical Carnatic Music
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold tracking-wide mt-1 text-foreground">
-            Lalita Kapilavai
-          </h1>
-        </div>
-        <div className="hidden sm:flex items-center gap-3 text-xs tracking-wider">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-            Next.js 16 • React 19 • pgvector
-          </span>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-stone-950">
+      <Navbar />
 
-      {/* Main Hero & Architectural Showcase */}
-      <main className="w-full max-w-6xl my-auto py-12 flex flex-col lg:flex-row items-center gap-12">
-        <div className="flex-1 flex flex-col gap-6 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-medium w-fit border border-border">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Infrastructure Initialized & Online
-          </div>
-
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight tracking-tight">
-            Preserving Sacred Heritage Through{" "}
-            <span className="text-primary underline decoration-primary/40 underline-offset-8">
-              Gold Leaf & Ragas
-            </span>
-          </h2>
-
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-            A digital sanctum honoring traditional Indian Tanjore paintings with 22k gold foil, 
-            Mysore classical styles, and sacred Carnatic vocal archives—linked via multi-modal 
-            vector embeddings and relational knowledge graphs.
-          </p>
-
-          {/* Core Feature Matrix */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-            <div className="p-4 rounded-lg bg-card border border-border/80 shadow-sm hover:border-primary/50 transition-colors">
-              <h3 className="font-serif font-semibold text-foreground text-sm">Tanjore & Mysore Art</h3>
-              <p className="text-xs text-muted-foreground mt-1 leading-normal">
-                High-resolution protected catalog with dynamic watermarking.
-              </p>
+      <main className="flex-1">
+        {/* Luxury Hero Banner */}
+        <section className="relative overflow-hidden py-24 sm:py-32 border-b border-border/60 bg-gradient-to-b from-card/80 to-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-widest text-primary mb-6">
+              <Sparkles className="w-3.5 h-3.5" />
+              Sacred Heritage & Living Fine Art Archive
             </div>
-            <div className="p-4 rounded-lg bg-card border border-border/80 shadow-sm hover:border-primary/50 transition-colors">
-              <h3 className="font-serif font-semibold text-foreground text-sm">Carnatic Recitals</h3>
-              <p className="text-xs text-muted-foreground mt-1 leading-normal">
-                Synesthetic audio player pairing visual motifs with melodic ragas.
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-card border border-border/80 shadow-sm hover:border-primary/50 transition-colors">
-              <h3 className="font-serif font-semibold text-foreground text-sm">Graphify & pgvector</h3>
-              <p className="text-xs text-muted-foreground mt-1 leading-normal">
-                PostgreSQL 17 vector similarity for multi-modal exploration.
-              </p>
+
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-bold tracking-tight text-foreground max-w-4xl mx-auto leading-tight">
+              Preserving Sacred Heritage Through{" "}
+              <span className="text-primary underline decoration-primary/40 underline-offset-8">
+                22k Gold Foil & Ragas
+              </span>
+            </h1>
+
+            <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
+              Explore authentic Thanjavur gold embossed paintings, Mysore traditional devotional art, 
+              and classical Carnatic music recitals by Lalita Kapilavai.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <Button asChild size="lg" className="font-serif">
+                <Link href="/gallery" className="flex items-center gap-2">
+                  Explore Art Catalog
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="font-serif border-border hover:border-primary">
+                <Link href="/blogs">Read Sacred Chronicle</Link>
+              </Button>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Traditional Visual Framing Card */}
-        <div className="w-full max-w-md lg:max-w-sm rounded-xl p-6 bg-card border-2 border-primary/40 shadow-lg relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
-          <span className="text-[11px] uppercase tracking-widest text-primary font-semibold">
-            Digital Archive Status
-          </span>
-          <h4 className="text-lg font-serif font-bold text-foreground mt-1">
-            System & Database Matrix
-          </h4>
-          <ul className="mt-4 space-y-2.5 text-xs text-muted-foreground">
-            <li className="flex justify-between py-1 border-b border-border/50">
-              <span>Framework:</span>
-              <span className="font-mono text-foreground">Next.js 16.3 (App Router)</span>
-            </li>
-            <li className="flex justify-between py-1 border-b border-border/50">
-              <span>UI Runtime:</span>
-              <span className="font-mono text-foreground">React 19.2</span>
-            </li>
-            <li className="flex justify-between py-1 border-b border-border/50">
-              <span>Styling:</span>
-              <span className="font-mono text-foreground">Tailwind CSS v4</span>
-            </li>
-            <li className="flex justify-between py-1 border-b border-border/50">
-              <span>Database:</span>
-              <span className="font-mono text-foreground">PostgreSQL 17 + pgvector</span>
-            </li>
-            <li className="flex justify-between py-1 border-b border-border/50">
-              <span>Containerization:</span>
-              <span className="font-mono text-foreground">Multi-stage Debian Bookworm</span>
-            </li>
-            <li className="flex justify-between py-1">
-              <span>Deployment:</span>
-              <span className="font-mono text-foreground">Coolify Automated VPS</span>
-            </li>
-          </ul>
-        </div>
+        {/* Feature Highlights Showcase */}
+        <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-8 rounded-xl bg-card border border-border/80 shadow-sm hover:border-primary/50 transition-colors flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-5">
+                  <Palette className="w-6 h-6" />
+                </div>
+                <h2 className="text-xl font-serif font-semibold text-foreground">
+                  Tanjore & Mysore Fine Art
+                </h2>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                  Authentic 22-carat gold foil relief work, semi-precious Jaipur gemstones, and hand-crafted teakwood frames.
+                </p>
+              </div>
+              <Link href="/gallery" className="mt-6 text-sm font-semibold text-primary flex items-center gap-1 hover:underline">
+                View Gallery <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="p-8 rounded-xl bg-card border border-border/80 shadow-sm hover:border-primary/50 transition-colors flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-5">
+                  <Music className="w-6 h-6" />
+                </div>
+                <h2 className="text-xl font-serif font-semibold text-foreground">
+                  Carnatic Vocal Recitals
+                </h2>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                  Devotional synesthesia linking traditional iconography to ragas composed by Tyagaraja, Dikshitar, and Syama Sastri.
+                </p>
+              </div>
+              <Link href="/events" className="mt-6 text-sm font-semibold text-primary flex items-center gap-1 hover:underline">
+                Upcoming Recitals <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="p-8 rounded-xl bg-card border border-border/80 shadow-sm hover:border-primary/50 transition-colors flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-5">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <h2 className="text-xl font-serif font-semibold text-foreground">
+                  Sacred Chronicle
+                </h2>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                  Authoritative essays exploring traditional gesso preparation, iconometric talamana, and spiritual symbolism.
+                </p>
+              </div>
+              <Link href="/blogs" className="mt-6 text-sm font-semibold text-primary flex items-center gap-1 hover:underline">
+                Read Articles <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full max-w-6xl py-6 border-t border-border flex flex-col sm:flex-row items-center justify-between text-xs text-muted-foreground gap-4">
-        <div>
-          © {new Date().getFullYear()} Lalita Kapilavai. All rights reserved.
-        </div>
-        <div className="flex items-center gap-6">
-          <span>Tanjore & Mysore Traditional Art</span>
-          <span>•</span>
-          <span>Carnatic Vocal Archive</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

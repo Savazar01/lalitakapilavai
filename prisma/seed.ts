@@ -37,7 +37,29 @@ async function main() {
     });
     console.log(`✅ Provisioned new Superadmin account: ${adminEmail}`);
   } else {
-    console.log(`ℹ️ Superadmin (${adminEmail}) already exists. Preserving existing account and credentials.`);
+    // If account record is missing or password was supplied via env, synchronize it
+    const existingAccount = await prisma.account.findFirst({
+      where: { userId: superadmin.id, providerId: "credential" },
+    });
+    const hashedPassword = await hashPassword(adminPassword);
+    if (!existingAccount) {
+      await prisma.account.create({
+        data: {
+          userId: superadmin.id,
+          accountId: superadmin.id,
+          providerId: "credential",
+          issuer: "local:credential",
+          password: hashedPassword,
+        },
+      });
+      console.log(`✅ Linked credential account for existing Superadmin: ${adminEmail}`);
+    } else {
+      await prisma.account.update({
+        where: { id: existingAccount.id },
+        data: { password: hashedPassword },
+      });
+      console.log(`🔑 Synchronized Superadmin credentials for: ${adminEmail}`);
+    }
   }
   console.log(`🔑 Superadmin Status -> Email: ${adminEmail}`);
 
@@ -218,6 +240,152 @@ async function main() {
     });
 
     console.log("✅ Provisioned Hierarchical Navigation Menu Tree");
+  }
+
+  // 5. Provision Default Published "Home" Page
+  const homePage = await prisma.page.findUnique({
+    where: { slug: "home" },
+  });
+
+  if (!homePage) {
+    const createdPage = await prisma.page.create({
+      data: {
+        title: "Sacred Art & Classical Carnatic Music",
+        slug: "home",
+        metaDescription:
+          "Living digital archive of traditional Indian Tanjore paintings with 22k gold leaf, Mysore classical fine art, and Carnatic classical vocal recitals by Lalita Kapilavai.",
+        isPublished: true,
+        publishedAt: new Date(),
+        sections: {
+          create: [
+            {
+              title: "Hero Section",
+              orderIndex: 1,
+              gridSpan: 12,
+              subSections: {
+                create: [
+                  {
+                    title: "Sanctum Welcome",
+                    orderIndex: 1,
+                    gridSpan: 12,
+                    content: {
+                      type: "doc",
+                      content: [
+                        {
+                          type: "heading",
+                          attrs: { level: 1, textAlign: "center" },
+                          content: [
+                            {
+                              type: "text",
+                              text: "Preserving Sacred Heritage Through Gold Leaf & Ragas",
+                              marks: [{ type: "bold" }],
+                            },
+                          ],
+                        },
+                        {
+                          type: "paragraph",
+                          attrs: { textAlign: "center" },
+                          content: [
+                            {
+                              type: "text",
+                              text: "A digital sanctum honoring traditional Indian Tanjore paintings with 22k gold foil, Mysore classical styles, and sacred Carnatic vocal archives—linked via multi-modal vector embeddings and relational knowledge graphs.",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              title: "Highlights Section",
+              orderIndex: 2,
+              gridSpan: 12,
+              subSections: {
+                create: [
+                  {
+                    title: "Tanjore & Mysore Art",
+                    orderIndex: 1,
+                    gridSpan: 4,
+                    content: {
+                      type: "doc",
+                      content: [
+                        {
+                          type: "heading",
+                          attrs: { level: 3 },
+                          content: [{ type: "text", text: "Tanjore & Mysore Art", marks: [{ type: "bold" }] }],
+                        },
+                        {
+                          type: "paragraph",
+                          content: [
+                            {
+                              type: "text",
+                              text: "High-resolution protected catalog of traditional 22k gold foil embossments, Jaipur gemstones, and teakwood framing.",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                  {
+                    title: "Carnatic Recitals",
+                    orderIndex: 2,
+                    gridSpan: 4,
+                    content: {
+                      type: "doc",
+                      content: [
+                        {
+                          type: "heading",
+                          attrs: { level: 3 },
+                          content: [{ type: "text", text: "Carnatic Recitals", marks: [{ type: "bold" }] }],
+                        },
+                        {
+                          type: "paragraph",
+                          content: [
+                            {
+                              type: "text",
+                              text: "Synesthetic audio player pairing traditional visual motifs with devotional melodic ragas across classical talas.",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                  {
+                    title: "Sacred Chronicle",
+                    orderIndex: 3,
+                    gridSpan: 4,
+                    content: {
+                      type: "doc",
+                      content: [
+                        {
+                          type: "heading",
+                          attrs: { level: 3 },
+                          content: [{ type: "text", text: "Sacred Chronicle", marks: [{ type: "bold" }] }],
+                        },
+                        {
+                          type: "paragraph",
+                          content: [
+                            {
+                              type: "text",
+                              text: "Curated research articles on Tanjore gesso preparation, iconometric talamana, and Carnatic musical philosophy.",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    });
+    console.log(`✅ Provisioned default published Home Page (${createdPage.slug})`);
+  } else {
+    console.log("ℹ️ Default Home Page already exists");
   }
 
   console.log("🌿 Database seed completed successfully!");

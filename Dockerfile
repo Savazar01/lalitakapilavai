@@ -3,6 +3,7 @@
 
 FROM node:22-bookworm-slim AS base
 WORKDIR /app
+RUN npm install -g npm@latest
 
 # Stage 1: Install dependencies
 FROM base AS deps
@@ -80,14 +81,8 @@ RUN mkdir -p .next && chown -R nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma CLI and tsx runtime dependencies from deps for automated entrypoint lifecycle
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/tsx ./node_modules/tsx
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/esbuild ./node_modules/esbuild
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@esbuild ./node_modules/@esbuild
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/get-tsconfig ./node_modules/get-tsconfig
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
+# Copy full node_modules from deps for automated entrypoint migrations and seeding
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Copy automated container lifecycle entrypoint hook
 COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
