@@ -7,9 +7,22 @@ import {
   LayoutGrid,
   Maximize,
   Sliders,
+  Image as ImageIcon,
+  Video,
+  Music,
+  Sparkles,
+  UploadCloud,
+  Heart,
+  Sun,
+  Flame,
+  Crown,
+  BookOpen,
+  Award,
+  Compass,
+  Shield,
+  Volume2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -29,6 +42,18 @@ export interface SectionStyle {
   paddingTop?: number;
   paddingBottom?: number;
   gridSpan?: number;
+  // Rich Column Media Block
+  mediaType?: "NONE" | "IMAGE" | "VIDEO" | "ICON" | "AUDIO_PLAYER";
+  mediaUrl?: string;
+  mediaAlt?: string;
+  mediaAspectRatio?: string;
+  mediaBorderRadius?: string;
+  iconName?: string;
+  iconSize?: number;
+  iconColor?: string;
+  audioTitle?: string;
+  audioUrl?: string;
+  videoUrl?: string;
 }
 
 export interface StyleInspectorProps {
@@ -56,16 +81,56 @@ const fontFamilies = [
   { label: "Plus Jakarta Sans (Modern Editorial)", value: "'Plus Jakarta Sans', sans-serif" },
 ];
 
+const availableIcons = [
+  { label: "Sparkles (Sacred Aura)", value: "Sparkles", Icon: Sparkles },
+  { label: "Music (Carnatic Swaras)", value: "Music", Icon: Music },
+  { label: "Palette (Traditional Arts)", value: "Palette", Icon: Paintbrush },
+  { label: "Sun (Surya Bhagavan)", value: "Sun", Icon: Sun },
+  { label: "Flame (Deepam)", value: "Flame", Icon: Flame },
+  { label: "Crown (Divine Regalia)", value: "Crown", Icon: Crown },
+  { label: "Book Open (Shastras & Vedas)", value: "BookOpen", Icon: BookOpen },
+  { label: "Award (Masterwork Provenance)", value: "Award", Icon: Award },
+  { label: "Shield (Watermarked Vault)", value: "Shield", Icon: Shield },
+  { label: "Heart (Devotion & Bhakti)", value: "Heart", Icon: Heart },
+  { label: "Compass (Orientation)", value: "Compass", Icon: Compass },
+];
+
 export function StyleInspector({
   style,
   onChange,
   isSubSection = false,
 }: StyleInspectorProps) {
+  const [uploadingImage, setUploadingImage] = React.useState(false);
+
   const update = (key: keyof SectionStyle, value: unknown) => {
     onChange({
       ...style,
       [key]: value,
     });
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    const body = new FormData();
+    body.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      update("mediaUrl", data.watermarkedUrl || data.rawUrl);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Media upload failed");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   return (
@@ -100,6 +165,223 @@ export function StyleInspector({
         </div>
       )}
 
+      {/* Column Media Block (When in SubSection) */}
+      {isSubSection && (
+        <div className="space-y-3 p-3 rounded-lg bg-muted/40 border border-border">
+          <label className="font-semibold text-foreground uppercase tracking-wider flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <ImageIcon className="w-3.5 h-3.5 text-primary" /> Rich Media Block
+            </span>
+            <span className="text-[10px] text-muted-foreground font-normal">Per Column</span>
+          </label>
+
+          {/* Media Type Selector */}
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground font-medium">Block Type</label>
+            <Select
+              value={style.mediaType || "NONE"}
+              onValueChange={(val) => update("mediaType", val)}
+            >
+              <SelectTrigger className="text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NONE">None (Inline Text Only)</SelectItem>
+                <SelectItem value="IMAGE">Image Showcase</SelectItem>
+                <SelectItem value="VIDEO">Video Embed / Player</SelectItem>
+                <SelectItem value="ICON">Devotional Icon</SelectItem>
+                <SelectItem value="AUDIO_PLAYER">Classical Audio Snippet</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* IMAGE Block Controls */}
+          {style.mediaType === "IMAGE" && (
+            <div className="space-y-2.5 pt-1">
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium flex items-center justify-between">
+                  <span>Image URL</span>
+                  <label className="cursor-pointer text-[10px] text-primary hover:underline flex items-center gap-1">
+                    <UploadCloud className="w-3 h-3" />
+                    {uploadingImage ? "Uploading..." : "Upload File"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                  </label>
+                </label>
+                <Input
+                  value={style.mediaUrl || ""}
+                  onChange={(e) => update("mediaUrl", e.target.value)}
+                  placeholder="https://..."
+                  className="text-xs font-mono"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium">Aspect Ratio</label>
+                <Select
+                  value={style.mediaAspectRatio || "auto"}
+                  onValueChange={(val) => update("mediaAspectRatio", val)}
+                >
+                  <SelectTrigger className="text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">Original / Auto</SelectItem>
+                    <SelectItem value="1:1">1:1 Square (Miniatures & Deities)</SelectItem>
+                    <SelectItem value="16:9">16:9 Landscape (Gallery Murals)</SelectItem>
+                    <SelectItem value="3:4">3:4 Portrait (Traditional Tanjore)</SelectItem>
+                    <SelectItem value="4:3">4:3 Classic</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium">Border Radius</label>
+                <Select
+                  value={style.mediaBorderRadius || "rounded-lg"}
+                  onValueChange={(val) => update("mediaBorderRadius", val)}
+                >
+                  <SelectTrigger className="text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rounded-none">Sharp / Framed (0px)</SelectItem>
+                    <SelectItem value="rounded-md">Subtle (6px)</SelectItem>
+                    <SelectItem value="rounded-lg">Modern (8px)</SelectItem>
+                    <SelectItem value="rounded-2xl">High Elegance (16px)</SelectItem>
+                    <SelectItem value="rounded-full">Circular (Avatar/Medallion)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium">Alt Text / Accessibility</label>
+                <Input
+                  value={style.mediaAlt || ""}
+                  onChange={(e) => update("mediaAlt", e.target.value)}
+                  placeholder="Artwork description for screen readers..."
+                  className="text-xs"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* VIDEO Block Controls */}
+          {style.mediaType === "VIDEO" && (
+            <div className="space-y-2 pt-1">
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
+                  <Video className="w-3 h-3 text-primary" /> Video URL (MP4, YouTube, Vimeo)
+                </label>
+                <Input
+                  value={style.videoUrl || ""}
+                  onChange={(e) => update("videoUrl", e.target.value)}
+                  placeholder="https://youtube.com/watch?v=... or .mp4"
+                  className="text-xs font-mono"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ICON Block Controls */}
+          {style.mediaType === "ICON" && (
+            <div className="space-y-2.5 pt-1">
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium">Select Icon</label>
+                <Select
+                  value={style.iconName || "Sparkles"}
+                  onValueChange={(val) => update("iconName", val)}
+                >
+                  <SelectTrigger className="text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableIcons.map((ic) => {
+                      const CurrentIcon = ic.Icon;
+                      return (
+                        <SelectItem key={ic.value} value={ic.value}>
+                          <span className="flex items-center gap-2">
+                            <CurrentIcon className="w-3.5 h-3.5 text-primary" />
+                            {ic.label}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>Icon Size</span>
+                  <span className="font-mono text-primary">{style.iconSize || 36}px</span>
+                </div>
+                <Input
+                  type="range"
+                  min={20}
+                  max={72}
+                  step={4}
+                  value={style.iconSize || 36}
+                  onChange={(e) => update("iconSize", parseInt(e.target.value))}
+                  className="cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium">Icon Color</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={style.iconColor || "#D4AF37"}
+                    onChange={(e) => update("iconColor", e.target.value)}
+                    className="w-8 h-8 rounded border border-border cursor-pointer bg-transparent"
+                  />
+                  <Input
+                    value={style.iconColor || "#D4AF37"}
+                    onChange={(e) => update("iconColor", e.target.value)}
+                    className="text-xs font-mono flex-1"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* AUDIO PLAYER Block Controls */}
+          {style.mediaType === "AUDIO_PLAYER" && (
+            <div className="space-y-2 pt-1">
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
+                  <Music className="w-3 h-3 text-primary" /> Recital / Audio Title
+                </label>
+                <Input
+                  value={style.audioTitle || ""}
+                  onChange={(e) => update("audioTitle", e.target.value)}
+                  placeholder="e.g. Endaro Mahanubhavulu (Raga Sri)"
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
+                  <Volume2 className="w-3 h-3 text-primary" /> Audio Stream URL (.mp3 / .wav)
+                </label>
+                <Input
+                  value={style.audioUrl || ""}
+                  onChange={(e) => update("audioUrl", e.target.value)}
+                  placeholder="https://media.lalitakapilavai.com/audio/..."
+                  className="text-xs font-mono"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Background Section */}
       <div className="space-y-3">
         <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -108,164 +390,112 @@ export function StyleInspector({
         </label>
 
         {/* Color Presets */}
-        <div className="grid grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-4 gap-2">
           {colorPresets.map((preset) => (
             <button
               key={preset.hex}
               type="button"
               onClick={() => update("backgroundColor", preset.hex)}
-              className="h-7 rounded border border-border flex items-center justify-center text-[10px] transition-transform hover:scale-105"
-              style={{ backgroundColor: preset.hex }}
-              title={`${preset.name} (${preset.hex})`}
+              className="flex flex-col items-center gap-1 group cursor-pointer"
             >
-              <span className="sr-only">{preset.name}</span>
+              <div
+                className={`w-full h-7 rounded border transition-all ${
+                  style.backgroundColor === preset.hex
+                    ? "ring-2 ring-primary ring-offset-1 border-transparent"
+                    : "border-border/60 hover:scale-105"
+                }`}
+                style={{ backgroundColor: preset.hex }}
+              />
+              <span className="text-[10px] text-muted-foreground truncate w-full text-center group-hover:text-foreground">
+                {preset.name}
+              </span>
             </button>
           ))}
         </div>
 
-        {/* Custom Hex Input */}
-        <div className="flex items-center gap-2">
-          <div
-            className="w-7 h-7 rounded border border-border shrink-0"
-            style={{ backgroundColor: style.backgroundColor || "#FAF7F2" }}
-          />
-          <Input
-            value={style.backgroundColor || ""}
-            onChange={(e) => update("backgroundColor", e.target.value)}
-            placeholder="#FAF7F2 or rgba(...)"
-            className="h-8 font-mono text-xs"
-          />
-        </div>
-
-        {/* Background Image URL */}
-        <div className="space-y-1">
-          <span className="text-[11px] text-muted-foreground">Background Image URL:</span>
-          <Input
-            value={style.backgroundImageUrl || ""}
-            onChange={(e) => update("backgroundImageUrl", e.target.value)}
-            placeholder="https://... or /media/..."
-            className="h-8 text-xs"
-          />
-        </div>
-
-        {style.backgroundImageUrl && (
-          <div className="space-y-1">
-            <div className="flex justify-between text-[11px] text-muted-foreground">
-              <span>Dark Overlay Opacity:</span>
-              <span className="font-mono">{Math.round((style.backgroundOverlayOpacity || 0.4) * 100)}%</span>
-            </div>
+        {/* Custom Hex */}
+        <div className="flex items-center gap-2 pt-1">
+          <label className="text-[11px] text-muted-foreground font-medium">Hex Color:</label>
+          <div className="flex-1 flex items-center gap-1">
+            <input
+              type="color"
+              value={style.backgroundColor || "#FAF7F2"}
+              onChange={(e) => update("backgroundColor", e.target.value)}
+              className="w-7 h-7 rounded border border-border cursor-pointer bg-transparent"
+            />
             <Input
-              type="range"
-              min={0}
-              max={1}
-              step={0.05}
-              value={style.backgroundOverlayOpacity ?? 0.4}
-              onChange={(e) => update("backgroundOverlayOpacity", parseFloat(e.target.value))}
+              value={style.backgroundColor || ""}
+              onChange={(e) => update("backgroundColor", e.target.value)}
+              placeholder="#FFFFFF"
+              className="font-mono text-xs h-7 uppercase"
             />
           </div>
-        )}
+        </div>
       </div>
 
       <Separator />
 
-      {/* Typography Section */}
+      {/* Typography Styling */}
       <div className="space-y-3">
         <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
           <Type className="w-3.5 h-3.5 text-primary" />
           Typography
         </label>
 
-        <div className="space-y-1">
-          <span className="text-[11px] text-muted-foreground">Font Family:</span>
+        <div className="space-y-1.5">
+          <label className="text-[11px] text-muted-foreground font-medium">Font Family</label>
           <Select
             value={style.fontFamily || "font-serif"}
             onValueChange={(val) => update("fontFamily", val)}
           >
-            <SelectTrigger className="h-8 text-xs">
-              <SelectValue placeholder="Select typography" />
+            <SelectTrigger className="text-xs">
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {fontFamilies.map((font) => (
-                <SelectItem key={font.value} value={font.value}>
-                  {font.label}
+              {fontFamilies.map((f) => (
+                <SelectItem key={f.value} value={f.value}>
+                  {f.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-
-        <div className="space-y-1">
-          <span className="text-[11px] text-muted-foreground">Text Color Hex:</span>
-          <div className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded border border-border shrink-0"
-              style={{ backgroundColor: style.textColor || "#1A1A1A" }}
-            />
-            <Input
-              value={style.textColor || ""}
-              onChange={(e) => update("textColor", e.target.value)}
-              placeholder="#1A1A1A"
-              className="h-8 font-mono text-xs"
-            />
-          </div>
-        </div>
       </div>
 
       <Separator />
 
-      {/* Spacing Controls */}
+      {/* Spacing & Padding */}
       <div className="space-y-3">
         <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
           <Maximize className="w-3.5 h-3.5 text-primary" />
           Section Spacing (Padding)
         </label>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <span className="text-[11px] text-muted-foreground">Top (px):</span>
+            <label className="text-[11px] text-muted-foreground">Top (px)</label>
             <Input
               type="number"
               min={0}
               max={240}
+              step={8}
               value={style.paddingTop ?? 64}
               onChange={(e) => update("paddingTop", parseInt(e.target.value) || 0)}
-              className="h-8 font-mono text-xs"
+              className="text-xs font-mono"
             />
           </div>
           <div className="space-y-1">
-            <span className="text-[11px] text-muted-foreground">Bottom (px):</span>
+            <label className="text-[11px] text-muted-foreground">Bottom (px)</label>
             <Input
               type="number"
               min={0}
               max={240}
+              step={8}
               value={style.paddingBottom ?? 64}
               onChange={(e) => update("paddingBottom", parseInt(e.target.value) || 0)}
-              className="h-8 font-mono text-xs"
+              className="text-xs font-mono"
             />
           </div>
-        </div>
-
-        {/* Quick spacing presets */}
-        <div className="flex gap-1">
-          {[
-            { label: "Compact", pt: 32, pb: 32 },
-            { label: "Standard", pt: 64, pb: 64 },
-            { label: "Spacious", pt: 112, pb: 112 },
-          ].map((preset) => (
-            <Button
-              key={preset.label}
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                update("paddingTop", preset.pt);
-                update("paddingBottom", preset.pb);
-              }}
-              className="flex-1 text-[10px] h-7 px-1"
-            >
-              {preset.label}
-            </Button>
-          ))}
         </div>
       </div>
     </aside>

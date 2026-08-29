@@ -101,15 +101,25 @@ model SystemSetting {
   watermarkFontSize Int      @default(32)
 
   // Cloudflare R2 / AWS S3 storage settings
+  storageProvider   String   @default("R2") // R2, S3, CUSTOM
   r2AccountId       String?
   r2BucketName      String?  @default("lalitakapilavai-media")
   r2PublicUrl       String?  @default("https://media.lalitakapilavai.com")
   s3Region          String?  @default("ap-south-1")
   s3BucketName      String?
+  s3Endpoint        String?
+  s3AccessKey       String?
+  s3SecretKey       String?
+  s3PublicUrl       String?
   
+  // Localization defaults
+  defaultCurrency   String   @default("INR")
+  defaultTimezone   String   @default("Asia/Kolkata")
+
   instagramUrl      String?
   youtubeUrl        String?
   facebookUrl       String?
+  pinterestUrl      String?
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -233,6 +243,7 @@ model Artwork {
   hasGoldFoil        Boolean              @default(false)
   goldPurity         String?              // e.g. "22 Carat Jaipur Gold Leaf"
   price              Decimal?             @db.Decimal(12, 2)
+  currency           String               @default("INR")
   isAvailable        Boolean              @default(true)
   isFeatured         Boolean              @default(false)
   primaryImageUrl    String
@@ -349,6 +360,7 @@ model Event {
   posterUrl          String?
   maxCapacity        Int?
   registrationFee    Decimal?            @db.Decimal(10, 2)
+  currency           String              @default("INR")
   isRegistrationOpen Boolean             @default(true)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
@@ -382,8 +394,10 @@ model EventRegistration {
 enum LeadStatus {
   NEW
   CONTACTED
+  IN_DISCUSSION
   QUALIFIED
   CLOSED
+  ARCHIVED
 }
 
 model Lead {

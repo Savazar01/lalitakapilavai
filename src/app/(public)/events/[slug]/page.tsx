@@ -7,10 +7,10 @@ import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { EventRsvpForm } from "@/components/public/event-rsvp-form";
+import { formatLocalizedDateTime } from "@/lib/formatters";
 import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
-  Clock,
   MapPin,
   Sparkles,
   Palette,
@@ -95,32 +95,14 @@ export default async function EventDetailPage({ params }: PageProps) {
 
               {/* Timing & Venue Matrix */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border border-border bg-card/60 text-xs">
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-2.5 sm:col-span-2">
                   <Calendar className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold text-foreground block">Dates</span>
+                    <span className="font-semibold text-foreground block">Event Schedule</span>
                     <span className="text-muted-foreground">
-                      {new Date(event.startDate).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}{" "}
-                      –{" "}
-                      {new Date(event.endDate).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-semibold text-foreground block">Timezone</span>
-                    <span className="text-muted-foreground">
-                      {event.timezone}
+                      {formatLocalizedDateTime(event.startDate, event.timezone)}
+                      {" – "}
+                      {formatLocalizedDateTime(event.endDate, event.timezone)}
                     </span>
                   </div>
                 </div>
@@ -128,9 +110,9 @@ export default async function EventDetailPage({ params }: PageProps) {
                 <div className="sm:col-span-2 flex items-start gap-2.5 pt-2 border-t border-border/40">
                   <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold text-foreground block">Location</span>
+                    <span className="font-semibold text-foreground block">Location & Venue</span>
                     <span className="text-muted-foreground">
-                      {event.venue}, {event.city}
+                      {event.venue}, {event.city} ({event.timezone})
                     </span>
                   </div>
                 </div>
@@ -155,6 +137,7 @@ export default async function EventDetailPage({ params }: PageProps) {
               eventTitle={event.title}
               isRegistrationOpen={event.isRegistrationOpen}
               registrationFee={event.registrationFee ? Number(event.registrationFee) : null}
+              currency={event.currency || "INR"}
               maxCapacity={event.maxCapacity}
             />
 

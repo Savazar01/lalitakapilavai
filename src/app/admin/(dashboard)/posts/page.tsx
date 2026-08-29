@@ -1,0 +1,608 @@
+"use client";
+
+import * as React from "react";
+import {
+  BookOpen,
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  Loader2,
+  UploadCloud,
+  Code2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+interface BlogPostItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featuredImageUrl: string | null;
+  author: string;
+  tags: string[];
+  metaTitle: string | null;
+  metaDescription: string | null;
+  structuredJsonLd: Record<string, unknown> | null;
+  isPublished: boolean;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export default function AdminPostsPage() {
+  const [posts, setPosts] = React.useState<BlogPostItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [search, setSearch] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<"ALL" | "PUBLISHED" | "DRAFT">("ALL");
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [editingPost, setEditingPost] = React.useState<BlogPostItem | null>(null);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [uploadingImage, setUploadingImage] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Form State
+  const [formData, setFormData] = React.useState({
+    title: "",
+    slug: "",
+    excerpt: "",
+    content: "",
+    featuredImageUrl: "",
+    author: "Lalita Kapilavai",
+    tags: "Tanjore Painting, Carnatic Music, Sacred Art",
+    metaTitle: "",
+    metaDescription: "",
+    isPublished: false,
+  });
+
+  const fetchPosts = React.useCallback(() => {
+    const url = new URL("/api/admin/posts", window.location.origin);
+    if (statusFilter !== "ALL") url.searchParams.set("status", statusFilter);
+    if (search.trim()) url.searchParams.set("search", search.trim());
+
+    fetch(url.toString())
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setPosts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load posts:", err);
+        setLoading(false);
+      });
+  }, [statusFilter, search]);
+
+  React.useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handleOpenCreate = () => {
+    setEditingPost(null);
+    setFormData({
+      title: "",
+      slug: "",
+      excerpt: "",
+      content: "",
+      featuredImageUrl: "",
+      author: "Lalita Kapilavai",
+      tags: "Tanjore Art, 22k Gold Foil, Carnatic Melakarta",
+      metaTitle: "",
+      metaDescription: "",
+      isPublished: false,
+    });
+    setError(null);
+    setModalOpen(true);
+  };
+
+  const handleOpenEdit = (post: BlogPostItem) => {
+    setEditingPost(post);
+    setFormData({
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      featuredImageUrl: post.featuredImageUrl || "",
+      author: post.author,
+      tags: post.tags.join(", "),
+      metaTitle: post.metaTitle || "",
+      metaDescription: post.metaDescription || "",
+      isPublished: post.isPublished,
+    });
+    setError(null);
+    setModalOpen(true);
+  };
+
+  const handleAutoSlug = (titleVal: string) => {
+    const slugVal = titleVal
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      title: titleVal,
+      slug: editingPost ? prev.slug : slugVal,
+    }));
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    const body = new FormData();
+    body.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      setFormData((prev) => ({
+        ...prev,
+        featuredImageUrl: data.watermarkedUrl || data.rawUrl,
+      }));
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      const isEdit = !!editingPost;
+      const url = isEdit
+        ? `/api/admin/posts/${editingPost.id}`
+        : "/api/admin/posts";
+      const method = isEdit ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save post");
+
+      setModalOpen(false);
+      fetchPosts();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error saving post");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Delete article "${title}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/posts/${id}`, { method: "DELETE" });
+      if (res.ok) fetchPosts();
+    } catch (err) {
+      console.error("Failed to delete post:", err);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <BookOpen className="w-4 h-4 text-primary" />
+            </div>
+            <h1 className="text-2xl font-serif font-bold text-foreground">
+              Blog & AEO Editorial Desk
+            </h1>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Publish heritage essays, technique guides, and AEO structured data optimized for Perplexity, ChatGPT & Google.
+          </p>
+        </div>
+
+        <Button
+          onClick={handleOpenCreate}
+          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Write Article
+        </Button>
+      </div>
+
+      {/* Filter Tabs & Search */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5">
+          {(["ALL", "PUBLISHED", "DRAFT"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setStatusFilter(tab)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                statusFilter === tab
+                  ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              {tab === "ALL" ? "All Articles" : tab === "PUBLISHED" ? "Published" : "Drafts"}
+            </button>
+          ))}
+        </div>
+
+        <div className="relative w-full md:w-72">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search articles & tags..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 text-xs"
+          />
+        </div>
+      </div>
+
+      {/* Articles Grid */}
+      {loading ? (
+        <div className="h-64 flex flex-col items-center justify-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          <span className="text-xs text-muted-foreground">Loading editorial articles...</span>
+        </div>
+      ) : posts.length === 0 ? (
+        <Card className="border-dashed p-10 text-center">
+          <BookOpen className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+          <p className="text-sm font-semibold text-foreground">No Articles Published</p>
+          <p className="text-xs text-muted-foreground mt-1 mb-4">
+            Publish cultural essays to boost organic discoverability and AI search engine visibility.
+          </p>
+          <Button onClick={handleOpenCreate} size="sm" variant="outline">
+            <Plus className="w-3.5 h-3.5 mr-1" /> Write First Article
+          </Button>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {posts.map((post) => (
+            <Card
+              key={post.id}
+              className="border border-border/80 bg-card hover:border-primary/40 transition-all hover:shadow-md flex flex-col justify-between"
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <Badge
+                    variant={post.isPublished ? "gold" : "outline"}
+                    className="text-[10px] uppercase tracking-wider flex items-center gap-1"
+                  >
+                    {post.isPublished ? (
+                      <>
+                        <CheckCircle2 className="w-2.5 h-2.5" /> Published
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-2.5 h-2.5" /> Draft
+                      </>
+                    )}
+                  </Badge>
+
+                  <Badge variant="outline" className="text-[10px] flex items-center gap-1 text-primary">
+                    <Sparkles className="w-2.5 h-2.5" /> Schema.org AEO
+                  </Badge>
+                </div>
+
+                <CardTitle className="font-serif text-base font-bold text-foreground line-clamp-2">
+                  {post.title}
+                </CardTitle>
+                <CardDescription className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                  {post.excerpt || "No excerpt provided."}
+                </CardDescription>
+
+                {/* Tags */}
+                {post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {post.tags.slice(0, 3).map((tag, i) => (
+                      <span
+                        key={i}
+                        className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </CardHeader>
+
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-between pt-3 border-t border-border/60 text-[11px] text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-primary" />
+                    <span>
+                      {new Date(post.updatedAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleOpenEdit(post)}
+                      className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
+                      title="Edit Article"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(post.id, post.title)}
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                      title="Delete Article"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Editor Modal */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">
+              {editingPost ? "Edit Article" : "Compose Heritage Essay"}
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Craft long-form cultural essays, attach high-res media, and configure generative search (AEO) metadata.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+            {error && (
+              <div className="p-3 text-xs rounded-md bg-destructive/10 border border-destructive/30 text-destructive font-medium">
+                {error}
+              </div>
+            )}
+
+            <Tabs defaultValue="content" className="w-full">
+              <TabsList className="grid grid-cols-3 mb-4">
+                <TabsTrigger value="content" className="text-xs">
+                  Article Body
+                </TabsTrigger>
+                <TabsTrigger value="seo" className="text-xs">
+                  SEO & Generative Engine (AEO)
+                </TabsTrigger>
+                <TabsTrigger value="jsonld" className="text-xs">
+                  <Code2 className="w-3 h-3 mr-1" /> JSON-LD Preview
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Tab 1: Content */}
+              <TabsContent value="content" className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Article Title *</label>
+                  <Input
+                    required
+                    value={formData.title}
+                    onChange={(e) => handleAutoSlug(e.target.value)}
+                    placeholder="e.g. The Sacred Science of 22k Gold Foil in Tanjore Iconography"
+                    className="text-xs font-medium"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Slug (URL) *</label>
+                    <Input
+                      required
+                      value={formData.slug}
+                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                      placeholder="e.g. sacred-science-22k-gold-foil"
+                      className="text-xs font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Author</label>
+                    <Input
+                      value={formData.author}
+                      onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Cover Image */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <span>Cover Image URL</span>
+                    <label className="cursor-pointer text-[11px] text-primary hover:underline flex items-center gap-1">
+                      <UploadCloud className="w-3 h-3" />
+                      {uploadingImage ? "Uploading..." : "Upload via Media Vault"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={uploadingImage}
+                      />
+                    </label>
+                  </label>
+                  <Input
+                    value={formData.featuredImageUrl}
+                    onChange={(e) => setFormData({ ...formData, featuredImageUrl: e.target.value })}
+                    placeholder="https://..."
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Article Summary / Excerpt</label>
+                  <textarea
+                    rows={2}
+                    value={formData.excerpt}
+                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                    placeholder="A brief 1-2 sentence preview for cards and search snippets..."
+                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Full Content (Markdown / HTML)</label>
+                  <textarea
+                    rows={8}
+                    required
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    placeholder="Write your article body..."
+                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm font-mono focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Tags (Comma-separated)</label>
+                  <Input
+                    value={formData.tags}
+                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                    placeholder="Tanjore, Gold Leaf, Mysore, Carnatic Ragas"
+                    className="text-xs"
+                  />
+                </div>
+              </TabsContent>
+
+              {/* Tab 2: SEO & AEO */}
+              <TabsContent value="seo" className="space-y-4">
+                <div className="p-3 rounded-md bg-primary/10 border border-primary/20 text-xs text-foreground/80 space-y-1">
+                  <span className="font-bold flex items-center gap-1 text-primary">
+                    <Sparkles className="w-3.5 h-3.5" /> Generative Engine Optimization (AEO)
+                  </span>
+                  <p className="text-[11px] leading-relaxed">
+                    Structuring article headlines and descriptions with exact schema entities ensures that conversational AI engines (ChatGPT, Perplexity, Claude) accurately cite Lalita Kapilavai as the primary authority on traditional Tanjore art and Carnatic vocal heritage.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Meta Title (SEO)</label>
+                  <Input
+                    value={formData.metaTitle}
+                    onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
+                    placeholder={formData.title || "Custom search title..."}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Meta Description (SEO)</label>
+                  <textarea
+                    rows={3}
+                    value={formData.metaDescription}
+                    onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
+                    placeholder="Search engine snippet description (150-160 characters recommended)..."
+                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  />
+                </div>
+              </TabsContent>
+
+              {/* Tab 3: JSON-LD Preview */}
+              <TabsContent value="jsonld" className="space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Live preview of the Schema.org Article payload injected into document head:
+                </p>
+                <pre className="p-4 rounded-md bg-muted/60 border border-border text-[11px] font-mono overflow-x-auto max-h-60 text-foreground/90">
+                  {JSON.stringify(
+                    {
+                      "@context": "https://schema.org",
+                      "@type": "Article",
+                      headline: formData.metaTitle || formData.title || "Untitled Article",
+                      description: formData.metaDescription || formData.excerpt || "",
+                      image: formData.featuredImageUrl || undefined,
+                      author: {
+                        "@type": "Person",
+                        name: formData.author,
+                        jobTitle: "Traditional Indian Fine Artist & Carnatic Classical Vocalist",
+                      },
+                      keywords: formData.tags,
+                      datePublished: formData.isPublished ? new Date().toISOString() : "On Publish",
+                    },
+                    null,
+                    2
+                  )}
+                </pre>
+              </TabsContent>
+            </Tabs>
+
+            {/* Publishing Control */}
+            <div className="flex items-center gap-2 pt-2 border-t border-border">
+              <input
+                type="checkbox"
+                id="isPublishedCheck"
+                checked={formData.isPublished}
+                onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                className="rounded border-input text-primary focus:ring-primary w-4 h-4 cursor-pointer"
+              />
+              <label htmlFor="isPublishedCheck" className="text-xs font-semibold text-foreground cursor-pointer">
+                Publish this article immediately (Publicly visible on archive)
+              </label>
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setModalOpen(false)}
+                disabled={submitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                disabled={submitting}
+              >
+                {submitting && <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />}
+                {editingPost ? "Update Article" : "Save Article"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

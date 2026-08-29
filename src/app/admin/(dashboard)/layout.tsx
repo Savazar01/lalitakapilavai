@@ -58,9 +58,14 @@ export default function AdminDashboardLayout({
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push("/admin/login");
-    router.refresh();
+    try {
+      await signOut();
+    } catch (err) {
+      console.error("Sign-out error:", err);
+    } finally {
+      router.push("/admin/login");
+      router.refresh();
+    }
   };
 
   const navContent = (
@@ -124,9 +129,13 @@ export default function AdminDashboardLayout({
 
         {/* User Card & Logout */}
         <div className="p-4 border-t border-border mt-auto flex flex-col gap-2 bg-card/80">
-          <div className="flex items-center justify-between">
+          <Link
+            href="/admin/profile"
+            className="flex items-center justify-between p-1.5 -m-1.5 rounded-md hover:bg-muted/50 transition-colors group"
+            title="Manage Profile & Security"
+          >
             <div className="flex flex-col truncate">
-              <span className="text-xs font-semibold text-foreground truncate">
+              <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                 {session?.user?.name || "Superadmin"}
               </span>
               <span className="text-[11px] text-muted-foreground truncate">
@@ -136,7 +145,7 @@ export default function AdminDashboardLayout({
             <Badge variant="gold" className="text-[10px] uppercase">
               {(session?.user as { role?: string } | undefined)?.role || "SUPER_ADMIN"}
             </Badge>
-          </div>
+          </Link>
 
           <div className="flex items-center justify-between pt-2 border-t border-border/40">
             <Link

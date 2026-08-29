@@ -28,6 +28,18 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  formatCurrency,
+  formatLocalizedDateTime,
+  SUPPORTED_CURRENCIES,
+} from "@/lib/formatters";
 
 interface ArtworkSummary {
   id: string;
@@ -59,6 +71,7 @@ interface EventItem {
   posterUrl: string | null;
   maxCapacity: number | null;
   registrationFee: number | null;
+  currency?: string;
   isRegistrationOpen: boolean;
   _count?: { registrations: number; artworks: number };
 }
@@ -95,6 +108,7 @@ export default function EventsAdminPage() {
   const [endDate, setEndDate] = React.useState("");
   const [maxCapacity, setMaxCapacity] = React.useState("");
   const [registrationFee, setRegistrationFee] = React.useState("");
+  const [currency, setCurrency] = React.useState("INR");
   const [isRegistrationOpen, setIsRegistrationOpen] = React.useState(true);
   const [selectedArtworkIds, setSelectedArtworkIds] = React.useState<string[]>([]);
 
@@ -159,6 +173,7 @@ export default function EventsAdminPage() {
     setEndDate("");
     setMaxCapacity("100");
     setRegistrationFee("");
+    setCurrency("INR");
     setIsRegistrationOpen(true);
     setSelectedArtworkIds([]);
     setDialogOpen(true);
@@ -177,6 +192,7 @@ export default function EventsAdminPage() {
     setEndDate(ev.endDate ? ev.endDate.slice(0, 16) : "");
     setMaxCapacity(ev.maxCapacity ? ev.maxCapacity.toString() : "");
     setRegistrationFee(ev.registrationFee ? ev.registrationFee.toString() : "");
+    setCurrency(ev.currency || "INR");
     setIsRegistrationOpen(ev.isRegistrationOpen);
 
     // Fetch linked artworks
@@ -223,6 +239,7 @@ export default function EventsAdminPage() {
       endDate: new Date(endDate).toISOString(),
       maxCapacity: maxCapacity ? parseInt(maxCapacity, 10) : null,
       registrationFee: registrationFee ? parseFloat(registrationFee) : null,
+      currency,
       isRegistrationOpen,
       artworkIds: selectedArtworkIds,
     };
@@ -362,8 +379,8 @@ export default function EventsAdminPage() {
               <CardContent className="space-y-2.5 pb-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span>
-                    {new Date(ev.startDate).toLocaleDateString()} • {ev.timezone}
+                  <span className="truncate">
+                    {formatLocalizedDateTime(ev.startDate, ev.timezone)}
                   </span>
                 </div>
 
@@ -372,6 +389,11 @@ export default function EventsAdminPage() {
                   <span className="truncate">
                     {ev.venue}, {ev.city}
                   </span>
+                </div>
+
+                <div className="flex items-center justify-between pt-1 text-[11px] text-muted-foreground">
+                  <span>Fee: <strong className="text-foreground">{ev.registrationFee ? formatCurrency(ev.registrationFee, ev.currency || "INR") : "Free Admission"}</strong></span>
+                  <span>Cap: <strong className="text-foreground">{ev.maxCapacity ? `${ev.maxCapacity} seats` : "Unlimited"}</strong></span>
                 </div>
 
                 <div className="flex items-center gap-4 pt-2 border-t border-border/50 text-[11px]">
@@ -563,13 +585,29 @@ export default function EventsAdminPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Fee (₹ INR)</label>
+                  <label className="text-xs font-semibold text-foreground">Fee</label>
                   <Input
                     type="number"
                     placeholder="0 for Free entry"
                     value={registrationFee}
                     onChange={(e) => setRegistrationFee(e.target.value)}
                   />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Currency</label>
+                  <Select value={currency} onValueChange={setCurrency}>
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SUPPORTED_CURRENCIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {c.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="flex items-center gap-2 pt-6">

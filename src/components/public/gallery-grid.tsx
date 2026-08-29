@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Palette, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/formatters";
 
 interface Category {
   id: string;
@@ -23,6 +24,7 @@ interface Artwork {
   yearCreated: number;
   hasGoldFoil: boolean;
   price: string | number | null;
+  currency?: string;
   isAvailable: boolean;
   watermarkedWebpUrl: string;
   category: Category;
@@ -135,7 +137,7 @@ export function GalleryGrid({
                         </h3>
                         {art.price && (
                           <span className="font-mono text-xs font-bold text-primary shrink-0">
-                            ₹{Number(art.price).toLocaleString("en-IN")}
+                            {formatCurrency(art.price, art.currency || "INR")}
                           </span>
                         )}
                       </div>

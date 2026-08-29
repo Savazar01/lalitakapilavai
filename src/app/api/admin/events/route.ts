@@ -99,6 +99,7 @@ export async function POST(request: NextRequest) {
           posterUrl: posterUrl || null,
           maxCapacity: maxCapacity ? parseInt(maxCapacity, 10) : null,
           registrationFee: registrationFee ? parseFloat(registrationFee) : null,
+          currency: body.currency || "INR",
           isRegistrationOpen: isRegistrationOpen !== undefined ? !!isRegistrationOpen : true,
         },
       });

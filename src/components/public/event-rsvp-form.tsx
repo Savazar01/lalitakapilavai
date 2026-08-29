@@ -5,12 +5,14 @@ import { CheckCircle, Loader2, Sparkles, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/formatters";
 
 interface EventRsvpFormProps {
   eventId: string;
   eventTitle: string;
   isRegistrationOpen: boolean;
   registrationFee: number | null;
+  currency?: string;
   maxCapacity: number | null;
 }
 
@@ -19,6 +21,7 @@ export function EventRsvpForm({
   eventTitle,
   isRegistrationOpen,
   registrationFee,
+  currency = "INR",
 }: EventRsvpFormProps) {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -92,7 +95,9 @@ export function EventRsvpForm({
             Reserve Your Attendance
           </CardTitle>
           <span className="text-xs font-mono font-bold text-primary">
-            {registrationFee ? `₹${registrationFee}` : "Free Admission"}
+            {registrationFee
+              ? formatCurrency(registrationFee * parseInt(tickets || "1", 10), currency)
+              : "Free Admission"}
           </span>
         </div>
         <CardDescription className="text-xs">

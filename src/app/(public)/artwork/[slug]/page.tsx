@@ -9,6 +9,7 @@ import { ArtCanvasViewer } from "@/components/public/art-canvas-viewer";
 import { ExhibitionQrModal } from "@/components/public/exhibition-qr-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/formatters";
 import {
   Sparkles,
   Music,
@@ -136,7 +137,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               <div className="flex items-center gap-3 pt-2">
                 {artwork.price ? (
                   <span className="font-mono text-xl sm:text-2xl font-bold text-primary">
-                    ₹{Number(artwork.price).toLocaleString("en-IN")}
+                    {formatCurrency(artwork.price, artwork.currency || "INR")}
                   </span>
                 ) : (
                   <span className="font-serif italic text-sm text-muted-foreground">

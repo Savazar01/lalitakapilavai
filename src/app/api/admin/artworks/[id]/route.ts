@@ -94,6 +94,7 @@ export async function PUT(
         hasGoldFoil: hasGoldFoil !== undefined ? !!hasGoldFoil : undefined,
         goldPurity,
         price: price !== undefined ? (price ? parseFloat(price) : null) : undefined,
+        currency: body.currency !== undefined ? body.currency : undefined,
         isAvailable: isAvailable !== undefined ? !!isAvailable : undefined,
         isFeatured: isFeatured !== undefined ? !!isFeatured : undefined,
         primaryImageUrl,

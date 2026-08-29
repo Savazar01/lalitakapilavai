@@ -31,6 +31,9 @@ import {
   Check,
   Globe,
   Sliders,
+  Video,
+  Music,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ViewportSwitcher, ViewportMode } from "@/components/builder/viewport-switcher";
@@ -236,6 +239,69 @@ function SortableSection({
                 </span>
               </div>
 
+              {/* Column Rich Media Preview */}
+              {(() => {
+                const media = (col.content as Record<string, unknown>)?._media as
+                  | Record<string, unknown>
+                  | undefined;
+                if (!media || !media.mediaType || media.mediaType === "NONE") return null;
+
+                if (media.mediaType === "IMAGE" && media.mediaUrl) {
+                  return (
+                    <div className="mb-2 relative rounded overflow-hidden border border-border/80 bg-muted/30">
+                      <img
+                        src={media.mediaUrl as string}
+                        alt={(media.mediaAlt as string) || "Column image"}
+                        className="w-full object-cover max-h-48 rounded"
+                      />
+                      <div className="absolute top-1 right-1 bg-black/70 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-[9px] font-mono">
+                        IMAGE ({String(media.mediaAspectRatio || "auto")})
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (media.mediaType === "VIDEO" && media.videoUrl) {
+                  return (
+                    <div className="mb-2 p-2.5 rounded border border-primary/30 bg-primary/5 flex items-center gap-2">
+                      <Video className="w-4 h-4 text-primary shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] font-bold uppercase text-primary block">Video</span>
+                        <p className="text-[11px] text-foreground truncate font-mono">{String(media.videoUrl)}</p>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (media.mediaType === "ICON") {
+                  return (
+                    <div className="mb-2 flex items-center justify-center p-3 rounded border border-border/60 bg-muted/20">
+                      <Sparkles
+                        style={{
+                          width: `${Number(media.iconSize) || 32}px`,
+                          height: `${Number(media.iconSize) || 32}px`,
+                          color: String(media.iconColor || "#D4AF37"),
+                        }}
+                      />
+                    </div>
+                  );
+                }
+
+                if (media.mediaType === "AUDIO_PLAYER" && media.audioUrl) {
+                  return (
+                    <div className="mb-2 p-2 rounded border border-primary/30 bg-card flex items-center gap-2">
+                      <Music className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] font-bold text-primary block">Audio Snippet</span>
+                        <p className="text-[11px] text-foreground truncate">{String(media.audioTitle || media.audioUrl)}</p>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return null;
+              })()}
+
               {/* Inline Tiptap Rich-Text Editor */}
               <TiptapEditor
                 content={col.content}
@@ -390,9 +456,13 @@ export default function VisualPageBuilder() {
       sections: page.sections.map((s) => {
         if (s.id !== sectionId) return s;
         const newSubs = [...s.subSections];
+        const prevMedia = (newSubs[subIdx].content as Record<string, unknown>)?._media;
         newSubs[subIdx] = {
           ...newSubs[subIdx],
-          content,
+          content: {
+            ...content,
+            ...(prevMedia ? { _media: prevMedia } : {}),
+          },
         };
         return { ...s, subSections: newSubs };
       }),
@@ -579,42 +649,80 @@ export default function VisualPageBuilder() {
         </div>
 
         {/* Right-Hand Property / Style Inspector */}
-        {currentSection && (
-          <StyleInspector
-            isSubSection={selectedSubIndex !== null}
-            style={{
-              backgroundColor: currentSection.backgroundColor,
-              paddingTop: currentSection.paddingTop,
-              paddingBottom: currentSection.paddingBottom,
-              gridSpan:
-                selectedSubIndex !== null
-                  ? currentSection.subSections[selectedSubIndex]?.gridSpan
-                  : undefined,
-            }}
-            onChange={(updated) => {
-              setPage({
-                ...page,
-                sections: page.sections.map((sec) => {
-                  if (sec.id !== currentSection.id) return sec;
-                  if (selectedSubIndex !== null) {
-                    const newSubs = [...sec.subSections];
-                    newSubs[selectedSubIndex] = {
-                      ...newSubs[selectedSubIndex],
-                      gridSpan: updated.gridSpan || newSubs[selectedSubIndex].gridSpan,
+        {currentSection && (() => {
+          const selectedSub =
+            selectedSubIndex !== null
+              ? currentSection.subSections[selectedSubIndex]
+              : null;
+          const subMedia = (selectedSub?.content as Record<string, unknown>)?._media as
+            | Record<string, unknown>
+            | undefined;
+
+          return (
+            <StyleInspector
+              isSubSection={selectedSubIndex !== null}
+              style={{
+                backgroundColor: currentSection.backgroundColor,
+                paddingTop: currentSection.paddingTop,
+                paddingBottom: currentSection.paddingBottom,
+                gridSpan: selectedSub?.gridSpan,
+                mediaType: (subMedia?.mediaType as "NONE" | "IMAGE" | "VIDEO" | "ICON" | "AUDIO_PLAYER") || "NONE",
+                mediaUrl: (subMedia?.mediaUrl as string) || "",
+                mediaAlt: (subMedia?.mediaAlt as string) || "",
+                mediaAspectRatio: (subMedia?.mediaAspectRatio as string) || "auto",
+                mediaBorderRadius: (subMedia?.mediaBorderRadius as string) || "rounded-lg",
+                iconName: (subMedia?.iconName as string) || "Sparkles",
+                iconSize: (subMedia?.iconSize as number) || 36,
+                iconColor: (subMedia?.iconColor as string) || "#D4AF37",
+                audioTitle: (subMedia?.audioTitle as string) || "",
+                audioUrl: (subMedia?.audioUrl as string) || "",
+                videoUrl: (subMedia?.videoUrl as string) || "",
+              }}
+              onChange={(updated) => {
+                setPage({
+                  ...page,
+                  sections: page.sections.map((sec) => {
+                    if (sec.id !== currentSection.id) return sec;
+                    if (selectedSubIndex !== null) {
+                      const newSubs = [...sec.subSections];
+                      const existingContent = (typeof newSubs[selectedSubIndex].content === "object"
+                        ? newSubs[selectedSubIndex].content
+                        : {}) as Record<string, unknown>;
+
+                      newSubs[selectedSubIndex] = {
+                        ...newSubs[selectedSubIndex],
+                        gridSpan: updated.gridSpan || newSubs[selectedSubIndex].gridSpan,
+                        content: {
+                          ...existingContent,
+                          _media: {
+                            mediaType: updated.mediaType || "NONE",
+                            mediaUrl: updated.mediaUrl || "",
+                            mediaAlt: updated.mediaAlt || "",
+                            mediaAspectRatio: updated.mediaAspectRatio || "auto",
+                            mediaBorderRadius: updated.mediaBorderRadius || "rounded-lg",
+                            iconName: updated.iconName || "Sparkles",
+                            iconSize: updated.iconSize || 36,
+                            iconColor: updated.iconColor || "#D4AF37",
+                            audioTitle: updated.audioTitle || "",
+                            audioUrl: updated.audioUrl || "",
+                            videoUrl: updated.videoUrl || "",
+                          },
+                        },
+                      };
+                      return { ...sec, subSections: newSubs };
+                    }
+                    return {
+                      ...sec,
+                      backgroundColor: updated.backgroundColor,
+                      paddingTop: updated.paddingTop,
+                      paddingBottom: updated.paddingBottom,
                     };
-                    return { ...sec, subSections: newSubs };
-                  }
-                  return {
-                    ...sec,
-                    backgroundColor: updated.backgroundColor,
-                    paddingTop: updated.paddingTop,
-                    paddingBottom: updated.paddingBottom,
-                  };
-                }),
-              });
-            }}
-          />
-        )}
+                  }),
+                });
+              }}
+            />
+          );
+        })()}
       </div>
 
       {/* Column Preset Modal */}

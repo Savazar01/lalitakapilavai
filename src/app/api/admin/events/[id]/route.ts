@@ -94,6 +94,7 @@ export async function PUT(
           posterUrl,
           maxCapacity: maxCapacity ? parseInt(maxCapacity, 10) : null,
           registrationFee: registrationFee ? parseFloat(registrationFee) : null,
+          currency: body.currency !== undefined ? body.currency : undefined,
           isRegistrationOpen: isRegistrationOpen !== undefined ? !!isRegistrationOpen : undefined,
         },
       });

@@ -39,6 +39,14 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { formatCurrency, SUPPORTED_CURRENCIES } from "@/lib/formatters";
 
 interface Category {
   id: string;
@@ -58,6 +66,7 @@ interface Artwork {
   hasGoldFoil: boolean;
   goldPurity: string | null;
   price: string | number | null;
+  currency?: string;
   isAvailable: boolean;
   isFeatured: boolean;
   primaryImageUrl: string;
@@ -94,6 +103,7 @@ export default function ArtworksAdminPage() {
   const [hasGoldFoil, setHasGoldFoil] = React.useState(true);
   const [goldPurity, setGoldPurity] = React.useState("22 Carat Jaipur Gold Leaf");
   const [price, setPrice] = React.useState("");
+  const [currency, setCurrency] = React.useState("INR");
   const [isAvailable, setIsAvailable] = React.useState(true);
   const [isFeatured, setIsFeatured] = React.useState(false);
 
@@ -167,6 +177,7 @@ export default function ArtworksAdminPage() {
     setHasGoldFoil(true);
     setGoldPurity("22 Carat Jaipur Gold Leaf");
     setPrice("");
+    setCurrency("INR");
     setIsAvailable(true);
     setIsFeatured(false);
     setPrimaryImageUrl("");
@@ -188,6 +199,7 @@ export default function ArtworksAdminPage() {
     setHasGoldFoil(art.hasGoldFoil);
     setGoldPurity(art.goldPurity || "");
     setPrice(art.price ? art.price.toString() : "");
+    setCurrency(art.currency || "INR");
     setIsAvailable(art.isAvailable);
     setIsFeatured(art.isFeatured);
     setPrimaryImageUrl(art.primaryImageUrl);
@@ -219,8 +231,8 @@ export default function ArtworksAdminPage() {
         const err = await res.json();
         alert(err.error || "Upload failed");
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
       alert("Error uploading image");
     } finally {
       setUploadingImage(false);
@@ -260,6 +272,7 @@ export default function ArtworksAdminPage() {
       hasGoldFoil,
       goldPurity: hasGoldFoil ? goldPurity : null,
       price: price ? parseFloat(price) : null,
+      currency,
       isAvailable,
       isFeatured,
       primaryImageUrl,
@@ -532,7 +545,7 @@ export default function ArtworksAdminPage() {
                   </h4>
                   {art.price && (
                     <span className="font-mono text-xs font-bold text-primary shrink-0">
-                      ₹{Number(art.price).toLocaleString("en-IN")}
+                      {formatCurrency(art.price, art.currency || "INR")}
                     </span>
                   )}
                 </div>
@@ -634,7 +647,7 @@ export default function ArtworksAdminPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="font-mono text-xs font-bold text-primary">
-                    {art.price ? `₹${Number(art.price).toLocaleString("en-IN")}` : "Inquire"}
+                    {art.price ? formatCurrency(art.price, art.currency || "INR") : "Inquire"}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex items-center gap-1">
@@ -824,16 +837,32 @@ export default function ArtworksAdminPage() {
                 )}
               </div>
 
-              {/* Price & Status */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Price & Currency & Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Price (₹ INR)</label>
+                  <label className="text-xs font-semibold text-foreground">Price</label>
                   <Input
                     type="number"
                     placeholder="e.g. 150000"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                   />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Currency</label>
+                  <Select value={currency} onValueChange={setCurrency}>
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SUPPORTED_CURRENCIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {c.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="flex items-center gap-2 pt-6">
@@ -858,7 +887,7 @@ export default function ArtworksAdminPage() {
                     className="rounded border-border text-primary focus:ring-primary h-4 w-4"
                   />
                   <label htmlFor="isFeatured" className="text-xs font-medium text-foreground">
-                    Feature on Homepage
+                    Feature on Home
                   </label>
                 </div>
               </div>

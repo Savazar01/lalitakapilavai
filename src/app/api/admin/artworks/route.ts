@@ -133,6 +133,7 @@ export async function POST(request: NextRequest) {
         hasGoldFoil: !!hasGoldFoil,
         goldPurity: goldPurity || (hasGoldFoil ? "22 Carat Jaipur Gold Leaf" : null),
         price: price ? parseFloat(price) : null,
+        currency: body.currency || "INR",
         isAvailable: isAvailable !== undefined ? !!isAvailable : true,
         isFeatured: !!isFeatured,
         primaryImageUrl,
