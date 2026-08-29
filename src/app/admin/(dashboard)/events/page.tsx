@@ -64,7 +64,12 @@ interface EventItem {
   eventType: "WORKSHOP" | "ONLINE_CLASSROOM" | "EXHIBITION" | "CONCERT" | "OTHER";
   description: string;
   venue: string;
+  venueName?: string | null;
+  streetAddress?: string | null;
   city: string;
+  stateProvince?: string | null;
+  postalCode?: string | null;
+  country?: string;
   timezone: string;
   startDate: string;
   endDate: string;
@@ -75,6 +80,19 @@ interface EventItem {
   isRegistrationOpen: boolean;
   _count?: { registrations: number; artworks: number };
 }
+
+export const SUPPORTED_COUNTRIES = [
+  { name: "India", defaultCurrency: "INR", defaultTimezone: "Asia/Kolkata" },
+  { name: "United States", defaultCurrency: "USD", defaultTimezone: "America/New_York" },
+  { name: "United Kingdom", defaultCurrency: "GBP", defaultTimezone: "Europe/London" },
+  { name: "United Arab Emirates", defaultCurrency: "AED", defaultTimezone: "Asia/Dubai" },
+  { name: "Germany", defaultCurrency: "EUR", defaultTimezone: "Europe/Berlin" },
+  { name: "France", defaultCurrency: "EUR", defaultTimezone: "Europe/Paris" },
+  { name: "Singapore", defaultCurrency: "SGD", defaultTimezone: "Asia/Singapore" },
+  { name: "Australia", defaultCurrency: "AUD", defaultTimezone: "Australia/Sydney" },
+  { name: "Canada", defaultCurrency: "CAD", defaultTimezone: "America/Toronto" },
+  { name: "Other", defaultCurrency: "USD", defaultTimezone: "UTC" },
+];
 
 const IANA_TIMEZONES = [
   { value: "Asia/Kolkata", label: "Asia/Kolkata (IST +05:30)" },
@@ -102,7 +120,12 @@ export default function EventsAdminPage() {
   const [eventType, setEventType] = React.useState<EventItem["eventType"]>("EXHIBITION");
   const [description, setDescription] = React.useState("");
   const [venue, setVenue] = React.useState("Lalita Kapilavai Heritage Studio");
+  const [venueName, setVenueName] = React.useState("Lalita Kapilavai Heritage Studio");
+  const [streetAddress, setStreetAddress] = React.useState("");
   const [city, setCity] = React.useState("Bengaluru");
+  const [stateProvince, setStateProvince] = React.useState("Karnataka");
+  const [postalCode, setPostalCode] = React.useState("560038");
+  const [country, setCountry] = React.useState("India");
   const [timezone, setTimezone] = React.useState("Asia/Kolkata");
   const [startDate, setStartDate] = React.useState("");
   const [endDate, setEndDate] = React.useState("");
@@ -160,6 +183,17 @@ export default function EventsAdminPage() {
     };
   }, []);
 
+  const handleCountryChange = (cName: string) => {
+    setCountry(cName);
+    const cfg = SUPPORTED_COUNTRIES.find((c) => c.name === cName);
+    if (cfg) {
+      setCurrency(cfg.defaultCurrency);
+      if (cfg.defaultTimezone) {
+        setTimezone(cfg.defaultTimezone);
+      }
+    }
+  };
+
   const handleOpenCreate = () => {
     setEditingEvent(null);
     setTitle("");
@@ -167,7 +201,12 @@ export default function EventsAdminPage() {
     setEventType("EXHIBITION");
     setDescription("");
     setVenue("Lalita Kapilavai Heritage Studio");
+    setVenueName("Lalita Kapilavai Heritage Studio");
+    setStreetAddress("");
     setCity("Bengaluru");
+    setStateProvince("Karnataka");
+    setPostalCode("560038");
+    setCountry("India");
     setTimezone("Asia/Kolkata");
     setStartDate("");
     setEndDate("");
@@ -185,9 +224,14 @@ export default function EventsAdminPage() {
     setSlug(ev.slug);
     setEventType(ev.eventType);
     setDescription(ev.description);
-    setVenue(ev.venue);
-    setCity(ev.city);
-    setTimezone(ev.timezone);
+    setVenue(ev.venue || ev.venueName || "Lalita Kapilavai Heritage Studio");
+    setVenueName(ev.venueName || ev.venue || "");
+    setStreetAddress(ev.streetAddress || "");
+    setCity(ev.city || "");
+    setStateProvince(ev.stateProvince || "");
+    setPostalCode(ev.postalCode || "");
+    setCountry(ev.country || "India");
+    setTimezone(ev.timezone || "Asia/Kolkata");
     setStartDate(ev.startDate ? ev.startDate.slice(0, 16) : "");
     setEndDate(ev.endDate ? ev.endDate.slice(0, 16) : "");
     setMaxCapacity(ev.maxCapacity ? ev.maxCapacity.toString() : "");
@@ -232,8 +276,13 @@ export default function EventsAdminPage() {
       slug,
       eventType,
       description,
-      venue,
-      city,
+      venue: venueName || venue || "Lalita Kapilavai Heritage Studio",
+      venueName: venueName || venue,
+      streetAddress: streetAddress || null,
+      city: city || "Bengaluru",
+      stateProvince: stateProvince || null,
+      postalCode: postalCode || null,
+      country: country || "India",
       timezone,
       startDate: new Date(startDate).toISOString(),
       endDate: new Date(endDate).toISOString(),
@@ -384,10 +433,10 @@ export default function EventsAdminPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="truncate">
-                    {ev.venue}, {ev.city}
+                <div className="flex items-start gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                  <span className="line-clamp-2">
+                    {ev.venueName || ev.venue}{ev.city ? `, ${ev.city}` : ""}{ev.country ? ` • ${ev.country}` : ""}
                   </span>
                 </div>
 
@@ -498,15 +547,14 @@ export default function EventsAdminPage() {
                   <label className="text-xs font-semibold text-foreground">Event Type</label>
                   <select
                     value={eventType}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onChange={(e) => setEventType(e.target.value as any)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                    onChange={(e) => setEventType(e.target.value as EventItem["eventType"])}
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   >
                     <option value="EXHIBITION">EXHIBITION (Gallery Floor)</option>
-                    <option value="CONCERT">CONCERT (Carnatic Vocal Recital)</option>
-                    <option value="WORKSHOP">WORKSHOP (Tanjore Gilding Class)</option>
-                    <option value="ONLINE_CLASSROOM">ONLINE_CLASSROOM (Virtual Raga Masterclass)</option>
-                    <option value="OTHER">OTHER</option>
+                    <option value="CONCERT">CONCERT (Classical Recital)</option>
+                    <option value="WORKSHOP">WORKSHOP (Tanjore Masterclass)</option>
+                    <option value="ONLINE_CLASSROOM">ONLINE CLASSROOM</option>
+                    <option value="OTHER">OTHER (Special Cultural Gathering)</option>
                   </select>
                 </div>
 
@@ -515,7 +563,7 @@ export default function EventsAdminPage() {
                   <select
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   >
                     {IANA_TIMEZONES.map((tz) => (
                       <option key={tz.value} value={tz.value}>
@@ -549,26 +597,85 @@ export default function EventsAdminPage() {
                 </div>
               </div>
 
-              {/* Venue & City */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Venue Address / Link</label>
-                  <Input
-                    placeholder="Lalita Kapilavai Heritage Studio, Indiranagar"
-                    value={venue}
-                    onChange={(e) => setVenue(e.target.value)}
-                    required
-                  />
+              {/* Global Structured Address Block */}
+              <div className="p-3.5 rounded-lg border border-border/80 bg-muted/20 space-y-3">
+                <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                  <span className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-primary" /> International Venue &amp; Address
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">Country selection auto-configures currency</span>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">City</label>
-                  <Input
-                    placeholder="Bengaluru"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    required
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-foreground">Venue / Gallery Hall</label>
+                    <Input
+                      placeholder="e.g. Lalita Kapilavai Heritage Studio"
+                      value={venueName}
+                      onChange={(e) => {
+                        setVenueName(e.target.value);
+                        setVenue(e.target.value);
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-foreground">Country (Auto-Currency)</label>
+                    <Select value={country} onValueChange={handleCountryChange}>
+                      <SelectTrigger className="h-9 text-xs">
+                        <SelectValue placeholder="Select Country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SUPPORTED_COUNTRIES.map((c) => (
+                          <SelectItem key={c.name} value={c.name}>
+                            {c.name} ({c.defaultCurrency})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-foreground">Street Address / Landmark</label>
+                    <Input
+                      placeholder="e.g. 108 Temple Bells Lane, Indiranagar"
+                      value={streetAddress}
+                      onChange={(e) => setStreetAddress(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-foreground">City</label>
+                    <Input
+                      placeholder="e.g. Bengaluru"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-foreground">State / Province</label>
+                    <Input
+                      placeholder="e.g. Karnataka"
+                      value={stateProvince}
+                      onChange={(e) => setStateProvince(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-foreground">Postal / Zip Code</label>
+                    <Input
+                      placeholder="e.g. 560038"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
 

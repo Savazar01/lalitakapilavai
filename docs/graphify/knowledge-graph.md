@@ -68,6 +68,7 @@ graph LR
         CatAdmin["/admin/categories (7 Classical Painting Schools Manager)"]
         LeadAdmin["/admin/leads (Exhibition QR CRM, Status Tracker & CSV Export)"]
         PostAdmin["/admin/posts (Blog & AEO Editorial Desk with Schema.org Preview)"]
+        UserAdmin["/admin/users (Superadmin RBAC Suite: Roles, Passwords & Account Lifecycle)"]
         SettingAdmin["/admin/settings (Watermark Vault, R2/S3 Endpoints & Socials)"]
         ProfileAdmin["/admin/profile (User Details, Password Change & Session Revocation)"]
     end
@@ -75,10 +76,11 @@ graph LR
     subgraph API_Endpoints
         MediaUpload["POST /api/admin/media/upload (Sharp Watermarking Pipeline)"]
         ArtworkAPI["/api/admin/artworks/* (CRUD + Currency)"]
-        EventAPI["/api/admin/events/* (CRUD + Currency + Timezones)"]
+        EventAPI["/api/admin/events/* (CRUD + Global Addresses + Auto-Currency + Timezones)"]
         CatAPI["/api/admin/categories/* (CRUD)"]
         LeadAPI["/api/admin/leads/* (Status PATCH, Search, CSV Export)"]
         PostAPI["/api/admin/posts/* (Blog CRUD + Schema.org Generator)"]
+        UserAPI["/api/admin/users/* (Superadmin RBAC, Session Purge, Password Reset)"]
         SettingAPI["/api/admin/settings/* (System Config & Storage Credentials)"]
         RSVPAPI["POST /api/events/register"]
         LeadSubmitAPI["POST /api/leads/submit"]
@@ -94,4 +96,24 @@ graph LR
     Admin_Control_Plane --> API_Endpoints
     API_Endpoints --> Prisma
     Prisma --> Postgres
+```
+
+---
+
+## 3. Visual Page Builder & Luxury Framing Engine
+
+```mermaid
+graph TD
+    Builder["12-Column Visual Page Builder (/admin/pages/[id]/builder)"]
+    ContrastEngine["Background-Aware Contrast Engine (Luminance & Preset Detector)"]
+    MultiRowPartition["Multi-Row Column Partitioning (Nested Sub-Sections: Text, Image, Video, Audio, Divider, CTA Button)"]
+    ArtisticFraming["Artistic Customization Engine (Gold/Terracotta/Silk/Charcoal Borders, Radii, Gold Radiant Glow, Traditional Fillets)"]
+    PublicSSR["Public SSR Dynamic Page Renderer (/[slug])"]
+
+    Builder --> ContrastEngine
+    Builder --> MultiRowPartition
+    Builder --> ArtisticFraming
+    ContrastEngine -->|Deep Charcoal Text on Parchment / Pure Light Text on Obsidian| PublicSSR
+    MultiRowPartition -->|Sequential Block Serialization| PublicSSR
+    ArtisticFraming -->|CSS Box Models & Ornamental Gold Fillets| PublicSSR
 ```

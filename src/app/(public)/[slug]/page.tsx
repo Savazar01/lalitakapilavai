@@ -94,8 +94,60 @@ export default async function DynamicPublicPage({ params }: PageProps) {
                         ? "col-span-12 md:col-span-3"
                         : "col-span-12";
 
+                    const colObj = col.content as Record<string, unknown>;
+                    const colStyle = (colObj?._style || {}) as {
+                      borderColor?: string;
+                      borderWidth?: number;
+                      borderStyle?: string;
+                      borderRadius?: string;
+                      boxShadow?: string;
+                      ornamentalFrame?: boolean;
+                    };
+
+                    const borderStyleObj: React.CSSProperties = {
+                      borderColor:
+                        colStyle.borderColor && colStyle.borderColor !== "transparent"
+                          ? colStyle.borderColor
+                          : undefined,
+                      borderWidth: colStyle.borderWidth ? `${colStyle.borderWidth}px` : undefined,
+                      borderStyle: (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
+                    };
+
+                    let radiusClass = "";
+                    if (colStyle.borderRadius === "rounded-md") radiusClass = "rounded-md";
+                    if (colStyle.borderRadius === "rounded-2xl") radiusClass = "rounded-2xl";
+                    if (colStyle.borderRadius === "rounded-t-full")
+                      radiusClass = "rounded-t-full overflow-hidden";
+
+                    let glowClass = "";
+                    if (colStyle.boxShadow === "gold-glow")
+                      glowClass = "shadow-[0_0_25px_rgba(212,175,55,0.25)]";
+                    if (colStyle.boxShadow === "soft") glowClass = "shadow-lg";
+
+                    const hasCustomStyling = !!(
+                      colStyle.borderColor ||
+                      colStyle.borderWidth ||
+                      colStyle.borderRadius ||
+                      colStyle.boxShadow ||
+                      colStyle.ornamentalFrame
+                    );
+
                     return (
-                      <div key={col.id} className={`${colSpanClass} w-full`}>
+                      <div
+                        key={col.id}
+                        className={`${colSpanClass} w-full relative ${radiusClass} ${glowClass} ${
+                          hasCustomStyling ? "p-4" : ""
+                        }`}
+                        style={borderStyleObj}
+                      >
+                        {colStyle.ornamentalFrame && (
+                          <>
+                            <div className="absolute top-1 left-1 w-3.5 h-3.5 border-t-2 border-l-2 border-[#D4AF37] pointer-events-none z-10" />
+                            <div className="absolute top-1 right-1 w-3.5 h-3.5 border-t-2 border-r-2 border-[#D4AF37] pointer-events-none z-10" />
+                            <div className="absolute bottom-1 left-1 w-3.5 h-3.5 border-b-2 border-l-2 border-[#D4AF37] pointer-events-none z-10" />
+                            <div className="absolute bottom-1 right-1 w-3.5 h-3.5 border-b-2 border-r-2 border-[#D4AF37] pointer-events-none z-10" />
+                          </>
+                        )}
                         <TiptapRenderer
                           content={col.content as Record<string, unknown>}
                         />

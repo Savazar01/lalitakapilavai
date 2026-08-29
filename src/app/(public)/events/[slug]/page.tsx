@@ -111,8 +111,18 @@ export default async function EventDetailPage({ params }: PageProps) {
                   <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold text-foreground block">Location & Venue</span>
-                    <span className="text-muted-foreground">
-                      {event.venue}, {event.city} ({event.timezone})
+                    <span className="text-foreground block text-sm font-medium">
+                      {event.venueName || event.venue}
+                    </span>
+                    <span className="text-xs text-muted-foreground block mt-0.5">
+                      {[
+                        event.streetAddress,
+                        event.city,
+                        [event.stateProvince, event.postalCode].filter(Boolean).join(" "),
+                        event.country,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
                     </span>
                   </div>
                 </div>

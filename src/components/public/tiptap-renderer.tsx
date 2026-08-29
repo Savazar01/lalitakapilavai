@@ -289,6 +289,102 @@ function renderMediaBlock(media: MediaBlockConfig): React.ReactNode {
   return null;
 }
 
+export interface ColumnBlock {
+  id: string;
+  type: "TEXT" | "IMAGE" | "VIDEO" | "AUDIO" | "DIVIDER" | "BUTTON";
+  content?: Record<string, unknown>;
+  mediaUrl?: string;
+  mediaAlt?: string;
+  mediaAspectRatio?: string;
+  mediaBorderRadius?: string;
+  videoUrl?: string;
+  audioUrl?: string;
+  audioTitle?: string;
+  dividerStyle?: "gold-leaf" | "lotus" | "line" | "temple";
+  buttonText?: string;
+  buttonUrl?: string;
+  buttonVariant?: "gold" | "outline" | "temple";
+}
+
+function renderColumnBlock(block: ColumnBlock): React.ReactNode {
+  if (block.type === "IMAGE") {
+    return (
+      <div key={block.id}>
+        {renderMediaBlock({
+          mediaType: "IMAGE",
+          mediaUrl: block.mediaUrl,
+          mediaAlt: block.mediaAlt,
+          mediaAspectRatio: block.mediaAspectRatio,
+          mediaBorderRadius: block.mediaBorderRadius,
+        })}
+      </div>
+    );
+  }
+
+  if (block.type === "VIDEO") {
+    return (
+      <div key={block.id}>
+        {renderMediaBlock({
+          mediaType: "VIDEO",
+          videoUrl: block.videoUrl,
+        })}
+      </div>
+    );
+  }
+
+  if (block.type === "AUDIO") {
+    return (
+      <div key={block.id}>
+        {renderMediaBlock({
+          mediaType: "AUDIO_PLAYER",
+          audioUrl: block.audioUrl,
+          audioTitle: block.audioTitle,
+        })}
+      </div>
+    );
+  }
+
+  if (block.type === "DIVIDER") {
+    return (
+      <div key={block.id} className="py-4 flex items-center justify-center gap-3">
+        <div className="h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent flex-1" />
+        <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+        <div className="h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent flex-1" />
+      </div>
+    );
+  }
+
+  if (block.type === "BUTTON") {
+    return (
+      <div key={block.id} className="py-2 flex">
+        <Link
+          href={block.buttonUrl || "#"}
+          className={`inline-flex items-center justify-center px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-semibold transition-all ${
+            block.buttonVariant === "outline"
+              ? "border border-primary text-primary hover:bg-primary/10"
+              : block.buttonVariant === "temple"
+              ? "bg-[#A3281E] text-white hover:bg-[#8A2219] shadow-md"
+              : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+          }`}
+        >
+          {block.buttonText || "Explore Masterwork"}
+        </Link>
+      </div>
+    );
+  }
+
+  if (block.type === "TEXT" && block.content) {
+    const doc = block.content as unknown as TiptapNode;
+    return (
+      <div key={block.id} className="prose prose-stone dark:prose-invert max-w-none">
+        {doc.type === "doc" ? renderNode(doc, block.id) : null}
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export function TiptapRenderer({ content, className = "" }: TiptapRendererProps) {
   if (!content) return null;
 
@@ -300,7 +396,19 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
     );
   }
 
-  const mediaConfig = (content as Record<string, unknown>)?._media as MediaBlockConfig | undefined;
+  const rawObj = content as Record<string, unknown>;
+
+  // Check if content has nested multi-row blocks
+  if (Array.isArray(rawObj.blocks) && rawObj.blocks.length > 0) {
+    return (
+      <div className={`space-y-4 ${className}`}>
+        {rawObj.blocks.map((block: ColumnBlock) => renderColumnBlock(block))}
+      </div>
+    );
+  }
+
+  // Fallback to single doc + legacy _media
+  const mediaConfig = rawObj._media as MediaBlockConfig | undefined;
   const doc = content as unknown as TiptapNode;
 
   return (

@@ -32,6 +32,7 @@ export interface TiptapEditorProps {
   className?: string;
   placeholder?: string;
   readOnly?: boolean;
+  isLight?: boolean;
 }
 
 export function TiptapEditor({
@@ -39,7 +40,12 @@ export function TiptapEditor({
   onChange,
   className = "",
   readOnly = false,
+  isLight = false,
 }: TiptapEditorProps) {
+  const proseClasses = isLight
+    ? "prose prose-stone text-[#1C1814] [&_*]:text-[#1C1814] [&_h1]:text-[#1C1814] [&_h2]:text-[#1C1814] [&_h3]:text-[#1C1814] [&_h4]:text-[#1C1814] [&_p]:text-[#2A2622] [&_li]:text-[#2A2622] [&_strong]:text-[#1C1814] [&_blockquote]:text-[#3A322C] [&_blockquote]:border-[#D4AF37]"
+    : "prose prose-stone dark:prose-invert text-[#F5EBE1]";
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -70,7 +76,7 @@ export function TiptapEditor({
     },
     editorProps: {
       attributes: {
-        class: `prose prose-stone dark:prose-invert max-w-none focus:outline-none min-h-[80px] p-2 ${className}`,
+        class: `${proseClasses} max-w-none focus:outline-none min-h-[80px] p-2 ${className}`,
       },
     },
   });
@@ -95,11 +101,21 @@ export function TiptapEditor({
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
+  const btnInactiveClass = isLight
+    ? "text-stone-700 hover:text-stone-950 hover:bg-stone-200/60"
+    : "text-muted-foreground hover:text-foreground";
+
   return (
     <div className="w-full relative group">
       {/* Floating / Sticky Inline Action Toolbar (visible when editable) */}
       {!readOnly && (
-        <div className="flex flex-wrap items-center gap-1 p-1 mb-2 rounded-lg border border-border bg-card/95 backdrop-blur-md shadow-sm z-20 transition-opacity">
+        <div
+          className={`flex flex-wrap items-center gap-1 p-1 mb-2 rounded-lg border transition-opacity z-20 ${
+            isLight
+              ? "border-stone-300 bg-white/95 text-stone-900 shadow-sm"
+              : "border-border bg-card/95 backdrop-blur-md shadow-sm"
+          }`}
+        >
           {/* Text Style formatting */}
           <Button
             type="button"
@@ -107,7 +123,9 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive("bold") ? "bg-primary/20 text-primary font-bold" : "text-muted-foreground"
+              editor.isActive("bold")
+                ? "bg-primary/20 text-primary font-bold"
+                : btnInactiveClass
             }`}
             title="Bold"
           >
@@ -120,7 +138,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive("italic") ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("italic") ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Italic"
           >
@@ -133,7 +151,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive("underline") ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("underline") ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Underline"
           >
@@ -149,7 +167,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
             className={`h-7 px-1.5 text-xs font-serif font-bold ${
-              editor.isActive("heading", { level: 1 }) ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("heading", { level: 1 }) ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Heading 1"
           >
@@ -162,7 +180,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
             className={`h-7 px-1.5 text-xs font-serif font-bold ${
-              editor.isActive("heading", { level: 2 }) ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("heading", { level: 2 }) ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Heading 2"
           >
@@ -175,7 +193,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
             className={`h-7 px-1.5 text-xs font-serif font-bold ${
-              editor.isActive("heading", { level: 3 }) ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("heading", { level: 3 }) ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Heading 3"
           >
@@ -188,7 +206,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
             className={`h-7 px-1.5 text-xs font-serif font-bold ${
-              editor.isActive("heading", { level: 4 }) ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("heading", { level: 4 }) ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Heading 4"
           >
@@ -204,7 +222,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive("bulletList") ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("bulletList") ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Bullet List"
           >
@@ -217,7 +235,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive("orderedList") ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("orderedList") ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Numbered List"
           >
@@ -230,7 +248,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive("blockquote") ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("blockquote") ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Blockquote"
           >
@@ -246,7 +264,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive({ textAlign: "left" }) ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive({ textAlign: "left" }) ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Align Left"
           >
@@ -259,7 +277,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive({ textAlign: "center" }) ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive({ textAlign: "center" }) ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Align Center"
           >
@@ -272,7 +290,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive({ textAlign: "right" }) ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive({ textAlign: "right" }) ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Align Right"
           >
@@ -285,7 +303,7 @@ export function TiptapEditor({
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign("justify").run()}
             className={`h-7 w-7 p-0 ${
-              editor.isActive({ textAlign: "justify" }) ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive({ textAlign: "justify" }) ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Justify"
           >
@@ -301,7 +319,7 @@ export function TiptapEditor({
             size="sm"
             onClick={setLink}
             className={`h-7 w-7 p-0 ${
-              editor.isActive("link") ? "bg-primary/20 text-primary" : "text-muted-foreground"
+              editor.isActive("link") ? "bg-primary/20 text-primary" : btnInactiveClass
             }`}
             title="Add Link"
           >

@@ -54,6 +54,13 @@ export interface SectionStyle {
   audioTitle?: string;
   audioUrl?: string;
   videoUrl?: string;
+  // Artistic Accents & Fine Art Framing
+  borderColor?: string;
+  borderWidth?: number;
+  borderStyle?: "solid" | "double" | "inset" | "dashed";
+  borderRadius?: "none" | "rounded-md" | "rounded-2xl" | "rounded-t-full";
+  boxShadow?: "none" | "soft" | "gold-glow";
+  ornamentalFrame?: boolean;
 }
 
 export interface StyleInspectorProps {
@@ -71,6 +78,14 @@ const colorPresets = [
   { name: "Deep Teak", hex: "#1E1B18" },
   { name: "Pure White", hex: "#FFFFFF" },
   { name: "Charcoal", hex: "#1A1A1A" },
+];
+
+const artisticBorderPresets = [
+  { name: "None", hex: "transparent" },
+  { name: "Antique Gold", hex: "#D4AF37" },
+  { name: "Temple Terracotta", hex: "#A3281E" },
+  { name: "Raw Silk Ivory", hex: "#E8DFD1" },
+  { name: "Subtle Charcoal", hex: "#2A2622" },
 ];
 
 const fontFamilies = [
@@ -459,6 +474,134 @@ export function StyleInspector({
               ))}
             </SelectContent>
           </Select>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Traditional Indian Framing & Artistic Accents */}
+      <div className="space-y-3">
+        <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
+          Fine Art Borders &amp; Accents
+        </label>
+
+        {/* Border Color Presets */}
+        <div className="space-y-1.5">
+          <label className="text-[11px] text-muted-foreground">Border Tone</label>
+          <div className="grid grid-cols-5 gap-1.5">
+            {artisticBorderPresets.map((b) => (
+              <button
+                key={b.name}
+                type="button"
+                onClick={() => update("borderColor", b.hex)}
+                className={`h-7 rounded border text-[9px] font-semibold flex items-center justify-center transition-all ${
+                  style.borderColor === b.hex
+                    ? "border-primary ring-1 ring-primary scale-105"
+                    : "border-border/60 hover:border-primary/50"
+                }`}
+                style={{
+                  backgroundColor: b.hex === "transparent" ? "transparent" : b.hex,
+                  color: b.hex === "#FFFFFF" || b.hex === "#E8DFD1" || b.hex === "transparent" ? "#000" : "#FFF",
+                }}
+                title={b.name}
+              >
+                {b.name.slice(0, 4)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Border Width & Style */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground">Border Width</label>
+            <Select
+              value={String(style.borderWidth ?? 0)}
+              onValueChange={(val) => update("borderWidth", parseInt(val, 10))}
+            >
+              <SelectTrigger className="text-xs h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">None (0px)</SelectItem>
+                <SelectItem value="1">Thin (1px)</SelectItem>
+                <SelectItem value="2">Medium (2px)</SelectItem>
+                <SelectItem value="3">Bold (3px)</SelectItem>
+                <SelectItem value="4">Heavy (4px)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground">Border Style</label>
+            <Select
+              value={style.borderStyle || "solid"}
+              onValueChange={(val) => update("borderStyle", val as SectionStyle["borderStyle"])}
+            >
+              <SelectTrigger className="text-xs h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="solid">Solid Leaf</SelectItem>
+                <SelectItem value="double">Double Border</SelectItem>
+                <SelectItem value="inset">Inset Traditional</SelectItem>
+                <SelectItem value="dashed">Dashed Fillet</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Corner Radius & Glow */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground">Corner Radius</label>
+            <Select
+              value={style.borderRadius || "none"}
+              onValueChange={(val) => update("borderRadius", val as SectionStyle["borderRadius"])}
+            >
+              <SelectTrigger className="text-xs h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Square (none)</SelectItem>
+                <SelectItem value="rounded-md">Subtle (md)</SelectItem>
+                <SelectItem value="rounded-2xl">Elegant (2xl)</SelectItem>
+                <SelectItem value="rounded-t-full">Temple Arch (Top)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground">Glow / Elevation</label>
+            <Select
+              value={style.boxShadow || "none"}
+              onValueChange={(val) => update("boxShadow", val as SectionStyle["boxShadow"])}
+            >
+              <SelectTrigger className="text-xs h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="soft">Soft Shadow</SelectItem>
+                <SelectItem value="gold-glow">Temple Gold Glow</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Ornamental Frame Fillet Toggle */}
+        <div className="flex items-center justify-between pt-1 p-2 rounded bg-muted/30 border border-border/60">
+          <div>
+            <span className="text-xs font-semibold text-foreground block">Gold Corner Fillets</span>
+            <span className="text-[10px] text-muted-foreground">Traditional Indian framing corner accent</span>
+          </div>
+          <input
+            type="checkbox"
+            checked={!!style.ornamentalFrame}
+            onChange={(e) => update("ornamentalFrame", e.target.checked)}
+            className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+          />
         </div>
       </div>
 

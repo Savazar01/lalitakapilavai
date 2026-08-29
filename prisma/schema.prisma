@@ -29,6 +29,7 @@ model User {
   emailVerified Boolean   @default(false)
   image         String?
   role          Role      @default(ADMIN)
+  status        String    @default("ACTIVE") // ACTIVE, SUSPENDED
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
@@ -353,7 +354,12 @@ model Event {
   eventType          EventType
   description        String              @db.Text
   venue              String
+  venueName          String?
+  streetAddress      String?
   city               String
+  stateProvince      String?
+  postalCode         String?
+  country            String              @default("India")
   timezone           String              @default("Asia/Kolkata")
   startDate          DateTime
   endDate            DateTime

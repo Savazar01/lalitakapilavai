@@ -34,11 +34,35 @@ import {
   Video,
   Music,
   Sparkles,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ViewportSwitcher, ViewportMode } from "@/components/builder/viewport-switcher";
 import { StyleInspector, SectionStyle } from "@/components/builder/style-inspector";
 import { TiptapEditor } from "@/components/builder/tiptap-editor";
+import { ColumnBlock } from "@/components/public/tiptap-renderer";
+
+export function isLightColor(colorStr?: string | null): boolean {
+  if (!colorStr) return false;
+  const hex = colorStr.trim().replace("#", "");
+  if (hex.length === 3) {
+    const r = parseInt(hex[0] + hex[0], 16);
+    const g = parseInt(hex[1] + hex[1], 16);
+    const b = parseInt(hex[2] + hex[2], 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.55;
+  }
+  if (hex.length === 6) {
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.55;
+  }
+  const lightPresets = ["#FAF7F2", "#FFFFFF", "#F3EBDD", "#E8DFD1", "#FBF8F1", "white"];
+  return lightPresets.some((p) => colorStr.toLowerCase().includes(p.toLowerCase()));
+}
 import {
   Dialog,
   DialogContent,
@@ -147,6 +171,97 @@ function SortableSection({
     paddingBottom: `${section.paddingBottom ?? 48}px`,
   };
 
+  const isSectionLight = isLightColor(section.backgroundColor);
+
+  const addBlockToCol = (colIdx: number, type: ColumnBlock["type"]) => {
+    const col = section.subSections[colIdx];
+    const colObj = (typeof col.content === "object" ? col.content : {}) as Record<string, unknown>;
+    const currentBlocks: ColumnBlock[] = Array.isArray(colObj.blocks) ? [...colObj.blocks] : [];
+
+    if (currentBlocks.length === 0 && col.content && (col.content as Record<string, unknown>).type === "doc") {
+      currentBlocks.push({
+        id: `blk-${Date.now()}-1`,
+        type: "TEXT",
+        content: col.content as Record<string, unknown>,
+      });
+    }
+
+    const newBlock: ColumnBlock = {
+      id: `blk-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      type,
+      ...(type === "TEXT"
+        ? {
+            content: {
+              type: "doc",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{ type: "text", text: "New verse or commentary block..." }],
+                },
+              ],
+            },
+          }
+        : {}),
+      ...(type === "IMAGE"
+        ? {
+            mediaUrl:
+              "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=800",
+            mediaAlt: "Classical Masterwork",
+            mediaAspectRatio: "auto",
+          }
+        : {}),
+      ...(type === "VIDEO"
+        ? { videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
+        : {}),
+      ...(type === "AUDIO"
+        ? {
+            audioTitle: "Carnatic Recital in Kalyani Raga",
+            audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+          }
+        : {}),
+      ...(type === "DIVIDER" ? { dividerStyle: "gold-leaf" } : {}),
+      ...(type === "BUTTON"
+        ? {
+            buttonText: "Explore Masterwork",
+            buttonUrl: "/gallery",
+            buttonVariant: "gold",
+          }
+        : {}),
+    };
+
+    currentBlocks.push(newBlock);
+    onUpdateSubSectionContent(colIdx, { ...colObj, blocks: currentBlocks });
+  };
+
+  const removeBlockFromCol = (colIdx: number, blockId: string) => {
+    const col = section.subSections[colIdx];
+    const colObj = (typeof col.content === "object" ? col.content : {}) as Record<string, unknown>;
+    const currentBlocks: ColumnBlock[] = Array.isArray(colObj.blocks)
+      ? colObj.blocks.filter((b) => b.id !== blockId)
+      : [];
+    onUpdateSubSectionContent(colIdx, { ...colObj, blocks: currentBlocks });
+  };
+
+  const moveBlock = (colIdx: number, blockIdx: number, direction: "up" | "down") => {
+    const col = section.subSections[colIdx];
+    const colObj = (typeof col.content === "object" ? col.content : {}) as Record<string, unknown>;
+    if (!Array.isArray(colObj.blocks)) return;
+    const targetIdx = direction === "up" ? blockIdx - 1 : blockIdx + 1;
+    if (targetIdx < 0 || targetIdx >= colObj.blocks.length) return;
+    const newBlocks = [...colObj.blocks];
+    const [moved] = newBlocks.splice(blockIdx, 1);
+    newBlocks.splice(targetIdx, 0, moved);
+    onUpdateSubSectionContent(colIdx, { ...colObj, blocks: newBlocks });
+  };
+
+  const updateBlock = (colIdx: number, blockId: string, updates: Partial<ColumnBlock>) => {
+    const col = section.subSections[colIdx];
+    const colObj = (typeof col.content === "object" ? col.content : {}) as Record<string, unknown>;
+    if (!Array.isArray(colObj.blocks)) return;
+    const newBlocks = colObj.blocks.map((b) => (b.id === blockId ? { ...b, ...updates } : b));
+    onUpdateSubSectionContent(colIdx, { ...colObj, blocks: newBlocks });
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -216,8 +331,40 @@ function SortableSection({
               ? "col-span-12 md:col-span-3"
               : "col-span-12";
 
-          const isColSelected =
-            isSelected && selectedSubSectionIndex === colIdx;
+          const isColSelected = isSelected && selectedSubSectionIndex === colIdx;
+
+          const colObj = (typeof col.content === "object" ? col.content : {}) as Record<string, unknown>;
+          const colStyle = (col.style || colObj?._style || {}) as SectionStyle;
+
+          const borderStyleObj: React.CSSProperties = {
+            borderColor:
+              colStyle.borderColor && colStyle.borderColor !== "transparent"
+                ? colStyle.borderColor
+                : undefined,
+            borderWidth: colStyle.borderWidth ? `${colStyle.borderWidth}px` : undefined,
+            borderStyle: (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
+          };
+
+          let radiusClass = "rounded-lg";
+          if (colStyle.borderRadius === "none") radiusClass = "rounded-none";
+          if (colStyle.borderRadius === "rounded-md") radiusClass = "rounded-md";
+          if (colStyle.borderRadius === "rounded-2xl") radiusClass = "rounded-2xl";
+          if (colStyle.borderRadius === "rounded-t-full") radiusClass = "rounded-t-full";
+
+          let glowClass = "";
+          if (colStyle.boxShadow === "gold-glow")
+            glowClass = "shadow-[0_0_25px_rgba(212,175,55,0.25)]";
+          if (colStyle.boxShadow === "soft") glowClass = "shadow-md";
+
+          const bgColClass = isSectionLight
+            ? isColSelected
+              ? "bg-white/95 border-primary/80"
+              : "bg-white/85 border-stone-300/80 hover:border-stone-400 text-stone-900"
+            : isColSelected
+            ? "bg-primary/5 border-primary/80 text-foreground"
+            : "bg-card/40 border-border/40 hover:border-primary/40 text-foreground";
+
+          const blocks = (Array.isArray(colObj.blocks) ? colObj.blocks : null) as ColumnBlock[] | null;
 
           return (
             <div
@@ -226,87 +373,338 @@ function SortableSection({
                 e.stopPropagation();
                 onSelectSubSection(colIdx);
               }}
-              className={`${colSpanClass} p-3 rounded-lg border transition-all ${
-                isColSelected
-                  ? "border-primary/80 bg-primary/5"
-                  : "border-border/40 hover:border-primary/40 bg-card/40"
-              }`}
+              style={borderStyleObj}
+              className={`${colSpanClass} p-3 transition-all relative ${radiusClass} ${glowClass} ${bgColClass} border`}
             >
+              {/* Ornamental Frame Fillets */}
+              {colStyle.ornamentalFrame && (
+                <>
+                  <div className="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-[#D4AF37] pointer-events-none z-10" />
+                  <div className="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-[#D4AF37] pointer-events-none z-10" />
+                  <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-[#D4AF37] pointer-events-none z-10" />
+                  <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-[#D4AF37] pointer-events-none z-10" />
+                </>
+              )}
+
               {/* Column label badge */}
-              <div className="flex items-center justify-between pb-1 mb-1 border-b border-border/30">
-                <span className="text-[10px] uppercase font-mono text-muted-foreground">
+              <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-border/30">
+                <span
+                  className={`text-[10px] uppercase font-mono font-semibold ${
+                    isSectionLight ? "text-stone-700" : "text-muted-foreground"
+                  }`}
+                >
                   Column {colIdx + 1} ({col.gridSpan}/12)
                 </span>
+                {colStyle.borderColor && colStyle.borderColor !== "transparent" && (
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                    Bordered
+                  </span>
+                )}
               </div>
 
-              {/* Column Rich Media Preview */}
-              {(() => {
-                const media = (col.content as Record<string, unknown>)?._media as
-                  | Record<string, unknown>
-                  | undefined;
-                if (!media || !media.mediaType || media.mediaType === "NONE") return null;
-
-                if (media.mediaType === "IMAGE" && media.mediaUrl) {
-                  return (
-                    <div className="mb-2 relative rounded overflow-hidden border border-border/80 bg-muted/30">
-                      <img
-                        src={media.mediaUrl as string}
-                        alt={(media.mediaAlt as string) || "Column image"}
-                        className="w-full object-cover max-h-48 rounded"
-                      />
-                      <div className="absolute top-1 right-1 bg-black/70 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-[9px] font-mono">
-                        IMAGE ({String(media.mediaAspectRatio || "auto")})
+              {/* Multi-Block Nested Row Rendering */}
+              {blocks && blocks.length > 0 ? (
+                <div className="space-y-3">
+                  {blocks.map((block, bIdx) => (
+                    <div
+                      key={block.id}
+                      className={`p-2 rounded border transition-colors ${
+                        isSectionLight ? "bg-stone-50/80 border-stone-200" : "bg-muted/20 border-border/50"
+                      }`}
+                    >
+                      {/* Block control bar */}
+                      <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-border/30 text-[10px] font-mono text-muted-foreground">
+                        <span className="font-semibold text-primary">
+                          #{bIdx + 1} {block.type}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveBlock(colIdx, bIdx, "up");
+                            }}
+                            disabled={bIdx === 0}
+                            className="p-1 hover:text-foreground disabled:opacity-30"
+                            title="Move Up"
+                          >
+                            <ChevronUp className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveBlock(colIdx, bIdx, "down");
+                            }}
+                            disabled={bIdx === blocks.length - 1}
+                            className="p-1 hover:text-foreground disabled:opacity-30"
+                            title="Move Down"
+                          >
+                            <ChevronDown className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeBlockFromCol(colIdx, block.id);
+                            }}
+                            className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                            title="Remove Block"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Block Contents */}
+                      {block.type === "TEXT" && (
+                        <TiptapEditor
+                          isLight={isSectionLight}
+                          content={block.content}
+                          onChange={(json) => updateBlock(colIdx, block.id, { content: json })}
+                        />
+                      )}
+
+                      {block.type === "IMAGE" && (
+                        <div className="space-y-1.5">
+                          {block.mediaUrl ? (
+                            <img
+                              src={block.mediaUrl}
+                              alt={block.mediaAlt || "Block image"}
+                              className="w-full h-36 object-cover rounded border border-border/80"
+                            />
+                          ) : (
+                            <div className="h-24 bg-muted/40 rounded border border-dashed border-border flex items-center justify-center text-xs text-muted-foreground">
+                              No image URL provided
+                            </div>
+                          )}
+                          <div className="grid grid-cols-2 gap-2 pt-1">
+                            <input
+                              type="text"
+                              placeholder="Image URL"
+                              value={block.mediaUrl || ""}
+                              onChange={(e) =>
+                                updateBlock(colIdx, block.id, { mediaUrl: e.target.value })
+                              }
+                              className="text-xs p-1 rounded border border-border bg-background text-foreground"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Alt text"
+                              value={block.mediaAlt || ""}
+                              onChange={(e) =>
+                                updateBlock(colIdx, block.id, { mediaAlt: e.target.value })
+                              }
+                              className="text-xs p-1 rounded border border-border bg-background text-foreground"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {block.type === "VIDEO" && (
+                        <div className="space-y-1.5">
+                          <div className="p-2 rounded bg-primary/5 border border-primary/20 flex items-center gap-2">
+                            <Video className="w-4 h-4 text-primary shrink-0" />
+                            <input
+                              type="text"
+                              placeholder="Video URL (YouTube/Vimeo/MP4)"
+                              value={block.videoUrl || ""}
+                              onChange={(e) =>
+                                updateBlock(colIdx, block.id, { videoUrl: e.target.value })
+                              }
+                              className="w-full text-xs p-1 rounded border border-border bg-background text-foreground font-mono"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {block.type === "AUDIO" && (
+                        <div className="space-y-1.5">
+                          <div className="p-2 rounded bg-card border border-primary/20 space-y-1.5">
+                            <div className="flex items-center gap-2">
+                              <Music className="w-3.5 h-3.5 text-primary shrink-0" />
+                              <input
+                                type="text"
+                                placeholder="Recital Title (e.g. Kalyani Varnam)"
+                                value={block.audioTitle || ""}
+                                onChange={(e) =>
+                                  updateBlock(colIdx, block.id, { audioTitle: e.target.value })
+                                }
+                                className="w-full text-xs p-1 rounded border border-border bg-background text-foreground"
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              placeholder="Audio MP3 URL"
+                              value={block.audioUrl || ""}
+                              onChange={(e) =>
+                                updateBlock(colIdx, block.id, { audioUrl: e.target.value })
+                              }
+                              className="w-full text-xs p-1 rounded border border-border bg-background text-foreground font-mono"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {block.type === "DIVIDER" && (
+                        <div className="py-2 flex items-center justify-center gap-2">
+                          <div className="h-px bg-primary/40 flex-1" />
+                          <Sparkles className="w-3.5 h-3.5 text-primary" />
+                          <div className="h-px bg-primary/40 flex-1" />
+                        </div>
+                      )}
+
+                      {block.type === "BUTTON" && (
+                        <div className="grid grid-cols-2 gap-2 py-1">
+                          <input
+                            type="text"
+                            placeholder="Button Label"
+                            value={block.buttonText || ""}
+                            onChange={(e) =>
+                              updateBlock(colIdx, block.id, { buttonText: e.target.value })
+                            }
+                            className="text-xs p-1 rounded border border-border bg-background text-foreground"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Link URL (e.g. /gallery)"
+                            value={block.buttonUrl || ""}
+                            onChange={(e) =>
+                              updateBlock(colIdx, block.id, { buttonUrl: e.target.value })
+                            }
+                            className="text-xs p-1 rounded border border-border bg-background text-foreground"
+                          />
+                        </div>
+                      )}
                     </div>
-                  );
-                }
+                  ))}
+                </div>
+              ) : (
+                /* Legacy single doc rendering with media preview */
+                <div>
+                  {/* Column Rich Media Preview */}
+                  {(() => {
+                    const media = colObj?._media as Record<string, unknown> | undefined;
+                    if (!media || !media.mediaType || media.mediaType === "NONE") return null;
 
-                if (media.mediaType === "VIDEO" && media.videoUrl) {
-                  return (
-                    <div className="mb-2 p-2.5 rounded border border-primary/30 bg-primary/5 flex items-center gap-2">
-                      <Video className="w-4 h-4 text-primary shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-bold uppercase text-primary block">Video</span>
-                        <p className="text-[11px] text-foreground truncate font-mono">{String(media.videoUrl)}</p>
-                      </div>
-                    </div>
-                  );
-                }
+                    if (media.mediaType === "IMAGE" && media.mediaUrl) {
+                      return (
+                        <div className="mb-2 relative rounded overflow-hidden border border-border/80 bg-muted/30">
+                          <img
+                            src={media.mediaUrl as string}
+                            alt={(media.mediaAlt as string) || "Column image"}
+                            className="w-full object-cover max-h-48 rounded"
+                          />
+                        </div>
+                      );
+                    }
 
-                if (media.mediaType === "ICON") {
-                  return (
-                    <div className="mb-2 flex items-center justify-center p-3 rounded border border-border/60 bg-muted/20">
-                      <Sparkles
-                        style={{
-                          width: `${Number(media.iconSize) || 32}px`,
-                          height: `${Number(media.iconSize) || 32}px`,
-                          color: String(media.iconColor || "#D4AF37"),
-                        }}
-                      />
-                    </div>
-                  );
-                }
+                    if (media.mediaType === "VIDEO" && media.videoUrl) {
+                      return (
+                        <div className="mb-2 p-2.5 rounded border border-primary/30 bg-primary/5 flex items-center gap-2">
+                          <Video className="w-4 h-4 text-primary shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[10px] font-bold uppercase text-primary block">Video</span>
+                            <p className="text-[11px] text-foreground truncate font-mono">{String(media.videoUrl)}</p>
+                          </div>
+                        </div>
+                      );
+                    }
 
-                if (media.mediaType === "AUDIO_PLAYER" && media.audioUrl) {
-                  return (
-                    <div className="mb-2 p-2 rounded border border-primary/30 bg-card flex items-center gap-2">
-                      <Music className="w-3.5 h-3.5 text-primary shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-bold text-primary block">Audio Snippet</span>
-                        <p className="text-[11px] text-foreground truncate">{String(media.audioTitle || media.audioUrl)}</p>
-                      </div>
-                    </div>
-                  );
-                }
+                    if (media.mediaType === "AUDIO_PLAYER" && media.audioUrl) {
+                      return (
+                        <div className="mb-2 p-2 rounded border border-primary/30 bg-card flex items-center gap-2">
+                          <Music className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[10px] font-bold text-primary block">Audio Snippet</span>
+                            <p className="text-[11px] text-foreground truncate">{String(media.audioTitle || media.audioUrl)}</p>
+                          </div>
+                        </div>
+                      );
+                    }
 
-                return null;
-              })()}
+                    return null;
+                  })()}
 
-              {/* Inline Tiptap Rich-Text Editor */}
-              <TiptapEditor
-                content={col.content}
-                onChange={(json) => onUpdateSubSectionContent(colIdx, json)}
-              />
+                  {/* Inline Tiptap Rich-Text Editor */}
+                  <TiptapEditor
+                    isLight={isSectionLight}
+                    content={col.content}
+                    onChange={(json) => onUpdateSubSectionContent(colIdx, json)}
+                  />
+                </div>
+              )}
+
+              {/* Add Block to Column Action Bar */}
+              <div className="mt-3 pt-2 border-t border-border/40 flex flex-wrap items-center gap-1">
+                <span
+                  className={`text-[9px] font-mono mr-1 ${
+                    isSectionLight ? "text-stone-600 font-semibold" : "text-muted-foreground"
+                  }`}
+                >
+                  + Add Row Block:
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "TEXT");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                >
+                  + Text
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "IMAGE");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                >
+                  + Image
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "VIDEO");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                >
+                  + Video
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "AUDIO");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                >
+                  + Audio
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "DIVIDER");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                >
+                  + Divider
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "BUTTON");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                >
+                  + Button
+                </button>
+              </div>
             </div>
           );
         })}
@@ -654,9 +1052,11 @@ export default function VisualPageBuilder() {
             selectedSubIndex !== null
               ? currentSection.subSections[selectedSubIndex]
               : null;
-          const subMedia = (selectedSub?.content as Record<string, unknown>)?._media as
-            | Record<string, unknown>
-            | undefined;
+          const subObj = (typeof selectedSub?.content === "object"
+            ? selectedSub.content
+            : {}) as Record<string, unknown>;
+          const subMedia = subObj?._media as Record<string, unknown> | undefined;
+          const subStyle = (selectedSub?.style || subObj?._style || {}) as SectionStyle;
 
           return (
             <StyleInspector
@@ -677,6 +1077,12 @@ export default function VisualPageBuilder() {
                 audioTitle: (subMedia?.audioTitle as string) || "",
                 audioUrl: (subMedia?.audioUrl as string) || "",
                 videoUrl: (subMedia?.videoUrl as string) || "",
+                borderColor: subStyle.borderColor || "",
+                borderWidth: subStyle.borderWidth ?? 0,
+                borderStyle: subStyle.borderStyle || "solid",
+                borderRadius: subStyle.borderRadius || "none",
+                boxShadow: subStyle.boxShadow || "none",
+                ornamentalFrame: !!subStyle.ornamentalFrame,
               }}
               onChange={(updated) => {
                 setPage({
@@ -694,6 +1100,14 @@ export default function VisualPageBuilder() {
                         gridSpan: updated.gridSpan || newSubs[selectedSubIndex].gridSpan,
                         content: {
                           ...existingContent,
+                          _style: {
+                            borderColor: updated.borderColor,
+                            borderWidth: updated.borderWidth,
+                            borderStyle: updated.borderStyle,
+                            borderRadius: updated.borderRadius,
+                            boxShadow: updated.boxShadow,
+                            ornamentalFrame: updated.ornamentalFrame,
+                          },
                           _media: {
                             mediaType: updated.mediaType || "NONE",
                             mediaUrl: updated.mediaUrl || "",

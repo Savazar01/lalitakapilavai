@@ -83,10 +83,10 @@ export default async function EventsPage() {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-                      <span className="truncate">
-                        {ev.venue}, {ev.city}
+                    <div className="flex items-start gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                      <span className="truncate text-foreground/90">
+                        {ev.venueName || ev.venue}{ev.city ? `, ${ev.city}` : ""}{ev.country ? ` (${ev.country})` : ""}
                       </span>
                     </div>
 
