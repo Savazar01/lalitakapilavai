@@ -1,59 +1,64 @@
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: lalitakapilavai_web
-    restart: unless-stopped
-    ports:
-      - "3060:3060"
-    environment:
-      - NODE_ENV=production
-      - PORT=3060
-      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-lalitakapilavai_prod}?schema=public
-      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3060}
-      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3060}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3060}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - lalitakapilavai_network
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3060/api/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-
   db:
     image: pgvector/pgvector:pg17
-    container_name: lalitakapilavai_db
-    restart: unless-stopped
-    ports:
-      - "5633:5432"
+    container_name: lalita_postgres_prod
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-lalitakapilavai_prod}
-      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
-      - ./docker/postgres/init-pgvector.sql:/docker-entrypoint-initdb.d/init-pgvector.sql:ro
-    networks:
-      - lalitakapilavai_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lalitakapilavai_prod}"]
       interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 5s
+    networks:
+      - coolify
 
-networks:
-  lalitakapilavai_network:
-    driver: bridge
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: lalita_web_prod
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "3060"
+    environment:
+      NODE_ENV: production
+      PORT: 3060
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@lalita_postgres_prod:5432/${POSTGRES_DB:-lalitakapilavai_prod}?schema=public
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME:-Lalita Kapilavai Superadmin}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-r2}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      S3_PUBLIC_DOMAIN: ${S3_PUBLIC_DOMAIN}
+      S3_REGION: ${S3_REGION:-auto}
+      WATERMARK_TEXT: ${WATERMARK_TEXT:-© Lalita Kapilavai | lalitakapilavai.com}
+      WATERMARK_OPACITY: ${WATERMARK_OPACITY:-0.75}
+    volumes:
+      - media_uploads:/app/public/media
+    networks:
+      - coolify
 
 volumes:
   postgres_prod_data:
-    driver: local
+    name: lalita_postgres_prod_data
+  media_uploads:
+    name: lalita_media_uploads
+
+networks:
+  coolify:
+    external: true

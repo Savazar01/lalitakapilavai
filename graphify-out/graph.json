@@ -4,6 +4,32 @@
   "graph": {},
   "nodes": [
     {
+      "label": "docker-entrypoint.sh",
+      "file_type": "code",
+      "source_file": "docker-entrypoint.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "id": "docker_entrypoint_sh",
+      "community": 42,
+      "norm_label": "docker-entrypoint.sh"
+    },
+    {
+      "label": "docker-entrypoint.sh script",
+      "file_type": "code",
+      "source_file": "docker-entrypoint.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "id": "c_users_avasa_downloads_openc_lalitakapilavai_docker_entrypoint_sh__entry",
+      "community": 42,
+      "norm_label": "docker-entrypoint.sh script"
+    },
+    {
       "label": "eslint.config.mjs",
       "file_type": "code",
       "source_file": "eslint.config.mjs",
@@ -891,7 +917,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_artwork_slug_page_tsx",
-      "community": 46,
+      "community": 7,
       "norm_label": "page.tsx"
     },
     {
@@ -900,7 +926,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L24",
       "id": "src_app_public_artwork_slug_page_tsx_slug_page_pageprops",
-      "community": 46,
+      "community": 7,
       "norm_label": "pageprops"
     },
     {
@@ -909,7 +935,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L28",
       "id": "slug_page_getartworkbyslug",
-      "community": 46,
+      "community": 7,
       "norm_label": "getartworkbyslug"
     },
     {
@@ -918,7 +944,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L43",
       "id": "src_app_public_artwork_slug_page_tsx_slug_page_generatemetadata",
-      "community": 46,
+      "community": 7,
       "norm_label": "generatemetadata()"
     },
     {
@@ -927,7 +953,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L62",
       "id": "slug_page_artworkdetailpage",
-      "community": 46,
+      "community": 7,
       "norm_label": "artworkdetailpage()"
     },
     {
@@ -936,7 +962,7 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_blogs_page_tsx",
-      "community": 47,
+      "community": 7,
       "norm_label": "page.tsx"
     },
     {
@@ -945,7 +971,7 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L8",
       "id": "blogs_page_metadata",
-      "community": 47,
+      "community": 7,
       "norm_label": "metadata"
     },
     {
@@ -954,7 +980,7 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L17",
       "id": "blogs_page_blogspage",
-      "community": 47,
+      "community": 7,
       "norm_label": "blogspage()"
     },
     {
@@ -963,7 +989,7 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_blogs_slug_page_tsx",
-      "community": 44,
+      "community": 7,
       "norm_label": "page.tsx"
     },
     {
@@ -972,7 +998,7 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L18",
       "id": "src_app_public_blogs_slug_page_tsx_slug_page_pageprops",
-      "community": 44,
+      "community": 7,
       "norm_label": "pageprops"
     },
     {
@@ -981,7 +1007,7 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L22",
       "id": "src_app_public_blogs_slug_page_tsx_slug_page_generatemetadata",
-      "community": 44,
+      "community": 7,
       "norm_label": "generatemetadata()"
     },
     {
@@ -990,7 +1016,7 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L56",
       "id": "slug_page_blogdetailpage",
-      "community": 44,
+      "community": 7,
       "norm_label": "blogdetailpage()"
     },
     {
@@ -999,7 +1025,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_events_page_tsx",
-      "community": 0,
+      "community": 7,
       "norm_label": "page.tsx"
     },
     {
@@ -1008,7 +1034,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L10",
       "id": "events_page_metadata",
-      "community": 0,
+      "community": 7,
       "norm_label": "metadata"
     },
     {
@@ -1017,7 +1043,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L16",
       "id": "events_page_eventspage",
-      "community": 0,
+      "community": 7,
       "norm_label": "eventspage()"
     },
     {
@@ -1026,7 +1052,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_events_slug_page_tsx",
-      "community": 49,
+      "community": 7,
       "norm_label": "page.tsx"
     },
     {
@@ -1035,7 +1061,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L20",
       "id": "src_app_public_events_slug_page_tsx_slug_page_pageprops",
-      "community": 49,
+      "community": 7,
       "norm_label": "pageprops"
     },
     {
@@ -1044,7 +1070,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L24",
       "id": "slug_page_geteventbyslug",
-      "community": 49,
+      "community": 7,
       "norm_label": "geteventbyslug"
     },
     {
@@ -1053,7 +1079,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L41",
       "id": "src_app_public_events_slug_page_tsx_slug_page_generatemetadata",
-      "community": 49,
+      "community": 7,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1062,7 +1088,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L55",
       "id": "slug_page_eventdetailpage",
-      "community": 49,
+      "community": 7,
       "norm_label": "eventdetailpage()"
     },
     {
@@ -1134,7 +1160,7 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_posts_page_tsx",
-      "community": 44,
+      "community": 7,
       "norm_label": "page.tsx"
     },
     {
@@ -1143,7 +1169,7 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L3",
       "id": "posts_page_postslegacyredirect",
-      "community": 44,
+      "community": 7,
       "norm_label": "postslegacyredirect()"
     },
     {
@@ -1152,7 +1178,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_posts_slug_page_tsx",
-      "community": 50,
+      "community": 7,
       "norm_label": "page.tsx"
     },
     {
@@ -1161,7 +1187,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L3",
       "id": "src_app_public_posts_slug_page_tsx_slug_page_pageprops",
-      "community": 50,
+      "community": 7,
       "norm_label": "pageprops"
     },
     {
@@ -1170,7 +1196,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L7",
       "id": "slug_page_postsluglegacyredirect",
-      "community": 50,
+      "community": 7,
       "norm_label": "postsluglegacyredirect()"
     },
     {
@@ -1278,7 +1304,7 @@
       "source_file": "src/app/admin/(dashboard)/artworks/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_artworks_page_tsx",
-      "community": 42,
+      "community": 0,
       "norm_label": "page.tsx"
     },
     {
@@ -1287,7 +1313,7 @@
       "source_file": "src/app/admin/(dashboard)/artworks/page.tsx",
       "source_location": "L56",
       "id": "artworks_page_category",
-      "community": 42,
+      "community": 0,
       "norm_label": "category"
     },
     {
@@ -1296,7 +1322,7 @@
       "source_file": "src/app/admin/(dashboard)/artworks/page.tsx",
       "source_location": "L63",
       "id": "artworks_page_artwork",
-      "community": 42,
+      "community": 0,
       "norm_label": "artwork"
     },
     {
@@ -1305,7 +1331,7 @@
       "source_file": "src/app/admin/(dashboard)/artworks/page.tsx",
       "source_location": "L85",
       "id": "artworks_page_artworksadminpage",
-      "community": 42,
+      "community": 0,
       "norm_label": "artworksadminpage()"
     },
     {
@@ -1620,7 +1646,7 @@
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_settings_page_tsx",
-      "community": 42,
+      "community": 0,
       "norm_label": "page.tsx"
     },
     {
@@ -1629,7 +1655,7 @@
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
       "source_location": "L40",
       "id": "settings_page_adminsettingspage",
-      "community": 42,
+      "community": 0,
       "norm_label": "adminsettingspage()"
     },
     {
@@ -1638,7 +1664,7 @@
       "source_file": "src/app/admin/(dashboard)/users/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_users_page_tsx",
-      "community": 42,
+      "community": 0,
       "norm_label": "page.tsx"
     },
     {
@@ -1647,7 +1673,7 @@
       "source_file": "src/app/admin/(dashboard)/users/page.tsx",
       "source_location": "L46",
       "id": "users_page_adminuser",
-      "community": 42,
+      "community": 0,
       "norm_label": "adminuser"
     },
     {
@@ -1656,7 +1682,7 @@
       "source_file": "src/app/admin/(dashboard)/users/page.tsx",
       "source_location": "L59",
       "id": "users_page_usermanagementpage",
-      "community": 42,
+      "community": 0,
       "norm_label": "usermanagementpage()"
     },
     {
@@ -1692,7 +1718,7 @@
       "source_file": "src/app/api/admin/artworks/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_artworks_route_ts",
-      "community": 45,
+      "community": 1,
       "norm_label": "route.ts"
     },
     {
@@ -1701,7 +1727,7 @@
       "source_file": "src/app/api/admin/artworks/route.ts",
       "source_location": "L6",
       "id": "artworks_route_get",
-      "community": 45,
+      "community": 1,
       "norm_label": "get()"
     },
     {
@@ -1710,7 +1736,7 @@
       "source_file": "src/app/api/admin/artworks/route.ts",
       "source_location": "L66",
       "id": "artworks_route_post",
-      "community": 45,
+      "community": 1,
       "norm_label": "post()"
     },
     {
@@ -2133,7 +2159,7 @@
       "source_file": "src/app/api/admin/qr/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_qr_route_ts",
-      "community": 45,
+      "community": 1,
       "norm_label": "route.ts"
     },
     {
@@ -2142,7 +2168,7 @@
       "source_file": "src/app/api/admin/qr/route.ts",
       "source_location": "L7",
       "id": "qr_route_get",
-      "community": 45,
+      "community": 1,
       "norm_label": "get()"
     },
     {
@@ -2250,7 +2276,7 @@
       "source_file": "src/app/api/blogs/route.ts",
       "source_location": "L1",
       "id": "src_app_api_blogs_route_ts",
-      "community": 48,
+      "community": 7,
       "norm_label": "route.ts"
     },
     {
@@ -2259,7 +2285,7 @@
       "source_file": "src/app/api/blogs/route.ts",
       "source_location": "L4",
       "id": "blogs_route_get",
-      "community": 48,
+      "community": 7,
       "norm_label": "get()"
     },
     {
@@ -2268,7 +2294,7 @@
       "source_file": "src/app/api/events/register/route.ts",
       "source_location": "L1",
       "id": "src_app_api_events_register_route_ts",
-      "community": 48,
+      "community": 7,
       "norm_label": "route.ts"
     },
     {
@@ -2277,7 +2303,7 @@
       "source_file": "src/app/api/events/register/route.ts",
       "source_location": "L4",
       "id": "register_route_post",
-      "community": 48,
+      "community": 7,
       "norm_label": "post()"
     },
     {
@@ -2304,7 +2330,7 @@
       "source_file": "src/app/api/leads/submit/route.ts",
       "source_location": "L1",
       "id": "src_app_api_leads_submit_route_ts",
-      "community": 48,
+      "community": 7,
       "norm_label": "route.ts"
     },
     {
@@ -2313,7 +2339,7 @@
       "source_file": "src/app/api/leads/submit/route.ts",
       "source_location": "L4",
       "id": "submit_route_post",
-      "community": 48,
+      "community": 7,
       "norm_label": "post()"
     },
     {
@@ -2340,7 +2366,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L1",
       "id": "src_components_builder_style_inspector_tsx",
-      "community": 42,
+      "community": 43,
       "norm_label": "style-inspector.tsx"
     },
     {
@@ -2358,7 +2384,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L69",
       "id": "builder_style_inspector_styleinspectorprops",
-      "community": 42,
+      "community": 43,
       "norm_label": "styleinspectorprops"
     },
     {
@@ -2367,7 +2393,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L75",
       "id": "builder_style_inspector_colorpresets",
-      "community": 42,
+      "community": 43,
       "norm_label": "colorpresets"
     },
     {
@@ -2376,7 +2402,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L86",
       "id": "builder_style_inspector_artisticborderpresets",
-      "community": 42,
+      "community": 43,
       "norm_label": "artisticborderpresets"
     },
     {
@@ -2385,7 +2411,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L94",
       "id": "builder_style_inspector_fontfamilies",
-      "community": 42,
+      "community": 43,
       "norm_label": "fontfamilies"
     },
     {
@@ -2394,7 +2420,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L102",
       "id": "builder_style_inspector_availableicons",
-      "community": 42,
+      "community": 43,
       "norm_label": "availableicons"
     },
     {
@@ -2538,7 +2564,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L1",
       "id": "src_components_public_art_canvas_viewer_tsx",
-      "community": 46,
+      "community": 7,
       "norm_label": "art-canvas-viewer.tsx"
     },
     {
@@ -2547,7 +2573,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L15",
       "id": "public_art_canvas_viewer_artcanvasviewerprops",
-      "community": 46,
+      "community": 7,
       "norm_label": "artcanvasviewerprops"
     },
     {
@@ -2556,7 +2582,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L26",
       "id": "public_art_canvas_viewer_artcanvasviewer",
-      "community": 46,
+      "community": 7,
       "norm_label": "artcanvasviewer()"
     },
     {
@@ -2565,7 +2591,7 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L1",
       "id": "src_components_public_blog_archive_client_tsx",
-      "community": 47,
+      "community": 7,
       "norm_label": "blog-archive-client.tsx"
     },
     {
@@ -2574,7 +2600,7 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L9",
       "id": "public_blog_archive_client_blogpostdata",
-      "community": 47,
+      "community": 7,
       "norm_label": "blogpostdata"
     },
     {
@@ -2583,7 +2609,7 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L22",
       "id": "public_blog_archive_client_estimatereadingtime",
-      "community": 47,
+      "community": 7,
       "norm_label": "estimatereadingtime()"
     },
     {
@@ -2592,7 +2618,7 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L29",
       "id": "public_blog_archive_client_blogarchiveclient",
-      "community": 47,
+      "community": 7,
       "norm_label": "blogarchiveclient()"
     },
     {
@@ -2655,7 +2681,7 @@
       "source_file": "src/components/public/event-rsvp-form.tsx",
       "source_location": "L21",
       "id": "public_event_rsvp_form_eventrsvpform",
-      "community": 49,
+      "community": 7,
       "norm_label": "eventrsvpform()"
     },
     {
@@ -2682,7 +2708,7 @@
       "source_file": "src/components/public/exhibition-qr-modal.tsx",
       "source_location": "L24",
       "id": "public_exhibition_qr_modal_exhibitionqrmodal",
-      "community": 46,
+      "community": 7,
       "norm_label": "exhibitionqrmodal()"
     },
     {
@@ -2745,7 +2771,7 @@
       "source_file": "src/components/public/navbar.tsx",
       "source_location": "L1",
       "id": "src_components_public_navbar_tsx",
-      "community": 4,
+      "community": 7,
       "norm_label": "navbar.tsx"
     },
     {
@@ -2754,7 +2780,7 @@
       "source_file": "src/components/public/navbar.tsx",
       "source_location": "L21",
       "id": "public_navbar_navbar",
-      "community": 47,
+      "community": 7,
       "norm_label": "navbar()"
     },
     {
@@ -2871,7 +2897,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L1",
       "id": "src_components_ui_badge_tsx",
-      "community": 44,
+      "community": 7,
       "norm_label": "badge.tsx"
     },
     {
@@ -2880,7 +2906,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L5",
       "id": "ui_badge_badgevariants",
-      "community": 44,
+      "community": 7,
       "norm_label": "badgevariants"
     },
     {
@@ -2889,7 +2915,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L27",
       "id": "ui_badge_badgeprops",
-      "community": 44,
+      "community": 7,
       "norm_label": "badgeprops"
     },
     {
@@ -2898,7 +2924,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L31",
       "id": "ui_badge_badge",
-      "community": 44,
+      "community": 7,
       "norm_label": "badge()"
     },
     {
@@ -3195,7 +3221,7 @@
       "source_file": "src/components/ui/select.tsx",
       "source_location": "L1",
       "id": "src_components_ui_select_tsx",
-      "community": 42,
+      "community": 0,
       "norm_label": "select.tsx"
     },
     {
@@ -3204,7 +3230,7 @@
       "source_file": "src/components/ui/select.tsx",
       "source_location": "L10",
       "id": "ui_select_selecttrigger",
-      "community": 42,
+      "community": 0,
       "norm_label": "selecttrigger"
     },
     {
@@ -3213,7 +3239,7 @@
       "source_file": "src/components/ui/select.tsx",
       "source_location": "L30",
       "id": "ui_select_selectscrollupbutton",
-      "community": 42,
+      "community": 0,
       "norm_label": "selectscrollupbutton"
     },
     {
@@ -3222,7 +3248,7 @@
       "source_file": "src/components/ui/select.tsx",
       "source_location": "L47",
       "id": "ui_select_selectscrolldownbutton",
-      "community": 42,
+      "community": 0,
       "norm_label": "selectscrolldownbutton"
     },
     {
@@ -3231,7 +3257,7 @@
       "source_file": "src/components/ui/select.tsx",
       "source_location": "L65",
       "id": "ui_select_selectcontent",
-      "community": 42,
+      "community": 0,
       "norm_label": "selectcontent"
     },
     {
@@ -3240,7 +3266,7 @@
       "source_file": "src/components/ui/select.tsx",
       "source_location": "L97",
       "id": "ui_select_selectlabel",
-      "community": 42,
+      "community": 0,
       "norm_label": "selectlabel"
     },
     {
@@ -3249,7 +3275,7 @@
       "source_file": "src/components/ui/select.tsx",
       "source_location": "L109",
       "id": "ui_select_selectitem",
-      "community": 42,
+      "community": 0,
       "norm_label": "selectitem"
     },
     {
@@ -3258,7 +3284,7 @@
       "source_file": "src/components/ui/select.tsx",
       "source_location": "L131",
       "id": "ui_select_selectseparator",
-      "community": 42,
+      "community": 0,
       "norm_label": "selectseparator"
     },
     {
@@ -3267,7 +3293,7 @@
       "source_file": "src/components/ui/separator.tsx",
       "source_location": "L1",
       "id": "src_components_ui_separator_tsx",
-      "community": 42,
+      "community": 43,
       "norm_label": "separator.tsx"
     },
     {
@@ -3276,7 +3302,7 @@
       "source_file": "src/components/ui/separator.tsx",
       "source_location": "L5",
       "id": "ui_separator_separator",
-      "community": 42,
+      "community": 43,
       "norm_label": "separator"
     },
     {
@@ -3375,7 +3401,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L1",
       "id": "src_components_ui_table_tsx",
-      "community": 42,
+      "community": 0,
       "norm_label": "table.tsx"
     },
     {
@@ -3384,7 +3410,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L4",
       "id": "ui_table_table",
-      "community": 42,
+      "community": 0,
       "norm_label": "table"
     },
     {
@@ -3393,7 +3419,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L18",
       "id": "ui_table_tableheader",
-      "community": 42,
+      "community": 0,
       "norm_label": "tableheader"
     },
     {
@@ -3402,7 +3428,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L26",
       "id": "ui_table_tablebody",
-      "community": 42,
+      "community": 0,
       "norm_label": "tablebody"
     },
     {
@@ -3411,7 +3437,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L38",
       "id": "ui_table_tablefooter",
-      "community": 42,
+      "community": 0,
       "norm_label": "tablefooter"
     },
     {
@@ -3420,7 +3446,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L53",
       "id": "ui_table_tablerow",
-      "community": 42,
+      "community": 0,
       "norm_label": "tablerow"
     },
     {
@@ -3429,7 +3455,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L68",
       "id": "ui_table_tablehead",
-      "community": 42,
+      "community": 0,
       "norm_label": "tablehead"
     },
     {
@@ -3438,7 +3464,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L83",
       "id": "ui_table_tablecell",
-      "community": 42,
+      "community": 0,
       "norm_label": "tablecell"
     },
     {
@@ -3447,7 +3473,7 @@
       "source_file": "src/components/ui/table.tsx",
       "source_location": "L98",
       "id": "ui_table_tablecaption",
-      "community": 42,
+      "community": 0,
       "norm_label": "tablecaption"
     },
     {
@@ -3456,7 +3482,7 @@
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L1",
       "id": "src_components_ui_tabs_tsx",
-      "community": 42,
+      "community": 0,
       "norm_label": "tabs.tsx"
     },
     {
@@ -3465,7 +3491,7 @@
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L7",
       "id": "ui_tabs_tabslist",
-      "community": 42,
+      "community": 0,
       "norm_label": "tabslist"
     },
     {
@@ -3474,7 +3500,7 @@
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L22",
       "id": "ui_tabs_tabstrigger",
-      "community": 42,
+      "community": 0,
       "norm_label": "tabstrigger"
     },
     {
@@ -3483,7 +3509,7 @@
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L37",
       "id": "ui_tabs_tabscontent",
-      "community": 42,
+      "community": 0,
       "norm_label": "tabscontent"
     },
     {
@@ -3492,7 +3518,7 @@
       "source_file": "src/components/ui/textarea.tsx",
       "source_location": "L1",
       "id": "src_components_ui_textarea_tsx",
-      "community": 42,
+      "community": 4,
       "norm_label": "textarea.tsx"
     },
     {
@@ -3501,7 +3527,7 @@
       "source_file": "src/components/ui/textarea.tsx",
       "source_location": "L4",
       "id": "ui_textarea_textarea",
-      "community": 42,
+      "community": 4,
       "norm_label": "textarea"
     },
     {
@@ -3537,7 +3563,7 @@
       "source_file": "src/components/ui/tooltip.tsx",
       "source_location": "L1",
       "id": "src_components_ui_tooltip_tsx",
-      "community": 42,
+      "community": 4,
       "norm_label": "tooltip.tsx"
     },
     {
@@ -3546,7 +3572,7 @@
       "source_file": "src/components/ui/tooltip.tsx",
       "source_location": "L9",
       "id": "ui_tooltip_tooltipcontent",
-      "community": 42,
+      "community": 4,
       "norm_label": "tooltipcontent"
     },
     {
@@ -3600,7 +3626,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L1",
       "id": "src_lib_formatters_ts",
-      "community": 42,
+      "community": 7,
       "norm_label": "formatters.ts"
     },
     {
@@ -3609,7 +3635,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L6",
       "id": "lib_formatters_supported_currencies",
-      "community": 42,
+      "community": 7,
       "norm_label": "supported_currencies"
     },
     {
@@ -3618,7 +3644,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L17",
       "id": "lib_formatters_supportedcurrency",
-      "community": 42,
+      "community": 7,
       "norm_label": "supportedcurrency"
     },
     {
@@ -3627,7 +3653,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L22",
       "id": "lib_formatters_formatcurrency",
-      "community": 46,
+      "community": 7,
       "norm_label": "formatcurrency()"
     },
     {
@@ -3636,7 +3662,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L78",
       "id": "lib_formatters_getordinalsuffix",
-      "community": 49,
+      "community": 7,
       "norm_label": "getordinalsuffix()"
     },
     {
@@ -3645,7 +3671,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L96",
       "id": "lib_formatters_formatlocalizeddatetime",
-      "community": 49,
+      "community": 7,
       "norm_label": "formatlocalizeddatetime()"
     },
     {
@@ -3654,7 +3680,7 @@
       "source_file": "src/lib/prisma.ts",
       "source_location": "L1",
       "id": "src_lib_prisma_ts",
-      "community": 48,
+      "community": 7,
       "norm_label": "prisma.ts"
     },
     {
@@ -3663,7 +3689,7 @@
       "source_file": "src/lib/prisma.ts",
       "source_location": "L3",
       "id": "lib_prisma_globalforprisma",
-      "community": 48,
+      "community": 7,
       "norm_label": "globalforprisma"
     },
     {
@@ -3672,7 +3698,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L1",
       "id": "src_lib_qr_ts",
-      "community": 45,
+      "community": 1,
       "norm_label": "qr.ts"
     },
     {
@@ -3681,7 +3707,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L4",
       "id": "lib_qr_qrcodeoptions",
-      "community": 45,
+      "community": 1,
       "norm_label": "qrcodeoptions"
     },
     {
@@ -3690,7 +3716,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L16",
       "id": "lib_qr_generateqrcodebuffer",
-      "community": 45,
+      "community": 1,
       "norm_label": "generateqrcodebuffer()"
     },
     {
@@ -3699,7 +3725,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L38",
       "id": "lib_qr_generateandstoreartworkqr",
-      "community": 45,
+      "community": 1,
       "norm_label": "generateandstoreartworkqr()"
     },
     {
@@ -3708,7 +3734,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L68",
       "id": "lib_qr_generateqrcodedataurl",
-      "community": 45,
+      "community": 1,
       "norm_label": "generateqrcodedataurl()"
     },
     {
@@ -3789,7 +3815,7 @@
       "source_file": "src/lib/utils.ts",
       "source_location": "L1",
       "id": "src_lib_utils_ts",
-      "community": 42,
+      "community": 4,
       "norm_label": "utils.ts"
     },
     {
@@ -3798,7 +3824,7 @@
       "source_file": "src/lib/utils.ts",
       "source_location": "L4",
       "id": "lib_utils_cn",
-      "community": 42,
+      "community": 4,
       "norm_label": "cn()"
     },
     {
@@ -4180,37 +4206,55 @@
       "norm_label": "code:bash (docker compose down)"
     },
     {
-      "label": "4. Coolify VPS Deployment Workflow",
+      "label": "4. Zero-Touch Coolify Deployment (via `coolify` Network)",
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L99",
-      "id": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow",
+      "id": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
       "community": 3,
-      "norm_label": "4. coolify vps deployment workflow"
+      "norm_label": "4. zero-touch coolify deployment (via `coolify` network)"
     },
     {
-      "label": "code:bash (npm run lint)",
+      "label": "5-Step Deployment Runbook",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L102",
+      "source_location": "L103",
+      "id": "lalitakapilavai_readme_5_step_deployment_runbook",
+      "community": 3,
+      "norm_label": "5-step deployment runbook"
+    },
+    {
+      "label": "Complete Production Environment Variables Template",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L128",
+      "id": "lalitakapilavai_readme_complete_production_environment_variables_template",
+      "community": 3,
+      "norm_label": "complete production environment variables template"
+    },
+    {
+      "label": "code:env (# ==========================================================)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L130",
       "id": "lalitakapilavai_readme_codeblock_11",
       "community": 3,
-      "norm_label": "code:bash (npm run lint)"
+      "norm_label": "code:env (# ==========================================================)"
     },
     {
-      "label": "code:bash (git push origin main)",
+      "label": "Automated Container Lifecycle & Idempotency Hook",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L107",
-      "id": "lalitakapilavai_readme_codeblock_12",
+      "source_location": "L168",
+      "id": "lalitakapilavai_readme_automated_container_lifecycle_idempotency_hook",
       "community": 3,
-      "norm_label": "code:bash (git push origin main)"
+      "norm_label": "automated container lifecycle & idempotency hook"
     },
     {
       "label": "5. Architectural Documentation & Skills",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L115",
+      "source_location": "L178",
       "id": "lalitakapilavai_readme_5_architectural_documentation_skills",
       "community": 3,
       "norm_label": "5. architectural documentation & skills"
@@ -4999,11 +5043,29 @@
       "norm_label": "{\n  signin,\n  signout,\n  usesession,\n  getsession,\n  changepassword,\n  updateuser,\n}"
     },
     {
+      "label": "4. Coolify VPS Deployment Workflow",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L99",
+      "community": 3,
+      "norm_label": "4. coolify vps deployment workflow",
+      "id": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow"
+    },
+    {
+      "label": "code:bash (git push origin main)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L107",
+      "community": 3,
+      "norm_label": "code:bash (git push origin main)",
+      "id": "lalitakapilavai_readme_codeblock_12"
+    },
+    {
       "label": "metadata",
       "file_type": "code",
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L9",
-      "community": 44,
+      "community": 7,
       "norm_label": "metadata",
       "id": "posts_page_metadata"
     },
@@ -5012,7 +5074,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L15",
-      "community": 44,
+      "community": 7,
       "norm_label": "blogarchivepage()",
       "id": "posts_page_blogarchivepage"
     },
@@ -5021,7 +5083,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L22",
-      "community": 50,
+      "community": 7,
       "norm_label": "generatemetadata()",
       "id": "src_app_public_posts_slug_page_tsx_slug_page_generatemetadata"
     },
@@ -5030,7 +5092,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L53",
-      "community": 50,
+      "community": 7,
       "norm_label": "blogpostdetailpage()",
       "id": "slug_page_blogpostdetailpage"
     },
@@ -5135,6 +5197,16 @@
     }
   ],
   "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docker-entrypoint.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docker_entrypoint_sh",
+      "target": "c_users_avasa_downloads_openc_lalitakapilavai_docker_entrypoint_sh__entry",
+      "confidence_score": 1.0
+    },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
@@ -6337,9 +6409,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "imports_from",
@@ -6348,9 +6420,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "src_components_public_navbar_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_navbar_tsx"
     },
     {
       "relation": "imports",
@@ -6359,9 +6431,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "public_navbar_navbar",
-      "confidence_score": 1.0
+      "target": "public_navbar_navbar"
     },
     {
       "relation": "imports_from",
@@ -6370,9 +6442,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "src_components_public_footer_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_footer_tsx"
     },
     {
       "relation": "imports",
@@ -6381,9 +6453,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "public_footer_footer",
-      "confidence_score": 1.0
+      "target": "public_footer_footer"
     },
     {
       "relation": "imports_from",
@@ -6392,9 +6464,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "src_components_public_blog_archive_client_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_blog_archive_client_tsx"
     },
     {
       "relation": "imports",
@@ -6403,9 +6475,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "public_blog_archive_client_blogarchiveclient",
-      "confidence_score": 1.0
+      "target": "public_blog_archive_client_blogarchiveclient"
     },
     {
       "relation": "contains",
@@ -6413,9 +6485,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "blogs_page_metadata",
-      "confidence_score": 1.0
+      "target": "blogs_page_metadata"
     },
     {
       "relation": "contains",
@@ -6423,9 +6495,9 @@
       "source_file": "src/app/(public)/blogs/page.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_page_tsx",
-      "target": "blogs_page_blogspage",
-      "confidence_score": 1.0
+      "target": "blogs_page_blogspage"
     },
     {
       "relation": "imports_from",
@@ -6434,9 +6506,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "imports_from",
@@ -6445,9 +6517,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "src_components_public_navbar_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_navbar_tsx"
     },
     {
       "relation": "imports",
@@ -6456,9 +6528,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "public_navbar_navbar",
-      "confidence_score": 1.0
+      "target": "public_navbar_navbar"
     },
     {
       "relation": "imports_from",
@@ -6467,9 +6539,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "src_components_public_footer_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_footer_tsx"
     },
     {
       "relation": "imports",
@@ -6478,9 +6550,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "public_footer_footer",
-      "confidence_score": 1.0
+      "target": "public_footer_footer"
     },
     {
       "relation": "imports_from",
@@ -6489,9 +6561,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "src_components_public_tiptap_renderer_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_tiptap_renderer_tsx"
     },
     {
       "relation": "imports",
@@ -6500,9 +6572,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "public_tiptap_renderer_tiptaprenderer",
-      "confidence_score": 1.0
+      "target": "public_tiptap_renderer_tiptaprenderer"
     },
     {
       "relation": "imports_from",
@@ -6511,9 +6583,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "src_components_ui_badge_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_badge_tsx"
     },
     {
       "relation": "imports",
@@ -6522,9 +6594,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "ui_badge_badge",
-      "confidence_score": 1.0
+      "target": "ui_badge_badge"
     },
     {
       "relation": "imports_from",
@@ -6533,9 +6605,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "src_components_ui_button_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_button_tsx"
     },
     {
       "relation": "imports",
@@ -6544,9 +6616,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "ui_button_button",
-      "confidence_score": 1.0
+      "target": "ui_button_button"
     },
     {
       "relation": "contains",
@@ -6554,9 +6626,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "src_app_public_blogs_slug_page_tsx_slug_page_pageprops",
-      "confidence_score": 1.0
+      "target": "src_app_public_blogs_slug_page_tsx_slug_page_pageprops"
     },
     {
       "relation": "contains",
@@ -6564,9 +6636,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "src_app_public_blogs_slug_page_tsx_slug_page_generatemetadata",
-      "confidence_score": 1.0
+      "target": "src_app_public_blogs_slug_page_tsx_slug_page_generatemetadata"
     },
     {
       "relation": "contains",
@@ -6574,9 +6646,9 @@
       "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_blogs_slug_page_tsx",
-      "target": "slug_page_blogdetailpage",
-      "confidence_score": 1.0
+      "target": "slug_page_blogdetailpage"
     },
     {
       "relation": "imports_from",
@@ -7167,9 +7239,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "posts_page_postslegacyredirect",
-      "confidence_score": 1.0
+      "target": "posts_page_postslegacyredirect"
     },
     {
       "relation": "imports_from",
@@ -7284,9 +7356,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "slug_page_postsluglegacyredirect",
-      "confidence_score": 1.0
+      "target": "slug_page_postsluglegacyredirect"
     },
     {
       "relation": "imports_from",
@@ -12427,9 +12499,9 @@
       "source_file": "src/app/api/blogs/route.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_blogs_route_ts",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "contains",
@@ -12437,9 +12509,9 @@
       "source_file": "src/app/api/blogs/route.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_blogs_route_ts",
-      "target": "blogs_route_get",
-      "confidence_score": 1.0
+      "target": "blogs_route_get"
     },
     {
       "relation": "imports_from",
@@ -12799,9 +12871,9 @@
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_editor_tsx",
-      "target": "builder_tiptap_editor_customimagenode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_editor_customimagenode"
     },
     {
       "relation": "contains",
@@ -13018,9 +13090,9 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blog_archive_client_tsx",
-      "target": "src_components_ui_input_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_input_tsx"
     },
     {
       "relation": "imports",
@@ -13029,9 +13101,9 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blog_archive_client_tsx",
-      "target": "ui_input_input",
-      "confidence_score": 1.0
+      "target": "ui_input_input"
     },
     {
       "relation": "contains",
@@ -13039,9 +13111,9 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blog_archive_client_tsx",
-      "target": "public_blog_archive_client_blogpostdata",
-      "confidence_score": 1.0
+      "target": "public_blog_archive_client_blogpostdata"
     },
     {
       "relation": "contains",
@@ -13049,9 +13121,9 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blog_archive_client_tsx",
-      "target": "public_blog_archive_client_estimatereadingtime",
-      "confidence_score": 1.0
+      "target": "public_blog_archive_client_estimatereadingtime"
     },
     {
       "relation": "contains",
@@ -13059,9 +13131,9 @@
       "source_file": "src/components/public/blog-archive-client.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blog_archive_client_tsx",
-      "target": "public_blog_archive_client_blogarchiveclient",
-      "confidence_score": 1.0
+      "target": "public_blog_archive_client_blogarchiveclient"
     },
     {
       "relation": "contains",
@@ -13069,9 +13141,9 @@
       "source_file": "src/components/public/blog-grid-embed.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blog_grid_embed_tsx",
-      "target": "public_blog_grid_embed_blogpostsummary",
-      "confidence_score": 1.0
+      "target": "public_blog_grid_embed_blogpostsummary"
     },
     {
       "relation": "contains",
@@ -13079,9 +13151,9 @@
       "source_file": "src/components/public/blog-grid-embed.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blog_grid_embed_tsx",
-      "target": "public_blog_grid_embed_estimatereadingtime",
-      "confidence_score": 1.0
+      "target": "public_blog_grid_embed_estimatereadingtime"
     },
     {
       "relation": "contains",
@@ -13089,9 +13161,9 @@
       "source_file": "src/components/public/blog-grid-embed.tsx",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blog_grid_embed_tsx",
-      "target": "public_blog_grid_embed_bloggridembed",
-      "confidence_score": 1.0
+      "target": "public_blog_grid_embed_bloggridembed"
     },
     {
       "relation": "imports_from",
@@ -13100,9 +13172,9 @@
       "source_file": "src/components/public/tiptap-renderer.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_tiptap_renderer_tsx",
-      "target": "src_components_public_blog_grid_embed_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_blog_grid_embed_tsx"
     },
     {
       "relation": "imports",
@@ -13111,9 +13183,9 @@
       "source_file": "src/components/public/tiptap-renderer.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_tiptap_renderer_tsx",
-      "target": "public_blog_grid_embed_bloggridembed",
-      "confidence_score": 1.0
+      "target": "public_blog_grid_embed_bloggridembed"
     },
     {
       "relation": "imports_from",
@@ -15473,11 +15545,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L95",
+      "source_location": "L99",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
-      "target": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow"
+      "target": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -15488,6 +15560,16 @@
       "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
       "target": "lalitakapilavai_readme_5_architectural_documentation_skills"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L95",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
+      "target": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow"
     },
     {
       "relation": "contains",
@@ -15763,31 +15845,51 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
+      "target": "lalitakapilavai_readme_5_step_deployment_runbook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L128",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
+      "target": "lalitakapilavai_readme_complete_production_environment_variables_template",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
+      "target": "lalitakapilavai_readme_automated_container_lifecycle_idempotency_hook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L130",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_complete_production_environment_variables_template",
+      "target": "lalitakapilavai_readme_codeblock_11",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
       "source_location": "L102",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow",
       "target": "lalitakapilavai_readme_codeblock_11"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L98",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow",
-      "target": "lalitakapilavai_readme_codeblock_12"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L103",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow",
-      "target": "lalitakapilavai_readme_codeblock_13"
     },
     {
       "relation": "contains",
@@ -16568,8 +16670,28 @@
       "confidence_score": 1.0,
       "source": "graphify_knowledge_graph_4_multi_format_media_vault_global_interaction_architecture",
       "target": "graphify_knowledge_graph_codeblock_4"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L98",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow",
+      "target": "lalitakapilavai_readme_codeblock_12"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L103",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow",
+      "target": "lalitakapilavai_readme_codeblock_13"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "9b725923693fda7fb41476366d6f96f7a5ecb474"
+  "built_at_commit": "35a78ef8f0be8384efbac61488d0379dd753ccf6"
 }

@@ -7,18 +7,19 @@ async function main() {
   console.log("🌱 Starting Lalita Kapilavai database seed...");
 
   // 1. Provision Superadmin User
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@lalitakapilavai.com";
+  const adminEmail = (process.env.ADMIN_EMAIL || "admin@lalitakapilavai.com").trim().toLowerCase();
   const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || "AdminPassword2026!";
-  const hashedPassword = await hashPassword(adminPassword);
+  const adminName = process.env.ADMIN_NAME || "Lalita Kapilavai Admin";
 
   let superadmin = await prisma.user.findUnique({
     where: { email: adminEmail },
   });
 
   if (!superadmin) {
+    const hashedPassword = await hashPassword(adminPassword);
     superadmin = await prisma.user.create({
       data: {
-        name: "Lalita Kapilavai Superadmin",
+        name: adminName,
         email: adminEmail,
         role: Role.SUPER_ADMIN,
         emailVerified: true,
@@ -34,30 +35,11 @@ async function main() {
         password: hashedPassword,
       },
     });
-    console.log(`✅ Provisioned Superadmin: ${adminEmail}`);
+    console.log(`✅ Provisioned new Superadmin account: ${adminEmail}`);
   } else {
-    await prisma.account.upsert({
-      where: {
-        providerId_accountId: {
-          providerId: "credential",
-          accountId: superadmin.id,
-        },
-      },
-      update: {
-        password: hashedPassword,
-        issuer: "local:credential",
-      },
-      create: {
-        userId: superadmin.id,
-        accountId: superadmin.id,
-        providerId: "credential",
-        issuer: "local:credential",
-        password: hashedPassword,
-      },
-    });
-    console.log(`✅ Refreshed Superadmin credentials: ${adminEmail}`);
+    console.log(`ℹ️ Superadmin (${adminEmail}) already exists. Preserving existing account and credentials.`);
   }
-  console.log(`🔑 Seeded Superadmin Credentials -> Email: ${adminEmail} | Password: ${adminPassword}`);
+  console.log(`🔑 Superadmin Status -> Email: ${adminEmail}`);
 
   // 2. Provision Default SystemSetting
   const existingSettings = await prisma.systemSetting.findFirst();
@@ -70,14 +52,14 @@ async function main() {
         adminAlertEmail: adminEmail,
         contactEmail: "contact@lalitakapilavai.com",
         contactPhone: "+91 98450 12345",
-        watermarkText: "© Lalita Kapilavai - Sacred Art & Heritage",
-        watermarkOpacity: 0.35,
+        watermarkText: process.env.WATERMARK_TEXT || "© Lalita Kapilavai - Sacred Art & Heritage",
+        watermarkOpacity: parseFloat(process.env.WATERMARK_OPACITY || "0.35"),
         watermarkFontSize: 28,
-        r2AccountId: process.env.R2_ACCOUNT_ID || "cloudflare-r2-account-id",
-        r2BucketName: "lalitakapilavai-media",
-        r2PublicUrl: "https://media.lalitakapilavai.com",
-        s3Region: "ap-south-1",
-        s3BucketName: "lalitakapilavai-masters-backup",
+        r2AccountId: process.env.S3_ENDPOINT || process.env.R2_ACCOUNT_ID || "cloudflare-r2-account-id",
+        r2BucketName: process.env.S3_BUCKET_NAME || "lalitakapilavai-media",
+        r2PublicUrl: process.env.S3_PUBLIC_DOMAIN || "https://media.lalitakapilavai.com",
+        s3Region: process.env.S3_REGION || "ap-south-1",
+        s3BucketName: process.env.S3_BUCKET_NAME || "lalitakapilavai-masters-backup",
         instagramUrl: "https://instagram.com/lalitakapilavai",
         youtubeUrl: "https://youtube.com/@lalitakapilavai",
       },
@@ -219,10 +201,19 @@ async function main() {
 
     await prisma.menuItem.create({
       data: {
+        label: "Sacred Chronicle",
+        path: "/blogs",
+        position: MenuPosition.TOP_CENTER,
+        orderIndex: 5,
+      },
+    });
+
+    await prisma.menuItem.create({
+      data: {
         label: "Commissions & Contact",
         path: "/commission",
         position: MenuPosition.TOP_RIGHT,
-        orderIndex: 5,
+        orderIndex: 6,
       },
     });
 
