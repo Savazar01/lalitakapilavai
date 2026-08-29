@@ -1,7 +1,7 @@
 services:
   postgres-dev:
     image: pgvector/pgvector:pg17
-    container_name: lalitakapilavai_postgres_dev
+    container_name: lalita_postgres_dev
     restart: unless-stopped
     ports:
       - "5633:5432"
@@ -13,12 +13,44 @@ services:
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
       - ./docker/postgres/init-pgvector.sql:/docker-entrypoint-initdb.d/init-pgvector.sql:ro
+    networks:
+      - lalita_dev_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lalitakapilavai_dev}"]
       interval: 5s
       timeout: 5s
       retries: 5
       start_period: 5s
+
+  web-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: lalita_web_dev
+    restart: unless-stopped
+    ports:
+      - "3060:3060"
+    environment:
+      - NODE_ENV=development
+      - PORT=3060
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres-dev:5432/${POSTGRES_DB:-lalitakapilavai_dev}?schema=public
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-dev-insecure-secret-key-at-least-32-chars-long}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3060}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3060}
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+    networks:
+      - lalita_dev_network
+
+networks:
+  lalita_dev_network:
+    driver: bridge
 
 volumes:
   postgres_dev_data:

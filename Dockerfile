@@ -1,4 +1,4 @@
-# Multi-stage production Dockerfile for Next.js 16 (Debian 12 Bookworm Slim)
+# Multi-stage Dockerfile for Next.js 16 (Debian 12 Bookworm Slim)
 # Full glibc binary compatibility for Sharp (libvips), Prisma query engines, and native add-ons
 
 FROM node:22-bookworm-slim AS base
@@ -12,6 +12,20 @@ RUN apt-get update && \
 
 COPY package.json package-lock.json ./
 RUN npm ci
+
+# Development stage for local multi-container live-reloading (inherits deps)
+FROM deps AS dev
+WORKDIR /app
+COPY prisma ./prisma
+RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; fi
+
+ENV NODE_ENV=development
+ENV PORT=3060
+ENV HOSTNAME="0.0.0.0"
+
+EXPOSE 3060
+
+CMD ["npm", "run", "dev"]
 
 # Stage 2: Build the application
 FROM base AS builder
