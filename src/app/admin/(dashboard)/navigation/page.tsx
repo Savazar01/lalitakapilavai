@@ -72,6 +72,7 @@ export default function NavigationManagerPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [targetDeleteNav, setTargetDeleteNav] = React.useState<{ id: string; label: string } | null>(null);
   const [deleting, setDeleting] = React.useState(false);
+  const [categories, setCategories] = React.useState<{ id: string; name: string; slug: string }[]>([]);
 
   const reloadMenu = React.useCallback(() => {
     fetch(`/api/admin/navigation?position=${selectedPosition}`)
@@ -85,6 +86,15 @@ export default function NavigationManagerPage() {
         setLoading(false);
       });
   }, [selectedPosition]);
+
+  React.useEffect(() => {
+    fetch("/api/admin/categories")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data)) setCategories(data);
+      })
+      .catch(() => {});
+  }, []);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -533,6 +543,57 @@ export default function NavigationManagerPage() {
                   onChange={(e) => setPath(e.target.value)}
                   required
                 />
+                {/* Quick Presets */}
+                <div className="pt-1.5 space-y-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">
+                    Quick Route Presets:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!label) setLabel("Fine Art Gallery");
+                        setPath("/gallery");
+                      }}
+                      className="px-2 py-0.5 rounded text-[11px] font-mono border border-border/80 bg-muted/30 hover:bg-primary/10 hover:border-primary/40 text-foreground transition-colors cursor-pointer"
+                    >
+                      /gallery
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!label) setLabel("Articles & AEO Posts");
+                        setPath("/posts");
+                      }}
+                      className="px-2 py-0.5 rounded text-[11px] font-mono border border-border/80 bg-muted/30 hover:bg-primary/10 hover:border-primary/40 text-foreground transition-colors cursor-pointer"
+                    >
+                      /posts
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!label) setLabel("Exhibitions & Events");
+                        setPath("/events");
+                      }}
+                      className="px-2 py-0.5 rounded text-[11px] font-mono border border-border/80 bg-muted/30 hover:bg-primary/10 hover:border-primary/40 text-foreground transition-colors cursor-pointer"
+                    >
+                      /events
+                    </button>
+                    {categories.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => {
+                          if (!label) setLabel(c.name);
+                          setPath(`/gallery/${c.slug}`);
+                        }}
+                        className="px-2 py-0.5 rounded text-[11px] font-mono border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/15 text-foreground transition-colors cursor-pointer"
+                      >
+                        /gallery/{c.slug}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center gap-2 pt-2 text-left">

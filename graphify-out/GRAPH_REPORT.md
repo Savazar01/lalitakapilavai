@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-08-29)
 
 ## Corpus Check
-- 98 files · ~54,700 words
+- 102 files · ~57,564 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 535 nodes · 997 edges · 43 communities (34 shown, 9 thin omitted)
+- 550 nodes · 1044 edges · 43 communities (34 shown, 9 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `efc778b6`
+- Built from commit: `e4b4d15a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -47,8 +47,8 @@
 - [[_COMMUNITY_Community 42|Community 42]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Button` - 25 edges
-2. `Badge()` - 20 edges
+1. `Button` - 26 edges
+2. `Badge()` - 22 edges
 3. `auth` - 20 edges
 4. `cn()` - 18 edges
 5. `compilerOptions` - 16 edges
@@ -59,26 +59,26 @@
 10. `DialogHeader()` - 14 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `EventDetailPage()` --calls--> `formatLocalizedDateTime()`  [EXTRACTED]
-  src/app/(public)/events/[slug]/page.tsx → src/lib/formatters.ts
-- `POST()` --calls--> `generateAndStoreArtworkQR()`  [EXTRACTED]
-  src/app/api/admin/artworks/route.ts → src/lib/qr.ts
 - `GET()` --calls--> `getMediaStream()`  [EXTRACTED]
   src/app/api/admin/media/vault/route.ts → src/lib/storage.ts
-- `Badge()` --calls--> `cn()`  [EXTRACTED]
-  src/components/ui/badge.tsx → src/lib/utils.ts
+- `ArtworkDetailPage()` --calls--> `generateQRCodeDataUrl()`  [EXTRACTED]
+  src/app/(public)/artwork/[slug]/page.tsx → src/lib/qr.ts
+- `POST()` --calls--> `generateAndStoreArtworkQR()`  [EXTRACTED]
+  src/app/api/admin/artworks/route.ts → src/lib/qr.ts
+- `GET()` --calls--> `generateQRCodeDataUrl()`  [EXTRACTED]
+  src/app/api/admin/qr/route.ts → src/lib/qr.ts
 - `DialogHeader()` --calls--> `cn()`  [EXTRACTED]
   src/components/ui/dialog.tsx → src/lib/utils.ts
 
 ## Communities (43 total, 9 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.09
-Nodes (45): COLOR_PRESETS, FONT_SIZES, TextStyleMark, TiptapEditorProps, ArtCategoryItem, ArtworkSummary, EventItem, IANA_TIMEZONES (+37 more)
+Cohesion: 0.08
+Nodes (48): columnPresets, isLightColor(), PageData, SectionData, SortableSection(), COLOR_PRESETS, FONT_SIZES, TextStyleMark (+40 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.17
-Nodes (16): POST(), generateAndStoreArtworkQR(), generateQRCodeBuffer(), generateQRCodeDataUrl(), QRCodeOptions, generatePresignedDownloadUrl(), generatePresignedUploadUrl(), getMediaStream() (+8 more)
+Cohesion: 0.16
+Nodes (18): POST(), generateAndStoreArtworkQR(), generateQRCodeBuffer(), generateQRCodeDataUrl(), QRCodeOptions, generatePresignedDownloadUrl(), generatePresignedUploadUrl(), getMediaStream() (+10 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.06
@@ -90,7 +90,7 @@ Nodes (30): 1. Architectural Stack, 2. Quickstart & Local Development, 3. Docker
 
 ### Community 4 - "Community 4"
 Cohesion: 0.09
-Nodes (21): NavItem, navItems, cn(), DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioItem (+13 more)
+Nodes (25): NavItem, navItems, cn(), ArtCanvasViewerProps, Badge(), BadgeProps, badgeVariants, DropdownMenuCheckboxItem (+17 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.08
@@ -101,12 +101,12 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.08
-Nodes (27): metadata, metadata, formatCurrency(), globalForPrisma, AnimatedSection(), AnimatedSectionProps, ArtCanvasViewer(), EventRsvpForm() (+19 more)
+Cohesion: 0.06
+Nodes (34): PageProps, metadata, formatCurrency(), formatLocalizedDateTime(), getOrdinalSuffix(), SUPPORTED_CURRENCIES, SupportedCurrency, globalForPrisma (+26 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.08
-Nodes (29): columnPresets, isLightColor(), PageData, SectionData, SortableSection(), SubSectionData, artisticBorderPresets, availableIcons (+21 more)
+Cohesion: 0.24
+Nodes (11): ColumnBlock, iconMap, MediaBlockConfig, renderColumnBlock(), renderMarks(), renderMediaBlock(), renderNode(), TiptapMark (+3 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.14
@@ -149,31 +149,31 @@ Cohesion: 0.28
 Nodes (5): geistMono, geistSans, metadata, ThemeProvider(), Toaster()
 
 ### Community 29 - "Community 29"
-Cohesion: 0.21
-Nodes (3): { GET, POST }, auth, AuthSession
+Cohesion: 0.18
+Nodes (4): { GET, POST }, auth, AuthSession, GET()
 
 ### Community 42 - "Community 42"
-Cohesion: 0.12
-Nodes (22): Artwork, Category, formatLocalizedDateTime(), getOrdinalSuffix(), SUPPORTED_CURRENCIES, SupportedCurrency, SelectContent, SelectItem (+14 more)
+Cohesion: 0.09
+Nodes (29): Artwork, Category, SubSectionData, artisticBorderPresets, availableIcons, colorPresets, fontFamilies, SectionStyle (+21 more)
 
 ## Knowledge Gaps
-- **224 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+219 more)
+- **228 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+223 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Button` connect `Community 0` to `Community 8`, `Community 42`, `Community 4`, `Community 7`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Why does `Badge()` connect `Community 0` to `Community 8`, `Community 42`, `Community 4`, `Community 7`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 4` to `Community 0`, `Community 8`, `Community 42`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `Button` connect `Community 0` to `Community 42`, `Community 4`, `Community 7`?**
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+- **Why does `Badge()` connect `Community 4` to `Community 0`, `Community 42`, `Community 7`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `cn()` connect `Community 4` to `Community 0`, `Community 42`?**
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _224 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _228 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.09057609057609058 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07889190003011141 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.058823529411764705 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**

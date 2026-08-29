@@ -10,13 +10,15 @@ import { ExhibitionQrModal } from "@/components/public/exhibition-qr-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/formatters";
+import { generateQRCodeDataUrl } from "@/lib/qr";
 import {
   Sparkles,
   Music,
   ArrowLeft,
-  Share2,
   ShieldCheck,
   Calendar,
+  QrCode,
+  Download,
 } from "lucide-react";
 
 interface PageProps {
@@ -64,6 +66,19 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
   if (!artwork) {
     notFound();
   }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3060";
+  const targetScanUrl = `${appUrl.replace(/\/+$/, "")}/artwork/${artwork.slug}?qr=true`;
+  const qrDataUrl =
+    artwork.qrCodeUrl ||
+    (await generateQRCodeDataUrl(targetScanUrl, {
+      width: 480,
+      margin: 2,
+      color: {
+        dark: "#0F0E0D",
+        light: "#FFFFFF",
+      },
+    }));
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
@@ -231,17 +246,42 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               </div>
             )}
 
+            {/* Exhibition Floor QR Code Card */}
+            <div className="p-3.5 rounded-xl border border-border/80 bg-card/60 flex items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <img
+                  src={qrDataUrl}
+                  alt={`QR Code for ${artwork.title}`}
+                  className="w-16 h-16 rounded-md border border-border bg-white p-1 shrink-0 shadow-xs"
+                />
+                <div className="space-y-0.5">
+                  <span className="font-serif font-bold text-xs text-foreground flex items-center gap-1.5">
+                    <QrCode className="w-3.5 h-3.5 text-primary" />
+                    Exhibition Placard QR
+                  </span>
+                  <p className="text-[10px] text-muted-foreground leading-tight max-w-[200px]">
+                    Scan in physical gallery or exhibition floor for curatorial provenance.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={qrDataUrl}
+                download={`placard-qr-${artwork.slug}.png`}
+                title="Download High-Res Printable QR Code"
+              >
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1 cursor-pointer">
+                  <Download className="w-3.5 h-3.5" />
+                  Print QR
+                </Button>
+              </a>
+            </div>
+
             {/* Action Buttons */}
-            <div className="pt-4 flex items-center gap-3">
+            <div className="pt-2 flex items-center gap-3">
               <Link href="/commission" className="flex-1">
-                <Button variant="gold" className="w-full font-serif font-bold gap-2">
+                <Button variant="gold" className="w-full font-serif font-bold gap-2 cursor-pointer">
                   <Sparkles className="w-4 h-4" />
                   Inquire for Acquisition
-                </Button>
-              </Link>
-              <Link href={`/media/qr-codes/${artwork.slug}.png`} target="_blank" download>
-                <Button variant="outline" size="icon" title="Exhibition Floor QR">
-                  <Share2 className="w-4 h-4" />
                 </Button>
               </Link>
             </div>

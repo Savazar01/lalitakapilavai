@@ -404,9 +404,23 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
   if (!content) return null;
 
   if (typeof content === "string") {
+    let parsedObj: Record<string, unknown> | null = null;
+    try {
+      const result = JSON.parse(content);
+      if (result && typeof result === "object") {
+        parsedObj = result as Record<string, unknown>;
+      }
+    } catch {
+      // Fallback for raw markdown or plain text
+    }
+
+    if (parsedObj) {
+      return <TiptapRenderer content={parsedObj} className={className} />;
+    }
+
     return (
       <div className={`prose prose-stone dark:prose-invert max-w-none ${className}`}>
-        <p>{content}</p>
+        <p className="whitespace-pre-line leading-relaxed">{content}</p>
       </div>
     );
   }

@@ -34,11 +34,25 @@ interface Artwork {
 export function GalleryGrid({
   artworks,
   categories,
+  initialCategorySlug,
 }: {
   artworks: Artwork[];
   categories: Category[];
+  initialCategorySlug?: string;
 }) {
-  const [selectedCat, setSelectedCat] = React.useState("ALL");
+  const initialId = React.useMemo(() => {
+    if (!initialCategorySlug) return "ALL";
+    const found = categories.find((c) => c.slug === initialCategorySlug);
+    return found ? found.id : "ALL";
+  }, [initialCategorySlug, categories]);
+
+  const [selectedCat, setSelectedCat] = React.useState(initialId);
+  const [prevSlug, setPrevSlug] = React.useState(initialCategorySlug);
+
+  if (initialCategorySlug !== prevSlug) {
+    setPrevSlug(initialCategorySlug);
+    setSelectedCat(initialId);
+  }
 
   const filtered = artworks.filter((art) => {
     if (selectedCat === "ALL") return true;

@@ -123,6 +123,8 @@ export default function AdminSettingsPage() {
     setLogoUploading(true);
     const body = new FormData();
     body.append("file", file);
+    body.append("mediaType", "logo");
+    body.append("isArtwork", "false");
 
     try {
       const res = await fetch("/api/admin/media/upload", {
@@ -132,9 +134,9 @@ export default function AdminSettingsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
-      const url = data.watermarkedUrl || data.publicUrl || data.primaryImageUrl;
+      const url = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
       setForm((prev) => ({ ...prev, logoUrl: url }));
-      toast.success("Logo uploaded successfully!");
+      toast.success("Logo uploaded successfully without watermark!");
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to upload logo");
     } finally {
@@ -149,6 +151,8 @@ export default function AdminSettingsPage() {
     setFaviconUploading(true);
     const body = new FormData();
     body.append("file", file);
+    body.append("mediaType", "logo");
+    body.append("isArtwork", "false");
 
     try {
       const res = await fetch("/api/admin/media/upload", {
@@ -158,9 +162,9 @@ export default function AdminSettingsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
-      const url = data.watermarkedUrl || data.publicUrl || data.primaryImageUrl;
+      const url = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
       setForm((prev) => ({ ...prev, faviconUrl: url }));
-      toast.success("Favicon uploaded successfully!");
+      toast.success("Favicon uploaded successfully without watermark!");
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to upload favicon");
     } finally {

@@ -244,6 +244,8 @@ export default function ArtworksAdminPage() {
     setUploadingImage(true);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("mediaType", "artwork");
+    formData.append("isArtwork", "true");
 
     try {
       const res = await fetch("/api/admin/media/upload", {

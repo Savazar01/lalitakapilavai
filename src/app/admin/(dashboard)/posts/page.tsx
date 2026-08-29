@@ -14,9 +14,17 @@ import {
   Loader2,
   UploadCloud,
   Code2,
+  Image as ImageIcon,
+  Quote,
+  Eye,
+  FileText,
+  Minus,
+  Layout,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TiptapEditor } from "@/components/builder/tiptap-editor";
+import { TiptapRenderer } from "@/components/public/tiptap-renderer";
 import {
   Card,
   CardHeader,
@@ -66,6 +74,8 @@ export default function AdminPostsPage() {
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadingImage, setUploadingImage] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [editorMode, setEditorMode] = React.useState<"VISUAL" | "RAW">("VISUAL");
+  const [activeTab, setActiveTab] = React.useState<string>("content");
 
   // Delete Confirmation State
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -164,6 +174,8 @@ export default function AdminPostsPage() {
     setUploadingImage(true);
     const body = new FormData();
     body.append("file", file);
+    body.append("mediaType", "general");
+    body.append("isArtwork", "false");
 
     try {
       const res = await fetch("/api/admin/media/upload", {
@@ -174,20 +186,64 @@ export default function AdminPostsPage() {
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
       const imgUrl =
-        data.watermarkedUrl ||
         data.publicUrl ||
+        data.watermarkedUrl ||
         data.primaryImageUrl ||
         data.rawUrl;
       setFormData((prev) => ({
         ...prev,
         featuredImageUrl: imgUrl,
       }));
-      toast.success("Cover image uploaded successfully!");
+      toast.success("Cover image uploaded without watermark!");
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Image upload failed");
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handleInlineImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("mediaType", "general");
+    body.append("isArtwork", "false");
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      const imgUrl = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
+      const snippet = `\n\n![Curatorial Illustration](${imgUrl})\n\n`;
+      setFormData((prev) => ({
+        ...prev,
+        content: prev.content ? `${prev.content}${snippet}` : snippet,
+      }));
+      toast.success("Image uploaded & added to article!");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Inline image upload failed");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const insertQuote = () => {
+    const quote = `\n\n> "Sacred iconography is the visual manifestation of nada brahma — eternal contemplation made visible."\n\n`;
+    setFormData((prev) => ({ ...prev, content: `${prev.content || ""}${quote}` }));
+    toast.info("Callout quote block inserted");
+  };
+
+  const insertDivider = () => {
+    const divider = `\n\n---\n\n`;
+    setFormData((prev) => ({ ...prev, content: `${prev.content || ""}${divider}` }));
+    toast.info("Ornamental divider inserted");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -435,16 +491,19 @@ export default function AdminPostsPage() {
               </div>
             )}
 
-            <Tabs defaultValue="content" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid grid-cols-4 mb-4">
                 <TabsTrigger value="content" className="text-xs">
                   Article Body
                 </TabsTrigger>
+                <TabsTrigger value="preview" className="text-xs">
+                  <Eye className="w-3 h-3 mr-1" /> Live Preview
+                </TabsTrigger>
                 <TabsTrigger value="seo" className="text-xs">
-                  SEO & Generative Engine (AEO)
+                  SEO &amp; AEO
                 </TabsTrigger>
                 <TabsTrigger value="jsonld" className="text-xs">
-                  <Code2 className="w-3 h-3 mr-1" /> JSON-LD Preview
+                  <Code2 className="w-3 h-3 mr-1" /> JSON-LD
                 </TabsTrigger>
               </TabsList>
 
@@ -518,16 +577,98 @@ export default function AdminPostsPage() {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Full Content (Markdown / HTML)</label>
-                  <textarea
-                    rows={8}
-                    required
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    placeholder="Write your article body..."
-                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm font-mono focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  />
+                {/* Rich Visual Editor / Raw Mode with Block Inserters */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground">
+                      Article Body &amp; Visual Layout
+                    </label>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        type="button"
+                        variant={editorMode === "VISUAL" ? "gold" : "outline"}
+                        size="sm"
+                        className="h-7 text-[11px] gap-1 px-2 cursor-pointer"
+                        onClick={() => setEditorMode("VISUAL")}
+                      >
+                        <Layout className="w-3 h-3" />
+                        Visual WYSIWYG
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={editorMode === "RAW" ? "gold" : "outline"}
+                        size="sm"
+                        className="h-7 text-[11px] gap-1 px-2 cursor-pointer"
+                        onClick={() => setEditorMode("RAW")}
+                      >
+                        <FileText className="w-3 h-3" />
+                        Raw Markdown / HTML
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Multi-Block Quick Inserters */}
+                  <div className="p-2.5 rounded-lg border border-border/80 bg-muted/20 flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                      Quick Block Inserters:
+                    </span>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <label className="cursor-pointer">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-border bg-card hover:bg-accent hover:text-primary transition-colors cursor-pointer">
+                          <ImageIcon className="w-3 h-3 text-primary" />
+                          Insert Image Block
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                          onChange={handleInlineImageUpload}
+                          className="hidden"
+                          disabled={uploadingImage}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={insertQuote}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-border bg-card hover:bg-accent hover:text-primary transition-colors cursor-pointer"
+                      >
+                        <Quote className="w-3 h-3 text-primary" />
+                        Callout Quote
+                      </button>
+                      <button
+                        type="button"
+                        onClick={insertDivider}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-border bg-card hover:bg-accent hover:text-primary transition-colors cursor-pointer"
+                      >
+                        <Minus className="w-3 h-3 text-primary" />
+                        Gold Divider
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Editor View */}
+                  {editorMode === "VISUAL" ? (
+                    <div className="rounded-md border border-border/80 bg-background/50 p-2 min-h-[300px]">
+                      <TiptapEditor
+                        content={formData.content}
+                        onChange={(json) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            content: JSON.stringify(json),
+                          }));
+                        }}
+                        placeholder="Compose your sacred art reflection, raga analysis, or exhibition commentary..."
+                      />
+                    </div>
+                  ) : (
+                    <textarea
+                      rows={12}
+                      required
+                      value={formData.content}
+                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                      placeholder="Write your article body..."
+                      className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm font-mono focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
@@ -538,6 +679,45 @@ export default function AdminPostsPage() {
                     placeholder="Tanjore, Gold Leaf, Mysore, Carnatic Ragas"
                     className="text-xs"
                   />
+                </div>
+              </TabsContent>
+
+              {/* Tab 2: Live Preview */}
+              <TabsContent value="preview" className="space-y-4">
+                <div className="p-6 rounded-xl border border-border bg-card/60 space-y-6 max-h-[60vh] overflow-y-auto">
+                  {formData.featuredImageUrl && (
+                    <div className="relative aspect-video w-full rounded-lg overflow-hidden border border-border">
+                      <img
+                        src={formData.featuredImageUrl}
+                        alt={formData.title || "Featured Image"}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-2 border-b border-border/60 pb-4">
+                    <span className="text-[11px] font-mono uppercase tracking-widest text-primary font-semibold">
+                      Article Live Preview
+                    </span>
+                    <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
+                      {formData.title || "Untitled Heritage Article"}
+                    </h1>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
+                      <span>By {formData.author || "Lalita Kapilavai"}</span>
+                      <span>•</span>
+                      <span>{new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
+                    </div>
+                  </div>
+
+                  {formData.excerpt && (
+                    <p className="font-serif italic text-sm text-foreground/80 border-l-2 border-primary pl-3 py-1">
+                      {formData.excerpt}
+                    </p>
+                  )}
+
+                  <div className="prose prose-stone dark:prose-invert max-w-none text-xs sm:text-sm">
+                    <TiptapRenderer content={formData.content} />
+                  </div>
                 </div>
               </TabsContent>
 

@@ -4,25 +4,9 @@ import { uploadBuffer } from "@/lib/storage";
 import prisma from "@/lib/prisma";
 import sharp from "sharp";
 import crypto from "crypto";
+import { generateWatermarkSvg } from "@/lib/watermark";
 
-function escapeXml(unsafe: string): string {
-  return unsafe.replace(/[<>&'"]/g, (c) => {
-    switch (c) {
-      case "<":
-        return "&lt;";
-      case ">":
-        return "&gt;";
-      case "&":
-        return "&amp;";
-      case "'":
-        return "&apos;";
-      case '"':
-        return "&quot;";
-      default:
-        return c;
-    }
-  });
-}
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,7 +62,44 @@ export async function POST(request: NextRequest) {
     const origExtension = detectedFormat === "jpeg" ? "jpg" : detectedFormat;
     const assetId = crypto.randomUUID();
 
-    // 4. Save Untouched Master Asset to Protected Vault
+    // 4. Determine Media Type & Watermarking Requirement
+    const mediaType = (formData.get("mediaType") as string) || "artwork";
+    const isArtworkParam = formData.get("isArtwork");
+    const isArtwork = isArtworkParam !== null ? isArtworkParam === "true" : mediaType === "artwork";
+
+    // Non-Artwork Media (Logos, favicons, page builder images, blog illustrations)
+    // Completely skip watermark compositing and master vault archiving
+    if (!isArtwork) {
+      const cleanWebpBuffer = await sharp(inputBuffer)
+        .webp({ quality: 88 })
+        .toBuffer();
+
+      const generalKey = `media/${assetId}.webp`;
+      const uploadResult = await uploadBuffer(
+        cleanWebpBuffer,
+        generalKey,
+        "image/webp",
+        false // public
+      );
+
+      return NextResponse.json({
+        success: true,
+        assetId,
+        publicUrl: uploadResult.publicUrl,
+        watermarkedUrl: uploadResult.publicUrl,
+        primaryImageUrl: uploadResult.publicUrl,
+        isWatermarked: false,
+        mediaType,
+        width,
+        height,
+        format: "webp",
+        originalFormat: origExtension,
+        originalSizeBytes: inputBuffer.length,
+        optimizedSizeBytes: cleanWebpBuffer.length,
+      });
+    }
+
+    // 5. Artwork Master Asset: Save Untouched Master to Protected Vault
     const masterKey = `masters/${assetId}.${origExtension}`;
     const masterUpload = await uploadBuffer(
       inputBuffer,
@@ -87,46 +108,24 @@ export async function POST(request: NextRequest) {
       true // isProtected
     );
 
-    // 5. Query Watermark Settings from DB or Default
+    // 6. Query Watermark Settings from DB or Default
     const systemSettings = await prisma.systemSetting.findFirst().catch(() => null);
     const watermarkText =
       customWatermark ||
       systemSettings?.watermarkText ||
       "© Lalita Kapilavai | lalitakapilavai.com";
-    const opacity = systemSettings?.watermarkOpacity || 0.45;
+    const opacity = systemSettings?.watermarkOpacity || 0.85;
 
-    // Calculate proportional font and banner dimensions
-    const fontSize = Math.max(18, Math.min(Math.round(width * 0.03), 48));
-    const bannerHeight = Math.max(48, Math.round(fontSize * 2.4));
+    // Generate Clean Cross-Platform SVG Overlay
+    const svgOverlay = generateWatermarkSvg({
+      width,
+      height,
+      text: watermarkText,
+      opacity,
+      fontSize: systemSettings?.watermarkFontSize || undefined,
+    });
 
-    // High-Contrast Luxury SVG Watermark Overlay with solid obsidian backdrop & temple-gold border
-    const svgOverlay = `
-      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="textShadow" x="-10%" y="-10%" width="120%" height="120%">
-            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000000" flood-opacity="0.9"/>
-          </filter>
-        </defs>
-        <!-- Overt Obsidian Protection Banner -->
-        <rect x="0" y="${height - bannerHeight}" width="${width}" height="${bannerHeight}" fill="#0F0E0D" fill-opacity="${Math.max(0.75, opacity)}" />
-        <line x1="0" y1="${height - bannerHeight}" x2="${width}" y2="${height - bannerHeight}" stroke="#D4AF37" stroke-width="2" stroke-opacity="${Math.max(0.8, opacity)}" />
-        <text 
-          x="${width / 2}" 
-          y="${height - bannerHeight / 2 + fontSize / 3}" 
-          text-anchor="middle" 
-          font-family="Georgia, 'Cinzel Decorative', serif" 
-          font-size="${fontSize}px" 
-          font-weight="700" 
-          letter-spacing="2.5px"
-          fill="#FAF7F2" 
-          filter="url(#textShadow)"
-        >
-          ${escapeXml(watermarkText)}
-        </text>
-      </svg>
-    `;
-
-    // 6. Generate Watermarked WebP Derivative
+    // 7. Generate Watermarked WebP Derivative
     const watermarkedBuffer = await sharp(inputBuffer)
       .composite([
         {
@@ -152,6 +151,8 @@ export async function POST(request: NextRequest) {
       publicUrl: watermarkedUpload.publicUrl,
       watermarkedUrl: watermarkedUpload.publicUrl,
       primaryImageUrl: watermarkedUpload.publicUrl,
+      isWatermarked: true,
+      mediaType: "artwork",
       protectedS3Key: masterUpload.key,
       vaultKey: masterUpload.key,
       masterKey: masterUpload.key,

@@ -276,6 +276,8 @@ function SortableSection({
     setUploadingBlockId(blockId);
     const body = new FormData();
     body.append("file", file);
+    body.append("mediaType", "general");
+    body.append("isArtwork", "false");
 
     try {
       const res = await fetch("/api/admin/media/upload", {
@@ -285,7 +287,7 @@ function SortableSection({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
-      const url = data.watermarkedUrl || data.publicUrl || data.primaryImageUrl;
+      const url = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
       updateBlock(colIdx, blockId, { mediaUrl: url });
       toast.success("Image uploaded to column block!");
     } catch (err: unknown) {
