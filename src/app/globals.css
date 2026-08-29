@@ -1,39 +1,75 @@
 @import "tailwindcss";
 
-:root {
-  /* Canvas & Surfaces: Warm Parchment & Raw Silk */
-  --background: #FBF8F1;
-  --foreground: #1C1814;
-  
-  --card: #FFFDF9;
-  --card-foreground: #1C1814;
-  
-  --popover: #FFFFFF;
-  --popover-foreground: #1C1814;
-  
-  /* Primary & Accents: Antique Temple Gold */
-  --primary: #C69214;
-  --primary-foreground: #FFFFFF;
-  
-  /* Secondary: Raw Silk & Warm Sand */
-  --secondary: #F2E8D5;
-  --secondary-foreground: #5C4A32;
-  
-  /* Muted & Borders */
-  --muted: #EFE8DA;
-  --muted-foreground: #766B5C;
-  
-  --accent: #FAF3E0;
-  --accent-foreground: #8C6207;
-  
-  --destructive: #A3281E;
-  --destructive-foreground: #FFFFFF;
-  
-  --border: #E5D9C5;
-  --input: #E5D9C5;
-  --ring: #C69214;
-  
-  --radius: 0.5rem;
+@layer base {
+  :root {
+    /* UI-UX-Pro-Max: Light Mode (Parchment, Ivory & Antique Temple Gold) */
+    --background: #FAF7F2;
+    --foreground: #1A1A1A;
+
+    --card: #FFFFFF;
+    --card-foreground: #1A1A1A;
+
+    --popover: #FFFFFF;
+    --popover-foreground: #1A1A1A;
+
+    /* Primary: Antique Temple Gold */
+    --primary: #D4AF37;
+    --primary-foreground: #1A1A1A;
+
+    /* Secondary: Madder Terracotta / Raw Silk */
+    --secondary: #F3EBDD;
+    --secondary-foreground: #5A4731;
+
+    /* Accent & Crimson Highlights */
+    --accent: #F7F0E3;
+    --accent-foreground: #A3281E;
+
+    --muted: #EFE9DC;
+    --muted-foreground: #6E675F;
+
+    --destructive: #A3281E;
+    --destructive-foreground: #FFFFFF;
+
+    --border: #E8E2D5;
+    --input: #E8E2D5;
+    --ring: #D4AF37;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* UI-UX-Pro-Max: Dark Mode (Obsidian, Slate & Luminous Warm Gold) */
+    --background: #0D0E12;
+    --foreground: #EAEAEA;
+
+    --card: #16181F;
+    --card-foreground: #EAEAEA;
+
+    --popover: #16181F;
+    --popover-foreground: #EAEAEA;
+
+    /* Primary: Luminous 22k Warm Gold */
+    --primary: #F3C64F;
+    --primary-foreground: #0D0E12;
+
+    /* Secondary: Aged Teak / Slate Surface */
+    --secondary: #1E222D;
+    --secondary-foreground: #D6DCE8;
+
+    /* Accent & Ember Highlights */
+    --accent: #252A38;
+    --accent-foreground: #F3C64F;
+
+    --muted: #1A1D27;
+    --muted-foreground: #9EA4B0;
+
+    --destructive: #CF4436;
+    --destructive-foreground: #FFFFFF;
+
+    --border: #2C2F3B;
+    --input: #2C2F3B;
+    --ring: #F3C64F;
+  }
 }
 
 @theme inline {
@@ -58,39 +94,6 @@
   --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Obsidian & Burnished 22k Gold */
-    --background: #0D0C0B;
-    --foreground: #F5EBE1;
-    
-    --card: #171513;
-    --card-foreground: #F5EBE1;
-    
-    --popover: #1C1A17;
-    --popover-foreground: #F5EBE1;
-    
-    --primary: #E5B338;
-    --primary-foreground: #0D0C0B;
-    
-    --secondary: #27231F;
-    --secondary-foreground: #E0D2C0;
-    
-    --muted: #24201C;
-    --muted-foreground: #9C8E7E;
-    
-    --accent: #2D2720;
-    --accent-foreground: #E5B338;
-    
-    --destructive: #CF4436;
-    --destructive-foreground: #FFFFFF;
-    
-    --border: #332C24;
-    --input: #332C24;
-    --ring: #E5B338;
-  }
 }
 
 body {

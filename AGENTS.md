@@ -78,3 +78,15 @@ Autonomous agents and contributors must ensure that for every interaction, files
 
 ### Local-Only Confidentiality:
 The `DevPlans/` directory is strictly ignored in `.gitignore` (`/DevPlans/`). It must never be committed to Git or pushed to remote repositories, ensuring development logs, architectural notes, and prompt transcripts remain permanently accessible exclusively on the local machine.
+
+---
+
+## 5. Enterprise Skill Manuals (`.skills/`)
+All code generation and architectural modifications must adhere to the specialized manuals in `.skills/`:
+- [`.skills/graphify.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/graphify.md): Codebase & Cultural Knowledge Graph extraction with pgvector cosine similarity.
+- [`.skills/ui-ux-pro-max.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/ui-ux-pro-max.md): 99 UX guidelines, luxury cultural portfolio tokens (Ivory/Gold light mode, Obsidian/Gold dark mode), and WCAG 2.2 AAA accessibility.
+- [`.skills/vercel-react-best-practices.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/vercel-react-best-practices.md): Strict RSC boundaries, parallel data fetching, zero-FOUC theme hydration, and re-render prevention.
+- [`.skills/better-auth-best-practices.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/better-auth-best-practices.md): Private admin authentication with PostgreSQL adapter, `disableSignUp: true`, and middleware route guards.
+- [`.skills/shadcn.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/shadcn.md): Design tokens and component elevation rules for Indian Classical fine art.
+- [`.skills/cloudflare-security.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/cloudflare-security.md): Cloudflare WAF hardening, rate limits, CSP headers, and R2 media policies.
+- [`.skills/playwright.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/playwright.md): E2E multi-browser test harness specifications.

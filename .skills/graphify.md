@@ -1,101 +1,84 @@
-# Skill: Graphify — Cultural Knowledge Graph & Synesthetic Node-Link Architecture
+# Skill: Graphify — Architectural & Cultural Knowledge Graph Engine
 
-## 1. Domain Vision & Purpose
-Lalita Kapilavai’s work uniquely bridges two profound Indian classical disciplines:
-1. **Sacred Visual Art**: Tanjore (Thanjavur), Mysore, and temple mural painting.
-2. **Carnatic Classical Music**: Vocal renditions of classical ragas, talas, and compositions.
-
-In Indian aesthetic philosophy (*Natya Shastra* & *Rasa theory*), music and visual arts evoke shared emotional states (*Bhavas* and *Rasas*). The **Graphify** architecture models this synesthesia as an interactive knowledge graph, enabling visitors to navigate between an artwork and the Carnatic raga that shares its mood, deity, or devotional narrative.
+## 1. Scope & Domain Context
+Graphify extracts, organizes, and queries the structural and semantic relationships within the **Lalita Kapilavai** portfolio and cultural archive platform. It maintains two synchronized graph layers:
+1. **Architectural Graph**: Codebase components, server actions, API routes, Prisma models, and middleware guards.
+2. **Cultural Knowledge Graph**: Domain entities linking Artworks, Categories, Carnatic Ragas, Compositions, Exhibitions/Events, and Inbound Leads.
 
 ---
 
-## 2. Core Entities (Nodes)
-The system represents the following primary nodes:
-
-- **`Artwork` Node**:
-  - Properties: `id`, `title`, `artStyle` (Tanjore, Mysore, Mural), `medium` (22k gold, teakwood), `yearCreated`, `goldPurity`, `embedding` (`vector(1536)`).
-- **`Raga` Node**:
-  - Properties: `id`, `name` (e.g., *Kalyani*, *Sankarabharanam*, *Mohanam*, *Charukesi*), `melakartaNumber`, `arohana`, `avarohana`, `deity`, `rasa` (Bhakti, Shanta, Karuna), `timeOfDay`, `embedding` (`vector(1536)`).
-- **`Composition` Node**:
-  - Properties: `id`, `title` (e.g., *Bhavanuta*, *Enneramum*, *Kalyani Amba*), `composer` (Tyagaraja, Dikshitar), `vocalist` ("Lalita Kapilavai"), `audioUrl`, `tala` (Adi, Rupaka), `duration`.
-- **`Exhibition` Node**:
-  - Properties: `id`, `title`, `venue`, `city`, `startDate`, `endDate`, `posterUrl`.
-- **`Technique` Node**:
-  - Properties: `id`, `name` (e.g., *Gesso Relief (Chunnam)*, *Pure Gold Foil Imprinting*, *Natural Stone Pigments*, *Semi-Precious Gem Setting*).
-
----
-
-## 3. Relational Link Topologies (Edges)
+## 2. Cultural & Domain Entity Relationship Graph
 
 ```mermaid
 graph TD
-    Artwork["Artwork: Krishna with Flute (Tanjore)"]
-    Raga["Raga: Mohanam (Pentatonic Scale)"]
-    Composition["Composition: Nannu Palimpa"]
-    Exhibition["Exhibition: Divine Sheen 2025"]
-    Technique["Technique: 22k Gold Foil Relief"]
-    
-    Artwork -- "INSPIRED_BY (Rasa: Bhakti)" --> Raga
-    Composition -- "SET_TO_RAGA" --> Raga
-    Artwork -- "USES_TECHNIQUE" --> Technique
-    Exhibition -- "EXHIBITS" --> Artwork
-    Composition -- "PERFORMED_BY" --> Artist["Lalita Kapilavai"]
+    Category["ArtCategory (Tanjore, Mysore, etc.)"]
+    Artwork["Artwork (22k Gold Foil, Dimensions, Price)"]
+    Raga["Carnatic Raga (Arohana/Avarohana, Rasa)"]
+    Composition["Composition (Vocal: Lalita Kapilavai)"]
+    Event["Event (Exhibition, Concert, Workshop)"]
+    Lead["Lead (Inbound Inquiries & QR Scans)"]
+
+    Artwork -->|BELONGS_TO| Category
+    Artwork -->|INSPIRED_BY_MOOD| Raga
+    Composition -->|SET_TO_RAGA| Raga
+    Artwork -->|EXHIBITED_AT| Event
+    Lead -->|ORIGINATED_FROM| Artwork
+    Lead -->|ATTENDED| Event
 ```
 
-### Relational Edges
-1. `(Artwork)-[:INSPIRED_BY { rasa: String, harmonyNote: String }]->(Raga)`
-   Connects painting visual motifs with melodic mood.
-2. `(Composition)-[:SET_TO_RAGA]->(Raga)`
-   Associates recorded vocal recitals with their underlying raga framework.
-3. `(Exhibition)-[:EXHIBITS { displayOrder: Int }]->(Artwork)`
-   Maps physical and virtual exhibition curations.
-4. `(Artwork)-[:USES_TECHNIQUE]->(Technique)`
-   Documents sacred artisan craft and traditional materials.
+### Relational Topology
+- `(Artwork)-[:BELONGS_TO]->(ArtCategory)`: Groups artworks under traditional schools (*Tanjore, Mysore, Pahari, Pichwai, Kalamkari, Cheriyal, Miscellaneous*).
+- `(Artwork)-[:INSPIRED_BY { harmonyNote: String }]->(Raga)`: Links visual motifs (e.g. Krishna, Devi, Rama) with the melodic raga mood (*Bhakti, Shanta, Karuna*).
+- `(Composition)-[:SET_TO_RAGA]->(Raga)`: Associates recorded Carnatic compositions with musical scale frameworks.
+- `(ArtworkOnEvent)-[:EXHIBITS { displayOrder: Int }]->(Event)`: Maps physical gallery exhibitions, virtual displays, and concert visuals.
+- `(Lead)-[:INQUIRED_ABOUT { source: "QR_SCAN" | "WEB_FORM" }]->(Artwork)`: Tracks provenance of buyer/collector inquiries from physical gallery QR cards directly into the CRM.
 
 ---
 
-## 4. Hybrid Relational + pgvector Semantic Search
-
-Graphify leverages PostgreSQL 17 and `pgvector` to enable multi-modal traversal:
+## 3. Hybrid Relational + pgvector Semantic Search
+All artwork visual features and raga characteristics are encoded into 1536-dimensional embeddings and stored in PostgreSQL 17 via `pgvector`:
 
 ```sql
--- Query: Find artworks aesthetically and thematically closest to a given visual embedding
+-- Find artworks aesthetically and thematically closest to a query embedding
 SELECT 
-    id, 
-    title, 
-    art_style, 
-    primary_image_url,
-    1 - (embedding <=> $1::vector) AS similarity
-FROM artworks
-WHERE embedding IS NOT NULL
-ORDER BY embedding <=> $1::vector
+    a.id, 
+    a.title, 
+    a.medium,
+    c.name AS category_name,
+    1 - (a.embedding <=> $1::vector) AS similarity
+FROM artworks a
+JOIN art_categories c ON a.category_id = c.id
+WHERE a.embedding IS NOT NULL
+ORDER BY a.embedding <=> $1::vector
 LIMIT 8;
 ```
 
-### Synesthetic Cross-Modal Query
-To retrieve Carnatic compositions that harmonize with the visual themes of an artwork:
-```sql
-SELECT 
-    c.id AS composition_id,
-    c.title AS composition_title,
-    c.audio_url,
-    r.name AS raga_name,
-    r.arohana,
-    r.avarohana,
-    l.harmony_note
-FROM artworks a
-JOIN artwork_raga_links l ON a.id = l.artwork_id
-JOIN ragas r ON l.raga_id = r.id
-JOIN compositions c ON c.raga_id = r.id
-WHERE a.slug = $1
-ORDER BY c.title ASC;
-```
-
 ---
 
-## 5. UI Visualization Guidelines
-- **Graph Explorer Component**: Client component using canvas / SVG rendering.
-- **Node Styling**:
-  - Artwork nodes: Circular avatars with gold foil border ring (`ring-2 ring-primary/80`).
-  - Raga nodes: Glowing amber orbs with soundwave pulse animations.
-  - Interactive click: Opens synesthetic drawer with synchronized high-res image zoom and audio playback.
+## 4. Codebase Architecture Graph
+
+```mermaid
+graph LR
+    subgraph Presentation
+        Page["src/app/*"]
+        AdminShell["src/app/admin/(dashboard)/*"]
+        UI["src/components/ui/*"]
+    end
+
+    subgraph Security_and_Auth
+        Middleware["src/middleware.ts"]
+        AuthServer["src/lib/auth.ts (Better-Auth)"]
+        AuthClient["src/lib/auth-client.ts"]
+    end
+
+    subgraph Data_Layer
+        PrismaClient["src/lib/prisma.ts"]
+        DB[(PostgreSQL 17 + pgvector :5633)]
+    end
+
+    Page --> AuthClient
+    AdminShell --> Middleware
+    Middleware --> AuthServer
+    AuthServer --> PrismaClient
+    PrismaClient --> DB
+```

@@ -1,5 +1,5 @@
-// Prisma Schema for Lalita Kapilavai Portfolio & Archive Platform
-// Configured with PostgreSQL 17 & pgvector extensions for multi-modal semantic retrieval
+// Prisma Schema for Lalita Kapilavai Portfolio & Cultural Archive Platform
+// Configured with PostgreSQL 17, pgvector, RBAC, Dynamic Layouts & Cultural Graph
 
 datasource db {
   provider   = "postgresql"
@@ -13,8 +13,14 @@ generator client {
 }
 
 // -----------------------------------------------------------------------------
-// Better-Auth Core Models
+// RBAC & Better-Auth Models
 // -----------------------------------------------------------------------------
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
 
 model User {
   id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
@@ -22,7 +28,7 @@ model User {
   email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
-  role          String    @default("admin")
+  role          Role      @default(ADMIN)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
@@ -74,15 +80,141 @@ model Verification {
 }
 
 // -----------------------------------------------------------------------------
-// Lalita Kapilavai Domain & Cultural Knowledge Graph Models
+// Global System Configuration & Storage
 // -----------------------------------------------------------------------------
 
-enum ArtStyle {
-  TANJORE
-  MYSORE
-  TEMPLE_MURAL
-  CONTEMPORARY_DEVOTIONAL
-  SKETCH_CHARCOAL
+model SystemSetting {
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  siteName          String   @default("Lalita Kapilavai — Sacred Art & Carnatic Music Archive")
+  siteDescription   String?  @db.Text
+  adminAlertEmail   String   @default("admin@lalitakapilavai.com")
+  contactEmail      String?
+  contactPhone      String?
+  
+  // Watermark parameters
+  watermarkText     String   @default("© Lalita Kapilavai - Sacred Art & Heritage")
+  watermarkOpacity  Float    @default(0.4)
+  watermarkFontSize Int      @default(32)
+
+  // Cloudflare R2 / AWS S3 storage settings
+  r2AccountId       String?
+  r2BucketName      String?  @default("lalitakapilavai-media")
+  r2PublicUrl       String?  @default("https://media.lalitakapilavai.com")
+  s3Region          String?  @default("ap-south-1")
+  s3BucketName      String?
+  
+  instagramUrl      String?
+  youtubeUrl        String?
+  facebookUrl       String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+// -----------------------------------------------------------------------------
+// Dynamic Navigation (Menu Items)
+// -----------------------------------------------------------------------------
+
+enum MenuPosition {
+  TOP_LEFT
+  TOP_CENTER
+  TOP_RIGHT
+  SIDEBAR_LEFT
+  DRAWER_RIGHT
+}
+
+model MenuItem {
+  id           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  label        String
+  path         String
+  position     MenuPosition  @default(TOP_CENTER)
+  orderIndex   Int           @default(0)
+  isActive     Boolean       @default(true)
+  openInNewTab Boolean       @default(false)
+  iconName     String?
+
+  // Self-referencing hierarchy supporting up to 2 nested sub-menu tiers
+  parentId     String?       @db.Uuid
+  parent       MenuItem?     @relation("MenuHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children     MenuItem[]    @relation("MenuHierarchy")
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("menu_items")
+}
+
+// -----------------------------------------------------------------------------
+// Dynamic Page Layout Engine (12-Column Responsive Grid)
+// -----------------------------------------------------------------------------
+
+model Page {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title           String
+  slug            String        @unique
+  metaDescription String?       @db.Text
+  isPublished     Boolean       @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  sections        PageSection[]
+
+  @@map("pages")
+}
+
+model PageSection {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  pageId          String        @db.Uuid
+  title           String?
+  slug            String?
+  orderIndex      Int           @default(0)
+  gridSpan        Int           @default(12) // 1 to 12 responsive grid span
+  backgroundColor String?
+  customCssClass  String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  page            Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  subSections     SubSection[]
+
+  @@map("page_sections")
+}
+
+model SubSection {
+  id         String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sectionId  String      @db.Uuid
+  title      String?
+  orderIndex Int         @default(0)
+  gridSpan   Int         @default(12) // 1 to 12 responsive grid span
+  content    Json        // Rich block JSON content
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  section    PageSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@map("sub_sections")
+}
+
+// -----------------------------------------------------------------------------
+// Artwork Catalog, Categories & Exhibitions
+// -----------------------------------------------------------------------------
+
+model ArtCategory {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name         String    @unique // Tanjore, Mysore, Pahari, Pichwai, Kalamkari, Cheriyal, Miscellaneous
+  slug         String    @unique
+  description  String?   @db.Text
+  coverImage   String?
+  displayOrder Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  artworks     Artwork[]
+
+  @@map("art_categories")
 }
 
 model Artwork {
@@ -90,45 +222,59 @@ model Artwork {
   title              String
   slug               String               @unique
   description        String               @db.Text
-  artStyle           ArtStyle
-  medium             String               // e.g., 22k Gold Foil, Teakwood, Natural Pigments
-  dimensions         String               // e.g., 36x48 inches
+  categoryId         String               @db.Uuid
+  dimensions         String               // e.g. "36 x 48 inches"
+  medium             String               // e.g. "22k Gold Foil, Teakwood, Semi-Precious Gemstones"
   yearCreated        Int
   hasGoldFoil        Boolean              @default(false)
-  goldPurity         String?              // e.g., 22 Carat Jaipur Gold
-  primaryImageUrl    String
-  watermarkedUrl     String
-  highResStorageKey  String?              // Protected R2 object key
-  isFeatured         Boolean              @default(false)
-  isAvailable        Boolean              @default(true)
+  goldPurity         String?              // e.g. "22 Carat Jaipur Gold Leaf"
   price              Decimal?             @db.Decimal(12, 2)
+  isAvailable        Boolean              @default(true)
+  isFeatured         Boolean              @default(false)
+  primaryImageUrl    String
+  watermarkedWebpUrl String
+  protectedS3Key     String?              // Protected original master S3 key
   
-  // 1536-dimensional embedding for visual & aesthetic vector similarity (pgvector)
+  // 1536-dimensional embedding for pgvector visual similarity
   embedding          Unsupported("vector(1536)")?
 
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
-  // Relational Graph Links
+  category           ArtCategory          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  events             ArtworkOnEvent[]
+  leads              Lead[]
   ragaLinks          ArtworkRagaLink[]
-  exhibitions        ExhibitionArtwork[]
-  inquiries          Inquiry[]
 
   @@map("artworks")
 }
+
+model ArtworkOnEvent {
+  artworkId    String   @db.Uuid
+  eventId      String   @db.Uuid
+  displayOrder Int      @default(0)
+
+  artwork      Artwork  @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([artworkId, eventId])
+  @@map("artworks_on_events")
+}
+
+// -----------------------------------------------------------------------------
+// Indian Classical Music Synesthesia Graph
+// -----------------------------------------------------------------------------
 
 model Raga {
   id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name            String            @unique
   melakartaNumber Int?
-  arohana         String            // Ascending musical scale notation
-  avarohana       String            // Descending musical scale notation
+  arohana         String            // Ascending scale (e.g. S R₂ G₃ M₁ P D₂ N₃ Ṡ)
+  avarohana       String            // Descending scale
   deity           String?
-  rasa            String?           // Emotional aesthetic (Bhakti, Karuna, Shanta, Veera)
-  timeOfDay       String?           // Pratah, Sandhya, Nishita
+  rasa            String?           // Bhakti, Shanta, Karuna, etc.
+  timeOfDay       String?
   description     String?           @db.Text
-  
-  // Vector embedding for tonal, affective, and melodic characteristics (pgvector)
   embedding       Unsupported("vector(1536)")?
 
   createdAt       DateTime          @default(now())
@@ -141,30 +287,29 @@ model Raga {
 }
 
 model Composition {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   title       String
-  ragaId      String   @db.Uuid
-  tala        String   // Adi, Rupaka, Misra Chapu, Khanda Chapu
-  composer    String   // Tyagaraja, Muthuswami Dikshitar, Syama Sastri, Purandara Dasa
-  vocalist    String   @default("Lalita Kapilavai")
+  ragaId      String    @db.Uuid
+  tala        String    // Adi, Rupaka, etc.
+  composer    String    // Tyagaraja, Dikshitar, etc.
+  vocalist    String    @default("Lalita Kapilavai")
   audioUrl    String
-  lyrics      String?  @db.Text
-  translation String?  @db.Text
-  duration    Int      // duration in seconds
+  lyrics      String?   @db.Text
+  translation String?   @db.Text
+  duration    Int       // seconds
   recordedAt  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  raga        Raga     @relation(fields: [ragaId], references: [id], onDelete: Cascade)
+  raga        Raga      @relation(fields: [ragaId], references: [id], onDelete: Cascade)
 
   @@map("compositions")
 }
 
-// Junction model linking Artworks to Ragas for synesthetic exploration
 model ArtworkRagaLink {
   artworkId   String   @db.Uuid
   ragaId      String   @db.Uuid
-  harmonyNote String?  @db.Text // Description of how the raga inspired the visual motifs
+  harmonyNote String?  @db.Text
   createdAt   DateTime @default(now())
 
   artwork     Artwork  @relation(fields: [artworkId], references: [id], onDelete: Cascade)
@@ -174,49 +319,107 @@ model ArtworkRagaLink {
   @@map("artwork_raga_links")
 }
 
-model Exhibition {
-  id          String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  title       String
-  slug        String              @unique
-  venue       String
-  city        String
-  startDate   DateTime
-  endDate     DateTime
-  description String              @db.Text
-  posterUrl   String?
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+// -----------------------------------------------------------------------------
+// Events, Workshops, Exhibitions & Concerts
+// -----------------------------------------------------------------------------
 
-  artworks    ExhibitionArtwork[]
-
-  @@map("exhibitions")
+enum EventType {
+  WORKSHOP
+  ONLINE_CLASSROOM
+  EXHIBITION
+  CONCERT
 }
 
-model ExhibitionArtwork {
-  exhibitionId String     @db.Uuid
-  artworkId    String     @db.Uuid
-  displayOrder Int        @default(0)
+model Event {
+  id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title              String
+  slug               String              @unique
+  eventType          EventType
+  description        String              @db.Text
+  venue              String
+  city               String
+  timezone           String              @default("Asia/Kolkata")
+  startDate          DateTime
+  endDate            DateTime
+  posterUrl          String?
+  maxCapacity        Int?
+  registrationFee    Decimal?            @db.Decimal(10, 2)
+  isRegistrationOpen Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
-  exhibition   Exhibition @relation(fields: [exhibitionId], references: [id], onDelete: Cascade)
-  artwork      Artwork    @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  artworks           ArtworkOnEvent[]
+  registrations      EventRegistration[]
+  leads              Lead[]
 
-  @@id([exhibitionId, artworkId])
-  @@map("exhibition_artworks")
+  @@map("events")
 }
 
-model Inquiry {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  artworkId   String?  @db.Uuid
-  name        String
-  email       String
-  phone       String?
-  subject     String
-  message     String   @db.Text
-  status      String   @default("PENDING") // PENDING, REVIEWED, RESPONDED, ARCHIVED
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model EventRegistration {
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  eventId       String   @db.Uuid
+  attendeeName  String
+  attendeeEmail String
+  attendeePhone String?
+  ticketCount   Int      @default(1)
+  paymentStatus String   @default("CONFIRMED")
+  registeredAt  DateTime @default(now())
 
-  artwork     Artwork? @relation(fields: [artworkId], references: [id], onDelete: SetNull)
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@map("inquiries")
+  @@map("event_registrations")
+}
+
+// -----------------------------------------------------------------------------
+// Inbound Leads CRM (Web Forms & Physical QR Scans)
+// -----------------------------------------------------------------------------
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CLOSED
+}
+
+model Lead {
+  id              String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String
+  email           String
+  phone           String?
+  subject         String?
+  message         String      @db.Text
+  status          LeadStatus  @default(NEW)
+  sourceArtworkId String?     @db.Uuid // Linked artwork for physical exhibition QR scans or direct inquiries
+  sourceEventId   String?     @db.Uuid
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  sourceArtwork   Artwork?    @relation(fields: [sourceArtworkId], references: [id], onDelete: SetNull)
+  sourceEvent     Event?      @relation(fields: [sourceEventId], references: [id], onDelete: SetNull)
+
+  @@map("leads")
+}
+
+// -----------------------------------------------------------------------------
+// SEO / AEO Optimized Blog Posts
+// -----------------------------------------------------------------------------
+
+model BlogPost {
+  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title            String
+  slug             String    @unique
+  excerpt          String    @db.Text
+  content          String    @db.Text
+  featuredImageUrl String?
+  author           String    @default("Lalita Kapilavai")
+  tags             String[]
+  metaTitle        String?
+  metaDescription  String?
+  structuredJsonLd Json?     // Structured Schema.org Article / BreadcrumbList JSON-LD
+  isPublished      Boolean   @default(false)
+  publishedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@map("blog_posts")
 }
