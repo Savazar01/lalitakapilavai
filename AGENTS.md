@@ -64,3 +64,12 @@ All autonomous agents and human contributors must strictly follow the local-firs
    ```
 6. **Deployment Target**:
    GitHub pushes to `master`/`main` trigger automated builds on the remote VPS managed via **Coolify**, building the multi-stage `Dockerfile` and deploying the standalone Next.js container alongside PostgreSQL 17.
+
+---
+
+## 4. Local Planning & Walkthrough Persistence Rule
+Whenever an `implementation_plan.md` or `walkthrough.md` is created or updated in the agent artifacts directory, autonomous agents MUST always mirror and persist copies into the local repository directories:
+- `plans/implementation_plan.md` (and historical timestamped copies `plans/YYYY-MM-DD_<topic>.md`)
+- `walkthroughs/walkthrough.md` (and historical timestamped copies `walkthroughs/YYYY-MM-DD_<topic>.md`)
+
+Both directories are strictly ignored in `.gitignore` (`/plans/`, `/walkthroughs/`) so they remain permanently stored and available on the local filesystem without leaking into remote Git commits.
