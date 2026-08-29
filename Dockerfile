@@ -36,12 +36,16 @@ RUN apt-get update && \
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client with glibc engine
-RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; fi
-
-# Next.js telemetry disabled during build
+# Build-time dummy environment variables to prevent next build prerender crashes
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/build_fallback?schema=public"
+ENV BETTER_AUTH_SECRET="build_secret_fallback_0123456789abcdef0123456789abcdef"
+ENV BETTER_AUTH_URL="http://localhost:3060"
+ENV NEXT_PUBLIC_APP_URL="http://localhost:3060"
+
+# Generate Prisma client with glibc engine
+RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; fi
 
 RUN npm run build
 

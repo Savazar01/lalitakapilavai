@@ -21,6 +21,8 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 const getEventBySlug = cache(async (slug: string) => {
   return await prisma.event.findUnique({
     where: { slug },

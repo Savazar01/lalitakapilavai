@@ -11,6 +11,8 @@ interface PageProps {
   params: Promise<{ categorySlug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { categorySlug } = await params;
   const category = await prisma.artCategory.findUnique({

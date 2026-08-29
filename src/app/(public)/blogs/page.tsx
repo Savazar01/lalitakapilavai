@@ -5,6 +5,8 @@ import { Footer } from "@/components/public/footer";
 import { Sparkles } from "lucide-react";
 import { BlogArchiveClient } from "@/components/public/blog-archive-client";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sacred Art & Cultural Chronicle — Lalita Kapilavai",
   description:

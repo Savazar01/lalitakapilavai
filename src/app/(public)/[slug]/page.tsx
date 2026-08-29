@@ -11,6 +11,8 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 // Cached database page query
 const getPageBySlug = cache(async (slug: string) => {
   return await prisma.page.findUnique({

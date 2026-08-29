@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-between p-6 sm:p-12 lg:p-20 selection:bg-primary selection:text-stone-950">

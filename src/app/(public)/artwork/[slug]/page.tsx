@@ -25,6 +25,8 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 const getArtworkBySlug = cache(async (slug: string) => {
   return await prisma.artwork.findUnique({
     where: { slug },

@@ -5,6 +5,8 @@ import { Footer } from "@/components/public/footer";
 import { GalleryGrid } from "@/components/public/gallery-grid";
 import { Sparkles } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Fine Art Gallery & Tanjore Archive — Lalita Kapilavai",
   description:
