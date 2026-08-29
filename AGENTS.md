@@ -67,9 +67,14 @@ All autonomous agents and human contributors must strictly follow the local-firs
 
 ---
 
-## 4. Local Planning & Walkthrough Persistence Rule
-Whenever an `implementation_plan.md` or `walkthrough.md` is created or updated in the agent artifacts directory, autonomous agents MUST always mirror and persist copies into the local repository directories:
-- `plans/implementation_plan.md` (and historical timestamped copies `plans/YYYY-MM-DD_<topic>.md`)
-- `walkthroughs/walkthrough.md` (and historical timestamped copies `walkthroughs/YYYY-MM-DD_<topic>.md`)
+## 4. Single-Folder Local 'DevPlans' Archiving Rule
+All user prompts, implementation plans, and walkthroughs MUST be persistently archived inside a single local directory: `DevPlans/`.
+Autonomous agents and contributors must ensure that for every interaction, files are preserved in chronological order using consistent naming and unique tags:
 
-Both directories are strictly ignored in `.gitignore` (`/plans/`, `/walkthroughs/`) so they remain permanently stored and available on the local filesystem without leaking into remote Git commits.
+### File Naming Convention & Tags:
+- **Prompts**: `YYYY-MM-DD_HH-mm-ss_[PROMPT]_<topic-slug>.md`
+- **Implementation Plans**: `YYYY-MM-DD_HH-mm-ss_[PLAN]_<topic-slug>.md`
+- **Walkthroughs**: `YYYY-MM-DD_HH-mm-ss_[WALKTHROUGH]_<topic-slug>.md`
+
+### Local-Only Confidentiality:
+The `DevPlans/` directory is strictly ignored in `.gitignore` (`/DevPlans/`). It must never be committed to Git or pushed to remote repositories, ensuring development logs, architectural notes, and prompt transcripts remain permanently accessible exclusively on the local machine.

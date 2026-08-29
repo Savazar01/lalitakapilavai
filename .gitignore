@@ -51,7 +51,8 @@ yarn-error.log*
 .pnpm-debug.log*
 *.pem
 
-# Local-only planning and walkthrough archives (Never committed to remote)
+# Local-only planning, prompts, and walkthrough archives (Never committed to remote)
+/DevPlans/
 /plans/
 /walkthroughs/
 /.plans/
