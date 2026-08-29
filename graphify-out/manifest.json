@@ -39,11 +39,6 @@
     "ast_hash": "e5de86be7eef9538e26d7c4ab4a02d32",
     "semantic_hash": ""
   },
-  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\middleware.ts": {
-    "mtime": 1787981528.7645261,
-    "ast_hash": "14bf6d3d1688ddb7d8c15d5063b03e64",
-    "semantic_hash": ""
-  },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\layout.tsx": {
     "mtime": 1788014143.0228217,
     "ast_hash": "f7942e61ef0027aaf6ef53404a4cb579",
@@ -240,13 +235,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\auth-client.ts": {
-    "mtime": 1787988523.42012,
-    "ast_hash": "7f5119436afc9b42ff581a5829fdebbb",
+    "mtime": 1788026011.2937841,
+    "ast_hash": "ab50177097d9a075230d8b3f7d60e0ba",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\auth.ts": {
-    "mtime": 1787986070.7735724,
-    "ast_hash": "1fa3064f490a7487aa4f690deb5aff7a",
+    "mtime": 1788026020.987795,
+    "ast_hash": "f6c050fe0bf8d9c364b117554a8ea5a3",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\prisma.ts": {
@@ -285,8 +280,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\docker-compose.yml": {
-    "mtime": 1788018993.5480895,
-    "ast_hash": "46af178f0542dd855dc6159e1950e816",
+    "mtime": 1788025969.8424494,
+    "ast_hash": "6fb10be1eb2b0423277be8f5303e96e9",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\README.md": {
@@ -590,8 +585,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\docker-entrypoint.sh": {
-    "mtime": 1788018974.5777297,
-    "ast_hash": "399df7222b2f87bfc39bfbbcd0380b4c",
+    "mtime": 1788026002.8926914,
+    "ast_hash": "decf5d4a4c5be701b087b6d72ac06ec9",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\proxy.ts": {
+    "mtime": 1788026026.251395,
+    "ast_hash": "3707cb01b065c613d32de3d406506cc8",
     "semantic_hash": ""
   }
 }

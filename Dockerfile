@@ -58,9 +58,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3060
 ENV HOSTNAME="0.0.0.0"
 
-# Install runtime SSL dependencies
+# Install runtime SSL and network utility dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openssl ca-certificates && \
+    apt-get install -y --no-install-recommends openssl ca-certificates netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
 # Security: Run as non-root user via Debian shadow-utils

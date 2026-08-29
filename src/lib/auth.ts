@@ -6,8 +6,14 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3060",
+  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3060",
   secret: process.env.BETTER_AUTH_SECRET || "dev-insecure-secret-key-at-least-32-chars-long",
+  trustedOrigins: [
+    "https://lalitakapilavai.savazar.com",
+    "http://localhost:3060",
+    ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+  ],
   advanced: {
     database: {
       generateId: false,
