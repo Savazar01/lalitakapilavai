@@ -138,6 +138,8 @@ export default function NavigationManagerPage() {
     e.preventDefault();
     setSubmitting(true);
 
+    const sanitizedPath = path.startsWith("/") || path.startsWith("http") ? path : "/" + path;
+
     try {
       if (editingItem) {
         // Edit existing
@@ -147,7 +149,7 @@ export default function NavigationManagerPage() {
           body: JSON.stringify({
             id: editingItem.id,
             label,
-            path,
+            path: sanitizedPath,
             openInNewTab,
           }),
         });
@@ -166,7 +168,7 @@ export default function NavigationManagerPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             label,
-            path,
+            path: sanitizedPath,
             position: selectedPosition,
             parentId: parentTargetId,
             openInNewTab,
@@ -562,12 +564,12 @@ export default function NavigationManagerPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (!label) setLabel("Articles & AEO Posts");
-                        setPath("/posts");
+                        if (!label) setLabel("Sacred Chronicle");
+                        setPath("/blogs");
                       }}
                       className="px-2 py-0.5 rounded text-[11px] font-mono border border-border/80 bg-muted/30 hover:bg-primary/10 hover:border-primary/40 text-foreground transition-colors cursor-pointer"
                     >
-                      /posts
+                      /blogs
                     </button>
                     <button
                       type="button"

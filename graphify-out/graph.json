@@ -891,7 +891,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_artwork_slug_page_tsx",
-      "community": 7,
+      "community": 46,
       "norm_label": "page.tsx"
     },
     {
@@ -900,7 +900,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L24",
       "id": "src_app_public_artwork_slug_page_tsx_slug_page_pageprops",
-      "community": 7,
+      "community": 46,
       "norm_label": "pageprops"
     },
     {
@@ -909,7 +909,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L28",
       "id": "slug_page_getartworkbyslug",
-      "community": 7,
+      "community": 46,
       "norm_label": "getartworkbyslug"
     },
     {
@@ -918,7 +918,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L43",
       "id": "src_app_public_artwork_slug_page_tsx_slug_page_generatemetadata",
-      "community": 7,
+      "community": 46,
       "norm_label": "generatemetadata()"
     },
     {
@@ -927,8 +927,71 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L62",
       "id": "slug_page_artworkdetailpage",
-      "community": 7,
+      "community": 46,
       "norm_label": "artworkdetailpage()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_public_blogs_page_tsx",
+      "community": 47,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "metadata",
+      "file_type": "code",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L8",
+      "id": "blogs_page_metadata",
+      "community": 47,
+      "norm_label": "metadata"
+    },
+    {
+      "label": "BlogsPage()",
+      "file_type": "code",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L17",
+      "id": "blogs_page_blogspage",
+      "community": 47,
+      "norm_label": "blogspage()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_public_blogs_slug_page_tsx",
+      "community": 44,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "PageProps",
+      "file_type": "code",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L18",
+      "id": "src_app_public_blogs_slug_page_tsx_slug_page_pageprops",
+      "community": 44,
+      "norm_label": "pageprops"
+    },
+    {
+      "label": "generateMetadata()",
+      "file_type": "code",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L22",
+      "id": "src_app_public_blogs_slug_page_tsx_slug_page_generatemetadata",
+      "community": 44,
+      "norm_label": "generatemetadata()"
+    },
+    {
+      "label": "BlogDetailPage()",
+      "file_type": "code",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L56",
+      "id": "slug_page_blogdetailpage",
+      "community": 44,
+      "norm_label": "blogdetailpage()"
     },
     {
       "label": "page.tsx",
@@ -963,7 +1026,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_events_slug_page_tsx",
-      "community": 7,
+      "community": 49,
       "norm_label": "page.tsx"
     },
     {
@@ -972,7 +1035,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L20",
       "id": "src_app_public_events_slug_page_tsx_slug_page_pageprops",
-      "community": 7,
+      "community": 49,
       "norm_label": "pageprops"
     },
     {
@@ -981,7 +1044,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L24",
       "id": "slug_page_geteventbyslug",
-      "community": 7,
+      "community": 49,
       "norm_label": "geteventbyslug"
     },
     {
@@ -990,7 +1053,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L41",
       "id": "src_app_public_events_slug_page_tsx_slug_page_generatemetadata",
-      "community": 7,
+      "community": 49,
       "norm_label": "generatemetadata()"
     },
     {
@@ -999,7 +1062,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L55",
       "id": "slug_page_eventdetailpage",
-      "community": 7,
+      "community": 49,
       "norm_label": "eventdetailpage()"
     },
     {
@@ -1071,26 +1134,17 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_posts_page_tsx",
-      "community": 7,
+      "community": 44,
       "norm_label": "page.tsx"
     },
     {
-      "label": "metadata",
+      "label": "PostsLegacyRedirect()",
       "file_type": "code",
       "source_file": "src/app/(public)/posts/page.tsx",
-      "source_location": "L9",
-      "id": "posts_page_metadata",
-      "community": 7,
-      "norm_label": "metadata"
-    },
-    {
-      "label": "BlogArchivePage()",
-      "file_type": "code",
-      "source_file": "src/app/(public)/posts/page.tsx",
-      "source_location": "L15",
-      "id": "posts_page_blogarchivepage",
-      "community": 7,
-      "norm_label": "blogarchivepage()"
+      "source_location": "L3",
+      "id": "posts_page_postslegacyredirect",
+      "community": 44,
+      "norm_label": "postslegacyredirect()"
     },
     {
       "label": "page.tsx",
@@ -1098,35 +1152,26 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_posts_slug_page_tsx",
-      "community": 7,
+      "community": 50,
       "norm_label": "page.tsx"
     },
     {
       "label": "PageProps",
       "file_type": "code",
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
-      "source_location": "L18",
+      "source_location": "L3",
       "id": "src_app_public_posts_slug_page_tsx_slug_page_pageprops",
-      "community": 7,
+      "community": 50,
       "norm_label": "pageprops"
     },
     {
-      "label": "generateMetadata()",
+      "label": "PostSlugLegacyRedirect()",
       "file_type": "code",
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
-      "source_location": "L22",
-      "id": "src_app_public_posts_slug_page_tsx_slug_page_generatemetadata",
-      "community": 7,
-      "norm_label": "generatemetadata()"
-    },
-    {
-      "label": "BlogPostDetailPage()",
-      "file_type": "code",
-      "source_file": "src/app/(public)/posts/[slug]/page.tsx",
-      "source_location": "L53",
-      "id": "slug_page_blogpostdetailpage",
-      "community": 7,
-      "norm_label": "blogpostdetailpage()"
+      "source_location": "L7",
+      "id": "slug_page_postsluglegacyredirect",
+      "community": 50,
+      "norm_label": "postsluglegacyredirect()"
     },
     {
       "label": "page.tsx",
@@ -1134,7 +1179,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_slug_page_tsx",
-      "community": 7,
+      "community": 8,
       "norm_label": "page.tsx"
     },
     {
@@ -1143,7 +1188,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L10",
       "id": "src_app_public_slug_page_tsx_slug_page_pageprops",
-      "community": 7,
+      "community": 8,
       "norm_label": "pageprops"
     },
     {
@@ -1152,7 +1197,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L15",
       "id": "slug_page_getpagebyslug",
-      "community": 7,
+      "community": 8,
       "norm_label": "getpagebyslug"
     },
     {
@@ -1161,7 +1206,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L31",
       "id": "src_app_public_slug_page_tsx_slug_page_generatemetadata",
-      "community": 7,
+      "community": 8,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1170,7 +1215,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L49",
       "id": "slug_page_dynamicpublicpage",
-      "community": 7,
+      "community": 8,
       "norm_label": "dynamicpublicpage()"
     },
     {
@@ -1359,7 +1404,7 @@
       "source_file": "src/app/admin/(dashboard)/leads/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_leads_page_tsx",
-      "community": 42,
+      "community": 0,
       "norm_label": "page.tsx"
     },
     {
@@ -1368,7 +1413,7 @@
       "source_file": "src/app/admin/(dashboard)/leads/page.tsx",
       "source_location": "L45",
       "id": "leads_page_leaditem",
-      "community": 42,
+      "community": 0,
       "norm_label": "leaditem"
     },
     {
@@ -1377,7 +1422,7 @@
       "source_file": "src/app/admin/(dashboard)/leads/page.tsx",
       "source_location": "L66",
       "id": "leads_page_statuscolors",
-      "community": 42,
+      "community": 0,
       "norm_label": "statuscolors"
     },
     {
@@ -1386,7 +1431,7 @@
       "source_file": "src/app/admin/(dashboard)/leads/page.tsx",
       "source_location": "L75",
       "id": "leads_page_adminleadspage",
-      "community": 42,
+      "community": 0,
       "norm_label": "adminleadspage()"
     },
     {
@@ -1458,7 +1503,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_pages_id_builder_page_tsx",
-      "community": 0,
+      "community": 43,
       "norm_label": "page.tsx"
     },
     {
@@ -1467,7 +1512,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L50",
       "id": "builder_page_islightcolor",
-      "community": 0,
+      "community": 43,
       "norm_label": "islightcolor()"
     },
     {
@@ -1476,7 +1521,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L78",
       "id": "builder_page_subsectiondata",
-      "community": 42,
+      "community": 43,
       "norm_label": "subsectiondata"
     },
     {
@@ -1485,7 +1530,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L86",
       "id": "builder_page_sectiondata",
-      "community": 0,
+      "community": 43,
       "norm_label": "sectiondata"
     },
     {
@@ -1494,7 +1539,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L97",
       "id": "builder_page_pagedata",
-      "community": 0,
+      "community": 43,
       "norm_label": "pagedata"
     },
     {
@@ -1503,7 +1548,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L107",
       "id": "builder_page_columnpresets",
-      "community": 0,
+      "community": 43,
       "norm_label": "columnpresets"
     },
     {
@@ -1512,16 +1557,16 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L141",
       "id": "builder_page_sortablesection",
-      "community": 0,
+      "community": 43,
       "norm_label": "sortablesection()"
     },
     {
       "label": "VisualPageBuilder()",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L836",
+      "source_location": "L886",
       "id": "builder_page_visualpagebuilder",
-      "community": 0,
+      "community": 43,
       "norm_label": "visualpagebuilder()"
     },
     {
@@ -1575,7 +1620,7 @@
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_settings_page_tsx",
-      "community": 0,
+      "community": 42,
       "norm_label": "page.tsx"
     },
     {
@@ -1584,7 +1629,7 @@
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
       "source_location": "L40",
       "id": "settings_page_adminsettingspage",
-      "community": 0,
+      "community": 42,
       "norm_label": "adminsettingspage()"
     },
     {
@@ -1647,7 +1692,7 @@
       "source_file": "src/app/api/admin/artworks/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_artworks_route_ts",
-      "community": 1,
+      "community": 45,
       "norm_label": "route.ts"
     },
     {
@@ -1656,7 +1701,7 @@
       "source_file": "src/app/api/admin/artworks/route.ts",
       "source_location": "L6",
       "id": "artworks_route_get",
-      "community": 1,
+      "community": 45,
       "norm_label": "get()"
     },
     {
@@ -1665,7 +1710,7 @@
       "source_file": "src/app/api/admin/artworks/route.ts",
       "source_location": "L66",
       "id": "artworks_route_post",
-      "community": 1,
+      "community": 45,
       "norm_label": "post()"
     },
     {
@@ -1890,7 +1935,7 @@
       "source_file": "src/app/api/admin/media/vault/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_media_vault_route_ts",
-      "community": 29,
+      "community": 1,
       "norm_label": "route.ts"
     },
     {
@@ -1899,7 +1944,7 @@
       "source_file": "src/app/api/admin/media/vault/route.ts",
       "source_location": "L5",
       "id": "vault_route_get",
-      "community": 29,
+      "community": 1,
       "norm_label": "get()"
     },
     {
@@ -2088,7 +2133,7 @@
       "source_file": "src/app/api/admin/qr/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_qr_route_ts",
-      "community": 1,
+      "community": 45,
       "norm_label": "route.ts"
     },
     {
@@ -2097,7 +2142,7 @@
       "source_file": "src/app/api/admin/qr/route.ts",
       "source_location": "L7",
       "id": "qr_route_get",
-      "community": 1,
+      "community": 45,
       "norm_label": "get()"
     },
     {
@@ -2202,10 +2247,28 @@
     {
       "label": "route.ts",
       "file_type": "code",
+      "source_file": "src/app/api/blogs/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_blogs_route_ts",
+      "community": 48,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "GET()",
+      "file_type": "code",
+      "source_file": "src/app/api/blogs/route.ts",
+      "source_location": "L4",
+      "id": "blogs_route_get",
+      "community": 48,
+      "norm_label": "get()"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
       "source_file": "src/app/api/events/register/route.ts",
       "source_location": "L1",
       "id": "src_app_api_events_register_route_ts",
-      "community": 7,
+      "community": 48,
       "norm_label": "route.ts"
     },
     {
@@ -2214,7 +2277,7 @@
       "source_file": "src/app/api/events/register/route.ts",
       "source_location": "L4",
       "id": "register_route_post",
-      "community": 7,
+      "community": 48,
       "norm_label": "post()"
     },
     {
@@ -2241,7 +2304,7 @@
       "source_file": "src/app/api/leads/submit/route.ts",
       "source_location": "L1",
       "id": "src_app_api_leads_submit_route_ts",
-      "community": 7,
+      "community": 48,
       "norm_label": "route.ts"
     },
     {
@@ -2250,7 +2313,7 @@
       "source_file": "src/app/api/leads/submit/route.ts",
       "source_location": "L4",
       "id": "submit_route_post",
-      "community": 7,
+      "community": 48,
       "norm_label": "post()"
     },
     {
@@ -2286,7 +2349,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L37",
       "id": "builder_style_inspector_sectionstyle",
-      "community": 42,
+      "community": 43,
       "norm_label": "sectionstyle"
     },
     {
@@ -2340,7 +2403,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L116",
       "id": "builder_style_inspector_styleinspector",
-      "community": 42,
+      "community": 43,
       "norm_label": "styleinspector()"
     },
     {
@@ -2353,10 +2416,19 @@
       "norm_label": "tiptap-editor.tsx"
     },
     {
+      "label": "CustomImageNode",
+      "file_type": "code",
+      "source_file": "src/components/builder/tiptap-editor.tsx",
+      "source_location": "L44",
+      "id": "builder_tiptap_editor_customimagenode",
+      "community": 0,
+      "norm_label": "customimagenode"
+    },
+    {
       "label": "TextStyleMark",
       "file_type": "code",
       "source_file": "src/components/builder/tiptap-editor.tsx",
-      "source_location": "L40",
+      "source_location": "L80",
       "id": "builder_tiptap_editor_textstylemark",
       "community": 0,
       "norm_label": "textstylemark"
@@ -2365,7 +2437,7 @@
       "label": "COLOR_PRESETS",
       "file_type": "code",
       "source_file": "src/components/builder/tiptap-editor.tsx",
-      "source_location": "L85",
+      "source_location": "L125",
       "id": "builder_tiptap_editor_color_presets",
       "community": 0,
       "norm_label": "color_presets"
@@ -2374,7 +2446,7 @@
       "label": "FONT_SIZES",
       "file_type": "code",
       "source_file": "src/components/builder/tiptap-editor.tsx",
-      "source_location": "L93",
+      "source_location": "L133",
       "id": "builder_tiptap_editor_font_sizes",
       "community": 0,
       "norm_label": "font_sizes"
@@ -2383,7 +2455,7 @@
       "label": "TiptapEditorProps",
       "file_type": "code",
       "source_file": "src/components/builder/tiptap-editor.tsx",
-      "source_location": "L106",
+      "source_location": "L146",
       "id": "builder_tiptap_editor_tiptapeditorprops",
       "community": 0,
       "norm_label": "tiptapeditorprops"
@@ -2392,7 +2464,7 @@
       "label": "TiptapEditor()",
       "file_type": "code",
       "source_file": "src/components/builder/tiptap-editor.tsx",
-      "source_location": "L115",
+      "source_location": "L156",
       "id": "builder_tiptap_editor_tiptapeditor",
       "community": 0,
       "norm_label": "tiptapeditor()"
@@ -2403,7 +2475,7 @@
       "source_file": "src/components/builder/viewport-switcher.tsx",
       "source_location": "L1",
       "id": "src_components_builder_viewport_switcher_tsx",
-      "community": 0,
+      "community": 43,
       "norm_label": "viewport-switcher.tsx"
     },
     {
@@ -2412,7 +2484,7 @@
       "source_file": "src/components/builder/viewport-switcher.tsx",
       "source_location": "L8",
       "id": "builder_viewport_switcher_viewportmode",
-      "community": 0,
+      "community": 43,
       "norm_label": "viewportmode"
     },
     {
@@ -2421,7 +2493,7 @@
       "source_file": "src/components/builder/viewport-switcher.tsx",
       "source_location": "L10",
       "id": "builder_viewport_switcher_viewportswitcherprops",
-      "community": 0,
+      "community": 43,
       "norm_label": "viewportswitcherprops"
     },
     {
@@ -2430,7 +2502,7 @@
       "source_file": "src/components/builder/viewport-switcher.tsx",
       "source_location": "L15",
       "id": "builder_viewport_switcher_viewportswitcher",
-      "community": 0,
+      "community": 43,
       "norm_label": "viewportswitcher()"
     },
     {
@@ -2439,7 +2511,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L1",
       "id": "src_components_public_animated_section_tsx",
-      "community": 7,
+      "community": 8,
       "norm_label": "animated-section.tsx"
     },
     {
@@ -2448,7 +2520,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L6",
       "id": "public_animated_section_animatedsectionprops",
-      "community": 7,
+      "community": 8,
       "norm_label": "animatedsectionprops"
     },
     {
@@ -2457,7 +2529,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L12",
       "id": "public_animated_section_animatedsection",
-      "community": 7,
+      "community": 8,
       "norm_label": "animatedsection()"
     },
     {
@@ -2466,7 +2538,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L1",
       "id": "src_components_public_art_canvas_viewer_tsx",
-      "community": 4,
+      "community": 46,
       "norm_label": "art-canvas-viewer.tsx"
     },
     {
@@ -2475,7 +2547,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L15",
       "id": "public_art_canvas_viewer_artcanvasviewerprops",
-      "community": 4,
+      "community": 46,
       "norm_label": "artcanvasviewerprops"
     },
     {
@@ -2484,8 +2556,80 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L26",
       "id": "public_art_canvas_viewer_artcanvasviewer",
-      "community": 7,
+      "community": 46,
       "norm_label": "artcanvasviewer()"
+    },
+    {
+      "label": "blog-archive-client.tsx",
+      "file_type": "code",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L1",
+      "id": "src_components_public_blog_archive_client_tsx",
+      "community": 47,
+      "norm_label": "blog-archive-client.tsx"
+    },
+    {
+      "label": "BlogPostData",
+      "file_type": "code",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L9",
+      "id": "public_blog_archive_client_blogpostdata",
+      "community": 47,
+      "norm_label": "blogpostdata"
+    },
+    {
+      "label": "estimateReadingTime()",
+      "file_type": "code",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L22",
+      "id": "public_blog_archive_client_estimatereadingtime",
+      "community": 47,
+      "norm_label": "estimatereadingtime()"
+    },
+    {
+      "label": "BlogArchiveClient()",
+      "file_type": "code",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L29",
+      "id": "public_blog_archive_client_blogarchiveclient",
+      "community": 47,
+      "norm_label": "blogarchiveclient()"
+    },
+    {
+      "label": "blog-grid-embed.tsx",
+      "file_type": "code",
+      "source_file": "src/components/public/blog-grid-embed.tsx",
+      "source_location": "L1",
+      "id": "src_components_public_blog_grid_embed_tsx",
+      "community": 8,
+      "norm_label": "blog-grid-embed.tsx"
+    },
+    {
+      "label": "BlogPostSummary",
+      "file_type": "code",
+      "source_file": "src/components/public/blog-grid-embed.tsx",
+      "source_location": "L7",
+      "id": "public_blog_grid_embed_blogpostsummary",
+      "community": 8,
+      "norm_label": "blogpostsummary"
+    },
+    {
+      "label": "estimateReadingTime()",
+      "file_type": "code",
+      "source_file": "src/components/public/blog-grid-embed.tsx",
+      "source_location": "L19",
+      "id": "public_blog_grid_embed_estimatereadingtime",
+      "community": 8,
+      "norm_label": "estimatereadingtime()"
+    },
+    {
+      "label": "BlogGridEmbed()",
+      "file_type": "code",
+      "source_file": "src/components/public/blog-grid-embed.tsx",
+      "source_location": "L26",
+      "id": "public_blog_grid_embed_bloggridembed",
+      "community": 8,
+      "norm_label": "bloggridembed()"
     },
     {
       "label": "event-rsvp-form.tsx",
@@ -2511,7 +2655,7 @@
       "source_file": "src/components/public/event-rsvp-form.tsx",
       "source_location": "L21",
       "id": "public_event_rsvp_form_eventrsvpform",
-      "community": 7,
+      "community": 49,
       "norm_label": "eventrsvpform()"
     },
     {
@@ -2538,7 +2682,7 @@
       "source_file": "src/components/public/exhibition-qr-modal.tsx",
       "source_location": "L24",
       "id": "public_exhibition_qr_modal_exhibitionqrmodal",
-      "community": 7,
+      "community": 46,
       "norm_label": "exhibitionqrmodal()"
     },
     {
@@ -2610,7 +2754,7 @@
       "source_file": "src/components/public/navbar.tsx",
       "source_location": "L21",
       "id": "public_navbar_navbar",
-      "community": 7,
+      "community": 47,
       "norm_label": "navbar()"
     },
     {
@@ -2626,7 +2770,7 @@
       "label": "TiptapMark",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "public_tiptap_renderer_tiptapmark",
       "community": 8,
       "norm_label": "tiptapmark"
@@ -2635,7 +2779,7 @@
       "label": "TiptapNode",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L23",
+      "source_location": "L24",
       "id": "public_tiptap_renderer_tiptapnode",
       "community": 8,
       "norm_label": "tiptapnode"
@@ -2644,7 +2788,7 @@
       "label": "MediaBlockConfig",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L31",
+      "source_location": "L32",
       "id": "public_tiptap_renderer_mediablockconfig",
       "community": 8,
       "norm_label": "mediablockconfig"
@@ -2653,7 +2797,7 @@
       "label": "TiptapRendererProps",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "public_tiptap_renderer_tiptaprendererprops",
       "community": 8,
       "norm_label": "tiptaprendererprops"
@@ -2662,7 +2806,7 @@
       "label": "iconMap",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "id": "public_tiptap_renderer_iconmap",
       "community": 8,
       "norm_label": "iconmap"
@@ -2671,7 +2815,7 @@
       "label": "renderMarks()",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L64",
+      "source_location": "L65",
       "id": "public_tiptap_renderer_rendermarks",
       "community": 8,
       "norm_label": "rendermarks()"
@@ -2680,7 +2824,7 @@
       "label": "renderNode()",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L106",
+      "source_location": "L107",
       "id": "public_tiptap_renderer_rendernode",
       "community": 8,
       "norm_label": "rendernode()"
@@ -2689,7 +2833,7 @@
       "label": "renderMediaBlock()",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L195",
+      "source_location": "L226",
       "id": "public_tiptap_renderer_rendermediablock",
       "community": 8,
       "norm_label": "rendermediablock()"
@@ -2698,7 +2842,7 @@
       "label": "ColumnBlock",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L307",
+      "source_location": "L338",
       "id": "public_tiptap_renderer_columnblock",
       "community": 8,
       "norm_label": "columnblock"
@@ -2707,7 +2851,7 @@
       "label": "renderColumnBlock()",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L324",
+      "source_location": "L356",
       "id": "public_tiptap_renderer_rendercolumnblock",
       "community": 8,
       "norm_label": "rendercolumnblock()"
@@ -2716,7 +2860,7 @@
       "label": "TiptapRenderer()",
       "file_type": "code",
       "source_file": "src/components/public/tiptap-renderer.tsx",
-      "source_location": "L403",
+      "source_location": "L443",
       "id": "public_tiptap_renderer_tiptaprenderer",
       "community": 8,
       "norm_label": "tiptaprenderer()"
@@ -2727,7 +2871,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L1",
       "id": "src_components_ui_badge_tsx",
-      "community": 4,
+      "community": 44,
       "norm_label": "badge.tsx"
     },
     {
@@ -2736,7 +2880,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L5",
       "id": "ui_badge_badgevariants",
-      "community": 4,
+      "community": 44,
       "norm_label": "badgevariants"
     },
     {
@@ -2745,7 +2889,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L27",
       "id": "ui_badge_badgeprops",
-      "community": 4,
+      "community": 44,
       "norm_label": "badgeprops"
     },
     {
@@ -2754,7 +2898,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L31",
       "id": "ui_badge_badge",
-      "community": 4,
+      "community": 44,
       "norm_label": "badge()"
     },
     {
@@ -3312,7 +3456,7 @@
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L1",
       "id": "src_components_ui_tabs_tsx",
-      "community": 0,
+      "community": 42,
       "norm_label": "tabs.tsx"
     },
     {
@@ -3321,7 +3465,7 @@
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L7",
       "id": "ui_tabs_tabslist",
-      "community": 0,
+      "community": 42,
       "norm_label": "tabslist"
     },
     {
@@ -3330,7 +3474,7 @@
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L22",
       "id": "ui_tabs_tabstrigger",
-      "community": 0,
+      "community": 42,
       "norm_label": "tabstrigger"
     },
     {
@@ -3339,7 +3483,7 @@
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L37",
       "id": "ui_tabs_tabscontent",
-      "community": 0,
+      "community": 42,
       "norm_label": "tabscontent"
     },
     {
@@ -3348,7 +3492,7 @@
       "source_file": "src/components/ui/textarea.tsx",
       "source_location": "L1",
       "id": "src_components_ui_textarea_tsx",
-      "community": 4,
+      "community": 42,
       "norm_label": "textarea.tsx"
     },
     {
@@ -3357,7 +3501,7 @@
       "source_file": "src/components/ui/textarea.tsx",
       "source_location": "L4",
       "id": "ui_textarea_textarea",
-      "community": 4,
+      "community": 42,
       "norm_label": "textarea"
     },
     {
@@ -3393,7 +3537,7 @@
       "source_file": "src/components/ui/tooltip.tsx",
       "source_location": "L1",
       "id": "src_components_ui_tooltip_tsx",
-      "community": 4,
+      "community": 42,
       "norm_label": "tooltip.tsx"
     },
     {
@@ -3402,7 +3546,7 @@
       "source_file": "src/components/ui/tooltip.tsx",
       "source_location": "L9",
       "id": "ui_tooltip_tooltipcontent",
-      "community": 4,
+      "community": 42,
       "norm_label": "tooltipcontent"
     },
     {
@@ -3456,7 +3600,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L1",
       "id": "src_lib_formatters_ts",
-      "community": 7,
+      "community": 42,
       "norm_label": "formatters.ts"
     },
     {
@@ -3465,7 +3609,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L6",
       "id": "lib_formatters_supported_currencies",
-      "community": 7,
+      "community": 42,
       "norm_label": "supported_currencies"
     },
     {
@@ -3474,7 +3618,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L17",
       "id": "lib_formatters_supportedcurrency",
-      "community": 7,
+      "community": 42,
       "norm_label": "supportedcurrency"
     },
     {
@@ -3483,7 +3627,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L22",
       "id": "lib_formatters_formatcurrency",
-      "community": 7,
+      "community": 46,
       "norm_label": "formatcurrency()"
     },
     {
@@ -3492,7 +3636,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L78",
       "id": "lib_formatters_getordinalsuffix",
-      "community": 7,
+      "community": 49,
       "norm_label": "getordinalsuffix()"
     },
     {
@@ -3501,7 +3645,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L96",
       "id": "lib_formatters_formatlocalizeddatetime",
-      "community": 7,
+      "community": 49,
       "norm_label": "formatlocalizeddatetime()"
     },
     {
@@ -3510,7 +3654,7 @@
       "source_file": "src/lib/prisma.ts",
       "source_location": "L1",
       "id": "src_lib_prisma_ts",
-      "community": 7,
+      "community": 48,
       "norm_label": "prisma.ts"
     },
     {
@@ -3519,7 +3663,7 @@
       "source_file": "src/lib/prisma.ts",
       "source_location": "L3",
       "id": "lib_prisma_globalforprisma",
-      "community": 7,
+      "community": 48,
       "norm_label": "globalforprisma"
     },
     {
@@ -3528,7 +3672,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L1",
       "id": "src_lib_qr_ts",
-      "community": 1,
+      "community": 45,
       "norm_label": "qr.ts"
     },
     {
@@ -3537,7 +3681,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L4",
       "id": "lib_qr_qrcodeoptions",
-      "community": 1,
+      "community": 45,
       "norm_label": "qrcodeoptions"
     },
     {
@@ -3546,7 +3690,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L16",
       "id": "lib_qr_generateqrcodebuffer",
-      "community": 1,
+      "community": 45,
       "norm_label": "generateqrcodebuffer()"
     },
     {
@@ -3555,7 +3699,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L38",
       "id": "lib_qr_generateandstoreartworkqr",
-      "community": 1,
+      "community": 45,
       "norm_label": "generateandstoreartworkqr()"
     },
     {
@@ -3564,7 +3708,7 @@
       "source_file": "src/lib/qr.ts",
       "source_location": "L68",
       "id": "lib_qr_generateqrcodedataurl",
-      "community": 1,
+      "community": 45,
       "norm_label": "generateqrcodedataurl()"
     },
     {
@@ -3645,7 +3789,7 @@
       "source_file": "src/lib/utils.ts",
       "source_location": "L1",
       "id": "src_lib_utils_ts",
-      "community": 4,
+      "community": 42,
       "norm_label": "utils.ts"
     },
     {
@@ -3654,7 +3798,7 @@
       "source_file": "src/lib/utils.ts",
       "source_location": "L4",
       "id": "lib_utils_cn",
-      "community": 4,
+      "community": 42,
       "norm_label": "cn()"
     },
     {
@@ -4855,6 +4999,42 @@
       "norm_label": "{\n  signin,\n  signout,\n  usesession,\n  getsession,\n  changepassword,\n  updateuser,\n}"
     },
     {
+      "label": "metadata",
+      "file_type": "code",
+      "source_file": "src/app/(public)/posts/page.tsx",
+      "source_location": "L9",
+      "community": 44,
+      "norm_label": "metadata",
+      "id": "posts_page_metadata"
+    },
+    {
+      "label": "BlogArchivePage()",
+      "file_type": "code",
+      "source_file": "src/app/(public)/posts/page.tsx",
+      "source_location": "L15",
+      "community": 44,
+      "norm_label": "blogarchivepage()",
+      "id": "posts_page_blogarchivepage"
+    },
+    {
+      "label": "generateMetadata()",
+      "file_type": "code",
+      "source_file": "src/app/(public)/posts/[slug]/page.tsx",
+      "source_location": "L22",
+      "community": 50,
+      "norm_label": "generatemetadata()",
+      "id": "src_app_public_posts_slug_page_tsx_slug_page_generatemetadata"
+    },
+    {
+      "label": "BlogPostDetailPage()",
+      "file_type": "code",
+      "source_file": "src/app/(public)/posts/[slug]/page.tsx",
+      "source_location": "L53",
+      "community": 50,
+      "norm_label": "blogpostdetailpage()",
+      "id": "slug_page_blogpostdetailpage"
+    },
+    {
       "label": "escapeXml()",
       "file_type": "code",
       "source_file": "src/app/api/admin/media/upload/route.ts",
@@ -4913,7 +5093,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L10",
-      "community": 7,
+      "community": 8,
       "norm_label": "pageprops",
       "id": "slug_page_pageprops"
     },
@@ -4922,7 +5102,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L31",
-      "community": 7,
+      "community": 8,
       "norm_label": "generatemetadata()",
       "id": "slug_page_generatemetadata"
     },
@@ -6051,9 +6231,9 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_artwork_slug_page_tsx",
-      "target": "src_lib_qr_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_qr_ts"
     },
     {
       "relation": "imports",
@@ -6062,9 +6242,9 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_artwork_slug_page_tsx",
-      "target": "lib_qr_generateqrcodedataurl",
-      "confidence_score": 1.0
+      "target": "lib_qr_generateqrcodedataurl"
     },
     {
       "relation": "contains",
@@ -6149,6 +6329,254 @@
       "weight": 1.0,
       "source": "slug_page_artworkdetailpage",
       "target": "lib_formatters_formatcurrency"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "src_lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "src_components_public_navbar_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "public_navbar_navbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "src_components_public_footer_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "public_footer_footer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "src_components_public_blog_archive_client_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "public_blog_archive_client_blogarchiveclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "blogs_page_metadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/page.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_page_tsx",
+      "target": "blogs_page_blogspage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "src_lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "src_components_public_navbar_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "public_navbar_navbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "src_components_public_footer_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "public_footer_footer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "src_components_public_tiptap_renderer_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "public_tiptap_renderer_tiptaprenderer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "src_components_ui_badge_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "ui_badge_badge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "src_components_ui_button_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "ui_button_button",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "src_app_public_blogs_slug_page_tsx_slug_page_pageprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "src_app_public_blogs_slug_page_tsx_slug_page_generatemetadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/blogs/[slug]/page.tsx",
+      "source_location": "L56",
+      "weight": 1.0,
+      "source": "src_app_public_blogs_slug_page_tsx",
+      "target": "slug_page_blogdetailpage",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6633,9 +7061,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "imports_from",
@@ -6644,9 +7072,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "src_components_public_navbar_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_navbar_tsx"
     },
     {
       "relation": "imports",
@@ -6655,9 +7083,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "public_navbar_navbar",
-      "confidence_score": 1.0
+      "target": "public_navbar_navbar"
     },
     {
       "relation": "imports_from",
@@ -6666,9 +7094,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "src_components_public_footer_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_footer_tsx"
     },
     {
       "relation": "imports",
@@ -6677,9 +7105,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "public_footer_footer",
-      "confidence_score": 1.0
+      "target": "public_footer_footer"
     },
     {
       "relation": "imports_from",
@@ -6688,9 +7116,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "src_components_public_gallery_grid_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_gallery_grid_tsx"
     },
     {
       "relation": "imports",
@@ -6699,9 +7127,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "public_gallery_grid_gallerygrid",
-      "confidence_score": 1.0
+      "target": "public_gallery_grid_gallerygrid"
     },
     {
       "relation": "contains",
@@ -6709,9 +7137,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "categoryslug_page_pageprops",
-      "confidence_score": 1.0
+      "target": "categoryslug_page_pageprops"
     },
     {
       "relation": "contains",
@@ -6719,9 +7147,9 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "categoryslug_page_generatemetadata",
-      "confidence_score": 1.0
+      "target": "categoryslug_page_generatemetadata"
     },
     {
       "relation": "contains",
@@ -6729,8 +7157,18 @@
       "source_file": "src/app/(public)/gallery/[categorySlug]/page.tsx",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_gallery_categoryslug_page_tsx",
-      "target": "categoryslug_page_categorygallerypage",
+      "target": "categoryslug_page_categorygallerypage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/posts/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_public_posts_page_tsx",
+      "target": "posts_page_postslegacyredirect",
       "confidence_score": 1.0
     },
     {
@@ -6740,9 +7178,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "imports_from",
@@ -6751,9 +7189,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "src_components_public_navbar_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_navbar_tsx"
     },
     {
       "relation": "imports",
@@ -6762,9 +7200,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "public_navbar_navbar",
-      "confidence_score": 1.0
+      "target": "public_navbar_navbar"
     },
     {
       "relation": "imports_from",
@@ -6773,9 +7211,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "src_components_public_footer_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_footer_tsx"
     },
     {
       "relation": "imports",
@@ -6784,9 +7222,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "public_footer_footer",
-      "confidence_score": 1.0
+      "target": "public_footer_footer"
     },
     {
       "relation": "imports_from",
@@ -6795,9 +7233,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "src_components_ui_badge_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_badge_tsx"
     },
     {
       "relation": "imports",
@@ -6806,9 +7244,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "ui_badge_badge",
-      "confidence_score": 1.0
+      "target": "ui_badge_badge"
     },
     {
       "relation": "contains",
@@ -6816,9 +7254,9 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "posts_page_metadata",
-      "confidence_score": 1.0
+      "target": "posts_page_metadata"
     },
     {
       "relation": "contains",
@@ -6826,8 +7264,28 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_page_tsx",
-      "target": "posts_page_blogarchivepage",
+      "target": "posts_page_blogarchivepage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/posts/[slug]/page.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_public_posts_slug_page_tsx",
+      "target": "src_app_public_posts_slug_page_tsx_slug_page_pageprops"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/posts/[slug]/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_public_posts_slug_page_tsx",
+      "target": "slug_page_postsluglegacyredirect",
       "confidence_score": 1.0
     },
     {
@@ -6837,9 +7295,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "imports_from",
@@ -6848,9 +7306,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "src_components_public_navbar_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_navbar_tsx"
     },
     {
       "relation": "imports",
@@ -6859,9 +7317,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "public_navbar_navbar",
-      "confidence_score": 1.0
+      "target": "public_navbar_navbar"
     },
     {
       "relation": "imports_from",
@@ -6870,9 +7328,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "src_components_public_footer_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_footer_tsx"
     },
     {
       "relation": "imports",
@@ -6881,9 +7339,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "public_footer_footer",
-      "confidence_score": 1.0
+      "target": "public_footer_footer"
     },
     {
       "relation": "imports_from",
@@ -6892,9 +7350,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "src_components_public_tiptap_renderer_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_tiptap_renderer_tsx"
     },
     {
       "relation": "imports",
@@ -6903,9 +7361,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "public_tiptap_renderer_tiptaprenderer",
-      "confidence_score": 1.0
+      "target": "public_tiptap_renderer_tiptaprenderer"
     },
     {
       "relation": "imports_from",
@@ -6914,9 +7372,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "src_components_ui_badge_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_badge_tsx"
     },
     {
       "relation": "imports",
@@ -6925,9 +7383,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "ui_badge_badge",
-      "confidence_score": 1.0
+      "target": "ui_badge_badge"
     },
     {
       "relation": "imports_from",
@@ -6936,9 +7394,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "src_components_ui_button_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_button_tsx"
     },
     {
       "relation": "imports",
@@ -6947,19 +7405,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "ui_button_button",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/(public)/posts/[slug]/page.tsx",
-      "source_location": "L18",
-      "weight": 1.0,
-      "source": "src_app_public_posts_slug_page_tsx",
-      "target": "src_app_public_posts_slug_page_tsx_slug_page_pageprops",
-      "confidence_score": 1.0
+      "target": "ui_button_button"
     },
     {
       "relation": "contains",
@@ -6967,9 +7415,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "src_app_public_posts_slug_page_tsx_slug_page_generatemetadata",
-      "confidence_score": 1.0
+      "target": "src_app_public_posts_slug_page_tsx_slug_page_generatemetadata"
     },
     {
       "relation": "contains",
@@ -6977,9 +7425,9 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_posts_slug_page_tsx",
-      "target": "slug_page_blogpostdetailpage",
-      "confidence_score": 1.0
+      "target": "slug_page_blogpostdetailpage"
     },
     {
       "relation": "imports_from",
@@ -9493,9 +9941,9 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_posts_page_tsx",
-      "target": "src_components_builder_tiptap_editor_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_builder_tiptap_editor_tsx"
     },
     {
       "relation": "imports",
@@ -9504,9 +9952,9 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_posts_page_tsx",
-      "target": "builder_tiptap_editor_tiptapeditor",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_editor_tiptapeditor"
     },
     {
       "relation": "imports_from",
@@ -9515,9 +9963,9 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_posts_page_tsx",
-      "target": "src_components_public_tiptap_renderer_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_public_tiptap_renderer_tsx"
     },
     {
       "relation": "imports",
@@ -9526,9 +9974,9 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_posts_page_tsx",
-      "target": "public_tiptap_renderer_tiptaprenderer",
-      "confidence_score": 1.0
+      "target": "public_tiptap_renderer_tiptaprenderer"
     },
     {
       "relation": "imports_from",
@@ -11227,9 +11675,9 @@
       "source_file": "src/app/api/admin/media/upload/route.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_media_upload_route_ts",
-      "target": "src_lib_watermark_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_watermark_ts"
     },
     {
       "relation": "imports",
@@ -11238,9 +11686,9 @@
       "source_file": "src/app/api/admin/media/upload/route.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_media_upload_route_ts",
-      "target": "lib_watermark_generatewatermarksvg",
-      "confidence_score": 1.0
+      "target": "lib_watermark_generatewatermarksvg"
     },
     {
       "relation": "contains",
@@ -11976,6 +12424,27 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/app/api/blogs/route.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_app_api_blogs_route_ts",
+      "target": "src_lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/blogs/route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_api_blogs_route_ts",
+      "target": "blogs_route_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/app/api/events/register/route.ts",
       "source_location": "L2",
       "weight": 1.0,
@@ -12328,6 +12797,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/builder/tiptap-editor.tsx",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "src_components_builder_tiptap_editor_tsx",
+      "target": "builder_tiptap_editor_customimagenode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L40",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -12531,6 +13010,110 @@
       "confidence_score": 1.0,
       "source": "src_components_public_art_canvas_viewer_tsx",
       "target": "public_art_canvas_viewer_artcanvasviewer"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_components_public_blog_archive_client_tsx",
+      "target": "src_components_ui_input_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_components_public_blog_archive_client_tsx",
+      "target": "ui_input_input",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_components_public_blog_archive_client_tsx",
+      "target": "public_blog_archive_client_blogpostdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_components_public_blog_archive_client_tsx",
+      "target": "public_blog_archive_client_estimatereadingtime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/blog-archive-client.tsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "src_components_public_blog_archive_client_tsx",
+      "target": "public_blog_archive_client_blogarchiveclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/blog-grid-embed.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_components_public_blog_grid_embed_tsx",
+      "target": "public_blog_grid_embed_blogpostsummary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/blog-grid-embed.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_components_public_blog_grid_embed_tsx",
+      "target": "public_blog_grid_embed_estimatereadingtime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/blog-grid-embed.tsx",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "src_components_public_blog_grid_embed_tsx",
+      "target": "public_blog_grid_embed_bloggridembed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/tiptap-renderer.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_components_public_tiptap_renderer_tsx",
+      "target": "src_components_public_blog_grid_embed_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/public/tiptap-renderer.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_components_public_tiptap_renderer_tsx",
+      "target": "public_blog_grid_embed_bloggridembed",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -14681,9 +15264,9 @@
       "source_file": "src/lib/watermark.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_watermark_ts",
-      "target": "lib_watermark_escapexml",
-      "confidence_score": 1.0
+      "target": "lib_watermark_escapexml"
     },
     {
       "relation": "contains",
@@ -14691,9 +15274,9 @@
       "source_file": "src/lib/watermark.ts",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_watermark_ts",
-      "target": "lib_watermark_watermarkoptions",
-      "confidence_score": 1.0
+      "target": "lib_watermark_watermarkoptions"
     },
     {
       "relation": "contains",
@@ -14701,9 +15284,9 @@
       "source_file": "src/lib/watermark.ts",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_watermark_ts",
-      "target": "lib_watermark_generatewatermarksvg",
-      "confidence_score": 1.0
+      "target": "lib_watermark_generatewatermarksvg"
     },
     {
       "relation": "calls",
@@ -14712,9 +15295,9 @@
       "source_file": "src/lib/watermark.ts",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lib_watermark_generatewatermarksvg",
-      "target": "lib_watermark_escapexml",
-      "confidence_score": 1.0
+      "target": "lib_watermark_escapexml"
     },
     {
       "relation": "contains",
@@ -15988,5 +16571,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e4b4d15afe7fd45773e94b13ecdaca42a55736b2"
+  "built_at_commit": "9b725923693fda7fb41476366d6f96f7a5ecb474"
 }

@@ -6,7 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
-import { Mark, mergeAttributes } from "@tiptap/core";
+import { Mark, Node, mergeAttributes } from "@tiptap/core";
 import {
   Bold,
   Italic,
@@ -25,6 +25,10 @@ import {
   Link as LinkIcon,
   Unlink,
   Palette,
+  Image as ImageIcon,
+  Minus,
+  UploadCloud,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +40,42 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+
+export const CustomImageNode = Node.create({
+  name: "image",
+  group: "block",
+  draggable: true,
+  addAttributes() {
+    return {
+      src: { default: null },
+      alt: { default: null },
+      title: { default: null },
+    };
+  },
+  parseHTML() {
+    return [{ tag: "img[src]" }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return [
+      "figure",
+      { class: "my-4 text-center" },
+      [
+        "img",
+        mergeAttributes(HTMLAttributes, {
+          class:
+            "rounded-xl border border-border max-h-[500px] object-contain mx-auto shadow-md",
+        }),
+      ],
+      HTMLAttributes.title
+        ? [
+            "figcaption",
+            { class: "text-xs font-serif italic text-muted-foreground mt-1.5" },
+            HTMLAttributes.title,
+          ]
+        : "",
+    ];
+  },
+});
 
 export const TextStyleMark = Mark.create({
   name: "textStyle",
@@ -110,6 +150,7 @@ export interface TiptapEditorProps {
   placeholder?: string;
   readOnly?: boolean;
   isLight?: boolean;
+  onEditorReady?: (editor: import("@tiptap/react").Editor) => void;
 }
 
 export function TiptapEditor({
@@ -118,10 +159,32 @@ export function TiptapEditor({
   className = "",
   readOnly = false,
   isLight = false,
+  onEditorReady,
 }: TiptapEditorProps) {
   const proseClasses = isLight
     ? "prose prose-stone text-[#1C1814] [&_h1]:text-[#1C1814] [&_h2]:text-[#1C1814] [&_h3]:text-[#1C1814] [&_h4]:text-[#1C1814] [&_p]:text-[#2A2622] [&_li]:text-[#2A2622] [&_strong]:text-[#1C1814] [&_blockquote]:text-[#3A322C] [&_blockquote]:border-[#D4AF37]"
     : "prose prose-stone dark:prose-invert text-[#F5EBE1]";
+
+  const parsedContent = React.useMemo(() => {
+    if (!content) return "<p></p>";
+    if (typeof content === "object") return content;
+    if (typeof content === "string") {
+      const trimmed = content.trim();
+      if (trimmed.startsWith("{") && trimmed.includes('"type":"doc"')) {
+        try {
+          let jsonStr = trimmed;
+          const lastBrace = trimmed.lastIndexOf("}");
+          if (lastBrace > 0) jsonStr = trimmed.slice(0, lastBrace + 1);
+          const parsed = JSON.parse(jsonStr);
+          if (parsed && typeof parsed === "object") return parsed;
+        } catch {
+          // fallback to raw string
+        }
+      }
+      return content;
+    }
+    return content;
+  }, [content]);
 
   const editor = useEditor({
     extensions: [
@@ -143,8 +206,9 @@ export function TiptapEditor({
         },
       }),
       TextStyleMark,
+      CustomImageNode,
     ],
-    content: content || "<p>Click to compose devotional verses or artwork narrative...</p>",
+    content: parsedContent || "<p>Click to compose devotional verses or artwork narrative...</p>",
     editable: !readOnly,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
@@ -159,8 +223,27 @@ export function TiptapEditor({
     },
   });
 
+  React.useEffect(() => {
+    if (editor && onEditorReady) {
+      onEditorReady(editor);
+    }
+  }, [editor, onEditorReady]);
+
+  React.useEffect(() => {
+    if (!editor || !parsedContent) return;
+    const currentJson = JSON.stringify(editor.getJSON());
+    const incomingJson = typeof parsedContent === "object" ? JSON.stringify(parsedContent) : parsedContent;
+    if (currentJson !== incomingJson && editor.getHTML() !== parsedContent) {
+      editor.commands.setContent(parsedContent);
+    }
+  }, [editor, parsedContent]);
+
   const [linkModalOpen, setLinkModalOpen] = React.useState(false);
   const [linkUrl, setLinkUrl] = React.useState("");
+  const [imageModalOpen, setImageModalOpen] = React.useState(false);
+  const [imageUrl, setImageUrl] = React.useState("");
+  const [imageCaption, setImageCaption] = React.useState("");
+  const [uploadingImage, setUploadingImage] = React.useState(false);
 
   if (!editor) {
     return null;
@@ -188,6 +271,46 @@ export function TiptapEditor({
     setLinkModalOpen(false);
   };
 
+  const handleImageModalUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("mediaType", "general");
+    body.append("isArtwork", "false");
+    try {
+      const res = await fetch("/api/admin/media/upload", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      const uploaded = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
+      setImageUrl(uploaded);
+    } catch (err: unknown) {
+      console.error(err);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleInsertImage = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!imageUrl.trim()) return;
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "image",
+        attrs: {
+          src: imageUrl.trim(),
+          alt: imageCaption.trim() || "Illustration",
+          title: imageCaption.trim() || undefined,
+        },
+      })
+      .run();
+    setImageUrl("");
+    setImageCaption("");
+    setImageModalOpen(false);
+  };
 
   const btnInactiveClass = isLight
     ? "text-stone-700 hover:text-stone-950 hover:bg-stone-200/60"
@@ -499,6 +622,32 @@ export function TiptapEditor({
               <Unlink className="h-3.5 w-3.5" />
             </Button>
           )}
+
+          <div className="h-4 w-px bg-border mx-1" />
+
+          {/* Image Insertion */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setImageModalOpen(true)}
+            className={`h-7 w-7 p-0 ${btnInactiveClass}`}
+            title="Insert Artwork / Illustration Image"
+          >
+            <ImageIcon className="h-3.5 w-3.5 text-primary" />
+          </Button>
+
+          {/* Horizontal Rule / Divider */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            className={`h-7 w-7 p-0 ${btnInactiveClass}`}
+            title="Insert Gold Divider"
+          >
+            <Minus className="h-3.5 w-3.5 text-primary" />
+          </Button>
         </div>
       )}
 
@@ -557,6 +706,114 @@ export function TiptapEditor({
                 className="text-xs"
               >
                 Apply Link
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Styled Image Insertion Modal Dialog */}
+      <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
+        <DialogContent className="max-w-md border-border bg-card">
+          <form onSubmit={handleInsertImage} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle className="text-base font-serif font-bold text-foreground">
+                Insert Image Block
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Upload an image from your computer or provide an existing URL.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 py-1">
+              {/* Local File Upload */}
+              <div className="border-2 border-dashed border-border hover:border-primary/50 rounded-lg p-3 text-center transition-colors">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  id="tiptap-modal-image-upload"
+                  className="hidden"
+                  onChange={handleImageModalUpload}
+                  disabled={uploadingImage}
+                />
+                <label
+                  htmlFor="tiptap-modal-image-upload"
+                  className="cursor-pointer flex flex-col items-center justify-center gap-1.5"
+                >
+                  {uploadingImage ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  ) : (
+                    <UploadCloud className="w-5 h-5 text-primary" />
+                  )}
+                  <span className="text-xs font-semibold text-foreground">
+                    {uploadingImage ? "Uploading clean asset..." : "Upload local image"}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">
+                    JPG, PNG, WebP (Bypasses watermark)
+                  </span>
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="h-px bg-border flex-1" />
+                <span className="text-[10px] uppercase text-muted-foreground font-mono">or enter url</span>
+                <div className="h-px bg-border flex-1" />
+              </div>
+
+              <div>
+                <label className="text-xs text-muted-foreground block mb-1">Image URL</label>
+                <Input
+                  type="text"
+                  placeholder="https://... or /media/public/..."
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  className="text-xs font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-muted-foreground block mb-1">Caption / Subtitle (Optional)</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. Traditional Tanjore gold relief detail"
+                  value={imageCaption}
+                  onChange={(e) => setImageCaption(e.target.value)}
+                  className="text-xs"
+                />
+              </div>
+
+              {imageUrl && (
+                <div className="rounded border border-border p-2 bg-muted/20 flex items-center gap-3">
+                  <img
+                    src={imageUrl}
+                    alt="Preview"
+                    className="w-12 h-12 object-cover rounded border border-border/80"
+                  />
+                  <span className="text-xs font-mono text-muted-foreground truncate flex-1">
+                    {imageUrl}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setImageModalOpen(false)}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="gold"
+                size="sm"
+                disabled={!imageUrl || uploadingImage}
+                className="text-xs"
+              >
+                Insert Block
               </Button>
             </DialogFooter>
           </form>

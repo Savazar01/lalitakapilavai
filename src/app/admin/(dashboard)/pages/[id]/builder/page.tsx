@@ -231,6 +231,7 @@ function SortableSection({
             buttonVariant: "gold",
           }
         : {}),
+      ...(type === "BLOG_GRID" ? { blogLimit: 4 } : {}),
     };
 
     currentBlocks.push(newBlock);
@@ -696,6 +697,45 @@ function SortableSection({
                           />
                         </div>
                       )}
+
+                      {block.type === "BLOG_GRID" && (
+                        <div className="p-3.5 rounded-xl border border-primary/40 bg-primary/5 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold text-primary flex items-center gap-1.5 uppercase tracking-wider">
+                              <Sparkles className="w-3.5 h-3.5 text-primary" /> Latest Blog Posts (4-Col Grid)
+                            </span>
+                            <div className="flex items-center gap-1.5 text-xs">
+                              <span className="text-muted-foreground text-[10px]">Limit:</span>
+                              <select
+                                value={block.blogLimit || 4}
+                                onChange={(e) =>
+                                  updateBlock(colIdx, block.id, {
+                                    blogLimit: parseInt(e.target.value, 10),
+                                  })
+                                }
+                                className="text-xs p-1 rounded border border-border bg-background text-foreground"
+                              >
+                                <option value={4}>4 Articles (1 Row)</option>
+                                <option value={8}>8 Articles (2 Rows)</option>
+                                <option value={12}>12 Articles (3 Rows)</option>
+                              </select>
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed">
+                            Dynamic 4-column feed of published essays with featured covers, reading times, tags, and links to /blogs/[slug].
+                          </p>
+                          <div className="grid grid-cols-4 gap-1.5 pt-1 opacity-70">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                              <div
+                                key={i}
+                                className="h-12 rounded border border-border/60 bg-muted/40 flex flex-col items-center justify-center p-1 text-center"
+                              >
+                                <span className="text-[9px] font-mono text-muted-foreground">Post {i + 1}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -823,6 +863,16 @@ function SortableSection({
                   className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
                 >
                   + Button
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "BLOG_GRID");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-primary/40 hover:border-primary bg-primary/10 hover:bg-primary/20 text-primary font-semibold transition-all cursor-pointer"
+                >
+                  + 4-Col Blog Grid
                 </button>
               </div>
             </div>

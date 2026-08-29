@@ -14,6 +14,7 @@ import {
   Compass,
   Volume2,
 } from "lucide-react";
+import { BlogGridEmbed } from "@/components/public/blog-grid-embed";
 
 interface TiptapMark {
   type: string;
@@ -184,6 +185,36 @@ function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
         </React.Fragment>
       );
 
+    case "image": {
+      const src = (node.attrs?.src as string) || "";
+      const alt = (node.attrs?.alt as string) || "Heritage artwork illustration";
+      const title = (node.attrs?.title as string) || "";
+      if (!src) return null;
+      return (
+        <figure key={key} className="my-6 text-center">
+          <img
+            src={src}
+            alt={alt}
+            className="w-full max-h-[550px] object-contain rounded-xl border border-border/80 mx-auto shadow-md"
+            loading="lazy"
+          />
+          {title && (
+            <figcaption className="mt-2 text-xs font-serif italic text-muted-foreground">
+              {title}
+            </figcaption>
+          )}
+        </figure>
+      );
+    }
+
+    case "horizontalRule":
+      return (
+        <hr
+          key={key}
+          className="my-8 border-t-2 border-primary/40 max-w-xs mx-auto"
+        />
+      );
+
     default:
       if (children) {
         return <div key={key}>{children}</div>;
@@ -306,7 +337,7 @@ function renderMediaBlock(media: MediaBlockConfig): React.ReactNode {
 
 export interface ColumnBlock {
   id: string;
-  type: "TEXT" | "IMAGE" | "VIDEO" | "AUDIO" | "DIVIDER" | "BUTTON";
+  type: "TEXT" | "IMAGE" | "VIDEO" | "AUDIO" | "DIVIDER" | "BUTTON" | "BLOG_GRID";
   content?: Record<string, unknown>;
   mediaUrl?: string;
   mediaAlt?: string;
@@ -319,6 +350,7 @@ export interface ColumnBlock {
   buttonText?: string;
   buttonUrl?: string;
   buttonVariant?: "gold" | "outline" | "temple";
+  blogLimit?: number;
 }
 
 function renderColumnBlock(block: ColumnBlock): React.ReactNode {
@@ -388,6 +420,14 @@ function renderColumnBlock(block: ColumnBlock): React.ReactNode {
     );
   }
 
+  if (block.type === "BLOG_GRID") {
+    return (
+      <div key={block.id} className="py-6 w-full">
+        <BlogGridEmbed limit={block.blogLimit || 4} />
+      </div>
+    );
+  }
+
   if (block.type === "TEXT" && block.content) {
     const doc = block.content as unknown as TiptapNode;
     return (
@@ -405,13 +445,31 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
 
   if (typeof content === "string") {
     let parsedObj: Record<string, unknown> | null = null;
-    try {
-      const result = JSON.parse(content);
-      if (result && typeof result === "object") {
-        parsedObj = result as Record<string, unknown>;
+    const trimmed = content.trim();
+
+    if (trimmed.startsWith("{") && trimmed.includes('"type":"doc"')) {
+      try {
+        let jsonStr = trimmed;
+        const lastBraceIdx = trimmed.lastIndexOf("}");
+        if (lastBraceIdx > 0) {
+          jsonStr = trimmed.slice(0, lastBraceIdx + 1);
+        }
+        const result = JSON.parse(jsonStr);
+        if (result && typeof result === "object" && result.type === "doc") {
+          parsedObj = result as Record<string, unknown>;
+        }
+      } catch {
+        // Not valid JSON
       }
-    } catch {
-      // Fallback for raw markdown or plain text
+    } else {
+      try {
+        const result = JSON.parse(trimmed);
+        if (result && typeof result === "object") {
+          parsedObj = result as Record<string, unknown>;
+        }
+      } catch {
+        // Fallback for raw markdown or plain text
+      }
     }
 
     if (parsedObj) {

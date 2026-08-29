@@ -84,6 +84,7 @@ export default function AdminPostsPage() {
 
 
   // Form State
+  const [editorInstance, setEditorInstance] = React.useState<import("@tiptap/react").Editor | null>(null);
   const [formData, setFormData] = React.useState({
     title: "",
     slug: "",
@@ -138,11 +139,27 @@ export default function AdminPostsPage() {
 
   const handleOpenEdit = (post: BlogPostItem) => {
     setEditingPost(post);
+    let cleanContent = post.content || "";
+    const trimmed = cleanContent.trim();
+    if (trimmed.startsWith("{") && trimmed.includes('"type":"doc"')) {
+      try {
+        let jsonStr = trimmed;
+        const lastBrace = trimmed.lastIndexOf("}");
+        if (lastBrace > 0) jsonStr = trimmed.slice(0, lastBrace + 1);
+        const parsed = JSON.parse(jsonStr);
+        if (parsed && typeof parsed === "object") {
+          cleanContent = JSON.stringify(parsed);
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+
     setFormData({
       title: post.title,
       slug: post.slug,
       excerpt: post.excerpt,
-      content: post.content,
+      content: cleanContent,
       featuredImageUrl: post.featuredImageUrl || "",
       author: post.author,
       tags: post.tags.join(", "),
@@ -221,11 +238,18 @@ export default function AdminPostsPage() {
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
       const imgUrl = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
-      const snippet = `\n\n![Curatorial Illustration](${imgUrl})\n\n`;
-      setFormData((prev) => ({
-        ...prev,
-        content: prev.content ? `${prev.content}${snippet}` : snippet,
-      }));
+      if (editorMode === "VISUAL" && editorInstance) {
+        editorInstance.chain().focus().insertContent({
+          type: "image",
+          attrs: { src: imgUrl, alt: "Curatorial Illustration" },
+        }).run();
+      } else {
+        const snippet = `\n\n![Curatorial Illustration](${imgUrl})\n\n`;
+        setFormData((prev) => ({
+          ...prev,
+          content: prev.content ? `${prev.content}${snippet}` : snippet,
+        }));
+      }
       toast.success("Image uploaded & added to article!");
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Inline image upload failed");
@@ -235,15 +259,30 @@ export default function AdminPostsPage() {
   };
 
   const insertQuote = () => {
-    const quote = `\n\n> "Sacred iconography is the visual manifestation of nada brahma — eternal contemplation made visible."\n\n`;
-    setFormData((prev) => ({ ...prev, content: `${prev.content || ""}${quote}` }));
-    toast.info("Callout quote block inserted");
+    if (editorMode === "VISUAL" && editorInstance) {
+      editorInstance
+        .chain()
+        .focus()
+        .setBlockquote()
+        .insertContent("Sacred iconography is the visual manifestation of nada brahma — eternal contemplation made visible.")
+        .run();
+      toast.info("Callout quote block inserted");
+    } else {
+      const quote = `\n\n> "Sacred iconography is the visual manifestation of nada brahma — eternal contemplation made visible."\n\n`;
+      setFormData((prev) => ({ ...prev, content: `${prev.content || ""}${quote}` }));
+      toast.info("Callout quote block inserted");
+    }
   };
 
   const insertDivider = () => {
-    const divider = `\n\n---\n\n`;
-    setFormData((prev) => ({ ...prev, content: `${prev.content || ""}${divider}` }));
-    toast.info("Ornamental divider inserted");
+    if (editorMode === "VISUAL" && editorInstance) {
+      editorInstance.chain().focus().setHorizontalRule().run();
+      toast.info("Ornamental divider inserted");
+    } else {
+      const divider = `\n\n---\n\n`;
+      setFormData((prev) => ({ ...prev, content: `${prev.content || ""}${divider}` }));
+      toast.info("Ornamental divider inserted");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -650,6 +689,7 @@ export default function AdminPostsPage() {
                     <div className="rounded-md border border-border/80 bg-background/50 p-2 min-h-[300px]">
                       <TiptapEditor
                         content={formData.content}
+                        onEditorReady={setEditorInstance}
                         onChange={(json) => {
                           setFormData((prev) => ({
                             ...prev,
