@@ -39,15 +39,15 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
-  { label: "Artwork Catalog", href: "/admin/artworks", icon: Palette },
+  { label: "Page Layouts", href: "/admin/pages", icon: FileText },
+  { label: "Navigation Menus", href: "/admin/navigation", icon: MenuIcon },
+  { label: "Blogs & AEO Posts", href: "/admin/posts", icon: BookOpen },
   { label: "Categories", href: "/admin/categories", icon: FolderTree },
+  { label: "Artwork Catalog", href: "/admin/artworks", icon: Palette },
   { label: "Exhibitions & Events", href: "/admin/events", icon: Calendar },
   { label: "Leads & QR Scans", href: "/admin/leads", icon: Users },
-  { label: "Navigation Menus", href: "/admin/navigation", icon: MenuIcon },
-  { label: "Page Layouts", href: "/admin/pages", icon: FileText },
-  { label: "Blog & AEO Posts", href: "/admin/posts", icon: BookOpen },
-  { label: "User Administration", href: "/admin/users", icon: UserCog, superAdminOnly: true },
   { label: "System Settings", href: "/admin/settings", icon: Settings },
+  { label: "User Administration", href: "/admin/users", icon: UserCog, superAdminOnly: true },
 ];
 
 export default function AdminDashboardLayout({
@@ -59,6 +59,16 @@ export default function AdminDashboardLayout({
   const router = useRouter();
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.logoUrl) setLogoUrl(data.logoUrl);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -117,9 +127,17 @@ export default function AdminDashboardLayout({
         {/* Brand Header */}
         <div className="h-16 px-6 border-b border-border flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-primary/20 border border-primary/40 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-primary" />
-            </div>
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Lalita Kapilavai"
+                className="h-8 w-auto max-w-[100px] object-contain rounded"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-md bg-primary/20 border border-primary/40 flex items-center justify-center">
+                <Shield className="w-4 h-4 text-primary" />
+              </div>
+            )}
             <div className="flex flex-col">
               <span className="font-serif font-bold text-sm leading-tight text-foreground">
                 Lalita Kapilavai
@@ -197,7 +215,15 @@ export default function AdminDashboardLayout({
               <SheetContent side="left" className="p-0 w-72 flex flex-col">
                 <SheetHeader className="p-4 border-b border-border">
                   <SheetTitle className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-primary" />
+                    {logoUrl ? (
+                      <img
+                        src={logoUrl}
+                        alt="Lalita Kapilavai"
+                        className="h-6 w-auto max-w-[90px] object-contain rounded"
+                      />
+                    ) : (
+                      <Shield className="w-4 h-4 text-primary" />
+                    )}
                     <span>Lalita Kapilavai Admin</span>
                   </SheetTitle>
                 </SheetHeader>

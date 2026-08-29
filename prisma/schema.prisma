@@ -121,6 +121,9 @@ model SystemSetting {
   youtubeUrl        String?
   facebookUrl       String?
   pinterestUrl      String?
+  // Branding
+  logoUrl           String?
+  faviconUrl        String?
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -250,6 +253,7 @@ model Artwork {
   primaryImageUrl    String
   watermarkedWebpUrl String
   protectedS3Key     String?              // Protected original master S3 key
+  qrCodeUrl          String?              // Generated high-res Exhibition Floor QR code URL
   
   // 1536-dimensional embedding for pgvector visual similarity
   embedding          Unsupported("vector(1536)")?

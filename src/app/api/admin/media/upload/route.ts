@@ -96,30 +96,30 @@ export async function POST(request: NextRequest) {
     const opacity = systemSettings?.watermarkOpacity || 0.45;
 
     // Calculate proportional font and banner dimensions
-    const fontSize = Math.max(16, Math.min(Math.round(width * 0.028), 48));
-    const bannerHeight = Math.max(40, Math.round(fontSize * 2.2));
+    const fontSize = Math.max(18, Math.min(Math.round(width * 0.03), 48));
+    const bannerHeight = Math.max(48, Math.round(fontSize * 2.4));
 
-    // Elegant SVG Watermark Overlay with dark blur bar and warm gold/ivory text
+    // High-Contrast Luxury SVG Watermark Overlay with solid obsidian backdrop & temple-gold border
     const svgOverlay = `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="bannerGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#0D0E12" stop-opacity="0" />
-            <stop offset="40%" stop-color="#0D0E12" stop-opacity="${opacity * 1.2}" />
-            <stop offset="100%" stop-color="#0D0E12" stop-opacity="${opacity * 1.5}" />
-          </linearGradient>
+          <filter id="textShadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000000" flood-opacity="0.9"/>
+          </filter>
         </defs>
-        <rect x="0" y="${height - bannerHeight}" width="${width}" height="${bannerHeight}" fill="url(#bannerGrad)" />
+        <!-- Overt Obsidian Protection Banner -->
+        <rect x="0" y="${height - bannerHeight}" width="${width}" height="${bannerHeight}" fill="#0F0E0D" fill-opacity="${Math.max(0.75, opacity)}" />
+        <line x1="0" y1="${height - bannerHeight}" x2="${width}" y2="${height - bannerHeight}" stroke="#D4AF37" stroke-width="2" stroke-opacity="${Math.max(0.8, opacity)}" />
         <text 
           x="${width / 2}" 
           y="${height - bannerHeight / 2 + fontSize / 3}" 
           text-anchor="middle" 
-          font-family="Georgia, serif" 
+          font-family="Georgia, 'Cinzel Decorative', serif" 
           font-size="${fontSize}px" 
-          font-weight="600" 
-          letter-spacing="2px"
+          font-weight="700" 
+          letter-spacing="2.5px"
           fill="#FAF7F2" 
-          fill-opacity="${Math.min(opacity + 0.3, 0.85)}"
+          filter="url(#textShadow)"
         >
           ${escapeXml(watermarkText)}
         </text>

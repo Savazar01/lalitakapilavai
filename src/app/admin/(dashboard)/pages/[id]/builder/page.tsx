@@ -36,6 +36,8 @@ import {
   Sparkles,
   ChevronUp,
   ChevronDown,
+  Upload,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -264,6 +266,35 @@ function SortableSection({
     onUpdateSubSectionContent(colIdx, { ...colObj, blocks: newBlocks });
   };
 
+  const [uploadingBlockId, setUploadingBlockId] = React.useState<string | null>(null);
+
+  const handleBlockImageUpload = async (
+    colIdx: number,
+    blockId: string,
+    file: File
+  ) => {
+    setUploadingBlockId(blockId);
+    const body = new FormData();
+    body.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      const url = data.watermarkedUrl || data.publicUrl || data.primaryImageUrl;
+      updateBlock(colIdx, blockId, { mediaUrl: url });
+      toast.success("Image uploaded to column block!");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload image");
+    } finally {
+      setUploadingBlockId(null);
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -468,37 +499,122 @@ function SortableSection({
                       )}
 
                       {block.type === "IMAGE" && (
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
+                          {/* Image preview with aspect-ratio styling */}
                           {block.mediaUrl ? (
-                            <img
-                              src={block.mediaUrl}
-                              alt={block.mediaAlt || "Block image"}
-                              className="w-full h-36 object-cover rounded border border-border/80"
-                            />
+                            <div className="relative group rounded-md overflow-hidden border border-border/80 bg-background/50 flex items-center justify-center">
+                              <img
+                                src={block.mediaUrl}
+                                alt={block.mediaAlt || "Block image"}
+                                className={`w-full object-cover transition-all ${
+                                  block.mediaAspectRatio === "1:1"
+                                    ? "aspect-square"
+                                    : block.mediaAspectRatio === "16:9"
+                                    ? "aspect-video"
+                                    : block.mediaAspectRatio === "4:3"
+                                    ? "aspect-[4/3]"
+                                    : block.mediaAspectRatio === "3:4"
+                                    ? "aspect-[3/4]"
+                                    : "aspect-auto max-h-48"
+                                }`}
+                              />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <label className="cursor-pointer">
+                                  <input
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleBlockImageUpload(colIdx, block.id, file);
+                                    }}
+                                    disabled={uploadingBlockId === block.id}
+                                  />
+                                  <span className="px-2 py-1 bg-background/90 text-foreground text-[11px] font-medium rounded shadow hover:bg-background transition-colors flex items-center gap-1 cursor-pointer">
+                                    <Upload className="w-3 h-3 text-primary" /> Replace
+                                  </span>
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => updateBlock(colIdx, block.id, { mediaUrl: "" })}
+                                  className="px-2 py-1 bg-destructive text-destructive-foreground text-[11px] font-medium rounded shadow hover:bg-destructive/90 transition-colors flex items-center gap-1 cursor-pointer"
+                                  title="Remove Image"
+                                >
+                                  <Trash2 className="w-3 h-3" /> Remove
+                                </button>
+                              </div>
+                            </div>
                           ) : (
-                            <div className="h-24 bg-muted/40 rounded border border-dashed border-border flex items-center justify-center text-xs text-muted-foreground">
-                              No image URL provided
+                            <div className="h-24 bg-muted/30 rounded border border-dashed border-border/80 flex flex-col items-center justify-center text-xs text-muted-foreground p-3 text-center">
+                              <ImageIcon className="w-5 h-5 text-muted-foreground/60 mb-1" />
+                              <span>No image selected</span>
                             </div>
                           )}
-                          <div className="grid grid-cols-2 gap-2 pt-1">
-                            <input
-                              type="text"
-                              placeholder="Image URL"
-                              value={block.mediaUrl || ""}
-                              onChange={(e) =>
-                                updateBlock(colIdx, block.id, { mediaUrl: e.target.value })
-                              }
-                              className="text-xs p-1 rounded border border-border bg-background text-foreground"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Alt text"
-                              value={block.mediaAlt || ""}
-                              onChange={(e) =>
-                                updateBlock(colIdx, block.id, { mediaAlt: e.target.value })
-                              }
-                              className="text-xs p-1 rounded border border-border bg-background text-foreground"
-                            />
+
+                          {/* Dual-Mode Controls: Local Upload + Aspect Ratio */}
+                          <div className="space-y-1.5 pt-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <label className="cursor-pointer">
+                                <input
+                                  type="file"
+                                  accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleBlockImageUpload(colIdx, block.id, file);
+                                  }}
+                                  disabled={uploadingBlockId === block.id}
+                                />
+                                <span className="inline-flex items-center justify-center px-2.5 py-1 rounded text-xs font-medium border border-border bg-background hover:bg-accent text-foreground transition-colors cursor-pointer shadow-xs">
+                                  {uploadingBlockId === block.id ? (
+                                    <Loader2 className="w-3 h-3 animate-spin mr-1.5 text-primary" />
+                                  ) : (
+                                    <Upload className="w-3 h-3 mr-1.5 text-primary" />
+                                  )}
+                                  {uploadingBlockId === block.id ? "Uploading..." : "Upload Image from Computer"}
+                                </span>
+                              </label>
+
+                              {/* Aspect Ratio Selector */}
+                              <div className="flex items-center gap-1 ml-auto">
+                                <span className="text-[10px] text-muted-foreground">Aspect:</span>
+                                <select
+                                  value={block.mediaAspectRatio || "auto"}
+                                  onChange={(e) =>
+                                    updateBlock(colIdx, block.id, { mediaAspectRatio: e.target.value })
+                                  }
+                                  className="text-xs py-1 px-1.5 rounded border border-border bg-background text-foreground cursor-pointer"
+                                >
+                                  <option value="auto">Original</option>
+                                  <option value="16:9">16:9 Wide</option>
+                                  <option value="1:1">1:1 Square</option>
+                                  <option value="4:3">4:3 Standard</option>
+                                  <option value="3:4">3:4 Portrait</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* Direct URL + Alt */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+                              <input
+                                type="text"
+                                placeholder="Or paste image URL (https://...)"
+                                value={block.mediaUrl || ""}
+                                onChange={(e) =>
+                                  updateBlock(colIdx, block.id, { mediaUrl: e.target.value })
+                                }
+                                className="text-xs p-1.5 rounded border border-border bg-background text-foreground font-mono"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Alt text / image caption"
+                                value={block.mediaAlt || ""}
+                                onChange={(e) =>
+                                  updateBlock(colIdx, block.id, { mediaAlt: e.target.value })
+                                }
+                                className="text-xs p-1.5 rounded border border-border bg-background text-foreground"
+                              />
+                            </div>
                           </div>
                         </div>
                       )}

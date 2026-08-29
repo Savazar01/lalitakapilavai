@@ -86,6 +86,8 @@ export async function PUT(request: NextRequest) {
       youtubeUrl: body.youtubeUrl,
       facebookUrl: body.facebookUrl,
       pinterestUrl: body.pinterestUrl,
+      logoUrl: body.logoUrl,
+      faviconUrl: body.faviconUrl,
     };
 
     let updated;

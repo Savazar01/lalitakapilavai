@@ -64,19 +64,30 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
 function renderMarks(text: string, marks?: TiptapMark[]): React.ReactNode {
   if (!marks || marks.length === 0) return text;
 
-  return marks.reduce<React.ReactNode>((acc, mark) => {
+  return marks.reduce<React.ReactNode>((acc, mark, idx) => {
     switch (mark.type) {
       case "bold":
-        return <strong>{acc}</strong>;
+        return <strong key={`b-${idx}`}>{acc}</strong>;
       case "italic":
-        return <em>{acc}</em>;
+        return <em key={`i-${idx}`}>{acc}</em>;
       case "underline":
-        return <u>{acc}</u>;
+        return <u key={`u-${idx}`}>{acc}</u>;
+      case "textStyle": {
+        const styleObj: React.CSSProperties = {};
+        if (mark.attrs?.color) styleObj.color = mark.attrs.color as string;
+        if (mark.attrs?.fontSize) styleObj.fontSize = mark.attrs.fontSize as string;
+        return (
+          <span key={`ts-${idx}`} style={styleObj}>
+            {acc}
+          </span>
+        );
+      }
       case "link": {
         const href = (mark.attrs?.href as string) || "#";
         const isExternal = href.startsWith("http");
         return (
           <Link
+            key={`l-${idx}`}
             href={href}
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
@@ -93,7 +104,7 @@ function renderMarks(text: string, marks?: TiptapMark[]): React.ReactNode {
 }
 
 function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
-  const children = node.content?.map((child, i) => renderNode(child, i));
+  const children = node.content?.map((child, i) => renderNode(child, `${String(key)}-c${i}`));
 
   const textAlign = node.attrs?.textAlign as string | undefined;
   const alignClass =
@@ -135,7 +146,7 @@ function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
     case "paragraph":
       return (
         <p key={key} className={`text-base leading-relaxed text-foreground/85 mb-4 ${alignClass}`}>
-          {children || "\u00A0"}
+          {children && children.length > 0 ? children : "\u00A0"}
         </p>
       );
 
@@ -167,7 +178,11 @@ function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
       );
 
     case "text":
-      return renderMarks(node.text || "", node.marks);
+      return (
+        <React.Fragment key={key}>
+          {renderMarks(node.text || "", node.marks)}
+        </React.Fragment>
+      );
 
     default:
       if (children) {

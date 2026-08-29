@@ -15,6 +15,8 @@ import {
   Loader2,
   Sparkles,
   Check,
+  QrCode,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +49,7 @@ import {
 interface ArtworkSummary {
   id: string;
   title: string;
+  slug: string;
   medium: string;
   primaryImageUrl: string;
 }
@@ -151,6 +154,60 @@ export default function EventsAdminPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [targetDeleteEvent, setTargetDeleteEvent] = React.useState<{ id: string; title: string } | null>(null);
   const [deleting, setDeleting] = React.useState(false);
+
+  // Exhibition QR Code State
+  const [exhibitionQrModalOpen, setExhibitionQrModalOpen] = React.useState(false);
+  const [selectedExhibitionEvent, setSelectedExhibitionEvent] = React.useState<EventItem | null>(null);
+  const [selectedArtworkForExhibition, setSelectedArtworkForExhibition] = React.useState<string>("");
+  const [exhibitionQrDataUrl, setExhibitionQrDataUrl] = React.useState<string>("");
+  const [exhibitionQrTargetUrl, setExhibitionQrTargetUrl] = React.useState<string>("");
+  const [exhibitionQrLoading, setExhibitionQrLoading] = React.useState(false);
+
+  const handleOpenExhibitionQR = async (ev: EventItem) => {
+    setSelectedExhibitionEvent(ev);
+    setSelectedArtworkForExhibition("");
+    setExhibitionQrModalOpen(true);
+    setExhibitionQrLoading(true);
+
+    try {
+      const host = window.location.origin;
+      const targetUrl = `${host}/events?id=${ev.id}`;
+      setExhibitionQrTargetUrl(targetUrl);
+      const res = await fetch(`/api/admin/qr?url=${encodeURIComponent(targetUrl)}`);
+      const data = await res.json();
+      if (data.dataUrl) setExhibitionQrDataUrl(data.dataUrl);
+    } catch {
+      toast.error("Failed to generate exhibition QR");
+    } finally {
+      setExhibitionQrLoading(false);
+    }
+  };
+
+  const handleSelectArtworkQR = async (artSlug: string) => {
+    setSelectedArtworkForExhibition(artSlug);
+    if (!selectedExhibitionEvent) return;
+    setExhibitionQrLoading(true);
+
+    try {
+      let fetchUrl = `/api/admin/qr?`;
+      if (artSlug === "") {
+        const host = window.location.origin;
+        fetchUrl += `url=${encodeURIComponent(`${host}/events?id=${selectedExhibitionEvent.id}`)}`;
+      } else {
+        fetchUrl += `slug=${encodeURIComponent(artSlug)}&eventId=${encodeURIComponent(selectedExhibitionEvent.slug)}`;
+      }
+      const res = await fetch(fetchUrl);
+      const data = await res.json();
+      if (data.dataUrl) {
+        setExhibitionQrDataUrl(data.dataUrl);
+        setExhibitionQrTargetUrl(data.targetUrl || "");
+      }
+    } catch {
+      toast.error("Failed to generate exhibition artwork QR");
+    } finally {
+      setExhibitionQrLoading(false);
+    }
+  };
 
 
   const reloadEvents = React.useCallback(() => {
@@ -500,6 +557,17 @@ export default function EventsAdminPage() {
                 </Link>
 
                 <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenExhibitionQR(ev)}
+                    className="h-8 text-xs gap-1"
+                    title="Generate Exhibition & Artwork Floor QR Codes"
+                  >
+                    <QrCode className="w-3.5 h-3.5 text-primary" />
+                    Exhibition QR
+                  </Button>
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -928,6 +996,91 @@ export default function EventsAdminPage() {
               ))
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Exhibition Floor QR Code Modal */}
+      <Dialog open={exhibitionQrModalOpen} onOpenChange={setExhibitionQrModalOpen}>
+        <DialogContent className="max-w-md text-center">
+          <DialogHeader>
+            <DialogTitle>Exhibition & Gallery Placard QR</DialogTitle>
+            <DialogDescription>
+              Generate high-resolution printable QR codes for {selectedExhibitionEvent?.title}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-3">
+            {/* Artwork Selector */}
+            <div className="text-left space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Target Display Asset</label>
+              <Select
+                value={selectedArtworkForExhibition || "event-general"}
+                onValueChange={(val) => handleSelectArtworkQR(val === "event-general" ? "" : val)}
+              >
+                <SelectTrigger className="text-xs">
+                  <SelectValue placeholder="Select target artwork..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="event-general">
+                    🏛️ General Exhibition RSVP & Info Page
+                  </SelectItem>
+                  {artworksCatalog.map((art) => (
+                    <SelectItem key={art.id} value={art.slug}>
+                      🖼️ {art.title} (Floor Placard)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* QR Preview Box */}
+            <div className="py-2 flex flex-col items-center justify-center space-y-2">
+              <div className="p-3 bg-white rounded-xl shadow-lg border border-border flex items-center justify-center min-w-[200px] min-h-[200px]">
+                {exhibitionQrLoading ? (
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    <span className="text-xs text-muted-foreground mt-2">Generating QR Code...</span>
+                  </div>
+                ) : exhibitionQrDataUrl ? (
+                  <img
+                    src={exhibitionQrDataUrl}
+                    alt="Exhibition QR Code"
+                    className="w-48 h-48 object-contain"
+                  />
+                ) : (
+                  <span className="text-xs text-muted-foreground">Unable to generate QR code</span>
+                )}
+              </div>
+              <span className="text-[11px] font-mono text-muted-foreground break-all max-w-xs">
+                {exhibitionQrTargetUrl}
+              </span>
+            </div>
+          </div>
+
+          <DialogFooter className="sm:justify-center gap-2">
+            {exhibitionQrDataUrl && (
+              <a
+                href={exhibitionQrDataUrl}
+                download={`exhibition-qr-${selectedArtworkForExhibition || selectedExhibitionEvent?.slug || "event"}.png`}
+              >
+                <Button variant="gold" size="sm" className="gap-1.5 cursor-pointer">
+                  <Download className="w-3.5 h-3.5" />
+                  Download Printable High-Res QR
+                </Button>
+              </a>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                navigator.clipboard.writeText(exhibitionQrTargetUrl);
+                toast.success("Target URL copied to clipboard!");
+              }}
+              className="gap-1.5 cursor-pointer"
+            >
+              Copy Scan URL
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

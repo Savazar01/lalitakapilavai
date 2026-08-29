@@ -76,7 +76,7 @@ export default async function DynamicPublicPage({ params }: PageProps) {
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* 12-Column CSS Grid Container */}
                 <div className="grid grid-cols-12 gap-6 items-start">
-                  {section.subSections.map((col) => {
+                  {section.subSections.map((col, colIdx) => {
                     const colSpanClass =
                       col.gridSpan === 12
                         ? "col-span-12"
@@ -134,7 +134,7 @@ export default async function DynamicPublicPage({ params }: PageProps) {
 
                     return (
                       <div
-                        key={col.id}
+                        key={col.id || `col-${colIdx}`}
                         className={`${colSpanClass} w-full relative ${radiusClass} ${glowClass} ${
                           hasCustomStyling ? "p-4" : ""
                         }`}

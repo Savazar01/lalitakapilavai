@@ -19,8 +19,9 @@ import { ChevronDown, Menu as MenuIcon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export async function Navbar() {
-  // Fetch active menu items for Top Center and Top Right
-  const [centerItems, rightItems, drawerItems] = await Promise.all([
+  // Fetch settings and active menu items for Top Center and Top Right
+  const [settings, centerItems, rightItems, drawerItems] = await Promise.all([
+    prisma.systemSetting.findFirst().catch(() => null),
     prisma.menuItem.findMany({
       where: { position: MenuPosition.TOP_CENTER, parentId: null, isActive: true },
       orderBy: { orderIndex: "asc" },
@@ -61,12 +62,20 @@ export async function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         {/* Brand Logo & Title */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-lg bg-primary/15 border border-primary/40 flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Sparkles className="w-5 h-5 text-primary" />
-          </div>
+          {settings?.logoUrl ? (
+            <img
+              src={settings.logoUrl}
+              alt={settings.siteName || "Lalita Kapilavai"}
+              className="h-11 w-auto max-w-[160px] object-contain group-hover:scale-105 transition-transform"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-lg bg-primary/15 border border-primary/40 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Sparkles className="w-5 h-5 text-primary" />
+            </div>
+          )}
           <div className="flex flex-col">
             <span className="font-serif font-bold text-lg tracking-tight text-foreground group-hover:text-primary transition-colors">
-              Lalita Kapilavai
+              {settings?.siteName ? settings.siteName.split("—")[0].trim() : "Lalita Kapilavai"}
             </span>
             <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
               Sacred Art &amp; Carnatic Archive

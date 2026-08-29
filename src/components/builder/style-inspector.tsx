@@ -40,6 +40,7 @@ export interface SectionStyle {
   backgroundImageUrl?: string;
   backgroundOverlayOpacity?: number;
   fontFamily?: string;
+  fontSize?: string;
   textColor?: string;
   paddingTop?: number;
   paddingBottom?: number;
@@ -483,6 +484,64 @@ export function StyleInspector({
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Base Font Size */}
+        <div className="space-y-1.5">
+          <label className="text-[11px] text-muted-foreground font-medium">Base Font Size</label>
+          <Select
+            value={style.fontSize || "default"}
+            onValueChange={(val) => update("fontSize", val === "default" ? undefined : val)}
+          >
+            <SelectTrigger className="text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Default Proportional</SelectItem>
+              <SelectItem value="14px">14px (Compact)</SelectItem>
+              <SelectItem value="16px">16px (Standard Body)</SelectItem>
+              <SelectItem value="18px">18px (Comfortable)</SelectItem>
+              <SelectItem value="20px">20px (Lead Text)</SelectItem>
+              <SelectItem value="24px">24px (Large)</SelectItem>
+              <SelectItem value="32px">32px (Sub-Heading)</SelectItem>
+              <SelectItem value="40px">40px (Display)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Text Color */}
+        <div className="space-y-1.5 pt-1">
+          <label className="text-[11px] text-muted-foreground font-medium">Text Color</label>
+          <div className="flex items-center gap-1.5">
+            {[
+              { label: "Default", val: undefined },
+              { label: "Temple Gold", val: "#D4AF37" },
+              { label: "Madder Terracotta", val: "#A3281E" },
+              { label: "Deep Charcoal", val: "#1C1814" },
+              { label: "Parchment Ivory", val: "#FAF7F2" },
+              { label: "Pure White", val: "#FFFFFF" },
+            ].map((swatch) => (
+              <button
+                key={swatch.val || "default"}
+                type="button"
+                onClick={() => update("textColor", swatch.val)}
+                className={`w-5 h-5 rounded-full border transition-all cursor-pointer ${
+                  style.textColor === swatch.val
+                    ? "ring-2 ring-primary ring-offset-1"
+                    : "hover:scale-110"
+                } ${!swatch.val ? "border-dashed border-border bg-transparent" : ""}`}
+                style={swatch.val ? { backgroundColor: swatch.val } : undefined}
+                title={swatch.label}
+              />
+            ))}
+            <input
+              type="color"
+              value={style.textColor || "#1C1814"}
+              onChange={(e) => update("textColor", e.target.value)}
+              className="w-5 h-5 rounded border border-border cursor-pointer bg-transparent"
+              title="Custom Hex Color"
+            />
+          </div>
         </div>
       </div>
 

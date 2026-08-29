@@ -120,6 +120,7 @@ export default function ArtworksAdminPage() {
 
   // QR Preview Modal
   const [qrModalOpen, setQrModalOpen] = React.useState(false);
+  const [qrLoading, setQrLoading] = React.useState(false);
   const [qrPreviewUrl, setQrPreviewUrl] = React.useState("");
   const [qrArtworkTitle, setQrArtworkTitle] = React.useState("");
   const [qrTargetSlug, setQrTargetSlug] = React.useState("");
@@ -411,11 +412,26 @@ export default function ArtworksAdminPage() {
   };
 
   // Open QR Preview
-  const handleOpenQR = (art: Artwork) => {
+  const handleOpenQR = async (art: Artwork) => {
     setQrArtworkTitle(art.title);
     setQrTargetSlug(art.slug);
-    setQrPreviewUrl(`/media/qr-codes/${art.slug}.png`);
+    setQrPreviewUrl("");
     setQrModalOpen(true);
+    setQrLoading(true);
+
+    try {
+      const res = await fetch(`/api/admin/qr?slug=${encodeURIComponent(art.slug)}`);
+      const data = await res.json();
+      if (data.dataUrl) {
+        setQrPreviewUrl(data.dataUrl);
+      } else {
+        toast.error("Failed to load QR code");
+      }
+    } catch {
+      toast.error("Network error loading QR code");
+    } finally {
+      setQrLoading(false);
+    }
   };
 
   // Create Category
@@ -1112,15 +1128,24 @@ export default function ArtworksAdminPage() {
           </DialogHeader>
 
           <div className="py-4 flex flex-col items-center justify-center space-y-3">
-            <div className="p-3 bg-white rounded-xl shadow-lg border border-border">
-              <Image
-                src={qrPreviewUrl}
-                alt="Exhibition QR Code"
-                width={200}
-                height={200}
-                className="w-48 h-48"
-                unoptimized
-              />
+            <div className="p-3 bg-white rounded-xl shadow-lg border border-border flex items-center justify-center min-w-[200px] min-h-[200px]">
+              {qrLoading ? (
+                <div className="flex flex-col items-center justify-center py-6">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="text-xs text-muted-foreground mt-2">Generating QR Code...</span>
+                </div>
+              ) : qrPreviewUrl ? (
+                <Image
+                  src={qrPreviewUrl}
+                  alt="Exhibition QR Code"
+                  width={200}
+                  height={200}
+                  className="w-48 h-48"
+                  unoptimized
+                />
+              ) : (
+                <div className="text-xs text-muted-foreground">Unable to generate QR code</div>
+              )}
             </div>
             <span className="text-[11px] font-mono text-muted-foreground">
               /artwork/{qrTargetSlug}?qr=true
@@ -1128,12 +1153,14 @@ export default function ArtworksAdminPage() {
           </div>
 
           <DialogFooter className="sm:justify-center">
-            <a href={qrPreviewUrl} download={`qr-${qrTargetSlug}.png`}>
-              <Button variant="gold" size="sm" className="gap-1.5">
-                <Download className="w-3.5 h-3.5" />
-                Download Print High-Res QR
-              </Button>
-            </a>
+            {qrPreviewUrl && (
+              <a href={qrPreviewUrl} download={`qr-${qrTargetSlug}.png`}>
+                <Button variant="gold" size="sm" className="gap-1.5 cursor-pointer">
+                  <Download className="w-3.5 h-3.5" />
+                  Download Print High-Res QR
+                </Button>
+              </a>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

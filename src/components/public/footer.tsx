@@ -22,12 +22,20 @@ export async function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Brand Column */}
           <div className="md:col-span-2 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded bg-primary/15 border border-primary/30 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-primary" />
-              </div>
+            <div className="flex items-center gap-3">
+              {settings?.logoUrl ? (
+                <img
+                  src={settings.logoUrl}
+                  alt={siteName}
+                  className="h-9 w-auto max-w-[140px] object-contain"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded bg-primary/15 border border-primary/30 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                </div>
+              )}
               <span className="font-serif font-bold text-lg text-foreground">
-                Lalita Kapilavai
+                {settings?.siteName ? settings.siteName.split("—")[0].trim() : "Lalita Kapilavai"}
               </span>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md">

@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
+import { Mark, mergeAttributes } from "@tiptap/core";
 import {
   Bold,
   Italic,
@@ -23,6 +24,7 @@ import {
   AlignJustify,
   Link as LinkIcon,
   Unlink,
+  Palette,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +37,71 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+export const TextStyleMark = Mark.create({
+  name: "textStyle",
+  addOptions() {
+    return {
+      HTMLAttributes: {},
+    };
+  },
+  parseHTML() {
+    return [
+      {
+        tag: "span",
+        getAttrs: (element) => {
+          const el = element as HTMLElement;
+          const hasColor = el.style.color;
+          const hasFontSize = el.style.fontSize;
+          if (!hasColor && !hasFontSize) return false;
+          return {};
+        },
+      },
+    ];
+  },
+  renderHTML({ HTMLAttributes }) {
+    const styles: string[] = [];
+    if (HTMLAttributes.color) styles.push(`color: ${HTMLAttributes.color}`);
+    if (HTMLAttributes.fontSize) styles.push(`font-size: ${HTMLAttributes.fontSize}`);
+    const filteredAttrs = { ...HTMLAttributes };
+    delete filteredAttrs.color;
+    delete filteredAttrs.fontSize;
+    if (styles.length > 0) filteredAttrs.style = styles.join("; ");
+    return ["span", mergeAttributes(this.options.HTMLAttributes, filteredAttrs), 0];
+  },
+  addAttributes() {
+    return {
+      color: {
+        default: null,
+        parseHTML: (element) => (element as HTMLElement).style.color || null,
+      },
+      fontSize: {
+        default: null,
+        parseHTML: (element) => (element as HTMLElement).style.fontSize || null,
+      },
+    };
+  },
+});
+
+const COLOR_PRESETS = [
+  { label: "Temple Gold", color: "#D4AF37" },
+  { label: "Madder Terracotta", color: "#A3281E" },
+  { label: "Deep Charcoal", color: "#1C1814" },
+  { label: "Parchment Ivory", color: "#FAF7F2" },
+  { label: "Pure White", color: "#FFFFFF" },
+];
+
+const FONT_SIZES = [
+  { label: "Size: Auto", value: "default" },
+  { label: "12px (Extra Small)", value: "12px" },
+  { label: "16px (Body Regular)", value: "16px" },
+  { label: "20px (Medium)", value: "20px" },
+  { label: "24px (Large)", value: "24px" },
+  { label: "32px (Sub-Heading H3)", value: "32px" },
+  { label: "40px (Section H2)", value: "40px" },
+  { label: "48px (Title H1)", value: "48px" },
+  { label: "64px (Hero Display)", value: "64px" },
+  { label: "72px (Grand Display)", value: "72px" },
+];
 
 export interface TiptapEditorProps {
   content?: Record<string, unknown> | string;
@@ -53,7 +120,7 @@ export function TiptapEditor({
   isLight = false,
 }: TiptapEditorProps) {
   const proseClasses = isLight
-    ? "prose prose-stone text-[#1C1814] [&_*]:text-[#1C1814] [&_h1]:text-[#1C1814] [&_h2]:text-[#1C1814] [&_h3]:text-[#1C1814] [&_h4]:text-[#1C1814] [&_p]:text-[#2A2622] [&_li]:text-[#2A2622] [&_strong]:text-[#1C1814] [&_blockquote]:text-[#3A322C] [&_blockquote]:border-[#D4AF37]"
+    ? "prose prose-stone text-[#1C1814] [&_h1]:text-[#1C1814] [&_h2]:text-[#1C1814] [&_h3]:text-[#1C1814] [&_h4]:text-[#1C1814] [&_p]:text-[#2A2622] [&_li]:text-[#2A2622] [&_strong]:text-[#1C1814] [&_blockquote]:text-[#3A322C] [&_blockquote]:border-[#D4AF37]"
     : "prose prose-stone dark:prose-invert text-[#F5EBE1]";
 
   const editor = useEditor({
@@ -75,6 +142,7 @@ export function TiptapEditor({
           class: "text-primary underline hover:opacity-80 transition-opacity",
         },
       }),
+      TextStyleMark,
     ],
     content: content || "<p>Click to compose devotional verses or artwork narrative...</p>",
     editable: !readOnly,
@@ -177,6 +245,79 @@ export function TiptapEditor({
           >
             <UnderlineIcon className="h-3.5 w-3.5" />
           </Button>
+
+          <div className="h-4 w-px bg-border mx-1" />
+
+          {/* Typography Sizing (12px to 72px) */}
+          <div className="flex items-center gap-1">
+            <select
+              value={(editor.getAttributes("textStyle").fontSize as string) || "default"}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === "default") {
+                  editor.chain().focus().setMark("textStyle", { fontSize: null }).run();
+                } else {
+                  editor.chain().focus().setMark("textStyle", { fontSize: val }).run();
+                }
+              }}
+              className={`h-7 text-[11px] font-medium px-1.5 rounded border ${
+                isLight
+                  ? "bg-white border-stone-300 text-stone-800 hover:border-stone-400"
+                  : "bg-background border-border text-foreground hover:border-primary/50"
+              } cursor-pointer outline-none`}
+              title="Font Size Presets"
+            >
+              {FONT_SIZES.map((fs) => (
+                <option key={fs.value} value={fs.value}>
+                  {fs.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Color Palette Selector */}
+          <div className="flex items-center gap-1 pl-0.5">
+            <div className="flex items-center gap-1 border border-border/80 rounded p-0.5 bg-background/50">
+              {COLOR_PRESETS.map((preset) => (
+                <button
+                  key={preset.color}
+                  type="button"
+                  onClick={() =>
+                    editor.chain().focus().setMark("textStyle", { color: preset.color }).run()
+                  }
+                  className="w-4 h-4 rounded-full border border-black/20 hover:scale-125 transition-transform cursor-pointer"
+                  style={{ backgroundColor: preset.color }}
+                  title={`${preset.label} (${preset.color})`}
+                />
+              ))}
+              <div className="h-3.5 w-px bg-border mx-0.5" />
+              {/* Custom Color Input */}
+              <label
+                className="w-4 h-4 rounded-full border border-border flex items-center justify-center cursor-pointer hover:border-primary transition-colors overflow-hidden relative"
+                title="Custom Hex Color"
+              >
+                <input
+                  type="color"
+                  value={(editor.getAttributes("textStyle").color as string) || "#D4AF37"}
+                  onChange={(e) =>
+                    editor.chain().focus().setMark("textStyle", { color: e.target.value }).run()
+                  }
+                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                />
+                <Palette className="w-2.5 h-2.5 text-primary pointer-events-none" />
+              </label>
+              {editor.getAttributes("textStyle").color && (
+                <button
+                  type="button"
+                  onClick={() => editor.chain().focus().setMark("textStyle", { color: null }).run()}
+                  className="text-[10px] text-muted-foreground hover:text-destructive px-1 font-bold"
+                  title="Reset Color"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
 
           <div className="h-4 w-px bg-border mx-1" />
 

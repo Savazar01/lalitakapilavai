@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-08-29)
 
 ## Corpus Check
-- 97 files · ~93,138 words
+- 98 files · ~54,700 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 530 nodes · 987 edges · 42 communities (33 shown, 9 thin omitted)
+- 535 nodes · 997 edges · 43 communities (34 shown, 9 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6d3fcfb5`
+- Built from commit: `efc778b6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -44,11 +44,12 @@
 - [[_COMMUNITY_Community 33|Community 33]]
 - [[_COMMUNITY_Community 36|Community 36]]
 - [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Button` - 25 edges
 2. `Badge()` - 20 edges
-3. `auth` - 19 edges
+3. `auth` - 20 edges
 4. `cn()` - 18 edges
 5. `compilerOptions` - 16 edges
 6. `Input` - 16 edges
@@ -58,6 +59,8 @@
 10. `DialogHeader()` - 14 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `EventDetailPage()` --calls--> `formatLocalizedDateTime()`  [EXTRACTED]
+  src/app/(public)/events/[slug]/page.tsx → src/lib/formatters.ts
 - `POST()` --calls--> `generateAndStoreArtworkQR()`  [EXTRACTED]
   src/app/api/admin/artworks/route.ts → src/lib/qr.ts
 - `GET()` --calls--> `getMediaStream()`  [EXTRACTED]
@@ -66,18 +69,16 @@
   src/components/ui/badge.tsx → src/lib/utils.ts
 - `DialogHeader()` --calls--> `cn()`  [EXTRACTED]
   src/components/ui/dialog.tsx → src/lib/utils.ts
-- `DialogFooter()` --calls--> `cn()`  [EXTRACTED]
-  src/components/ui/dialog.tsx → src/lib/utils.ts
 
-## Communities (42 total, 9 thin omitted)
+## Communities (43 total, 9 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.08
-Nodes (55): Artwork, Category, TiptapEditorProps, ArtCategoryItem, ArtworkSummary, EventItem, IANA_TIMEZONES, Registration (+47 more)
+Cohesion: 0.09
+Nodes (45): COLOR_PRESETS, FONT_SIZES, TextStyleMark, TiptapEditorProps, ArtCategoryItem, ArtworkSummary, EventItem, IANA_TIMEZONES (+37 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.19
-Nodes (14): POST(), generateAndStoreArtworkQR(), generateQRCodeBuffer(), QRCodeOptions, generatePresignedDownloadUrl(), generatePresignedUploadUrl(), getMediaStream(), getStorageClient() (+6 more)
+Cohesion: 0.17
+Nodes (16): POST(), generateAndStoreArtworkQR(), generateQRCodeBuffer(), generateQRCodeDataUrl(), QRCodeOptions, generatePresignedDownloadUrl(), generatePresignedUploadUrl(), getMediaStream() (+8 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.06
@@ -100,8 +101,8 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.07
-Nodes (36): metadata, metadata, formatCurrency(), formatLocalizedDateTime(), getOrdinalSuffix(), SUPPORTED_CURRENCIES, SupportedCurrency, globalForPrisma (+28 more)
+Cohesion: 0.08
+Nodes (27): metadata, metadata, formatCurrency(), globalForPrisma, AnimatedSection(), AnimatedSectionProps, ArtCanvasViewer(), EventRsvpForm() (+19 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.08
@@ -151,24 +152,28 @@ Nodes (5): geistMono, geistSans, metadata, ThemeProvider(), Toaster()
 Cohesion: 0.21
 Nodes (3): { GET, POST }, auth, AuthSession
 
+### Community 42 - "Community 42"
+Cohesion: 0.12
+Nodes (22): Artwork, Category, formatLocalizedDateTime(), getOrdinalSuffix(), SUPPORTED_CURRENCIES, SupportedCurrency, SelectContent, SelectItem (+14 more)
+
 ## Knowledge Gaps
-- **221 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+216 more)
+- **224 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+219 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Button` connect `Community 0` to `Community 8`, `Community 4`, `Community 7`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
-- **Why does `Badge()` connect `Community 7` to `Community 0`, `Community 8`, `Community 4`?**
+- **Why does `Button` connect `Community 0` to `Community 8`, `Community 42`, `Community 4`, `Community 7`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+- **Why does `Badge()` connect `Community 0` to `Community 8`, `Community 42`, `Community 4`, `Community 7`?**
   _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 4` to `Community 0`, `Community 8`, `Community 7`?**
+- **Why does `cn()` connect `Community 4` to `Community 0`, `Community 8`, `Community 42`?**
   _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _221 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _224 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.07835642618251314 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09057609057609058 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.058823529411764705 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
