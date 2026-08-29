@@ -37,6 +37,7 @@ All code in this repository strictly adheres to modern, bleeding-edge production
 - **Image Processing**: Sharp for dynamic watermarking, WebP/AVIF transformations, and thumbnail generation.
 - **Testing**: Playwright for end-to-end multi-browser test automation.
 - **Content Graph**: Graphify architectural node-link mapping linking Artworks to Carnatic Ragas and Compositions.
+- **Container Runtime Standard**: Debian 12 Bookworm Slim (`node:22-bookworm-slim`) multi-stage build across all stages (`base`, `deps`, `builder`, `runner`) ensuring full glibc binary compatibility, high performance, and stability for Sharp (libvips), Prisma query engines, and native Node.js add-ons.
 
 ---
 

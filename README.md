@@ -13,6 +13,7 @@
 - **ORM**: Prisma Client v6 with `postgresqlExtensions` preview feature
 - **Auth**: Better-Auth for admin access control
 - **Storage**: Cloudflare R2 / AWS S3 with signed private URLs and dynamic image watermarking (Sharp)
+- **Container Runtime**: Debian 12 Bookworm Slim (`node:22-bookworm-slim`) for full glibc binary compatibility with Sharp (libvips) and Prisma native engines
 - **Deployment**: Multi-stage Dockerized deployment orchestrated via Coolify on VPS
 
 ---
@@ -70,7 +71,7 @@ npm run build
 ```
 
 ### Full Multi-Stage Docker Build
-Build and run the production Next.js standalone container alongside PostgreSQL 17:
+Build and run the production Next.js standalone container (powered by Debian 12 `node:22-bookworm-slim`) alongside PostgreSQL 17:
 ```bash
 docker compose up -d --build
 ```

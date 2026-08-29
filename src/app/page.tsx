@@ -90,7 +90,7 @@ export default function Home() {
             </li>
             <li className="flex justify-between py-1 border-b border-border/50">
               <span>Containerization:</span>
-              <span className="font-mono text-foreground">Multi-stage Alpine Docker</span>
+              <span className="font-mono text-foreground">Multi-stage Debian Bookworm</span>
             </li>
             <li className="flex justify-between py-1">
               <span>Deployment:</span>
