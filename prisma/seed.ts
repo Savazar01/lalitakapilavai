@@ -8,7 +8,7 @@ async function main() {
 
   // 1. Provision Superadmin User
   const adminEmail = process.env.ADMIN_EMAIL || "admin@lalitakapilavai.com";
-  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || "ChangeMeInProduction123!";
+  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || "AdminPassword2026!";
   const hashedPassword = await hashPassword(adminPassword);
 
   let superadmin = await prisma.user.findUnique({
@@ -30,13 +30,34 @@ async function main() {
         userId: superadmin.id,
         accountId: superadmin.id,
         providerId: "credential",
+        issuer: "local:credential",
         password: hashedPassword,
       },
     });
     console.log(`✅ Provisioned Superadmin: ${adminEmail}`);
   } else {
-    console.log(`ℹ️ Superadmin already exists: ${adminEmail}`);
+    await prisma.account.upsert({
+      where: {
+        providerId_accountId: {
+          providerId: "credential",
+          accountId: superadmin.id,
+        },
+      },
+      update: {
+        password: hashedPassword,
+        issuer: "local:credential",
+      },
+      create: {
+        userId: superadmin.id,
+        accountId: superadmin.id,
+        providerId: "credential",
+        issuer: "local:credential",
+        password: hashedPassword,
+      },
+    });
+    console.log(`✅ Refreshed Superadmin credentials: ${adminEmail}`);
   }
+  console.log(`🔑 Seeded Superadmin Credentials -> Email: ${adminEmail} | Password: ${adminPassword}`);
 
   // 2. Provision Default SystemSetting
   const existingSettings = await prisma.systemSetting.findFirst();

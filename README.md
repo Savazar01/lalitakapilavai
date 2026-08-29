@@ -32,8 +32,8 @@ cd lalitakapilavai
 cp .env.example .env
 ```
 
-### Step 2: Start Local PostgreSQL with `pgvector`
-Launch the development database container (PostgreSQL 17 + pgvector on port `5432`):
+### Step 2: Start Local Full-Stack (Web + PostgreSQL)
+Launch both the development database (PostgreSQL 17 + pgvector on port `5633`) and the Next.js dev server on port `3060`:
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
@@ -49,16 +49,20 @@ npm install
 npx prisma generate
 ```
 
-### Step 4: Run Database Migrations / Push
+### Step 4: Run Database Migrations & Seed Default Data
 ```bash
 npx prisma db push
+npx tsx prisma/seed.ts
 ```
 
-### Step 5: Start Local Development Server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+### Step 5: Admin Control Center & Default Credentials
+The platform provides a secured, private administration desk with Better-Auth authentication (public registration disabled).
+
+- **Admin Login URL**: [http://localhost:3060/admin/login](http://localhost:3060/admin/login)
+- **Superadmin Email**: `admin@lalitakapilavai.com`
+- **Default Password**: `AdminPassword2026!` (configured via `ADMIN_INITIAL_PASSWORD` in `.env`)
+- **Admin Dashboard**: [http://localhost:3060/admin](http://localhost:3060/admin)
+- **Public Portal**: [http://localhost:3060](http://localhost:3060)
 
 ---
 
@@ -101,10 +105,10 @@ docker compose down
    ```
 2. **Push to GitHub**:
    ```bash
-   git push origin master
+   git push origin main
    ```
 3. **Automated Coolify Deployment**:
-   Coolify monitors the `master` branch, pulls the repository, executes the multi-stage `Dockerfile`, mounts the persistent PostgreSQL volume, and configures Traefik reverse-proxy with automated Let's Encrypt SSL certificates.
+   Coolify monitors the `main` branch, pulls the repository, executes the multi-stage `Dockerfile`, mounts the persistent PostgreSQL volume, and configures Traefik reverse-proxy with automated Let's Encrypt SSL certificates.
 
 ---
 

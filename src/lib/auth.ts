@@ -8,6 +8,11 @@ export const auth = betterAuth({
   }),
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3060",
   secret: process.env.BETTER_AUTH_SECRET || "dev-insecure-secret-key-at-least-32-chars-long",
+  advanced: {
+    database: {
+      generateId: false,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     disableSignUp: true, // Strictly disable public self-registration
