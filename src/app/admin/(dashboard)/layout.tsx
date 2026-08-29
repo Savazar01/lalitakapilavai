@@ -41,7 +41,7 @@ const navItems: NavItem[] = [
   { label: "Categories", href: "/admin/categories", icon: FolderTree },
   { label: "Exhibitions & Events", href: "/admin/events", icon: Calendar },
   { label: "Leads & QR Scans", href: "/admin/leads", icon: Users },
-  { label: "Navigation Menus", href: "/admin/menus", icon: MenuIcon },
+  { label: "Navigation Menus", href: "/admin/navigation", icon: MenuIcon },
   { label: "Page Layouts", href: "/admin/pages", icon: FileText },
   { label: "Blog & AEO Posts", href: "/admin/posts", icon: BookOpen },
   { label: "System Settings", href: "/admin/settings", icon: Settings },
