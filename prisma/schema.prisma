@@ -1,0 +1,222 @@
+// Prisma Schema for Lalita Kapilavai Portfolio & Archive Platform
+// Configured with PostgreSQL 17 & pgvector extensions for multi-modal semantic retrieval
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector, uuid_ossp(map: "uuid-ossp")]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+// -----------------------------------------------------------------------------
+// Better-Auth Core Models
+// -----------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          String    @default("admin")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String   @db.Uuid
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId       String    @db.Uuid
+  accountId    String
+  providerId   String
+  accessToken  String?
+  refreshToken String?
+  expiresAt    DateTime?
+  password     String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+// -----------------------------------------------------------------------------
+// Lalita Kapilavai Domain & Cultural Knowledge Graph Models
+// -----------------------------------------------------------------------------
+
+enum ArtStyle {
+  TANJORE
+  MYSORE
+  TEMPLE_MURAL
+  CONTEMPORARY_DEVOTIONAL
+  SKETCH_CHARCOAL
+}
+
+model Artwork {
+  id                 String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title              String
+  slug               String               @unique
+  description        String               @db.Text
+  artStyle           ArtStyle
+  medium             String               // e.g., 22k Gold Foil, Teakwood, Natural Pigments
+  dimensions         String               // e.g., 36x48 inches
+  yearCreated        Int
+  hasGoldFoil        Boolean              @default(false)
+  goldPurity         String?              // e.g., 22 Carat Jaipur Gold
+  primaryImageUrl    String
+  watermarkedUrl     String
+  highResStorageKey  String?              // Protected R2 object key
+  isFeatured         Boolean              @default(false)
+  isAvailable        Boolean              @default(true)
+  price              Decimal?             @db.Decimal(12, 2)
+  
+  // 1536-dimensional embedding for visual & aesthetic vector similarity (pgvector)
+  embedding          Unsupported("vector(1536)")?
+
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  // Relational Graph Links
+  ragaLinks          ArtworkRagaLink[]
+  exhibitions        ExhibitionArtwork[]
+  inquiries          Inquiry[]
+
+  @@map("artworks")
+}
+
+model Raga {
+  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String            @unique
+  melakartaNumber Int?
+  arohana         String            // Ascending musical scale notation
+  avarohana       String            // Descending musical scale notation
+  deity           String?
+  rasa            String?           // Emotional aesthetic (Bhakti, Karuna, Shanta, Veera)
+  timeOfDay       String?           // Pratah, Sandhya, Nishita
+  description     String?           @db.Text
+  
+  // Vector embedding for tonal, affective, and melodic characteristics (pgvector)
+  embedding       Unsupported("vector(1536)")?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  compositions    Composition[]
+  artworkLinks    ArtworkRagaLink[]
+
+  @@map("ragas")
+}
+
+model Composition {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title       String
+  ragaId      String   @db.Uuid
+  tala        String   // Adi, Rupaka, Misra Chapu, Khanda Chapu
+  composer    String   // Tyagaraja, Muthuswami Dikshitar, Syama Sastri, Purandara Dasa
+  vocalist    String   @default("Lalita Kapilavai")
+  audioUrl    String
+  lyrics      String?  @db.Text
+  translation String?  @db.Text
+  duration    Int      // duration in seconds
+  recordedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  raga        Raga     @relation(fields: [ragaId], references: [id], onDelete: Cascade)
+
+  @@map("compositions")
+}
+
+// Junction model linking Artworks to Ragas for synesthetic exploration
+model ArtworkRagaLink {
+  artworkId   String   @db.Uuid
+  ragaId      String   @db.Uuid
+  harmonyNote String?  @db.Text // Description of how the raga inspired the visual motifs
+  createdAt   DateTime @default(now())
+
+  artwork     Artwork  @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  raga        Raga     @relation(fields: [ragaId], references: [id], onDelete: Cascade)
+
+  @@id([artworkId, ragaId])
+  @@map("artwork_raga_links")
+}
+
+model Exhibition {
+  id          String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title       String
+  slug        String              @unique
+  venue       String
+  city        String
+  startDate   DateTime
+  endDate     DateTime
+  description String              @db.Text
+  posterUrl   String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  artworks    ExhibitionArtwork[]
+
+  @@map("exhibitions")
+}
+
+model ExhibitionArtwork {
+  exhibitionId String     @db.Uuid
+  artworkId    String     @db.Uuid
+  displayOrder Int        @default(0)
+
+  exhibition   Exhibition @relation(fields: [exhibitionId], references: [id], onDelete: Cascade)
+  artwork      Artwork    @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+
+  @@id([exhibitionId, artworkId])
+  @@map("exhibition_artworks")
+}
+
+model Inquiry {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  artworkId   String?  @db.Uuid
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String   @db.Text
+  status      String   @default("PENDING") // PENDING, REVIEWED, RESPONDED, ARCHIVED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  artwork     Artwork? @relation(fields: [artworkId], references: [id], onDelete: SetNull)
+
+  @@map("inquiries")
+}
