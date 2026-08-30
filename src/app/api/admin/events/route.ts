@@ -55,19 +55,26 @@ export async function POST(request: NextRequest) {
       stateProvince,
       postalCode,
       country,
+      countryCode,
       timezone,
       startDate,
       endDate,
       posterUrl,
+      bannerImage,
+      galleryImages,
       maxCapacity,
       registrationFee,
       isRegistrationOpen,
+      isPublished,
+      contactName,
+      contactEmail,
+      contactPhone,
       artworkIds,
     } = body;
 
-    if (!title || !slug || !eventType || !startDate || !endDate) {
+    if (!title || !slug || !eventType || !startDate) {
       return NextResponse.json(
-        { error: "Title, slug, event type, start and end dates are required" },
+        { error: "Title, slug, event type, and start date are required" },
         { status: 400 }
       );
     }
@@ -103,14 +110,21 @@ export async function POST(request: NextRequest) {
           stateProvince: stateProvince || null,
           postalCode: postalCode || null,
           country: country || "India",
+          countryCode: countryCode || null,
           timezone: timezone || "Asia/Kolkata",
           startDate: new Date(startDate),
-          endDate: new Date(endDate),
-          posterUrl: posterUrl || null,
+          endDate: endDate ? new Date(endDate) : null,
+          posterUrl: posterUrl || bannerImage || null,
+          bannerImage: bannerImage || posterUrl || null,
+          galleryImages: galleryImages ? galleryImages : undefined,
           maxCapacity: maxCapacity ? parseInt(maxCapacity, 10) : null,
           registrationFee: registrationFee ? parseFloat(registrationFee) : null,
           currency: body.currency || "INR",
           isRegistrationOpen: isRegistrationOpen !== undefined ? !!isRegistrationOpen : true,
+          isPublished: isPublished !== undefined ? !!isPublished : true,
+          contactName: contactName || null,
+          contactEmail: contactEmail || null,
+          contactPhone: contactPhone || null,
         },
       });
 

@@ -353,6 +353,8 @@ enum EventType {
   ONLINE_CLASSROOM
   EXHIBITION
   CONCERT
+  RECITAL
+  PRIVATE_VIEWING
   OTHER
 }
 
@@ -369,14 +371,21 @@ model Event {
   stateProvince      String?
   postalCode         String?
   country            String              @default("India")
+  countryCode        String?
   timezone           String              @default("Asia/Kolkata")
   startDate          DateTime
-  endDate            DateTime
+  endDate            DateTime?
   posterUrl          String?
+  bannerImage        String?
+  galleryImages      Json?
   maxCapacity        Int?
   registrationFee    Decimal?            @db.Decimal(10, 2)
   currency           String              @default("INR")
   isRegistrationOpen Boolean             @default(true)
+  isPublished        Boolean             @default(true)
+  contactName        String?
+  contactEmail       String?
+  contactPhone       String?
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 

@@ -408,10 +408,19 @@
       "norm_label": "clsx"
     },
     {
-      "label": "framer-motion",
+      "label": "countries-and-timezones",
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L39",
+      "id": "lalitakapilavai_package_dependencies_countries_and_timezones",
+      "community": 2,
+      "norm_label": "countries-and-timezones"
+    },
+    {
+      "label": "framer-motion",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L40",
       "id": "lalitakapilavai_package_dependencies_framer_motion",
       "community": 2,
       "norm_label": "framer-motion"
@@ -420,7 +429,7 @@
       "label": "lucide-react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L40",
+      "source_location": "L41",
       "id": "lalitakapilavai_package_dependencies_lucide_react",
       "community": 2,
       "norm_label": "lucide-react"
@@ -429,7 +438,7 @@
       "label": "next",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L41",
+      "source_location": "L42",
       "id": "lalitakapilavai_package_dependencies_next",
       "community": 2,
       "norm_label": "next"
@@ -438,7 +447,7 @@
       "label": "next-themes",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L42",
+      "source_location": "L43",
       "id": "lalitakapilavai_package_dependencies_next_themes",
       "community": 2,
       "norm_label": "next-themes"
@@ -447,7 +456,7 @@
       "label": "nodemailer",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L43",
+      "source_location": "L44",
       "id": "lalitakapilavai_package_dependencies_nodemailer",
       "community": 2,
       "norm_label": "nodemailer"
@@ -456,7 +465,7 @@
       "label": "qrcode",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L44",
+      "source_location": "L45",
       "id": "lalitakapilavai_package_dependencies_qrcode",
       "community": 2,
       "norm_label": "qrcode"
@@ -465,7 +474,7 @@
       "label": "react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "lalitakapilavai_package_dependencies_react",
       "community": 2,
       "norm_label": "react"
@@ -474,7 +483,7 @@
       "label": "react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "id": "lalitakapilavai_package_dependencies_react_dom",
       "community": 2,
       "norm_label": "react-dom"
@@ -483,7 +492,7 @@
       "label": "sharp",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "id": "lalitakapilavai_package_dependencies_sharp",
       "community": 2,
       "norm_label": "sharp"
@@ -492,7 +501,7 @@
       "label": "sonner",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L48",
+      "source_location": "L49",
       "id": "lalitakapilavai_package_dependencies_sonner",
       "community": 2,
       "norm_label": "sonner"
@@ -501,7 +510,7 @@
       "label": "tailwind-merge",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L49",
+      "source_location": "L50",
       "id": "lalitakapilavai_package_dependencies_tailwind_merge",
       "community": 2,
       "norm_label": "tailwind-merge"
@@ -510,7 +519,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L51",
+      "source_location": "L52",
       "id": "lalitakapilavai_package_devdependencies",
       "community": 5,
       "norm_label": "devdependencies"
@@ -519,7 +528,7 @@
       "label": "@tailwindcss/postcss",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L52",
+      "source_location": "L53",
       "id": "lalitakapilavai_package_devdependencies_tailwindcss_postcss",
       "community": 5,
       "norm_label": "@tailwindcss/postcss"
@@ -528,7 +537,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L53",
+      "source_location": "L54",
       "id": "lalitakapilavai_package_devdependencies_types_node",
       "community": 5,
       "norm_label": "@types/node"
@@ -537,7 +546,7 @@
       "label": "@types/qrcode",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L54",
+      "source_location": "L55",
       "id": "lalitakapilavai_package_devdependencies_types_qrcode",
       "community": 5,
       "norm_label": "@types/qrcode"
@@ -546,7 +555,7 @@
       "label": "@types/react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L55",
+      "source_location": "L56",
       "id": "lalitakapilavai_package_devdependencies_types_react",
       "community": 5,
       "norm_label": "@types/react"
@@ -555,7 +564,7 @@
       "label": "@types/react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L56",
+      "source_location": "L57",
       "id": "lalitakapilavai_package_devdependencies_types_react_dom",
       "community": 5,
       "norm_label": "@types/react-dom"
@@ -564,7 +573,7 @@
       "label": "eslint",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L57",
+      "source_location": "L58",
       "id": "lalitakapilavai_package_devdependencies_eslint",
       "community": 5,
       "norm_label": "eslint"
@@ -573,7 +582,7 @@
       "label": "eslint-config-next",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L58",
+      "source_location": "L59",
       "id": "lalitakapilavai_package_devdependencies_eslint_config_next",
       "community": 5,
       "norm_label": "eslint-config-next"
@@ -582,7 +591,7 @@
       "label": "prisma",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L59",
+      "source_location": "L60",
       "id": "lalitakapilavai_package_devdependencies_prisma",
       "community": 5,
       "norm_label": "prisma"
@@ -591,7 +600,7 @@
       "label": "tailwindcss",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L60",
+      "source_location": "L61",
       "id": "lalitakapilavai_package_devdependencies_tailwindcss",
       "community": 5,
       "norm_label": "tailwindcss"
@@ -600,7 +609,7 @@
       "label": "tsx",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L61",
+      "source_location": "L62",
       "id": "lalitakapilavai_package_devdependencies_tsx",
       "community": 5,
       "norm_label": "tsx"
@@ -609,7 +618,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L62",
+      "source_location": "L63",
       "id": "lalitakapilavai_package_devdependencies_typescript",
       "community": 5,
       "norm_label": "typescript"
@@ -618,7 +627,7 @@
       "label": "overrides",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L64",
+      "source_location": "L65",
       "id": "lalitakapilavai_package_overrides",
       "community": 5,
       "norm_label": "overrides"
@@ -627,7 +636,7 @@
       "label": "deepmerge-ts",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L65",
+      "source_location": "L66",
       "id": "lalitakapilavai_package_overrides_deepmerge_ts",
       "community": 5,
       "norm_label": "deepmerge-ts"
@@ -636,7 +645,7 @@
       "label": "eslint",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L66",
+      "source_location": "L67",
       "id": "lalitakapilavai_package_overrides_eslint",
       "community": 5,
       "norm_label": "eslint"
@@ -944,7 +953,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L1",
       "id": "src_app_page_tsx",
-      "community": 21,
+      "community": 36,
       "norm_label": "page.tsx"
     },
     {
@@ -953,7 +962,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L12",
       "id": "app_page_generatemetadata",
-      "community": 21,
+      "community": 36,
       "norm_label": "generatemetadata()"
     },
     {
@@ -962,7 +971,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L42",
       "id": "app_page_homepage",
-      "community": 21,
+      "community": 36,
       "norm_label": "homepage()"
     },
     {
@@ -1140,7 +1149,7 @@
       "label": "metadata",
       "file_type": "code",
       "source_file": "src/app/(public)/events/page.tsx",
-      "source_location": "L14",
+      "source_location": "L15",
       "id": "events_page_metadata",
       "community": 0,
       "norm_label": "metadata"
@@ -1149,7 +1158,7 @@
       "label": "EventsPage()",
       "file_type": "code",
       "source_file": "src/app/(public)/events/page.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "events_page_eventspage",
       "community": 0,
       "norm_label": "eventspage()"
@@ -1167,16 +1176,25 @@
       "label": "PageProps",
       "file_type": "code",
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
-      "source_location": "L20",
+      "source_location": "L24",
       "id": "src_app_public_events_slug_page_tsx_slug_page_pageprops",
       "community": 7,
       "norm_label": "pageprops"
     },
     {
+      "label": "GalleryPhoto",
+      "file_type": "code",
+      "source_file": "src/app/(public)/events/[slug]/page.tsx",
+      "source_location": "L30",
+      "id": "slug_page_galleryphoto",
+      "community": 7,
+      "norm_label": "galleryphoto"
+    },
+    {
       "label": "getEventBySlug",
       "file_type": "code",
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
-      "source_location": "L26",
+      "source_location": "L35",
       "id": "slug_page_geteventbyslug",
       "community": 7,
       "norm_label": "geteventbyslug"
@@ -1185,7 +1203,7 @@
       "label": "generateMetadata()",
       "file_type": "code",
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
-      "source_location": "L43",
+      "source_location": "L52",
       "id": "src_app_public_events_slug_page_tsx_slug_page_generatemetadata",
       "community": 7,
       "norm_label": "generatemetadata()"
@@ -1194,7 +1212,7 @@
       "label": "EventDetailPage()",
       "file_type": "code",
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
-      "source_location": "L57",
+      "source_location": "L66",
       "id": "slug_page_eventdetailpage",
       "community": 7,
       "norm_label": "eventdetailpage()"
@@ -1286,7 +1304,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_posts_slug_page_tsx",
-      "community": 40,
+      "community": 37,
       "norm_label": "page.tsx"
     },
     {
@@ -1295,7 +1313,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L3",
       "id": "src_app_public_posts_slug_page_tsx_slug_page_pageprops",
-      "community": 40,
+      "community": 37,
       "norm_label": "pageprops"
     },
     {
@@ -1304,7 +1322,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L9",
       "id": "slug_page_postsluglegacyredirect",
-      "community": 40,
+      "community": 37,
       "norm_label": "postsluglegacyredirect()"
     },
     {
@@ -1313,7 +1331,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_slug_page_tsx",
-      "community": 36,
+      "community": 21,
       "norm_label": "page.tsx"
     },
     {
@@ -1322,7 +1340,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L9",
       "id": "src_app_public_slug_page_tsx_slug_page_pageprops",
-      "community": 36,
+      "community": 21,
       "norm_label": "pageprops"
     },
     {
@@ -1331,7 +1349,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L16",
       "id": "slug_page_getpagebyslug",
-      "community": 36,
+      "community": 21,
       "norm_label": "getpagebyslug"
     },
     {
@@ -1340,7 +1358,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L32",
       "id": "src_app_public_slug_page_tsx_slug_page_generatemetadata",
-      "community": 36,
+      "community": 21,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1349,7 +1367,7 @@
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L50",
       "id": "slug_page_dynamicpublicpage",
-      "community": 36,
+      "community": 21,
       "norm_label": "dynamicpublicpage()"
     },
     {
@@ -1482,7 +1500,7 @@
       "label": "ArtworkSummary",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L52",
+      "source_location": "L39",
       "id": "events_page_artworksummary",
       "community": 0,
       "norm_label": "artworksummary"
@@ -1491,7 +1509,7 @@
       "label": "Registration",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L60",
+      "source_location": "L47",
       "id": "events_page_registration",
       "community": 0,
       "norm_label": "registration"
@@ -1500,34 +1518,16 @@
       "label": "EventItem",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L69",
+      "source_location": "L56",
       "id": "events_page_eventitem",
       "community": 0,
       "norm_label": "eventitem"
     },
     {
-      "label": "SUPPORTED_COUNTRIES",
-      "file_type": "code",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L93",
-      "id": "events_page_supported_countries",
-      "community": 0,
-      "norm_label": "supported_countries"
-    },
-    {
-      "label": "IANA_TIMEZONES",
-      "file_type": "code",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L106",
-      "id": "events_page_iana_timezones",
-      "community": 0,
-      "norm_label": "iana_timezones"
-    },
-    {
       "label": "EventsAdminPage()",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L116",
+      "source_location": "L87",
       "id": "events_page_eventsadminpage",
       "community": 0,
       "norm_label": "eventsadminpage()"
@@ -2067,7 +2067,7 @@
       "label": "DELETE()",
       "file_type": "code",
       "source_file": "src/app/api/admin/events/[id]/route.ts",
-      "source_location": "L136",
+      "source_location": "L150",
       "id": "src_app_api_admin_events_id_route_ts_id_route_delete",
       "community": 48,
       "norm_label": "delete()"
@@ -2712,12 +2712,120 @@
       "norm_label": "dashboardlayoutmanager()"
     },
     {
+      "label": "event-form-modal.tsx",
+      "file_type": "code",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L1",
+      "id": "src_components_admin_event_form_modal_tsx",
+      "community": 7,
+      "norm_label": "event-form-modal.tsx"
+    },
+    {
+      "label": "GalleryImageItem",
+      "file_type": "code",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L42",
+      "id": "admin_event_form_modal_galleryimageitem",
+      "community": 7,
+      "norm_label": "galleryimageitem"
+    },
+    {
+      "label": "EventFormData",
+      "file_type": "code",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L47",
+      "id": "admin_event_form_modal_eventformdata",
+      "community": 7,
+      "norm_label": "eventformdata"
+    },
+    {
+      "label": "ArtworkSummary",
+      "file_type": "code",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L78",
+      "id": "admin_event_form_modal_artworksummary",
+      "community": 7,
+      "norm_label": "artworksummary"
+    },
+    {
+      "label": "EventFormModalProps",
+      "file_type": "code",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L86",
+      "id": "admin_event_form_modal_eventformmodalprops",
+      "community": 7,
+      "norm_label": "eventformmodalprops"
+    },
+    {
+      "label": "EventFormModal()",
+      "file_type": "code",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L94",
+      "id": "admin_event_form_modal_eventformmodal",
+      "community": 7,
+      "norm_label": "eventformmodal()"
+    },
+    {
+      "label": "EventFormContent()",
+      "file_type": "code",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L116",
+      "id": "admin_event_form_modal_eventformcontent",
+      "community": 7,
+      "norm_label": "eventformcontent()"
+    },
+    {
+      "label": "modern-datetime-picker.tsx",
+      "file_type": "code",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L1",
+      "id": "src_components_admin_modern_datetime_picker_tsx",
+      "community": 7,
+      "norm_label": "modern-datetime-picker.tsx"
+    },
+    {
+      "label": "ModernDateTimePickerProps",
+      "file_type": "code",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L19",
+      "id": "admin_modern_datetime_picker_moderndatetimepickerprops",
+      "community": 7,
+      "norm_label": "moderndatetimepickerprops"
+    },
+    {
+      "label": "MONTH_NAMES",
+      "file_type": "code",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L28",
+      "id": "admin_modern_datetime_picker_month_names",
+      "community": 7,
+      "norm_label": "month_names"
+    },
+    {
+      "label": "SHORT_DAYS",
+      "file_type": "code",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L33",
+      "id": "admin_modern_datetime_picker_short_days",
+      "community": 7,
+      "norm_label": "short_days"
+    },
+    {
+      "label": "ModernDateTimePicker()",
+      "file_type": "code",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L35",
+      "id": "admin_modern_datetime_picker_moderndatetimepicker",
+      "community": 7,
+      "norm_label": "moderndatetimepicker()"
+    },
+    {
       "label": "style-inspector.tsx",
       "file_type": "code",
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L1",
       "id": "src_components_builder_style_inspector_tsx",
-      "community": 0,
+      "community": 43,
       "norm_label": "style-inspector.tsx"
     },
     {
@@ -2735,7 +2843,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L69",
       "id": "builder_style_inspector_styleinspectorprops",
-      "community": 0,
+      "community": 43,
       "norm_label": "styleinspectorprops"
     },
     {
@@ -2744,7 +2852,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L75",
       "id": "builder_style_inspector_colorpresets",
-      "community": 0,
+      "community": 43,
       "norm_label": "colorpresets"
     },
     {
@@ -2753,7 +2861,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L86",
       "id": "builder_style_inspector_artisticborderpresets",
-      "community": 0,
+      "community": 43,
       "norm_label": "artisticborderpresets"
     },
     {
@@ -2762,7 +2870,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L94",
       "id": "builder_style_inspector_fontfamilies",
-      "community": 0,
+      "community": 43,
       "norm_label": "fontfamilies"
     },
     {
@@ -2771,7 +2879,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L102",
       "id": "builder_style_inspector_availableicons",
-      "community": 0,
+      "community": 43,
       "norm_label": "availableicons"
     },
     {
@@ -2915,7 +3023,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L1",
       "id": "src_components_public_art_canvas_viewer_tsx",
-      "community": 7,
+      "community": 0,
       "norm_label": "art-canvas-viewer.tsx"
     },
     {
@@ -2924,7 +3032,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L15",
       "id": "public_art_canvas_viewer_artcanvasviewerprops",
-      "community": 7,
+      "community": 0,
       "norm_label": "artcanvasviewerprops"
     },
     {
@@ -3050,7 +3158,7 @@
       "source_file": "src/components/public/dynamic-page-sections.tsx",
       "source_location": "L26",
       "id": "public_dynamic_page_sections_dynamicpagesections",
-      "community": 0,
+      "community": 50,
       "norm_label": "dynamicpagesections()"
     },
     {
@@ -3752,7 +3860,7 @@
       "source_file": "src/components/ui/separator.tsx",
       "source_location": "L1",
       "id": "src_components_ui_separator_tsx",
-      "community": 4,
+      "community": 43,
       "norm_label": "separator.tsx"
     },
     {
@@ -3761,7 +3869,7 @@
       "source_file": "src/components/ui/separator.tsx",
       "source_location": "L5",
       "id": "ui_separator_separator",
-      "community": 4,
+      "community": 43,
       "norm_label": "separator"
     },
     {
@@ -4186,6 +4294,114 @@
       "id": "lib_formatters_formatlocalizeddatetime",
       "community": 7,
       "norm_label": "formatlocalizeddatetime()"
+    },
+    {
+      "label": "geo-timezone.ts",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L1",
+      "id": "src_lib_geo_timezone_ts",
+      "community": 7,
+      "norm_label": "geo-timezone.ts"
+    },
+    {
+      "label": "CountryInfo",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L3",
+      "id": "lib_geo_timezone_countryinfo",
+      "community": 7,
+      "norm_label": "countryinfo"
+    },
+    {
+      "label": "TimezoneOption",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L14",
+      "id": "lib_geo_timezone_timezoneoption",
+      "community": 7,
+      "norm_label": "timezoneoption"
+    },
+    {
+      "label": "DIAL_CODES",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L22",
+      "id": "lib_geo_timezone_dial_codes",
+      "community": 7,
+      "norm_label": "dial_codes"
+    },
+    {
+      "label": "COUNTRY_CURRENCIES",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L70",
+      "id": "lib_geo_timezone_country_currencies",
+      "community": 7,
+      "norm_label": "country_currencies"
+    },
+    {
+      "label": "getAddressLabels()",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L118",
+      "id": "lib_geo_timezone_getaddresslabels",
+      "community": 7,
+      "norm_label": "getaddresslabels()"
+    },
+    {
+      "label": "getAllCountries()",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L135",
+      "id": "lib_geo_timezone_getallcountries",
+      "community": 7,
+      "norm_label": "getallcountries()"
+    },
+    {
+      "label": "findCountry()",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L183",
+      "id": "lib_geo_timezone_findcountry",
+      "community": 7,
+      "norm_label": "findcountry()"
+    },
+    {
+      "label": "getTimezonesForCountry()",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L203",
+      "id": "lib_geo_timezone_gettimezonesforcountry",
+      "community": 7,
+      "norm_label": "gettimezonesforcountry()"
+    },
+    {
+      "label": "zonedTimeToUtc()",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L282",
+      "id": "lib_geo_timezone_zonedtimetoutc",
+      "community": 7,
+      "norm_label": "zonedtimetoutc()"
+    },
+    {
+      "label": "utcToZonedParts()",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L334",
+      "id": "lib_geo_timezone_utctozonedparts",
+      "community": 7,
+      "norm_label": "utctozonedparts()"
+    },
+    {
+      "label": "formatEventSchedule()",
+      "file_type": "code",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L422",
+      "id": "lib_geo_timezone_formateventschedule",
+      "community": 7,
+      "norm_label": "formateventschedule()"
     },
     {
       "label": "prisma.ts",
@@ -5556,11 +5772,29 @@
       "norm_label": "{\n  signin,\n  signout,\n  usesession,\n  getsession,\n  changepassword,\n  updateuser,\n}"
     },
     {
+      "label": "SUPPORTED_COUNTRIES",
+      "file_type": "code",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L93",
+      "community": 0,
+      "norm_label": "supported_countries",
+      "id": "events_page_supported_countries"
+    },
+    {
+      "label": "IANA_TIMEZONES",
+      "file_type": "code",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L106",
+      "community": 0,
+      "norm_label": "iana_timezones",
+      "id": "events_page_iana_timezones"
+    },
+    {
       "label": "Home()",
       "file_type": "code",
       "source_file": "src/app/page.tsx",
       "source_location": "L3",
-      "community": 21,
+      "community": 36,
       "norm_label": "home()",
       "id": "app_page_home"
     },
@@ -5632,7 +5866,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L22",
-      "community": 40,
+      "community": 37,
       "norm_label": "generatemetadata()",
       "id": "src_app_public_posts_slug_page_tsx_slug_page_generatemetadata"
     },
@@ -5641,7 +5875,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L53",
-      "community": 40,
+      "community": 37,
       "norm_label": "blogpostdetailpage()",
       "id": "slug_page_blogpostdetailpage"
     },
@@ -5704,7 +5938,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L10",
-      "community": 36,
+      "community": 21,
       "norm_label": "pageprops",
       "id": "slug_page_pageprops"
     },
@@ -5713,7 +5947,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/[slug]/page.tsx",
       "source_location": "L31",
-      "community": 36,
+      "community": 21,
       "norm_label": "generatemetadata()",
       "id": "slug_page_generatemetadata"
     },
@@ -6160,6 +6394,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "lalitakapilavai_package_dependencies",
+      "target": "lalitakapilavai_package_dependencies_countries_and_timezones",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
       "source_location": "L38",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -6392,9 +6636,9 @@
       "source_file": "package.json",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_package_overrides",
-      "target": "lalitakapilavai_package_overrides_eslint",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_package_overrides_eslint"
     },
     {
       "relation": "contains",
@@ -7849,6 +8093,28 @@
       "target": "public_dynamic_page_sections_dynamicpagesections"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/events/page.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "src_app_public_events_page_tsx",
+      "target": "src_lib_geo_timezone_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/events/page.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "src_app_public_events_page_tsx",
+      "target": "lib_geo_timezone_formateventschedule",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/(public)/events/page.tsx",
@@ -7952,9 +8218,9 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L10",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "src_app_public_events_slug_page_tsx",
-      "target": "src_lib_formatters_ts"
+      "target": "src_lib_geo_timezone_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7963,9 +8229,9 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L10",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "src_app_public_events_slug_page_tsx",
-      "target": "lib_formatters_formatlocalizeddatetime"
+      "target": "lib_geo_timezone_formateventschedule",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -8003,6 +8269,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_app_public_events_slug_page_tsx",
+      "target": "slug_page_galleryphoto",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L26",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8028,6 +8304,28 @@
       "confidence_score": 1.0,
       "source": "src_app_public_events_slug_page_tsx",
       "target": "slug_page_eventdetailpage"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/events/[slug]/page.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_public_events_slug_page_tsx",
+      "target": "src_lib_formatters_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/events/[slug]/page.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_public_events_slug_page_tsx",
+      "target": "lib_formatters_formatlocalizeddatetime"
     },
     {
       "relation": "imports_from",
@@ -8072,6 +8370,17 @@
       "confidence_score": 1.0,
       "source": "slug_page_eventdetailpage",
       "target": "slug_page_geteventbyslug"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/(public)/events/[slug]/page.tsx",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "slug_page_eventdetailpage",
+      "target": "lib_geo_timezone_formateventschedule"
     },
     {
       "relation": "calls",
@@ -9745,28 +10054,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L20",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_events_page_tsx",
-      "target": "src_components_ui_input_tsx"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L20",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_events_page_tsx",
-      "target": "ui_input_input"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
       "source_location": "L21",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -9943,6 +10230,145 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "src_components_admin_event_form_modal_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "admin_event_form_modal_eventformmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "admin_event_form_modal_eventformdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "src_lib_geo_timezone_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "lib_geo_timezone_formateventschedule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "src_lib_formatters_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "lib_formatters_formatcurrency"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "events_page_artworksummary"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "events_page_registration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "events_page_eventitem"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L76",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "events_page_eventsadminpage"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "src_components_ui_input_tsx"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_events_page_tsx",
+      "target": "ui_input_input"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
       "source_location": "L37",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -10005,28 +10431,6 @@
       "target": "ui_select_selecttrigger"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L41",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_events_page_tsx",
-      "target": "src_lib_formatters_ts"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L41",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_events_page_tsx",
-      "target": "lib_formatters_formatcurrency"
-    },
-    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -10052,36 +10456,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L32",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_events_page_tsx",
-      "target": "events_page_artworksummary"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L39",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_events_page_tsx",
-      "target": "events_page_registration"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L48",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_events_page_tsx",
-      "target": "events_page_eventitem"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
       "source_location": "L87",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -10097,16 +10471,6 @@
       "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_events_page_tsx",
       "target": "events_page_iana_timezones"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/events/page.tsx",
-      "source_location": "L76",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_events_page_tsx",
-      "target": "events_page_eventsadminpage"
     },
     {
       "relation": "imports_from",
@@ -14108,9 +14472,9 @@
       "source_file": "src/app/api/media/[...path]/route.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_media_path_route_ts",
-      "target": "path_route_mime_map",
-      "confidence_score": 1.0
+      "target": "path_route_mime_map"
     },
     {
       "relation": "contains",
@@ -14118,9 +14482,9 @@
       "source_file": "src/app/api/media/[...path]/route.ts",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_media_path_route_ts",
-      "target": "path_route_get",
-      "confidence_score": 1.0
+      "target": "path_route_get"
     },
     {
       "relation": "contains",
@@ -14332,12 +14696,34 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_components_admin_ai_assistant_modal_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L43",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_editor_tsx",
       "target": "src_components_admin_ai_assistant_modal_tsx"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "admin_ai_assistant_modal_aiassistantmodal",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -14643,6 +15029,458 @@
       "confidence_score": 1.0,
       "source": "src_components_admin_dashboard_layout_manager_tsx",
       "target": "admin_dashboard_layout_manager_dashboardlayoutmanager"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_components_ui_button_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_button_button",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_components_ui_input_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_input_input",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_components_ui_badge_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_badge_badge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_components_ui_dialog_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_dialog_dialogcontent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_dialog_dialogheader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_dialog_dialogtitle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_dialog_dialogdescription",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_dialog_dialogfooter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_components_ui_tabs_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_tabs_tabslist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_tabs_tabstrigger",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "ui_tabs_tabscontent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_components_admin_modern_datetime_picker_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "admin_modern_datetime_picker_moderndatetimepicker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_lib_geo_timezone_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "lib_geo_timezone_getallcountries",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "lib_geo_timezone_findcountry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "lib_geo_timezone_gettimezonesforcountry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "lib_geo_timezone_formateventschedule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "src_lib_formatters_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "lib_formatters_supported_currencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "admin_event_form_modal_galleryimageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "admin_event_form_modal_eventformdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "admin_event_form_modal_artworksummary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L86",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "admin_event_form_modal_eventformmodalprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "admin_event_form_modal_eventformmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/event-form-modal.tsx",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "src_components_admin_event_form_modal_tsx",
+      "target": "admin_event_form_modal_eventformcontent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "src_components_ui_button_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "ui_button_button",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "src_components_ui_badge_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "ui_badge_badge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "src_lib_geo_timezone_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "lib_geo_timezone_zonedtimetoutc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "lib_geo_timezone_utctozonedparts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "admin_modern_datetime_picker_moderndatetimepickerprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "admin_modern_datetime_picker_month_names",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "admin_modern_datetime_picker_short_days",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/modern-datetime-picker.tsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "src_components_admin_modern_datetime_picker_tsx",
+      "target": "admin_modern_datetime_picker_moderndatetimepicker",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -17345,6 +18183,149 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_countryinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_timezoneoption",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_dial_codes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_country_currencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L118",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_getaddresslabels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L135",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_getallcountries",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L183",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_findcountry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L203",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_gettimezonesforcountry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L282",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_zonedtimetoutc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L334",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_utctozonedparts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L422",
+      "weight": 1.0,
+      "source": "src_lib_geo_timezone_ts",
+      "target": "lib_geo_timezone_formateventschedule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L144",
+      "weight": 1.0,
+      "source": "lib_geo_timezone_getallcountries",
+      "target": "lib_geo_timezone_getaddresslabels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "lib_geo_timezone_findcountry",
+      "target": "lib_geo_timezone_getallcountries",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo-timezone.ts",
+      "source_location": "L433",
+      "weight": 1.0,
+      "source": "lib_geo_timezone_formateventschedule",
+      "target": "lib_geo_timezone_utctozonedparts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/lib/prisma.ts",
       "source_location": "L3",
       "weight": 1.0,
@@ -19020,5 +20001,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "ae8997f6d87613dc1d176053f26c81ab73fbc84f"
+  "built_at_commit": "1a510ad469f42d59766a31e11cd9c7faa199aa72"
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/public/navbar";
@@ -6,8 +7,8 @@ import { Footer } from "@/components/public/footer";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Calendar, Clock, MapPin, Palette, ArrowRight, Sparkles } from "lucide-react";
-
 import { DynamicPageSections } from "@/components/public/dynamic-page-sections";
+import { formatEventSchedule } from "@/lib/geo-timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 export default async function EventsPage() {
   const [events, pageData] = await Promise.all([
     prisma.event.findMany({
+      where: { isPublished: true },
       orderBy: { startDate: "asc" },
       include: {
         _count: { select: { artworks: true, registrations: true } },
@@ -72,7 +74,6 @@ export default async function EventsPage() {
       )}
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
-
         {events.length === 0 ? (
           <Card className="p-12 text-center border-dashed max-w-md mx-auto">
             <Calendar className="w-10 h-10 mx-auto text-primary mb-2 opacity-50" />
@@ -83,62 +84,83 @@ export default async function EventsPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((ev) => (
-              <Link key={ev.id} href={`/events/${ev.slug}`} className="group block">
-                <Card className="hover:border-primary/60 transition-all flex flex-col justify-between h-full shadow-sm hover:shadow-xl">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge variant="gold" className="text-[10px] uppercase">
-                        {ev.eventType}
-                      </Badge>
-                      <Badge
-                        variant={ev.isRegistrationOpen ? "outline" : "secondary"}
-                        className="text-[10px]"
-                      >
-                        {ev.isRegistrationOpen ? "RSVP Open" : "Concluded"}
-                      </Badge>
-                    </div>
+            {events.map((ev) => {
+              const banner = ev.bannerImage || ev.posterUrl;
+              const schedule = formatEventSchedule(ev.startDate, ev.endDate, ev.timezone);
 
-                    <CardTitle className="text-lg font-serif font-bold text-foreground group-hover:text-primary transition-colors mt-2">
-                      {ev.title}
-                    </CardTitle>
-                  </CardHeader>
+              return (
+                <Link key={ev.id} href={`/events/${ev.slug}`} className="group block">
+                  <Card className="hover:border-primary/60 transition-all flex flex-col justify-between h-full shadow-sm hover:shadow-xl overflow-hidden">
+                    {banner && (
+                      <div className="relative h-44 w-full bg-muted/30 overflow-hidden">
+                        <Image
+                          src={banner}
+                          alt={ev.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                        <div className="absolute top-3 right-3 flex gap-1">
+                          <Badge variant="gold" className="text-[10px] uppercase font-mono shadow-md">
+                            {ev.eventType}
+                          </Badge>
+                        </div>
+                      </div>
+                    )}
 
-                  <CardContent className="space-y-2 text-xs text-muted-foreground pb-4">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
-                      <span>
-                        {new Date(ev.startDate).toLocaleDateString("en-US", {
-                          weekday: "short",
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </div>
+                    <CardHeader className="pb-3">
+                      {!banner && (
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <Badge variant="gold" className="text-[10px] uppercase font-mono">
+                            {ev.eventType}
+                          </Badge>
+                          <Badge
+                            variant={ev.isRegistrationOpen ? "outline" : "secondary"}
+                            className="text-[10px]"
+                          >
+                            {ev.isRegistrationOpen ? "RSVP Open" : "Concluded"}
+                          </Badge>
+                        </div>
+                      )}
 
-                    <div className="flex items-start gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                      <span className="truncate text-foreground/90">
-                        {ev.venueName || ev.venue}{ev.city ? `, ${ev.city}` : ""}{ev.country ? ` (${ev.country})` : ""}
-                      </span>
-                    </div>
+                      <CardTitle className="text-lg font-serif font-bold text-foreground group-hover:text-primary transition-colors mt-1 line-clamp-2">
+                        {ev.title}
+                      </CardTitle>
+                    </CardHeader>
 
-                    <p className="line-clamp-2 text-foreground/80 pt-2 border-t border-border/50">
-                      {ev.description}
-                    </p>
+                    <CardContent className="space-y-2.5 text-xs text-muted-foreground pb-4 flex-1">
+                      <div className="flex items-start gap-2">
+                        <Clock className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                        <span className="font-medium text-foreground leading-snug">
+                          {schedule}
+                        </span>
+                      </div>
 
-                    <div className="pt-3 flex items-center justify-between text-xs text-primary font-serif font-semibold">
-                      <span className="inline-flex items-center gap-1">
-                        <Palette className="w-3 h-3" />
-                        {ev._count?.artworks || 0} Artworks on Display
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                      <div className="flex items-start gap-2">
+                        <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                        <span className="truncate text-foreground/90">
+                          {ev.venueName || ev.venue}{ev.city ? `, ${ev.city}` : ""}{ev.country ? ` (${ev.country})` : ""}
+                        </span>
+                      </div>
+
+                      {ev.description && (
+                        <p className="line-clamp-2 text-muted-foreground pt-2 border-t border-border/50">
+                          {ev.description}
+                        </p>
+                      )}
+
+                      <div className="pt-3 flex items-center justify-between text-xs text-primary font-serif font-semibold mt-auto">
+                        <span className="inline-flex items-center gap-1">
+                          <Palette className="w-3 h-3" />
+                          {ev._count?.artworks || 0} Artworks on Display
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>

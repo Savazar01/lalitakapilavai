@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Calendar,
@@ -15,13 +16,10 @@ import {
   Edit2,
   Trash2,
   Loader2,
-  Sparkles,
-  Check,
   QrCode,
   Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {
@@ -34,20 +32,9 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  formatCurrency,
-  formatLocalizedDateTime,
-  SUPPORTED_CURRENCIES,
-} from "@/lib/formatters";
+import { EventFormModal, EventFormData } from "@/components/admin/event-form-modal";
+import { formatEventSchedule } from "@/lib/geo-timezone";
+import { formatCurrency } from "@/lib/formatters";
 
 interface ArtworkSummary {
   id: string;
@@ -70,7 +57,7 @@ interface EventItem {
   id: string;
   title: string;
   slug: string;
-  eventType: "WORKSHOP" | "ONLINE_CLASSROOM" | "EXHIBITION" | "CONCERT" | "OTHER";
+  eventType: "WORKSHOP" | "ONLINE_CLASSROOM" | "EXHIBITION" | "CONCERT" | "RECITAL" | "PRIVATE_VIEWING" | "OTHER";
   description: string;
   venue: string;
   venueName?: string | null;
@@ -79,70 +66,32 @@ interface EventItem {
   stateProvince?: string | null;
   postalCode?: string | null;
   country?: string;
+  countryCode?: string | null;
   timezone: string;
   startDate: string;
-  endDate: string;
-  posterUrl: string | null;
+  endDate?: string | null;
+  posterUrl?: string | null;
+  bannerImage?: string | null;
+  galleryImages?: { url: string; caption?: string }[] | null;
   maxCapacity: number | null;
   registrationFee: number | null;
   currency?: string;
   isRegistrationOpen: boolean;
+  isPublished?: boolean;
+  contactName?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
   _count?: { registrations: number; artworks: number };
 }
-
-export const SUPPORTED_COUNTRIES = [
-  { name: "India", defaultCurrency: "INR", defaultTimezone: "Asia/Kolkata" },
-  { name: "United States", defaultCurrency: "USD", defaultTimezone: "America/New_York" },
-  { name: "United Kingdom", defaultCurrency: "GBP", defaultTimezone: "Europe/London" },
-  { name: "United Arab Emirates", defaultCurrency: "AED", defaultTimezone: "Asia/Dubai" },
-  { name: "Germany", defaultCurrency: "EUR", defaultTimezone: "Europe/Berlin" },
-  { name: "France", defaultCurrency: "EUR", defaultTimezone: "Europe/Paris" },
-  { name: "Singapore", defaultCurrency: "SGD", defaultTimezone: "Asia/Singapore" },
-  { name: "Australia", defaultCurrency: "AUD", defaultTimezone: "Australia/Sydney" },
-  { name: "Canada", defaultCurrency: "CAD", defaultTimezone: "America/Toronto" },
-  { name: "Other", defaultCurrency: "USD", defaultTimezone: "UTC" },
-];
-
-const IANA_TIMEZONES = [
-  { value: "Asia/Kolkata", label: "Asia/Kolkata (IST +05:30)" },
-  { value: "America/New_York", label: "America/New_York (EST/EDT -05:00)" },
-  { value: "America/Los_Angeles", label: "America/Los_Angeles (PST/PDT -08:00)" },
-  { value: "Europe/London", label: "Europe/London (GMT/BST +00:00)" },
-  { value: "Asia/Dubai", label: "Asia/Dubai (GST +04:00)" },
-  { value: "Asia/Singapore", label: "Asia/Singapore (SGT +08:00)" },
-  { value: "Australia/Sydney", label: "Australia/Sydney (AEST +10:00)" },
-];
 
 export default function EventsAdminPage() {
   const [events, setEvents] = React.useState<EventItem[]>([]);
   const [artworksCatalog, setArtworksCatalog] = React.useState<ArtworkSummary[]>([]);
   const [loading, setLoading] = React.useState(true);
 
-  // Dialog State (Create / Edit)
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [editingEvent, setEditingEvent] = React.useState<EventItem | null>(null);
-  const [saving, setSaving] = React.useState(false);
-
-  // Form Fields
-  const [title, setTitle] = React.useState("");
-  const [slug, setSlug] = React.useState("");
-  const [eventType, setEventType] = React.useState<EventItem["eventType"]>("EXHIBITION");
-  const [description, setDescription] = React.useState("");
-  const [venue, setVenue] = React.useState("Lalita Kapilavai Heritage Studio");
-  const [venueName, setVenueName] = React.useState("Lalita Kapilavai Heritage Studio");
-  const [streetAddress, setStreetAddress] = React.useState("");
-  const [city, setCity] = React.useState("Bengaluru");
-  const [stateProvince, setStateProvince] = React.useState("Karnataka");
-  const [postalCode, setPostalCode] = React.useState("560038");
-  const [country, setCountry] = React.useState("India");
-  const [timezone, setTimezone] = React.useState("Asia/Kolkata");
-  const [startDate, setStartDate] = React.useState("");
-  const [endDate, setEndDate] = React.useState("");
-  const [maxCapacity, setMaxCapacity] = React.useState("");
-  const [registrationFee, setRegistrationFee] = React.useState("");
-  const [currency, setCurrency] = React.useState("INR");
-  const [isRegistrationOpen, setIsRegistrationOpen] = React.useState(true);
-  const [selectedArtworkIds, setSelectedArtworkIds] = React.useState<string[]>([]);
+  // Form Modal State
+  const [formModalOpen, setFormModalOpen] = React.useState(false);
+  const [editingEvent, setEditingEvent] = React.useState<EventFormData | null>(null);
 
   // Attendee Viewer Modal
   const [attendeeModalOpen, setAttendeeModalOpen] = React.useState(false);
@@ -150,68 +99,18 @@ export default function EventsAdminPage() {
   const [attendees, setAttendees] = React.useState<Registration[]>([]);
   const [loadingAttendees, setLoadingAttendees] = React.useState(false);
 
-  // Artwork Linker Modal
-  const [linkerModalOpen, setLinkerModalOpen] = React.useState(false);
-
-  // Delete Confirmation State
+  // Delete Confirm State
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [targetDeleteEvent, setTargetDeleteEvent] = React.useState<{ id: string; title: string } | null>(null);
   const [deleting, setDeleting] = React.useState(false);
 
-  // Exhibition QR Code State
+  // Exhibition Floor QR Modal State
   const [exhibitionQrModalOpen, setExhibitionQrModalOpen] = React.useState(false);
   const [selectedExhibitionEvent, setSelectedExhibitionEvent] = React.useState<EventItem | null>(null);
-  const [selectedArtworkForExhibition, setSelectedArtworkForExhibition] = React.useState<string>("");
   const [exhibitionQrDataUrl, setExhibitionQrDataUrl] = React.useState<string>("");
   const [exhibitionQrTargetUrl, setExhibitionQrTargetUrl] = React.useState<string>("");
   const [exhibitionQrLoading, setExhibitionQrLoading] = React.useState(false);
-
-  const handleOpenExhibitionQR = async (ev: EventItem) => {
-    setSelectedExhibitionEvent(ev);
-    setSelectedArtworkForExhibition("");
-    setExhibitionQrModalOpen(true);
-    setExhibitionQrLoading(true);
-
-    try {
-      const host = window.location.origin;
-      const targetUrl = `${host}/events?id=${ev.id}`;
-      setExhibitionQrTargetUrl(targetUrl);
-      const res = await fetch(`/api/admin/qr?url=${encodeURIComponent(targetUrl)}`);
-      const data = await res.json();
-      if (data.dataUrl) setExhibitionQrDataUrl(data.dataUrl);
-    } catch {
-      toast.error("Failed to generate exhibition QR");
-    } finally {
-      setExhibitionQrLoading(false);
-    }
-  };
-
-  const handleSelectArtworkQR = async (artSlug: string) => {
-    setSelectedArtworkForExhibition(artSlug);
-    if (!selectedExhibitionEvent) return;
-    setExhibitionQrLoading(true);
-
-    try {
-      let fetchUrl = `/api/admin/qr?`;
-      if (artSlug === "") {
-        const host = window.location.origin;
-        fetchUrl += `url=${encodeURIComponent(`${host}/events?id=${selectedExhibitionEvent.id}`)}`;
-      } else {
-        fetchUrl += `slug=${encodeURIComponent(artSlug)}&eventId=${encodeURIComponent(selectedExhibitionEvent.slug)}`;
-      }
-      const res = await fetch(fetchUrl);
-      const data = await res.json();
-      if (data.dataUrl) {
-        setExhibitionQrDataUrl(data.dataUrl);
-        setExhibitionQrTargetUrl(data.targetUrl || "");
-      }
-    } catch {
-      toast.error("Failed to generate exhibition artwork QR");
-    } finally {
-      setExhibitionQrLoading(false);
-    }
-  };
-
+  const [selectedArtworkForExhibition, setSelectedArtworkForExhibition] = React.useState<string>("");
 
   const reloadEvents = React.useCallback(() => {
     Promise.all([
@@ -230,176 +129,61 @@ export default function EventsAdminPage() {
   }, []);
 
   React.useEffect(() => {
-    let isMounted = true;
-    Promise.all([
-      fetch("/api/admin/events").then((res) => (res.ok ? res.json() : [])),
-      fetch("/api/admin/artworks").then((res) => (res.ok ? res.json() : [])),
-    ])
-      .then(([eventsData, artworksData]) => {
-        if (isMounted) {
-          setEvents(eventsData);
-          setArtworksCatalog(artworksData);
-          setLoading(false);
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-        if (isMounted) setLoading(false);
-      });
+    reloadEvents();
+  }, [reloadEvents]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleCountryChange = (cName: string) => {
-    setCountry(cName);
-    const cfg = SUPPORTED_COUNTRIES.find((c) => c.name === cName);
-    if (cfg) {
-      setCurrency(cfg.defaultCurrency);
-      if (cfg.defaultTimezone) {
-        setTimezone(cfg.defaultTimezone);
-      }
-    }
-  };
-
+  // Open Create Modal
   const handleOpenCreate = () => {
     setEditingEvent(null);
-    setTitle("");
-    setSlug("");
-    setEventType("EXHIBITION");
-    setDescription("");
-    setVenue("Lalita Kapilavai Heritage Studio");
-    setVenueName("Lalita Kapilavai Heritage Studio");
-    setStreetAddress("");
-    setCity("Bengaluru");
-    setStateProvince("Karnataka");
-    setPostalCode("560038");
-    setCountry("India");
-    setTimezone("Asia/Kolkata");
-    setStartDate("");
-    setEndDate("");
-    setMaxCapacity("100");
-    setRegistrationFee("");
-    setCurrency("INR");
-    setIsRegistrationOpen(true);
-    setSelectedArtworkIds([]);
-    setDialogOpen(true);
+    setFormModalOpen(true);
   };
 
+  // Open Edit Modal with full data
   const handleOpenEdit = async (ev: EventItem) => {
-    setEditingEvent(ev);
-    setTitle(ev.title);
-    setSlug(ev.slug);
-    setEventType(ev.eventType);
-    setDescription(ev.description);
-    setVenue(ev.venue || ev.venueName || "Lalita Kapilavai Heritage Studio");
-    setVenueName(ev.venueName || ev.venue || "");
-    setStreetAddress(ev.streetAddress || "");
-    setCity(ev.city || "");
-    setStateProvince(ev.stateProvince || "");
-    setPostalCode(ev.postalCode || "");
-    setCountry(ev.country || "India");
-    setTimezone(ev.timezone || "Asia/Kolkata");
-    setStartDate(ev.startDate ? ev.startDate.slice(0, 16) : "");
-    setEndDate(ev.endDate ? ev.endDate.slice(0, 16) : "");
-    setMaxCapacity(ev.maxCapacity ? ev.maxCapacity.toString() : "");
-    setRegistrationFee(ev.registrationFee ? ev.registrationFee.toString() : "");
-    setCurrency(ev.currency || "INR");
-    setIsRegistrationOpen(ev.isRegistrationOpen);
-
-    // Fetch linked artworks
     try {
       const res = await fetch(`/api/admin/events/${ev.id}`);
       if (res.ok) {
         const fullEvent = await res.json();
-        setSelectedArtworkIds(
-          fullEvent.artworks?.map((a: { artworkId: string }) => a.artworkId) || []
-        );
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
-    setDialogOpen(true);
-  };
-
-  const handleTitleChange = (val: string) => {
-    setTitle(val);
-    if (!editingEvent) {
-      setSlug(
-        val
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)/g, "")
-      );
-    }
-  };
-
-  const handleSaveEvent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-
-    const payload = {
-      title,
-      slug,
-      eventType,
-      description,
-      venue: venueName || venue || "Lalita Kapilavai Heritage Studio",
-      venueName: venueName || venue,
-      streetAddress: streetAddress || null,
-      city: city || "Bengaluru",
-      stateProvince: stateProvince || null,
-      postalCode: postalCode || null,
-      country: country || "India",
-      timezone,
-      startDate: new Date(startDate).toISOString(),
-      endDate: new Date(endDate).toISOString(),
-      maxCapacity: maxCapacity ? parseInt(maxCapacity, 10) : null,
-      registrationFee: registrationFee ? parseFloat(registrationFee) : null,
-      currency,
-      isRegistrationOpen,
-      artworkIds: selectedArtworkIds,
-    };
-
-    try {
-      if (editingEvent) {
-        const res = await fetch(`/api/admin/events/${editingEvent.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+        setEditingEvent({
+          id: fullEvent.id,
+          title: fullEvent.title,
+          slug: fullEvent.slug,
+          eventType: fullEvent.eventType,
+          description: fullEvent.description || "",
+          venue: fullEvent.venue || fullEvent.venueName || "Lalita Kapilavai Heritage Studio",
+          venueName: fullEvent.venueName || fullEvent.venue || "Lalita Kapilavai Heritage Studio",
+          streetAddress: fullEvent.streetAddress || "",
+          city: fullEvent.city || "Bengaluru",
+          stateProvince: fullEvent.stateProvince || "",
+          postalCode: fullEvent.postalCode || "",
+          country: fullEvent.country || "India",
+          countryCode: fullEvent.countryCode || "IN",
+          timezone: fullEvent.timezone || "Asia/Kolkata",
+          startDate: fullEvent.startDate || "",
+          endDate: fullEvent.endDate || "",
+          posterUrl: fullEvent.posterUrl || "",
+          bannerImage: fullEvent.bannerImage || fullEvent.posterUrl || "",
+          galleryImages: fullEvent.galleryImages || [],
+          maxCapacity: fullEvent.maxCapacity,
+          registrationFee: fullEvent.registrationFee ? Number(fullEvent.registrationFee) : 0,
+          currency: fullEvent.currency || "INR",
+          isRegistrationOpen: fullEvent.isRegistrationOpen,
+          isPublished: fullEvent.isPublished !== false,
+          contactName: fullEvent.contactName || "",
+          contactEmail: fullEvent.contactEmail || "",
+          contactPhone: fullEvent.contactPhone || "",
+          artworkIds: fullEvent.artworks?.map((a: { artworkId: string }) => a.artworkId) || [],
         });
-        if (res.ok) {
-          toast.success("Event updated successfully!");
-          setDialogOpen(false);
-          reloadEvents();
-        } else {
-          const err = await res.json().catch(() => ({}));
-          toast.error(err.error || "Failed to update event");
-        }
       } else {
-        const res = await fetch("/api/admin/events", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (res.ok) {
-          toast.success("Event scheduled successfully!");
-          setDialogOpen(false);
-          reloadEvents();
-        } else {
-          const err = await res.json().catch(() => ({}));
-          toast.error(err.error || "Failed to create event");
-        }
+        setEditingEvent(ev as unknown as EventFormData);
       }
-    } catch (e) {
-      console.error(e);
-      toast.error("Error saving event");
-    } finally {
-      setSaving(false);
+    } catch {
+      setEditingEvent(ev as unknown as EventFormData);
     }
+    setFormModalOpen(true);
   };
 
+  // Delete Handlers
   const handleDeleteClick = (id: string, evTitle: string) => {
     setTargetDeleteEvent({ id, title: evTitle });
     setDeleteDialogOpen(true);
@@ -419,15 +203,14 @@ export default function EventsAdminPage() {
         const err = await res.json().catch(() => ({}));
         toast.error(err.error || "Failed to delete event");
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
       toast.error("Error deleting event");
     } finally {
       setDeleting(false);
     }
   };
 
-
+  // View Attendees Handler
   const handleViewAttendees = async (ev: EventItem) => {
     setAttendeeEventTitle(ev.title);
     setLoadingAttendees(true);
@@ -445,517 +228,335 @@ export default function EventsAdminPage() {
     }
   };
 
-  const toggleArtworkSelection = (artId: string) => {
-    setSelectedArtworkIds((prev) =>
-      prev.includes(artId) ? prev.filter((id) => id !== artId) : [...prev, artId]
-    );
+  // Exhibition Floor QR Handler
+  const handleOpenExhibitionQR = async (ev: EventItem) => {
+    setSelectedExhibitionEvent(ev);
+    setSelectedArtworkForExhibition("");
+    setExhibitionQrLoading(true);
+    setExhibitionQrModalOpen(true);
+
+    try {
+      const host = window.location.origin;
+      const target = `${host}/events/${ev.slug}`;
+      const res = await fetch(`/api/admin/qr?url=${encodeURIComponent(target)}`);
+      const data = await res.json();
+      if (data.dataUrl) {
+        setExhibitionQrDataUrl(data.dataUrl);
+        setExhibitionQrTargetUrl(target);
+      }
+    } catch {
+      toast.error("Failed to generate exhibition QR code");
+    } finally {
+      setExhibitionQrLoading(false);
+    }
+  };
+
+  const handleArtworkQrChange = async (artSlug: string) => {
+    setSelectedArtworkForExhibition(artSlug);
+    if (!selectedExhibitionEvent) return;
+    setExhibitionQrLoading(true);
+
+    try {
+      let fetchUrl = `/api/admin/qr?`;
+      if (artSlug === "") {
+        const host = window.location.origin;
+        fetchUrl += `url=${encodeURIComponent(`${host}/events/${selectedExhibitionEvent.slug}`)}`;
+      } else {
+        fetchUrl += `slug=${encodeURIComponent(artSlug)}&eventId=${encodeURIComponent(selectedExhibitionEvent.slug)}`;
+      }
+      const res = await fetch(fetchUrl);
+      const data = await res.json();
+      if (data.dataUrl) {
+        setExhibitionQrDataUrl(data.dataUrl);
+        setExhibitionQrTargetUrl(data.targetUrl || "");
+      }
+    } catch {
+      toast.error("Failed to generate exhibition artwork QR");
+    } finally {
+      setExhibitionQrLoading(false);
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            Exhibitions &amp; Recitals Desk
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
-            Events &amp; Exhibitions
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Manage classical workshops, gallery exhibitions, Carnatic recitals, timezone alignments, and attendee RSVPs.
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
+            Exhibitions, Recitals &amp; Workshops
+          </h1>
+          <p className="text-xs text-muted-foreground mt-1">
+            Curate international schedules, venue coordinates, timezones, and masterwork exhibition linkages.
           </p>
         </div>
 
-        <Button variant="gold" onClick={handleOpenCreate} className="gap-2 shrink-0">
+        <Button onClick={handleOpenCreate} variant="gold" className="gap-2">
           <Plus className="w-4 h-4" />
-          Create Event
+          Schedule Event
         </Button>
       </div>
 
-      {/* Events Grid */}
+      {/* Events Grid / Listing */}
       {loading ? (
-        <div className="py-20 flex flex-col items-center justify-center text-muted-foreground gap-2">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-          <span className="text-xs">Loading event calendar...</span>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       ) : events.length === 0 ? (
         <Card className="p-12 text-center border-dashed">
-          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-            <Calendar className="w-6 h-6 text-primary" />
-          </div>
-          <CardTitle className="text-lg">No Events Scheduled</CardTitle>
-          <CardDescription className="text-xs max-w-sm mx-auto mt-1 mb-4">
-            Create an exhibition or concert to attach masterworks and start capturing visitor RSVPs.
+          <Calendar className="w-12 h-12 mx-auto text-primary mb-3 opacity-60" />
+          <CardTitle className="text-base font-serif">No Events Scheduled</CardTitle>
+          <CardDescription className="text-xs mt-1">
+            Create your first Tanjore exhibition, classical concert, or workshop masterclass.
           </CardDescription>
-          <Button variant="gold" size="sm" onClick={handleOpenCreate}>
-            <Plus className="w-4 h-4 mr-1" />
-            Schedule First Event
+          <Button onClick={handleOpenCreate} variant="gold" size="sm" className="mt-4 gap-1">
+            <Plus className="w-3.5 h-3.5" />
+            Create Event
           </Button>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {events.map((ev) => (
-            <Card key={ev.id} className="hover:border-primary/50 transition-all flex flex-col justify-between">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
-                  <Badge variant="gold" className="text-[10px] uppercase">
-                    {ev.eventType}
-                  </Badge>
-                  <Badge variant={ev.isRegistrationOpen ? "outline" : "secondary"} className="text-[10px]">
-                    {ev.isRegistrationOpen ? "RSVP Open" : "Closed"}
-                  </Badge>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {events.map((ev) => {
+            const banner = ev.bannerImage || ev.posterUrl;
+            return (
+              <Card
+                key={ev.id}
+                className="hover:border-primary/50 transition-all flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-lg"
+              >
+                {/* Optional Hero Banner Preview */}
+                {banner && (
+                  <div className="relative h-36 w-full bg-muted/30 overflow-hidden border-b border-border/60">
+                    <Image
+                      src={banner}
+                      alt={ev.title}
+                      fill
+                      className="object-cover transition-transform duration-500 hover:scale-105"
+                    />
+                    <div className="absolute top-2 right-2 flex gap-1">
+                      <Badge variant="gold" className="text-[10px] uppercase font-mono shadow-md">
+                        {ev.eventType}
+                      </Badge>
+                    </div>
+                  </div>
+                )}
 
-                <CardTitle className="text-base font-serif font-bold text-foreground mt-2">
-                  {ev.title}
-                </CardTitle>
+                <CardHeader className="pb-2">
+                  {!banner && (
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <Badge variant="gold" className="text-[10px] uppercase">
+                        {ev.eventType}
+                      </Badge>
+                      <Badge
+                        variant={ev.isRegistrationOpen ? "outline" : "secondary"}
+                        className="text-[10px]"
+                      >
+                        {ev.isRegistrationOpen ? "RSVP Open" : "Closed"}
+                      </Badge>
+                    </div>
+                  )}
 
-                <CardDescription className="text-xs font-mono text-primary">
-                  /{ev.slug}
-                </CardDescription>
-              </CardHeader>
+                  <CardTitle className="text-base font-serif font-bold text-foreground line-clamp-1">
+                    {ev.title}
+                  </CardTitle>
 
-              <CardContent className="space-y-2.5 pb-4 text-xs text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="truncate">
-                    {formatLocalizedDateTime(ev.startDate, ev.timezone)}
-                  </span>
-                </div>
+                  <CardDescription className="text-xs font-mono text-primary truncate">
+                    /{ev.slug}
+                  </CardDescription>
+                </CardHeader>
 
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                  <span className="line-clamp-2">
-                    {ev.venueName || ev.venue}{ev.city ? `, ${ev.city}` : ""}{ev.country ? ` • ${ev.country}` : ""}
-                  </span>
-                </div>
+                <CardContent className="space-y-2.5 pb-4 text-xs text-muted-foreground flex-1">
+                  {/* Schedule in Native Event Timezone */}
+                  <div className="flex items-start gap-2">
+                    <Clock className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                    <span className="font-medium text-foreground leading-snug">
+                      {formatEventSchedule(ev.startDate, ev.endDate, ev.timezone)}
+                    </span>
+                  </div>
 
-                <div className="flex items-center justify-between pt-1 text-[11px] text-muted-foreground">
-                  <span>Fee: <strong className="text-foreground">{ev.registrationFee ? formatCurrency(ev.registrationFee, ev.currency || "INR") : "Free Admission"}</strong></span>
-                  <span>Cap: <strong className="text-foreground">{ev.maxCapacity ? `${ev.maxCapacity} seats` : "Unlimited"}</strong></span>
-                </div>
+                  {/* Venue & Location */}
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                    <span className="line-clamp-2">
+                      {ev.venueName || ev.venue}
+                      {ev.city ? `, ${ev.city}` : ""}
+                      {ev.country ? ` • ${ev.country}` : ""}
+                    </span>
+                  </div>
 
-                <div className="flex items-center gap-4 pt-2 border-t border-border/50 text-[11px]">
-                  <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-                    <Palette className="w-3 h-3 text-primary" />
-                    {ev._count?.artworks || 0} Artworks
-                  </span>
-                  <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-                    <Users className="w-3 h-3 text-primary" />
-                    {ev._count?.registrations || 0} RSVPs
-                  </span>
-                </div>
-              </CardContent>
+                  {/* Fee & Capacity */}
+                  <div className="flex items-center justify-between pt-1 text-[11px] text-muted-foreground border-t border-border/40">
+                    <span>
+                      Fee:{" "}
+                      <strong className="text-foreground">
+                        {ev.registrationFee
+                          ? formatCurrency(ev.registrationFee, ev.currency || "INR")
+                          : "Free Admission"}
+                      </strong>
+                    </span>
+                    <span>
+                      Cap:{" "}
+                      <strong className="text-foreground">
+                        {ev.maxCapacity ? `${ev.maxCapacity} seats` : "Unlimited"}
+                      </strong>
+                    </span>
+                  </div>
 
-              <div className="p-3 bg-secondary/30 border-t border-border/60 flex items-center justify-between gap-2">
-                <Link
-                  href={`/events/${ev.slug}`}
-                  target="_blank"
-                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  Public Page
-                </Link>
+                  {/* Artworks & Registrations Count */}
+                  <div className="flex items-center gap-4 pt-1 text-[11px]">
+                    <span className="inline-flex items-center gap-1 font-semibold text-foreground">
+                      <Palette className="w-3 h-3 text-primary" />
+                      {ev._count?.artworks || 0} Artworks
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-semibold text-foreground">
+                      <Users className="w-3 h-3 text-primary" />
+                      {ev._count?.registrations || 0} RSVPs
+                    </span>
+                  </div>
+                </CardContent>
 
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleOpenExhibitionQR(ev)}
-                    className="h-8 text-xs gap-1"
-                    title="Generate Exhibition & Artwork Floor QR Codes"
+                {/* Card Action Footer */}
+                <div className="p-3 bg-secondary/30 border-t border-border/60 flex items-center justify-between gap-2">
+                  <Link
+                    href={`/events/${ev.slug}`}
+                    target="_blank"
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
-                    <QrCode className="w-3.5 h-3.5 text-primary" />
-                    Exhibition QR
-                  </Button>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Public Page
+                  </Link>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleViewAttendees(ev)}
-                    className="h-8 text-xs gap-1"
-                  >
-                    <Users className="w-3.5 h-3.5" />
-                    RSVPs ({ev._count?.registrations || 0})
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenExhibitionQR(ev)}
+                      className="h-7 text-xs px-2 gap-1"
+                      title="Floor QR Codes"
+                    >
+                      <QrCode className="w-3.5 h-3.5 text-primary" />
+                      QR
+                    </Button>
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleOpenEdit(ev)}
-                    className="h-8 w-8 p-0"
-                    title="Edit Event"
-                  >
-                    <Edit2 className="w-3.5 h-3.5 text-muted-foreground" />
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewAttendees(ev)}
+                      className="h-7 text-xs px-2 gap-1"
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      RSVPs ({ev._count?.registrations || 0})
+                    </Button>
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteClick(ev.id, ev.title)}
-                    className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
-                    title="Delete Event"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleOpenEdit(ev)}
+                      className="h-7 w-7 p-0"
+                      title="Edit Event"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-muted-foreground" />
+                    </Button>
 
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteClick(ev.id, ev.title)}
+                      className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
+                      title="Delete Event"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
 
-      {/* Event Create / Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <form onSubmit={handleSaveEvent}>
-            <DialogHeader>
-              <DialogTitle>
-                {editingEvent ? "Edit Event / Exhibition" : "Schedule New Event / Exhibition"}
-              </DialogTitle>
-              <DialogDescription>
-                Configure dates, timezones, gallery venue, and attach specific masterworks.
-              </DialogDescription>
-            </DialogHeader>
+      {/* Comprehensive Event Form Modal */}
+      <EventFormModal
+        isOpen={formModalOpen}
+        onClose={() => setFormModalOpen(false)}
+        onSaved={reloadEvents}
+        initialEvent={editingEvent}
+        artworksCatalog={artworksCatalog}
+      />
 
-            <div className="space-y-4 py-4 text-left">
-              {/* Title & Slug */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Title</label>
-                  <Input
-                    placeholder="e.g. Divine Gold: Tanjore Sacred Retrospective"
-                    value={title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">URL Slug</label>
-                  <Input
-                    placeholder="divine-gold-retrospective"
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Event Type & Timezone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Event Type</label>
-                  <select
-                    value={eventType}
-                    onChange={(e) => setEventType(e.target.value as EventItem["eventType"])}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    <option value="EXHIBITION">EXHIBITION (Gallery Floor)</option>
-                    <option value="CONCERT">CONCERT (Classical Recital)</option>
-                    <option value="WORKSHOP">WORKSHOP (Tanjore Masterclass)</option>
-                    <option value="ONLINE_CLASSROOM">ONLINE CLASSROOM</option>
-                    <option value="OTHER">OTHER (Special Cultural Gathering)</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Timezone (IANA)</label>
-                  <select
-                    value={timezone}
-                    onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    {IANA_TIMEZONES.map((tz) => (
-                      <option key={tz.value} value={tz.value}>
-                        {tz.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Start Date &amp; Time</label>
-                  <Input
-                    type="datetime-local"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">End Date &amp; Time</label>
-                  <Input
-                    type="datetime-local"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Global Structured Address Block */}
-              <div className="p-3.5 rounded-lg border border-border/80 bg-muted/20 space-y-3">
-                <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
-                  <span className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-primary" /> International Venue &amp; Address
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">Country selection auto-configures currency</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">Venue / Gallery Hall</label>
-                    <Input
-                      placeholder="e.g. Lalita Kapilavai Heritage Studio"
-                      value={venueName}
-                      onChange={(e) => {
-                        setVenueName(e.target.value);
-                        setVenue(e.target.value);
-                      }}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">Country (Auto-Currency)</label>
-                    <Select value={country} onValueChange={handleCountryChange}>
-                      <SelectTrigger className="h-9 text-xs">
-                        <SelectValue placeholder="Select Country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SUPPORTED_COUNTRIES.map((c) => (
-                          <SelectItem key={c.name} value={c.name}>
-                            {c.name} ({c.defaultCurrency})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">Street Address / Landmark</label>
-                    <Input
-                      placeholder="e.g. 108 Temple Bells Lane, Indiranagar"
-                      value={streetAddress}
-                      onChange={(e) => setStreetAddress(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">City</label>
-                    <Input
-                      placeholder="e.g. Bengaluru"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">State / Province</label>
-                    <Input
-                      placeholder="e.g. Karnataka"
-                      value={stateProvince}
-                      onChange={(e) => setStateProvince(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">Postal / Zip Code</label>
-                    <Input
-                      placeholder="e.g. 560038"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Capacity & Fee */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Max Capacity</label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 150"
-                    value={maxCapacity}
-                    onChange={(e) => setMaxCapacity(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Fee</label>
-                  <Input
-                    type="number"
-                    placeholder="0 for Free entry"
-                    value={registrationFee}
-                    onChange={(e) => setRegistrationFee(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Currency</label>
-                  <Select value={currency} onValueChange={setCurrency}>
-                    <SelectTrigger className="h-9 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SUPPORTED_CURRENCIES.map((c) => (
-                        <SelectItem key={c.code} value={c.code}>
-                          {c.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center gap-2 pt-6">
-                  <input
-                    type="checkbox"
-                    id="isRegOpen"
-                    checked={isRegistrationOpen}
-                    onChange={(e) => setIsRegistrationOpen(e.target.checked)}
-                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
-                  />
-                  <label htmlFor="isRegOpen" className="text-xs font-medium text-foreground">
-                    RSVP Open
-                  </label>
-                </div>
-              </div>
-
-              {/* Exhibition Artwork Linker Button */}
-              <div className="p-3 rounded-lg border border-border bg-muted/20 flex items-center justify-between">
-                <div>
-                  <h4 className="font-serif font-bold text-xs text-foreground">
-                    Exhibition Catalog Linkage
-                  </h4>
-                  <p className="text-[11px] text-muted-foreground">
-                    {selectedArtworkIds.length} masterwork(s) attached to this event.
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setLinkerModalOpen(true)}
-                  className="text-xs gap-1"
-                >
-                  <Palette className="w-3.5 h-3.5" />
-                  Select Artworks
-                </Button>
-              </div>
-
-              {/* Description */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">Description &amp; Agenda</label>
-                  <AiAssistantModal
-                    initialContext={`${title ? `Event: ${title}\n` : ""}${venueName || venue ? `Venue: ${venueName || venue}\n` : ""}${description || ""}`}
-                    onApply={(aiText) => setDescription(aiText)}
-                    triggerLabel="✨ AI Agenda"
-                  />
-                </div>
-                <textarea
-                  rows={3}
-                  placeholder="Overview of the exhibition, featured ragas, or workshop curriculum..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-                disabled={saving}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" variant="gold" disabled={saving}>
-                {saving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Event"
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Exhibition Artwork Linker Modal */}
-      <Dialog open={linkerModalOpen} onOpenChange={setLinkerModalOpen}>
-        <DialogContent className="max-w-xl max-h-[80vh] flex flex-col">
+      {/* Exhibition Artwork Linker / Floor QR Modal */}
+      <Dialog open={exhibitionQrModalOpen} onOpenChange={setExhibitionQrModalOpen}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Attach Masterworks to Exhibition</DialogTitle>
-            <DialogDescription>
-              Select paintings that will be on physical display in this exhibition.
+            <DialogTitle className="flex items-center gap-2 font-serif">
+              <QrCode className="w-5 h-5 text-primary" />
+              Exhibition Floor QR Code
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Generate scannable QR cards for the entrance desk or individual masterwork pedestals.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto py-3 space-y-2 pr-1">
-            {artworksCatalog.map((art) => {
-              const isSelected = selectedArtworkIds.includes(art.id);
-              return (
-                <div
-                  key={art.id}
-                  onClick={() => toggleArtworkSelection(art.id)}
-                  className={`p-2.5 rounded-lg border flex items-center justify-between cursor-pointer transition-all ${
-                    isSelected
-                      ? "border-primary bg-primary/10"
-                      : "border-border hover:border-primary/50"
-                  }`}
+          <div className="space-y-4 py-2 text-center">
+            {selectedExhibitionEvent && (
+              <div className="space-y-1 text-left">
+                <label className="text-xs font-semibold text-foreground">Target QR Destination</label>
+                <select
+                  value={selectedArtworkForExhibition}
+                  onChange={(e) => handleArtworkQrChange(e.target.value)}
+                  className="w-full bg-card border border-border text-foreground text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-primary focus:outline-none"
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-5 h-5 rounded border flex items-center justify-center text-xs font-bold ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "border-muted-foreground"
-                      }`}
-                    >
-                      {isSelected && <Check className="w-3.5 h-3.5" />}
-                    </div>
-                    <div>
-                      <h4 className="font-serif font-bold text-xs text-foreground">
-                        {art.title}
-                      </h4>
-                      <p className="text-[10px] text-muted-foreground">
-                        {art.medium}
-                      </p>
-                    </div>
-                  </div>
+                  <option value="">Full Exhibition Guide ({selectedExhibitionEvent.title})</option>
+                  {artworksCatalog.map((art) => (
+                    <option key={art.slug} value={art.slug}>
+                      Artwork Pedestal: {art.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="flex flex-col items-center justify-center p-4 rounded-xl border border-border bg-card">
+              {exhibitionQrLoading ? (
+                <div className="py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
                 </div>
-              );
-            })}
+              ) : exhibitionQrDataUrl ? (
+                <div className="space-y-3">
+                  <div className="relative w-48 h-48 mx-auto bg-white p-2 rounded-lg shadow-sm">
+                    <Image
+                      src={exhibitionQrDataUrl}
+                      alt="Exhibition QR Code"
+                      width={192}
+                      height={192}
+                      className="mx-auto"
+                      unoptimized
+                    />
+                  </div>
+                  <p className="text-[11px] font-mono text-muted-foreground break-all max-w-xs mx-auto">
+                    {exhibitionQrTargetUrl}
+                  </p>
+                </div>
+              ) : null}
+            </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex items-center justify-between sm:justify-between">
+            {exhibitionQrDataUrl && (
+              <a
+                href={exhibitionQrDataUrl}
+                download={`qr-${selectedExhibitionEvent?.slug || "event"}.png`}
+                className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Download PNG
+              </a>
+            )}
             <Button
               type="button"
-              variant="gold"
+              variant="outline"
               size="sm"
-              onClick={() => setLinkerModalOpen(false)}
+              onClick={() => setExhibitionQrModalOpen(false)}
             >
-              Done ({selectedArtworkIds.length} selected)
+              Done
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -998,7 +599,7 @@ export default function EventsAdminPage() {
                     <Badge variant="gold" className="text-[10px]">
                       {a.ticketCount} {a.ticketCount === 1 ? "seat" : "seats"}
                     </Badge>
-                    <span className="block text-[10px] text-muted-foreground mt-0.5">
+                    <span className="text-[10px] text-muted-foreground block mt-0.5">
                       {new Date(a.registeredAt).toLocaleDateString()}
                     </span>
                   </div>
@@ -1006,110 +607,30 @@ export default function EventsAdminPage() {
               ))
             )}
           </div>
-        </DialogContent>
-      </Dialog>
 
-      {/* Exhibition Floor QR Code Modal */}
-      <Dialog open={exhibitionQrModalOpen} onOpenChange={setExhibitionQrModalOpen}>
-        <DialogContent className="max-w-md text-center">
-          <DialogHeader>
-            <DialogTitle>Exhibition & Gallery Placard QR</DialogTitle>
-            <DialogDescription>
-              Generate high-resolution printable QR codes for {selectedExhibitionEvent?.title}.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-3">
-            {/* Artwork Selector */}
-            <div className="text-left space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Target Display Asset</label>
-              <Select
-                value={selectedArtworkForExhibition || "event-general"}
-                onValueChange={(val) => handleSelectArtworkQR(val === "event-general" ? "" : val)}
-              >
-                <SelectTrigger className="text-xs">
-                  <SelectValue placeholder="Select target artwork..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="event-general">
-                    🏛️ General Exhibition RSVP & Info Page
-                  </SelectItem>
-                  {artworksCatalog.map((art) => (
-                    <SelectItem key={art.id} value={art.slug}>
-                      🖼️ {art.title} (Floor Placard)
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* QR Preview Box */}
-            <div className="py-2 flex flex-col items-center justify-center space-y-2">
-              <div className="p-3 bg-white rounded-xl shadow-lg border border-border flex items-center justify-center min-w-[200px] min-h-[200px]">
-                {exhibitionQrLoading ? (
-                  <div className="flex flex-col items-center justify-center py-6">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <span className="text-xs text-muted-foreground mt-2">Generating QR Code...</span>
-                  </div>
-                ) : exhibitionQrDataUrl ? (
-                  <img
-                    src={exhibitionQrDataUrl}
-                    alt="Exhibition QR Code"
-                    className="w-48 h-48 object-contain"
-                  />
-                ) : (
-                  <span className="text-xs text-muted-foreground">Unable to generate QR code</span>
-                )}
-              </div>
-              <span className="text-[11px] font-mono text-muted-foreground break-all max-w-xs">
-                {exhibitionQrTargetUrl}
-              </span>
-            </div>
-          </div>
-
-          <DialogFooter className="sm:justify-center gap-2">
-            {exhibitionQrDataUrl && (
-              <a
-                href={exhibitionQrDataUrl}
-                download={`exhibition-qr-${selectedArtworkForExhibition || selectedExhibitionEvent?.slug || "event"}.png`}
-              >
-                <Button variant="gold" size="sm" className="gap-1.5 cursor-pointer">
-                  <Download className="w-3.5 h-3.5" />
-                  Download Printable High-Res QR
-                </Button>
-              </a>
-            )}
+          <DialogFooter>
             <Button
+              type="button"
               variant="outline"
               size="sm"
-              onClick={() => {
-                navigator.clipboard.writeText(exhibitionQrTargetUrl);
-                toast.success("Target URL copied to clipboard!");
-              }}
-              className="gap-1.5 cursor-pointer"
+              onClick={() => setAttendeeModalOpen(false)}
             >
-              Copy Scan URL
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirm Dialog */}
       <ConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title="Delete Event Record"
-        description={
-          targetDeleteEvent
-            ? `Are you sure you want to delete the event "${targetDeleteEvent.title}"? This will also remove its associated attendee registrations. This action cannot be undone.`
-            : "Are you sure you want to delete this event?"
-        }
-        confirmText="Delete Event"
+        title="Delete Event"
+        description={`Are you sure you want to permanently delete event "${targetDeleteEvent?.title}"? All attendee registrations will also be removed.`}
+        confirmText={deleting ? "Deleting..." : "Delete Event"}
         isDestructive={true}
-        isLoading={deleting}
         onConfirm={handleConfirmDelete}
       />
     </div>
   );
 }
-
