@@ -54,7 +54,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^9.39.5",
     "eslint-config-next": "16.3.3",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
@@ -62,6 +62,7 @@
     "typescript": "^5"
   },
   "overrides": {
-    "deepmerge-ts": "^8.0.0"
+    "deepmerge-ts": "^8.0.0",
+    "eslint": "^9.39.5"
   }
 }

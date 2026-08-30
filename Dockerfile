@@ -1,18 +1,20 @@
+# syntax=docker/dockerfile:1.4
 # Multi-stage Dockerfile for Next.js 16 (Debian 12 Bookworm Slim)
 # Full glibc binary compatibility for Sharp (libvips), Prisma query engines, and native add-ons
 
 FROM node:22-bookworm-slim AS base
 WORKDIR /app
-RUN npm install -g npm@latest
 
-# Stage 1: Install dependencies
-FROM base AS deps
+# Consolidate all required system packages in base layer once
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openssl ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends openssl ca-certificates netcat-openbsd && \
+    rm -rf /var/lib/apt/lists/* && \
+    npm install -g npm@latest
 
+# Stage 1: Install dependencies with npm cache mount
+FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci --loglevel=error
 
 # Development stage for local multi-container live-reloading (inherits deps)
 FROM deps AS dev
@@ -28,12 +30,9 @@ EXPOSE 3060
 
 CMD ["npm", "run", "dev"]
 
-# Stage 2: Build the application
+# Stage 2: Build the application with BuildKit cache mounts
 FROM base AS builder
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends openssl ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
-
+WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -48,7 +47,8 @@ ENV NEXT_PUBLIC_APP_URL="http://localhost:3060"
 # Generate Prisma client with glibc engine
 RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; fi
 
-RUN npm run build
+# Fast Next.js production compilation with cache mount
+RUN --mount=type=cache,target=/app/.next/cache npm run build
 
 # Stage 3: Minimal production runner
 FROM base AS runner
@@ -58,11 +58,6 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3060
 ENV HOSTNAME="0.0.0.0"
-
-# Install runtime SSL and network utility dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends openssl ca-certificates netcat-openbsd && \
-    rm -rf /var/lib/apt/lists/*
 
 # Security: Run as non-root user via Debian shadow-utils
 RUN groupadd --system --gid 1001 nodejs && \
@@ -92,9 +87,6 @@ COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 # Copy automated container lifecycle entrypoint hook
 COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh
-
-# Enforce non-root ownership across application directory
-RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 

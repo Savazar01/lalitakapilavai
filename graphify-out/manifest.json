@@ -5,18 +5,18 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1788059162.3258007,
+    "mtime": 1788063084.1142745,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next.config.ts": {
-    "mtime": 1788016091.3129325,
-    "ast_hash": "a95e2255d90fa990eac93cd199a00657",
+    "mtime": 1788062505.40822,
+    "ast_hash": "e9e260050debd3ddebb19b6e52e66db0",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\package.json": {
-    "mtime": 1788056808.9203005,
-    "ast_hash": "c2dc178400f9856df52a51911aaea857",
+    "mtime": 1788062654.5154648,
+    "ast_hash": "8b57e836cd7fda7cf5caa04c8c711f95",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\postcss.config.mjs": {
@@ -280,8 +280,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\docker-compose.yml": {
-    "mtime": 1788025969.8424494,
-    "ast_hash": "6fb10be1eb2b0423277be8f5303e96e9",
+    "mtime": 1788062520.8811722,
+    "ast_hash": "3773c950949ea087d16c9f8c307627d8",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\README.md": {
@@ -585,8 +585,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\docker-entrypoint.sh": {
-    "mtime": 1788054695.053312,
-    "ast_hash": "4846534661295764138a014f3626cebc",
+    "mtime": 1788062527.1271672,
+    "ast_hash": "c079d69e463b599be709789d36f2f72b",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\proxy.ts": {
@@ -647,6 +647,11 @@
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\dynamic-page-sections.tsx": {
     "mtime": 1788058860.036594,
     "ast_hash": "ff75e2183a286bf39856f920bd339db7",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\media\\[...path]\\route.ts": {
+    "mtime": 1788062706.641901,
+    "ast_hash": "0f7c98bc5e8dc810632fecf01a00d6c7",
     "semantic_hash": ""
   }
 }

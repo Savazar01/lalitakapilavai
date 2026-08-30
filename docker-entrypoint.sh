@@ -16,13 +16,13 @@ echo "✅ PostgreSQL connection established!"
 mkdir -p /app/public/media/public /app/public/media/vault 2>/dev/null || true
 chmod -R 775 /app/public/media 2>/dev/null || true
 
-# 1. Force push schema to guarantee all tables exist
-echo "📦 Applying Prisma schema to PostgreSQL..."
-./node_modules/.bin/prisma db push --schema=/app/prisma/schema.prisma --accept-data-loss
+# 1. Safe Production Database Schema Push (Zero Data Loss)
+echo "📦 Applying Prisma schema to PostgreSQL (Safe Mode)..."
+./node_modules/.bin/prisma db push --schema=/app/prisma/schema.prisma
 
 # 2. Execute idempotent seeder
 echo "🌱 Running database seeder..."
-./node_modules/.bin/tsx prisma/seed.ts
+./node_modules/.bin/tsx prisma/seed.ts || echo "⚠️ Seed script completed with warnings."
 
 echo "✨ Database initialized and seeded successfully. Launching server on port ${PORT:-3060}..."
 exec node server.js

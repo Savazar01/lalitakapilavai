@@ -20,11 +20,28 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.s3.amazonaws.com",
       },
+      // Deployment domain distributions
       {
         protocol: "https",
-        hostname: "**.s3.*.amazonaws.com",
+        hostname: "**.savazar.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.lalitakapilavai.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/media/:path*",
+        destination: "/api/media/:path*",
+      },
+    ];
   },
   async redirects() {
     return [
