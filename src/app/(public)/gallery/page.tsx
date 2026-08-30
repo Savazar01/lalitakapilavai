@@ -5,6 +5,8 @@ import { Footer } from "@/components/public/footer";
 import { GalleryGrid } from "@/components/public/gallery-grid";
 import { Sparkles } from "lucide-react";
 
+import { DynamicPageSections } from "@/components/public/dynamic-page-sections";
+
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -22,7 +24,21 @@ export default async function GalleryPage() {
     prisma.artCategory.findMany({
       orderBy: { displayOrder: "asc" },
     }),
-    prisma.page.findUnique({ where: { slug: "gallery" } }).catch(() => null),
+    prisma.page
+      .findUnique({
+        where: { slug: "gallery" },
+        include: {
+          sections: {
+            orderBy: { orderIndex: "asc" },
+            include: {
+              subSections: {
+                orderBy: { orderIndex: "asc" },
+              },
+            },
+          },
+        },
+      })
+      .catch(() => null),
   ]);
 
   const headerTitle = pageData?.title || "Traditional Art Gallery";
@@ -36,13 +52,17 @@ export default async function GalleryPage() {
     price: a.price ? a.price.toString() : null,
   }));
 
+  const hasCustomSections = pageData?.sections && pageData.sections.length > 0;
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 w-full">
-        {/* Header Banner */}
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+      {/* Dynamic Page Builder Sections or Fallback Header */}
+      {hasCustomSections ? (
+        <DynamicPageSections sections={pageData.sections} />
+      ) : (
+        <div className="text-center max-w-2xl mx-auto pt-12 sm:pt-16 pb-6 px-4 space-y-3">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
             <Sparkles className="w-3.5 h-3.5" />
             Curated Sacred Vault
@@ -54,6 +74,9 @@ export default async function GalleryPage() {
             {headerSubtitle}
           </p>
         </div>
+      )}
+
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
 
         {/* Dynamic Filterable Gallery Grid */}
         <GalleryGrid artworks={serializedArtworks} categories={categories} />

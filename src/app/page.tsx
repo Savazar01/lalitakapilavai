@@ -3,8 +3,7 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
-import { AnimatedSection } from "@/components/public/animated-section";
-import { TiptapRenderer } from "@/components/public/tiptap-renderer";
+import { DynamicPageSections } from "@/components/public/dynamic-page-sections";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Palette, Music, BookOpen, ArrowRight } from "lucide-react";
 
@@ -71,95 +70,7 @@ export default async function HomePage() {
         <Navbar />
 
         <main className="flex-1">
-          {homePage.sections.map((section) => {
-            return (
-              <AnimatedSection
-                key={section.id}
-                className={`w-full relative ${section.customCssClass || ""}`}
-                style={{
-                  backgroundColor: section.backgroundColor || undefined,
-                  paddingTop: "48px",
-                  paddingBottom: "48px",
-                }}
-              >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="grid grid-cols-12 gap-6 items-start">
-                    {section.subSections.map((col, colIdx) => {
-                      const colSpanClass =
-                        col.gridSpan === 12
-                          ? "col-span-12"
-                          : col.gridSpan === 8
-                          ? "col-span-12 md:col-span-8"
-                          : col.gridSpan === 7
-                          ? "col-span-12 md:col-span-7"
-                          : col.gridSpan === 6
-                          ? "col-span-12 md:col-span-6"
-                          : col.gridSpan === 5
-                          ? "col-span-12 md:col-span-5"
-                          : col.gridSpan === 4
-                          ? "col-span-12 md:col-span-4"
-                          : col.gridSpan === 3
-                          ? "col-span-12 md:col-span-3"
-                          : "col-span-12";
-
-                      const colObj = col.content as Record<string, unknown>;
-                      const colStyle = (colObj?._style || {}) as {
-                        borderColor?: string;
-                        borderWidth?: number;
-                        borderStyle?: string;
-                        borderRadius?: string;
-                        boxShadow?: string;
-                        ornamentalFrame?: boolean;
-                      };
-
-                      const borderStyleObj: React.CSSProperties = {
-                        borderColor:
-                          colStyle.borderColor && colStyle.borderColor !== "transparent"
-                            ? colStyle.borderColor
-                            : undefined,
-                        borderWidth: colStyle.borderWidth ? `${colStyle.borderWidth}px` : undefined,
-                        borderStyle: (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
-                      };
-
-                      let radiusClass = "";
-                      if (colStyle.borderRadius === "rounded-md") radiusClass = "rounded-md";
-                      if (colStyle.borderRadius === "rounded-2xl") radiusClass = "rounded-2xl";
-                      if (colStyle.borderRadius === "rounded-t-full")
-                        radiusClass = "rounded-t-full overflow-hidden";
-
-                      let glowClass = "";
-                      if (colStyle.boxShadow === "gold-glow")
-                        glowClass = "shadow-[0_0_25px_rgba(212,175,55,0.25)]";
-                      if (colStyle.boxShadow === "soft") glowClass = "shadow-lg";
-
-                      const hasCustomStyling = !!(
-                        colStyle.borderColor ||
-                        colStyle.borderWidth ||
-                        colStyle.borderRadius ||
-                        colStyle.boxShadow ||
-                        colStyle.ornamentalFrame
-                      );
-
-                      return (
-                        <div
-                          key={col.id || `col-${colIdx}`}
-                          className={`${colSpanClass} w-full relative ${radiusClass} ${glowClass} ${
-                            hasCustomStyling ? "p-6" : ""
-                          }`}
-                          style={borderStyleObj}
-                        >
-                          {colStyle.ornamentalFrame && (
-                            <div className="absolute inset-0 border-2 border-primary/20 pointer-events-none rounded-lg -m-1" />
-                          )}
-                          <TiptapRenderer content={col.content as Record<string, unknown>} />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </AnimatedSection>
-            );
-          })}
+          <DynamicPageSections sections={homePage.sections} />
         </main>
 
         <Footer />

@@ -520,7 +520,7 @@ async function main() {
   }
   console.log("✅ Provisioned default administrative dashboard widgets");
 
-  // 13. Provision Core System Pages (Editable Headers & Meta)
+  // 13. Provision Core System Pages (Editable Headers & Meta & Page Sections)
   const systemPages = [
     {
       title: "Sacred Art & Cultural Chronicle",
@@ -529,8 +529,47 @@ async function main() {
       metaDescription:
         "Explore authoritative writings on 22k gold Tanjore painting techniques, Mysore traditional iconography, and Carnatic musical synesthesia by Lalita Kapilavai.",
       isPublished: true,
-      displayInNav: true,
-      navOrder: 3,
+      sectionTitle: "Curatorial Insights Hero",
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "✨ CURATORIAL CHRONICLE & INSIGHTS",
+                marks: [
+                  { type: "bold" },
+                  { type: "textStyle", attrs: { color: "#D4AF37" } },
+                ],
+              },
+            ],
+          },
+          {
+            type: "heading",
+            attrs: { level: 1, textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "Sacred Art & Cultural Chronicle",
+                marks: [{ type: "bold" }],
+              },
+            ],
+          },
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "Scholarly perspectives on classical South Indian visual arts, sacred iconography, 22-carat gold relief traditions, and Carnatic musical synesthesia.",
+              },
+            ],
+          },
+        ],
+      },
     },
     {
       title: "Traditional Art Gallery",
@@ -539,8 +578,47 @@ async function main() {
       metaDescription:
         "Five centuries of classical sacred painting traditions preserved through authentic 22-carat gold foil relief work, purified gesso, and semi-precious Jaipur gemstones.",
       isPublished: true,
-      displayInNav: true,
-      navOrder: 1,
+      sectionTitle: "Gallery Vault Hero",
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "✨ SACRED MASTERWORK VAULT",
+                marks: [
+                  { type: "bold" },
+                  { type: "textStyle", attrs: { color: "#D4AF37" } },
+                ],
+              },
+            ],
+          },
+          {
+            type: "heading",
+            attrs: { level: 1, textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "Traditional Art Gallery",
+                marks: [{ type: "bold" }],
+              },
+            ],
+          },
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "Five centuries of classical sacred painting traditions preserved through authentic 22-carat gold foil relief work, purified gesso, and semi-precious Jaipur gemstones.",
+              },
+            ],
+          },
+        ],
+      },
     },
     {
       title: "Exhibitions & Events",
@@ -549,25 +627,105 @@ async function main() {
       metaDescription:
         "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.",
       isPublished: true,
-      displayInNav: true,
-      navOrder: 4,
+      sectionTitle: "Cultural Calendar Hero",
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "✨ CULTURAL CALENDAR & RECITALS",
+                marks: [
+                  { type: "bold" },
+                  { type: "textStyle", attrs: { color: "#D4AF37" } },
+                ],
+              },
+            ],
+          },
+          {
+            type: "heading",
+            attrs: { level: 1, textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "Exhibitions & Events",
+                marks: [{ type: "bold" }],
+              },
+            ],
+          },
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.",
+              },
+            ],
+          },
+        ],
+      },
     },
     {
       title: "Traditional Art Disciplines",
       slug: "categories",
       metaTitle: "Sacred Art Disciplines — Lalita Kapilavai",
       metaDescription:
-        "Explore classical South Indian artistic disciplines spanning Thanjavur 22k gold foil embossments and Mysore traditional styles.",
+        "Explore classical South Indian artistic disciplines spanning Thanjavur 22k gold foil embossments, Mysore traditional paintings, temple murals, and Carnatic music traditions.",
       isPublished: true,
-      displayInNav: false,
-      navOrder: 5,
+      sectionTitle: "Disciplines Lineage Hero",
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "✨ HERITAGE LINEAGE & SCHOOLS",
+                marks: [
+                  { type: "bold" },
+                  { type: "textStyle", attrs: { color: "#D4AF37" } },
+                ],
+              },
+            ],
+          },
+          {
+            type: "heading",
+            attrs: { level: 1, textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "Traditional Art Disciplines",
+                marks: [{ type: "bold" }],
+              },
+            ],
+          },
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [
+              {
+                type: "text",
+                text: "Explore classical South Indian artistic disciplines spanning Thanjavur 22k gold foil embossments, Mysore traditional paintings, temple murals, and Carnatic music traditions.",
+              },
+            ],
+          },
+        ],
+      },
     },
   ];
 
   for (const sp of systemPages) {
     const existingPage = await prisma.page.findUnique({
       where: { slug: sp.slug },
+      include: { sections: true },
     });
+
     if (!existingPage) {
       await prisma.page.create({
         data: {
@@ -575,9 +733,49 @@ async function main() {
           slug: sp.slug,
           metaDescription: sp.metaDescription,
           isPublished: sp.isPublished,
+          sections: {
+            create: [
+              {
+                title: sp.sectionTitle || "Hero Banner",
+                orderIndex: 1,
+                gridSpan: 12,
+                subSections: {
+                  create: [
+                    {
+                      title: "Header Content",
+                      orderIndex: 1,
+                      gridSpan: 12,
+                      content: sp.content,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
         },
       });
-      console.log(`✅ Provisioned editable system page: /${sp.slug}`);
+      console.log(`✅ Provisioned editable system page with full sections: /${sp.slug}`);
+    } else if (existingPage.sections.length === 0) {
+      // Backfill default section if page has 0 sections
+      await prisma.pageSection.create({
+        data: {
+          pageId: existingPage.id,
+          title: sp.sectionTitle || "Hero Banner",
+          orderIndex: 1,
+          gridSpan: 12,
+          subSections: {
+            create: [
+              {
+                title: "Header Content",
+                orderIndex: 1,
+                gridSpan: 12,
+                content: sp.content,
+              },
+            ],
+          },
+        },
+      });
+      console.log(`✅ Backfilled default hero section for: /${sp.slug}`);
     }
   }
 

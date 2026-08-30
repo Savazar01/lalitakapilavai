@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Calendar, Clock, MapPin, Palette, ArrowRight, Sparkles } from "lucide-react";
 
+import { DynamicPageSections } from "@/components/public/dynamic-page-sections";
+
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -23,7 +25,21 @@ export default async function EventsPage() {
         _count: { select: { artworks: true, registrations: true } },
       },
     }),
-    prisma.page.findUnique({ where: { slug: "events" } }).catch(() => null),
+    prisma.page
+      .findUnique({
+        where: { slug: "events" },
+        include: {
+          sections: {
+            orderBy: { orderIndex: "asc" },
+            include: {
+              subSections: {
+                orderBy: { orderIndex: "asc" },
+              },
+            },
+          },
+        },
+      })
+      .catch(() => null),
   ]);
 
   const headerTitle = pageData?.title || "Exhibitions & Events";
@@ -31,12 +47,17 @@ export default async function EventsPage() {
     pageData?.metaDescription ||
     "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.";
 
+  const hasCustomSections = pageData?.sections && pageData.sections.length > 0;
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 w-full">
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+      {/* Dynamic Page Builder Sections or Fallback Header */}
+      {hasCustomSections ? (
+        <DynamicPageSections sections={pageData.sections} />
+      ) : (
+        <div className="text-center max-w-2xl mx-auto pt-12 sm:pt-16 pb-6 px-4 space-y-3">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
             <Sparkles className="w-3.5 h-3.5" />
             Cultural Calendar &amp; Recitals
@@ -48,6 +69,9 @@ export default async function EventsPage() {
             {headerSubtitle}
           </p>
         </div>
+      )}
+
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
 
         {events.length === 0 ? (
           <Card className="p-12 text-center border-dashed max-w-md mx-auto">
