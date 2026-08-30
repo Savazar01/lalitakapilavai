@@ -35,13 +35,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300"
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          enableColorScheme={false}
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           {children}
           <Toaster position="top-right" richColors />
         </ThemeProvider>

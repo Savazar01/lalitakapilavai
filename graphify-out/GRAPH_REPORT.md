@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-08-30)
 
 ## Corpus Check
-- 117 files · ~69,031 words
+- 117 files · ~69,085 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 625 nodes · 1216 edges · 50 communities (37 shown, 13 thin omitted)
+- 625 nodes · 1216 edges · 51 communities (38 shown, 13 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `eb437bfa`
+- Built from commit: `c0b50ed1`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -53,6 +53,7 @@
 - [[_COMMUNITY_Community 44|Community 44]]
 - [[_COMMUNITY_Community 47|Community 47]]
 - [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 50|Community 50]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Button` - 30 edges
@@ -78,7 +79,7 @@
 - `ArtworkDetailPage()` --calls--> `generateQRCodeDataUrl()`  [EXTRACTED]
   src/app/(public)/artwork/[slug]/page.tsx → src/lib/qr.ts
 
-## Communities (50 total, 13 thin omitted)
+## Communities (51 total, 13 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -169,8 +170,8 @@ Cohesion: 0.39
 Nodes (6): POST(), AiConfig, CULTURAL_SYSTEM_PROMPT, generateAiContent(), GenerateOptions, getAiConfig()
 
 ### Community 37 - "Community 37"
-Cohesion: 0.11
-Nodes (11): metadata, metadata, metadata, BlogArchiveClient(), BlogPostData, Footer(), FooterConfig, LegalLinkItem (+3 more)
+Cohesion: 0.15
+Nodes (8): metadata, metadata, Footer(), FooterConfig, LegalLinkItem, SocialLinkItem, Navbar(), PageProps
 
 ### Community 39 - "Community 39"
 Cohesion: 0.22
@@ -179,6 +180,10 @@ Nodes (5): PageProps, metadata, Artwork, Category, GalleryGrid()
 ### Community 43 - "Community 43"
 Cohesion: 0.11
 Nodes (18): columnPresets, isLightColor(), PageData, SectionData, SortableSection(), SubSectionData, artisticBorderPresets, availableIcons (+10 more)
+
+### Community 50 - "Community 50"
+Cohesion: 0.33
+Nodes (3): metadata, BlogArchiveClient(), BlogPostData
 
 ## Knowledge Gaps
 - **255 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+250 more)

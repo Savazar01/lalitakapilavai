@@ -19,10 +19,14 @@ export default async function AdminDashboardPage() {
     prisma.event.count().catch(() => 0),
     prisma.lead.count().catch(() => 0),
     prisma.raga.count().catch(() => 0),
-    prisma.dashboardWidget.findMany({
-      where: { isArchived: false },
-      orderBy: { order: "asc" },
-    }).catch(() => []),
+    prisma.dashboardWidget?.findMany
+      ? prisma.dashboardWidget
+          .findMany({
+            where: { isArchived: false },
+            orderBy: { order: "asc" },
+          })
+          .catch(() => [])
+      : Promise.resolve([]),
   ]);
 
   const liveCounts: Record<string, { value: number | string; sub?: string }> = {

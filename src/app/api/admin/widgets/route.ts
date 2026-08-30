@@ -17,6 +17,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const includeArchived = searchParams.get("includeArchived") === "true";
 
+    if (!prisma.dashboardWidget?.findMany) {
+      return NextResponse.json([]);
+    }
+
     const widgets = await prisma.dashboardWidget.findMany({
       where: includeArchived ? {} : { isArchived: false },
       orderBy: { order: "asc" },

@@ -21,6 +21,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await request.json();
 
+    if (!prisma.dashboardWidget?.update) {
+      return NextResponse.json({ error: "Dashboard widgets service temporarily unavailable" }, { status: 503 });
+    }
+
     const widget = await prisma.dashboardWidget.update({
       where: { id },
       data: {
@@ -56,6 +60,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
     const hardDelete = searchParams.get("hard") === "true";
+
+    if (!prisma.dashboardWidget?.delete || !prisma.dashboardWidget?.update) {
+      return NextResponse.json({ error: "Dashboard widgets service temporarily unavailable" }, { status: 503 });
+    }
 
     if (hardDelete) {
       await prisma.dashboardWidget.delete({ where: { id } });
