@@ -17,10 +17,18 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogsPage() {
-  const rawPosts = await prisma.blogPost.findMany({
-    where: { isPublished: true },
-    orderBy: { publishedAt: "desc" },
-  });
+  const [rawPosts, pageData] = await Promise.all([
+    prisma.blogPost.findMany({
+      where: { isPublished: true },
+      orderBy: { publishedAt: "desc" },
+    }),
+    prisma.page.findUnique({ where: { slug: "blogs" } }).catch(() => null),
+  ]);
+
+  const headerTitle = pageData?.title || "Sacred Art & Cultural Chronicle";
+  const headerSubtitle =
+    pageData?.metaDescription ||
+    "Scholarly perspectives on classical South Indian visual arts, sacred iconography, 22-carat gold relief traditions, and Carnatic musical synesthesia.";
 
   const posts = rawPosts.map((p) => ({
     id: p.id,
@@ -46,10 +54,10 @@ export default async function BlogsPage() {
             Curatorial Chronicle &amp; Insights
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground">
-            Sacred Art &amp; Cultural Chronicle
+            {headerTitle}
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Scholarly perspectives on classical South Indian visual arts, sacred iconography, 22-carat gold relief traditions, and Carnatic musical synesthesia.
+            {headerSubtitle}
           </p>
         </div>
 

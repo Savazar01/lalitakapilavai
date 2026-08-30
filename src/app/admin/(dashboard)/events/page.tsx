@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 
 import {
   Select,
@@ -858,7 +859,14 @@ export default function EventsAdminPage() {
 
               {/* Description */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Description &amp; Agenda</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground">Description &amp; Agenda</label>
+                  <AiAssistantModal
+                    initialContext={`${title ? `Event: ${title}\n` : ""}${venueName || venue ? `Venue: ${venueName || venue}\n` : ""}${description || ""}`}
+                    onApply={(aiText) => setDescription(aiText)}
+                    triggerLabel="✨ AI Agenda"
+                  />
+                </div>
                 <textarea
                   rows={3}
                   placeholder="Overview of the exhibition, featured ragas, or workshop curriculum..."

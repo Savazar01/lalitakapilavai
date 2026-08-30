@@ -74,6 +74,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 # Copy public static assets
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
+# Setup public media storage directory with write permissions
+RUN mkdir -p /app/public/media/public /app/public/media/vault && \
+    chown -R nextjs:nodejs /app/public/media && \
+    chmod -R 775 /app/public/media
+
 # Setup prerender cache directory permissions
 RUN mkdir -p .next && chown -R nextjs:nodejs .next
 

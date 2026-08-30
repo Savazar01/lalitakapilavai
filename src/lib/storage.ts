@@ -131,11 +131,16 @@ export async function uploadBuffer(
   const config = await getStorageConfig();
   const client = await getStorageClient();
 
+  // Sanitize key: strip redundant slashes and directories ('media/', 'public/', 'vault/')
+  const sanitizedKey = key
+    .replace(/^[/\\]+/, "")
+    .replace(/^(media[/\\]|public[/\\]|vault[/\\])+/g, "");
+
   if (config.isLocalStorage || !client) {
     // Local filesystem storage fallback
     const subFolder = isProtected ? "vault" : "public";
     const baseDir = path.join(process.cwd(), "public", "media", subFolder);
-    const filePath = path.join(baseDir, key);
+    const filePath = path.join(baseDir, sanitizedKey);
 
     // Ensure target folder exists
     const dir = path.dirname(filePath);
@@ -146,14 +151,14 @@ export async function uploadBuffer(
     fs.writeFileSync(filePath, buffer);
 
     const publicUrl = isProtected
-      ? `/api/admin/media/vault?key=${encodeURIComponent(key)}`
-      : `/media/${subFolder}/${key}`;
+      ? `/api/admin/media/vault?key=${encodeURIComponent(sanitizedKey)}`
+      : `/media/${subFolder}/${sanitizedKey}`;
 
-    return { key, publicUrl };
+    return { key: sanitizedKey, publicUrl };
   }
 
   // Cloud R2 / S3 Upload
-  const fullKey = isProtected ? `vault/${key}` : `public/${key}`;
+  const fullKey = isProtected ? `vault/${sanitizedKey}` : `public/${sanitizedKey}`;
 
   await client.send(
     new PutObjectCommand({

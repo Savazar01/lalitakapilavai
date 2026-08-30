@@ -271,64 +271,76 @@ export default function PagesAdminPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {pages.map((p) => (
-            <Card key={p.id} className="hover:border-primary/50 transition-all flex flex-col justify-between">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="text-base font-serif font-bold text-foreground">
-                    {p.title}
-                  </CardTitle>
-                  <Badge variant={p.isPublished ? "gold" : "outline"} className="text-[10px] uppercase">
-                    {p.isPublished ? "Published" : "Draft"}
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs font-mono text-primary">
-                  /{p.slug}
-                </CardDescription>
-              </CardHeader>
+          {pages.map((p) => {
+            const isCorePage = ["home", "blogs", "gallery", "events", "categories"].includes(p.slug);
+            return (
+              <Card key={p.id} className="hover:border-primary/50 transition-all flex flex-col justify-between">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-base font-serif font-bold text-foreground">
+                      {p.title}
+                    </CardTitle>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {isCorePage && (
+                        <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-600 dark:text-amber-400">
+                          Core
+                        </Badge>
+                      )}
+                      <Badge variant={p.isPublished ? "gold" : "outline"} className="text-[10px] uppercase">
+                        {p.isPublished ? "Published" : "Draft"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardDescription className="text-xs font-mono text-primary">
+                    /{p.slug}
+                  </CardDescription>
+                </CardHeader>
 
-              <CardContent className="pb-4">
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {p.metaDescription || "No meta description provided."}
-                </p>
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50 text-[11px] text-muted-foreground">
-                  <span>{p._count?.sections || 0} Sections</span>
-                  <span>•</span>
-                  <span>Updated {new Date(p.updatedAt).toLocaleDateString()}</span>
-                </div>
-              </CardContent>
+                <CardContent className="pb-4">
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {p.metaDescription || "No meta description provided."}
+                  </p>
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50 text-[11px] text-muted-foreground">
+                    <span>{p._count?.sections || 0} Sections</span>
+                    <span>•</span>
+                    <span>Updated {new Date(p.updatedAt).toLocaleDateString()}</span>
+                  </div>
+                </CardContent>
 
-              <div className="p-3 bg-secondary/30 border-t border-border/60 flex items-center justify-between gap-2">
-                <Link
-                  href={`/${p.slug}`}
-                  target="_blank"
-                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  View Live
-                </Link>
-
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteClick(p.id, p.title)}
-                    className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 cursor-pointer"
-                    title="Delete Page"
+                <div className="p-3 bg-secondary/30 border-t border-border/60 flex items-center justify-between gap-2">
+                  <Link
+                    href={`/${p.slug === "home" ? "" : p.slug}`}
+                    target="_blank"
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-
-                  <Link href={`/admin/pages/${p.id}/builder`}>
-                    <Button variant="default" size="sm" className="h-8 text-xs gap-1.5 font-semibold">
-                      <Pencil className="w-3.5 h-3.5" />
-                      Visual Builder
-                    </Button>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    View Live
                   </Link>
+
+                  <div className="flex items-center gap-1">
+                    {!isCorePage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(p.id, p.title)}
+                        className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 cursor-pointer"
+                        title="Delete Page"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+
+                    <Link href={`/admin/pages/${p.id}/builder`}>
+                      <Button variant="default" size="sm" className="h-8 text-xs gap-1.5 font-semibold">
+                        <Pencil className="w-3.5 h-3.5" />
+                        Visual Builder
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
 

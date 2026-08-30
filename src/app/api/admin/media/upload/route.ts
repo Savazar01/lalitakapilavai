@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         .webp({ quality: 88 })
         .toBuffer();
 
-      const generalKey = `media/${assetId}.webp`;
+      const generalKey = `${assetId}.webp`;
       const uploadResult = await uploadBuffer(
         cleanWebpBuffer,
         generalKey,

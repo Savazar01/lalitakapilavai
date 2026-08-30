@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const [artworks, categories] = await Promise.all([
+  const [artworks, categories, pageData] = await Promise.all([
     prisma.artwork.findMany({
       orderBy: { createdAt: "desc" },
       include: { category: true },
@@ -22,7 +22,13 @@ export default async function GalleryPage() {
     prisma.artCategory.findMany({
       orderBy: { displayOrder: "asc" },
     }),
+    prisma.page.findUnique({ where: { slug: "gallery" } }).catch(() => null),
   ]);
+
+  const headerTitle = pageData?.title || "Traditional Art Gallery";
+  const headerSubtitle =
+    pageData?.metaDescription ||
+    "Five centuries of classical sacred painting traditions preserved through authentic 22-carat gold foil relief work, purified gesso, and semi-precious Jaipur gemstones.";
 
   // Serialize decimals for client components
   const serializedArtworks = artworks.map((a) => ({
@@ -42,10 +48,10 @@ export default async function GalleryPage() {
             Curated Sacred Vault
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground">
-            Traditional Art Gallery
+            {headerTitle}
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Five centuries of classical sacred painting traditions preserved through authentic 22-carat gold foil relief work, purified gesso, and semi-precious Jaipur gemstones.
+            {headerSubtitle}
           </p>
         </div>
 

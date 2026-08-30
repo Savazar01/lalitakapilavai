@@ -40,6 +40,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 
 export const CustomImageNode = Node.create({
   name: "image",
@@ -648,6 +649,17 @@ export function TiptapEditor({
           >
             <Minus className="h-3.5 w-3.5 text-primary" />
           </Button>
+
+          <div className="h-4 w-px bg-border mx-1" />
+
+          {/* Inline AI Assistant */}
+          <AiAssistantModal
+            initialContext={editor.getText()}
+            onApply={(aiText) => {
+              editor.chain().focus().insertContent(aiText).run();
+            }}
+            triggerLabel="AI Polish"
+          />
         </div>
       )}
 

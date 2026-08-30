@@ -1,22 +1,7 @@
-import Link from "next/link";
 import prisma from "@/lib/prisma";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Palette,
-  Calendar,
-  Users,
-  Database,
-  ArrowUpRight,
-  Sparkles,
-  Music,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { DashboardLayoutManager, DashboardWidgetData } from "@/components/admin/dashboard-layout-manager";
 
 export const dynamic = "force-dynamic";
 
@@ -27,48 +12,117 @@ export default async function AdminDashboardPage() {
     eventCount,
     leadCount,
     ragaCount,
+    rawWidgets,
   ] = await Promise.all([
     prisma.artwork.count().catch(() => 0),
     prisma.artCategory.count().catch(() => 0),
     prisma.event.count().catch(() => 0),
     prisma.lead.count().catch(() => 0),
     prisma.raga.count().catch(() => 0),
+    prisma.dashboardWidget.findMany({
+      where: { isArchived: false },
+      orderBy: { order: "asc" },
+    }).catch(() => []),
   ]);
 
-  const statCards = [
-    {
-      title: "Artworks Catalog",
-      value: artworkCount,
-      description: `${categoryCount} Traditional art categories`,
-      icon: Palette,
-      href: "/admin/artworks",
-      badge: "Tanjore & Mysore",
-    },
-    {
-      title: "Exhibitions & Events",
-      value: eventCount,
-      description: "Workshops & gallery recitals",
-      icon: Calendar,
-      href: "/admin/events",
-      badge: "Active",
-    },
-    {
-      title: "Inbound Leads & QR CRM",
-      value: leadCount,
-      description: "Gallery inquiries & collector requests",
-      icon: Users,
-      href: "/admin/leads",
-      badge: "CRM",
-    },
-    {
-      title: "Carnatic Ragas & Music",
-      value: ragaCount,
-      description: "Synesthetic cultural graph nodes",
-      icon: Music,
-      href: "/admin/music",
-      badge: "pgvector",
-    },
-  ];
+  const liveCounts: Record<string, { value: number | string; sub?: string }> = {
+    "/admin/artworks": { value: artworkCount, sub: `${categoryCount} Traditional art categories` },
+    "/admin/events": { value: eventCount, sub: "Workshops & gallery recitals" },
+    "/admin/leads": { value: leadCount, sub: "Gallery inquiries & collector requests" },
+    "/admin/music": { value: ragaCount, sub: "Synesthetic cultural graph nodes" },
+  };
+
+  let initialWidgets: DashboardWidgetData[] = [];
+
+  if (rawWidgets && rawWidgets.length > 0) {
+    initialWidgets = rawWidgets.map((w) => ({
+      id: w.id,
+      title: w.title,
+      description: w.description,
+      widgetType: w.widgetType,
+      metricValue: w.metricValue,
+      metricSub: w.metricSub,
+      targetUrl: w.targetUrl,
+      iconName: w.iconName,
+      order: w.order,
+      isArchived: w.isArchived,
+      computedMetric:
+        w.widgetType === "STAT_CARD" && w.targetUrl && liveCounts[w.targetUrl]
+          ? String(liveCounts[w.targetUrl].value)
+          : w.metricValue || "-",
+      computedSub:
+        w.widgetType === "STAT_CARD" && w.targetUrl && liveCounts[w.targetUrl]
+          ? liveCounts[w.targetUrl].sub
+          : w.metricSub || "",
+    }));
+  } else {
+    // Default fallback initial widgets before first seed
+    initialWidgets = [
+      {
+        id: "default-1",
+        title: "Artworks Catalog",
+        widgetType: "STAT_CARD",
+        targetUrl: "/admin/artworks",
+        iconName: "Palette",
+        order: 1,
+        isArchived: false,
+        computedMetric: String(artworkCount),
+        computedSub: `${categoryCount} Traditional art categories`,
+      },
+      {
+        id: "default-2",
+        title: "Exhibitions & Events",
+        widgetType: "STAT_CARD",
+        targetUrl: "/admin/events",
+        iconName: "Calendar",
+        order: 2,
+        isArchived: false,
+        computedMetric: String(eventCount),
+        computedSub: "Workshops & gallery recitals",
+      },
+      {
+        id: "default-3",
+        title: "Inbound Leads & QR CRM",
+        widgetType: "STAT_CARD",
+        targetUrl: "/admin/leads",
+        iconName: "Users",
+        order: 3,
+        isArchived: false,
+        computedMetric: String(leadCount),
+        computedSub: "Gallery inquiries & collector requests",
+      },
+      {
+        id: "default-4",
+        title: "Carnatic Ragas & Music",
+        widgetType: "STAT_CARD",
+        targetUrl: "/admin/music",
+        iconName: "Music",
+        order: 4,
+        isArchived: false,
+        computedMetric: String(ragaCount),
+        computedSub: "Synesthetic cultural graph nodes",
+      },
+      {
+        id: "default-5",
+        title: "System Health & Services",
+        widgetType: "SYSTEM_STATUS",
+        order: 5,
+        isArchived: false,
+        description: "Live configuration status of containerized services.",
+      },
+      {
+        id: "default-6",
+        title: "Quick Operations",
+        widgetType: "QUICK_LINK",
+        targetUrl: "/admin/artworks",
+        metricSub: "Add New Tanjore or Mysore Artwork",
+        iconName: "Database",
+        order: 6,
+        isArchived: false,
+        description: "Direct access to common curation tasks.",
+      },
+    ];
+  }
 
   return (
     <div className="space-y-8">
@@ -81,9 +135,9 @@ export default async function AdminDashboardPage() {
               <Sparkles className="w-3.5 h-3.5" />
               Administrative Overview
             </div>
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
               Welcome to Lalita Kapilavai Archive
-            </h2>
+            </h1>
             <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
               Manage your sacred artwork catalog with 22k gold specifications,
               dynamic watermarked assets, exhibitions, physical QR scan leads, and
@@ -96,113 +150,8 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Link key={card.title} href={card.href}>
-              <Card className="hover:border-primary/60 transition-all hover:shadow-md h-full cursor-pointer">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-foreground">
-                    {card.title}
-                  </CardTitle>
-                  <div className="w-8 h-8 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-serif font-bold text-foreground">
-                    {card.value}
-                  </div>
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground">
-                      {card.description}
-                    </p>
-                    <Badge variant="outline" className="text-[10px]">
-                      {card.badge}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* System Status Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">System Health & Services</CardTitle>
-              <Badge variant="gold" className="text-[10px]">Operational</Badge>
-            </div>
-            <CardDescription className="text-xs">
-              Live configuration status of containerized services.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between items-center py-2 border-b border-border/60">
-                <span className="text-muted-foreground">Database Port:</span>
-                <span className="font-mono font-semibold text-foreground">Host 5633 &rarr; Container 5432</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/60">
-                <span className="text-muted-foreground">Vector Extension:</span>
-                <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">pgvector 0.8.2 Active</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/60">
-                <span className="text-muted-foreground">Web Application Port:</span>
-                <span className="font-mono font-semibold text-foreground">3060</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/60">
-                <span className="text-muted-foreground">Authentication Engine:</span>
-                <span className="font-mono font-semibold text-foreground">Better-Auth (Private RBAC)</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-muted-foreground">Public Self-Registration:</span>
-                <span className="font-mono font-semibold text-destructive">Disabled (Security Enforced)</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Quick Operations</CardTitle>
-              <Database className="w-4 h-4 text-primary" />
-            </div>
-            <CardDescription className="text-xs">
-              Direct access to common curation tasks.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2.5 text-xs">
-            <Link
-              href="/admin/artworks"
-              className="flex items-center justify-between p-3 rounded-md bg-secondary/50 hover:bg-secondary border border-border/60 text-foreground font-medium transition-colors"
-            >
-              <span>Add New Tanjore or Mysore Artwork</span>
-              <ArrowUpRight className="w-4 h-4 text-primary" />
-            </Link>
-            <Link
-              href="/admin/events"
-              className="flex items-center justify-between p-3 rounded-md bg-secondary/50 hover:bg-secondary border border-border/60 text-foreground font-medium transition-colors"
-            >
-              <span>Schedule Classical Concert or Exhibition</span>
-              <ArrowUpRight className="w-4 h-4 text-primary" />
-            </Link>
-            <Link
-              href="/admin/settings"
-              className="flex items-center justify-between p-3 rounded-md bg-secondary/50 hover:bg-secondary border border-border/60 text-foreground font-medium transition-colors"
-            >
-              <span>Configure Watermark Text & Cloudflare R2 Keys</span>
-              <ArrowUpRight className="w-4 h-4 text-primary" />
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Dynamic Customizable Layout Manager */}
+      <DashboardLayoutManager initialWidgets={initialWidgets} />
     </div>
   );
 }

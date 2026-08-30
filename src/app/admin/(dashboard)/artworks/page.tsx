@@ -38,6 +38,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 import {
   Table,
   TableHeader,
@@ -1086,7 +1087,14 @@ export default function ArtworksAdminPage() {
 
               {/* Description */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Artistic Commentary &amp; Provenance</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground">Artistic Commentary &amp; Provenance</label>
+                  <AiAssistantModal
+                    initialContext={`${title ? `Artwork Title: ${title}\n` : ""}${medium ? `Medium: ${medium}\n` : ""}${description || ""}`}
+                    onApply={(aiText) => setDescription(aiText)}
+                    triggerLabel="✨ AI Provenance"
+                  />
+                </div>
                 <textarea
                   rows={3}
                   placeholder="Detailed iconographic description, spiritual symbolism, and Carnatic raga links..."

@@ -84,9 +84,72 @@ async function main() {
         s3BucketName: process.env.S3_BUCKET_NAME || "lalitakapilavai-masters-backup",
         instagramUrl: "https://instagram.com/lalitakapilavai",
         youtubeUrl: "https://youtube.com/@lalitakapilavai",
+        footerConfig: {
+          aboutText:
+            "Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.",
+          contactEmail: "contact@lalitakapilavai.com",
+          contactPhone: "+91 98450 12345",
+          copyrightText: "© 2026 Lalita Kapilavai. All sacred rights reserved.",
+          socialLinks: [
+            { platform: "Instagram", url: "https://instagram.com/lalitakapilavai", isVisible: true },
+            { platform: "YouTube", url: "https://youtube.com/@lalitakapilavai", isVisible: true },
+          ],
+          legalLinks: [
+            { label: "Privacy Policy", url: "/privacy", isVisible: true },
+            { label: "Terms & Conditions", url: "/terms", isVisible: true },
+            { label: "Art Licensing & Reproduction", url: "/licensing", isVisible: true },
+            { label: "Admin Portal", url: "/admin", isVisible: true },
+          ],
+        },
+        emailConfig: {
+          provider: "gmail",
+          smtpHost: "smtp.gmail.com",
+          smtpPort: 587,
+          smtpUser: "",
+          smtpPassword: "",
+          fromEmail: "contact@lalitakapilavai.com",
+          fromName: "Lalita Kapilavai Archive",
+          isEnabled: false,
+        },
+        aiConfig: {
+          activeProvider: "gemini",
+          apiKey: "",
+          baseUrl: "",
+          defaultModel: "gemini-1.5-pro",
+          temperature: 0.7,
+        },
       },
     });
-    console.log("✅ Provisioned SystemSettings with watermark and storage settings");
+    console.log("✅ Provisioned SystemSettings with watermark, storage, footer, and AI configs");
+  } else {
+    // Ensure configs exist if null
+    const updates: Record<string, unknown> = {};
+    if (!existingSettings.footerConfig) {
+      updates.footerConfig = {
+        aboutText:
+          "Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.",
+        contactEmail: existingSettings.contactEmail || "contact@lalitakapilavai.com",
+        contactPhone: existingSettings.contactPhone || "+91 98450 12345",
+        copyrightText: "© 2026 Lalita Kapilavai. All sacred rights reserved.",
+        socialLinks: [
+          { platform: "Instagram", url: existingSettings.instagramUrl || "https://instagram.com/lalitakapilavai", isVisible: true },
+          { platform: "YouTube", url: existingSettings.youtubeUrl || "https://youtube.com/@lalitakapilavai", isVisible: true },
+        ],
+        legalLinks: [
+          { label: "Privacy Policy", url: "/privacy", isVisible: true },
+          { label: "Terms & Conditions", url: "/terms", isVisible: true },
+          { label: "Art Licensing & Reproduction", url: "/licensing", isVisible: true },
+          { label: "Admin Portal", url: "/admin", isVisible: true },
+        ],
+      };
+    }
+    if (Object.keys(updates).length > 0) {
+      await prisma.systemSetting.update({
+        where: { id: existingSettings.id },
+        data: updates,
+      });
+      console.log("✅ Synchronized missing footer/email configurations in SystemSettings");
+    }
   }
 
   // 3. Provision Default Art Categories
@@ -386,6 +449,136 @@ async function main() {
     console.log(`✅ Provisioned default published Home Page (${createdPage.slug})`);
   } else {
     console.log("ℹ️ Default Home Page already exists");
+  }
+
+  // 12. Provision Default Dashboard Widgets
+  const defaultWidgets = [
+    {
+      title: "Artworks Catalog",
+      description: "Traditional art categories and gold foil relief masterworks",
+      widgetType: "STAT_CARD",
+      targetUrl: "/admin/artworks",
+      iconName: "Palette",
+      order: 1,
+    },
+    {
+      title: "Exhibitions & Events",
+      description: "Workshops, gallery showcases & recital schedules",
+      widgetType: "STAT_CARD",
+      targetUrl: "/admin/events",
+      iconName: "Calendar",
+      order: 2,
+    },
+    {
+      title: "Inbound Leads & QR CRM",
+      description: "Gallery visitor inquiries & collector requests",
+      widgetType: "STAT_CARD",
+      targetUrl: "/admin/leads",
+      iconName: "Users",
+      order: 3,
+    },
+    {
+      title: "Carnatic Ragas & Music",
+      description: "Synesthetic cultural audio graph nodes & compositions",
+      widgetType: "STAT_CARD",
+      targetUrl: "/admin/music",
+      iconName: "Music",
+      order: 4,
+    },
+    {
+      title: "Sacred Chronicles & Essays",
+      description: "Curated research articles on Tanjore iconography & raga bhava",
+      widgetType: "STAT_CARD",
+      targetUrl: "/admin/posts",
+      iconName: "BookOpen",
+      order: 5,
+    },
+    {
+      title: "System Health & Services",
+      description: "Live configuration status of containerized services.",
+      widgetType: "SYSTEM_STATUS",
+      order: 6,
+    },
+    {
+      title: "Quick Operations",
+      description: "Direct administrative access to catalog management.",
+      widgetType: "QUICK_LINK",
+      targetUrl: "/admin/artworks",
+      metricSub: "Add New Tanjore or Mysore Masterwork",
+      iconName: "Sparkles",
+      order: 7,
+    },
+  ];
+
+  for (const w of defaultWidgets) {
+    const existingWidget = await prisma.dashboardWidget.findFirst({
+      where: { title: w.title },
+    });
+    if (!existingWidget) {
+      await prisma.dashboardWidget.create({ data: w });
+    }
+  }
+  console.log("✅ Provisioned default administrative dashboard widgets");
+
+  // 13. Provision Core System Pages (Editable Headers & Meta)
+  const systemPages = [
+    {
+      title: "Sacred Art & Cultural Chronicle",
+      slug: "blogs",
+      metaTitle: "Sacred Art & Cultural Chronicle — Lalita Kapilavai",
+      metaDescription:
+        "Explore authoritative writings on 22k gold Tanjore painting techniques, Mysore traditional iconography, and Carnatic musical synesthesia by Lalita Kapilavai.",
+      isPublished: true,
+      displayInNav: true,
+      navOrder: 3,
+    },
+    {
+      title: "Traditional Art Gallery",
+      slug: "gallery",
+      metaTitle: "Fine Art Gallery & Tanjore Archive — Lalita Kapilavai",
+      metaDescription:
+        "Five centuries of classical sacred painting traditions preserved through authentic 22-carat gold foil relief work, purified gesso, and semi-precious Jaipur gemstones.",
+      isPublished: true,
+      displayInNav: true,
+      navOrder: 1,
+    },
+    {
+      title: "Exhibitions & Events",
+      slug: "events",
+      metaTitle: "Exhibitions, Concerts & Workshops — Lalita Kapilavai",
+      metaDescription:
+        "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.",
+      isPublished: true,
+      displayInNav: true,
+      navOrder: 4,
+    },
+    {
+      title: "Traditional Art Disciplines",
+      slug: "categories",
+      metaTitle: "Sacred Art Disciplines — Lalita Kapilavai",
+      metaDescription:
+        "Explore classical South Indian artistic disciplines spanning Thanjavur 22k gold foil embossments and Mysore traditional styles.",
+      isPublished: true,
+      displayInNav: false,
+      navOrder: 5,
+    },
+  ];
+
+  for (const sp of systemPages) {
+    const existingPage = await prisma.page.findUnique({
+      where: { slug: sp.slug },
+    });
+    if (!existingPage) {
+      await prisma.page.create({
+        data: {
+          title: sp.title,
+          slug: sp.slug,
+          metaDescription: sp.metaDescription,
+          isPublished: sp.isPublished,
+        },
+      });
+      console.log(`✅ Provisioned editable system page: /${sp.slug}`);
+    }
   }
 
   console.log("🌿 Database seed completed successfully!");

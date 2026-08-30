@@ -16,12 +16,20 @@ export const metadata: Metadata = {
 };
 
 export default async function EventsPage() {
-  const events = await prisma.event.findMany({
-    orderBy: { startDate: "asc" },
-    include: {
-      _count: { select: { artworks: true, registrations: true } },
-    },
-  });
+  const [events, pageData] = await Promise.all([
+    prisma.event.findMany({
+      orderBy: { startDate: "asc" },
+      include: {
+        _count: { select: { artworks: true, registrations: true } },
+      },
+    }),
+    prisma.page.findUnique({ where: { slug: "events" } }).catch(() => null),
+  ]);
+
+  const headerTitle = pageData?.title || "Exhibitions & Events";
+  const headerSubtitle =
+    pageData?.metaDescription ||
+    "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.";
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
@@ -34,10 +42,10 @@ export default async function EventsPage() {
             Cultural Calendar &amp; Recitals
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground">
-            Exhibitions &amp; Events
+            {headerTitle}
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.
+            {headerSubtitle}
           </p>
         </div>
 

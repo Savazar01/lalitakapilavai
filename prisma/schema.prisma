@@ -125,6 +125,11 @@ model SystemSetting {
   logoUrl           String?
   faviconUrl        String?
 
+  // Dynamic Footer, Email/Gmail SMTP & Multi-Provider AI Configuration
+  footerConfig      Json?
+  emailConfig       Json?
+  aiConfig          Json?
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -451,4 +456,25 @@ model BlogPost {
   updatedAt        DateTime  @updatedAt
 
   @@map("blog_posts")
+}
+
+// -----------------------------------------------------------------------------
+// Customizable Admin Dashboard Widgets
+// -----------------------------------------------------------------------------
+
+model DashboardWidget {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title       String
+  description String?
+  widgetType  String   // "STAT_CARD", "QUICK_LINK", "SYSTEM_STATUS", "CUSTOM_HTML"
+  metricValue String?
+  metricSub   String?
+  targetUrl   String?
+  iconName    String?  // Lucide icon identifier
+  order       Int      @default(0)
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("dashboard_widgets")
 }

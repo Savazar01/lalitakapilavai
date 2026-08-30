@@ -12,6 +12,10 @@ while ! nc -z "$DB_HOST" "$DB_PORT" 2>/dev/null && ! node -e "const net=require(
 done
 echo "✅ PostgreSQL connection established!"
 
+# 0. Ensure media storage directories exist and are writable
+mkdir -p /app/public/media/public /app/public/media/vault 2>/dev/null || true
+chmod -R 775 /app/public/media 2>/dev/null || true
+
 # 1. Force push schema to guarantee all tables exist
 echo "📦 Applying Prisma schema to PostgreSQL..."
 ./node_modules/.bin/prisma db push --schema=/app/prisma/schema.prisma --accept-data-loss

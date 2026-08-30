@@ -2,16 +2,80 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Sparkles, Mail, Phone, ExternalLink } from "lucide-react";
 
+interface SocialLinkItem {
+  platform: string;
+  url: string;
+  isVisible: boolean;
+}
+
+interface LegalLinkItem {
+  label: string;
+  url: string;
+  isVisible: boolean;
+}
+
+interface FooterConfig {
+  aboutText?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  copyrightText?: string;
+  socialLinks?: SocialLinkItem[];
+  legalLinks?: LegalLinkItem[];
+}
+
 export async function Footer() {
   const settings = await prisma.systemSetting.findFirst().catch(() => null);
+
+  const footerConfig = (settings?.footerConfig as FooterConfig | null) || null;
 
   const siteName =
     settings?.siteName ||
     "Lalita Kapilavai — Sacred Art & Carnatic Music Archive";
   const watermarkText =
     settings?.watermarkText || "© Lalita Kapilavai - Sacred Art & Heritage";
-  const contactEmail = settings?.contactEmail || "contact@lalitakapilavai.com";
-  const contactPhone = settings?.contactPhone || "+91 98450 12345";
+
+  const contactEmail =
+    footerConfig?.contactEmail || settings?.contactEmail || "contact@lalitakapilavai.com";
+  const contactPhone =
+    footerConfig?.contactPhone || settings?.contactPhone || "+91 98450 12345";
+  const aboutText =
+    footerConfig?.aboutText ||
+    "Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.";
+  const copyrightText =
+    footerConfig?.copyrightText ||
+    `© ${new Date().getFullYear()} ${siteName}. All sacred rights reserved.`;
+
+  // Default fallback social links if not customized
+  const defaultSocials: SocialLinkItem[] = [
+    {
+      platform: "Instagram",
+      url: settings?.instagramUrl || "https://instagram.com/lalitakapilavai",
+      isVisible: !!settings?.instagramUrl || true,
+    },
+    {
+      platform: "YouTube",
+      url: settings?.youtubeUrl || "https://youtube.com/@lalitakapilavai",
+      isVisible: !!settings?.youtubeUrl || true,
+    },
+  ];
+
+  const socialLinks: SocialLinkItem[] =
+    footerConfig?.socialLinks && footerConfig.socialLinks.length > 0
+      ? footerConfig.socialLinks.filter((s) => s.isVisible && s.url)
+      : defaultSocials;
+
+  // Default fallback legal links if not customized
+  const defaultLegal: LegalLinkItem[] = [
+    { label: "Privacy Policy", url: "/privacy", isVisible: true },
+    { label: "Terms & Conditions", url: "/terms", isVisible: true },
+    { label: "Art Licensing & Reproduction", url: "/licensing", isVisible: true },
+    { label: "Admin Portal", url: "/admin", isVisible: true },
+  ];
+
+  const legalLinks: LegalLinkItem[] =
+    footerConfig?.legalLinks && footerConfig.legalLinks.length > 0
+      ? footerConfig.legalLinks.filter((l) => l.isVisible && l.url)
+      : defaultLegal;
 
   return (
     <footer className="w-full border-t border-border/80 bg-card/60 transition-colors duration-300">
@@ -39,7 +103,7 @@ export async function Footer() {
               </span>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md">
-              Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.
+              {aboutText}
             </p>
             <p className="text-xs font-mono text-primary font-semibold">
               {watermarkText}
@@ -72,6 +136,11 @@ export async function Footer() {
                   Exhibitions &amp; Concerts
                 </Link>
               </li>
+              <li>
+                <Link href="/blogs" className="hover:text-primary transition-colors">
+                  Sacred Art Chronicles
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -91,49 +160,32 @@ export async function Footer() {
                 <Phone className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span>{contactPhone}</span>
               </li>
-              {settings?.instagramUrl && (
-                <li>
+              {socialLinks.map((s) => (
+                <li key={s.platform}>
                   <a
-                    href={settings.instagramUrl}
+                    href={s.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+                    className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
                   >
-                    <ExternalLink className="w-3 h-3" />
-                    Instagram Portfolio
+                    <ExternalLink className="w-3 h-3 text-primary" />
+                    <span>{s.platform}</span>
                   </a>
                 </li>
-              )}
-              {settings?.youtubeUrl && (
-                <li>
-                  <a
-                    href={settings.youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-primary transition-colors"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    YouTube Concert Channel
-                  </a>
-                </li>
-              )}
+              ))}
             </ul>
           </div>
         </div>
 
         {/* Bottom Copyright Strip */}
         <div className="pt-6 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} {siteName}. All Rights Reserved.</p>
-          <div className="flex items-center gap-4 text-[11px]">
-            <Link href="/privacy" className="hover:text-primary transition-colors">
-              Privacy Notice
-            </Link>
-            <Link href="/terms" className="hover:text-primary transition-colors">
-              Copyright &amp; Licensing
-            </Link>
-            <Link href="/admin" className="hover:text-primary transition-colors">
-              Admin
-            </Link>
+          <p>{copyrightText}</p>
+          <div className="flex flex-wrap items-center gap-4 text-[11px]">
+            {legalLinks.map((l) => (
+              <Link key={l.label} href={l.url} className="hover:text-primary transition-colors">
+                {l.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

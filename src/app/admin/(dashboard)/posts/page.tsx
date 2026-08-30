@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 
@@ -608,7 +609,14 @@ export default function AdminPostsPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Article Summary / Excerpt</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground">Article Summary / Excerpt</label>
+                    <AiAssistantModal
+                      initialContext={formData.title}
+                      onApply={(txt) => setFormData((prev) => ({ ...prev, excerpt: txt }))}
+                      triggerLabel="✨ AI Excerpt"
+                    />
+                  </div>
                   <textarea
                     rows={2}
                     value={formData.excerpt}
@@ -625,6 +633,20 @@ export default function AdminPostsPage() {
                       Article Body &amp; Visual Layout
                     </label>
                     <div className="flex items-center gap-1.5">
+                      <AiAssistantModal
+                        initialContext={formData.content}
+                        onApply={(aiText) => {
+                          if (editorInstance) {
+                            editorInstance.chain().focus().insertContent(aiText).run();
+                          } else {
+                            setFormData((prev) => ({
+                              ...prev,
+                              content: prev.content ? `${prev.content}\n\n${aiText}` : aiText,
+                            }));
+                          }
+                        }}
+                        triggerLabel="✨ AI Assist"
+                      />
                       <Button
                         type="button"
                         variant={editorMode === "VISUAL" ? "gold" : "outline"}

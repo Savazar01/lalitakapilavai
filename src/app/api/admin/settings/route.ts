@@ -88,6 +88,9 @@ export async function PUT(request: NextRequest) {
       pinterestUrl: body.pinterestUrl,
       logoUrl: body.logoUrl,
       faviconUrl: body.faviconUrl,
+      footerConfig: body.footerConfig !== undefined ? body.footerConfig : undefined,
+      emailConfig: body.emailConfig !== undefined ? body.emailConfig : undefined,
+      aiConfig: body.aiConfig !== undefined ? body.aiConfig : undefined,
     };
 
     let updated;
