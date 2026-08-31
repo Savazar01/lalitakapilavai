@@ -308,6 +308,7 @@ async function main() {
   // 5. Provision Default Published "Home" Page
   const homePage = await prisma.page.findUnique({
     where: { slug: "home" },
+    include: { sections: true },
   });
 
   if (!homePage) {
@@ -447,8 +448,10 @@ async function main() {
       },
     });
     console.log(`✅ Provisioned default published Home Page (${createdPage.slug})`);
+  } else if (homePage.sections.length === 0) {
+    console.log("📦 Backfilled default sections for: /home");
   } else {
-    console.log("ℹ️ Default Home Page already exists");
+    console.log(`🛡️ Preserved existing admin modifications for: /home (${homePage.sections.length} sections)`);
   }
 
   // 12. Provision Default Dashboard Widgets
@@ -776,6 +779,9 @@ async function main() {
         },
       });
       console.log(`✅ Backfilled default hero section for: /${sp.slug}`);
+    } else {
+      // PRESERVE: Admin has customized this page; do not modify!
+      console.log(`🛡️ Preserved existing admin modifications for: /${sp.slug} (${existingPage.sections.length} sections)`);
     }
   }
 

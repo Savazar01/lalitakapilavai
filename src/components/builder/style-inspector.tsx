@@ -23,7 +23,9 @@ import {
   Volume2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 import {
   Select,
@@ -33,7 +35,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BACKGROUND_PATTERNS } from "@/lib/background-patterns";
 
 export interface SectionStyle {
@@ -453,37 +454,56 @@ export function StyleInspector({
         </div>
       )}
 
-      {/* Background Section with Mode Tabs */}
-      <div className="space-y-3">
-        <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
-          <span className="flex items-center gap-1.5">
+      {/* Background Section with Three-Mode Switcher */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-serif uppercase tracking-wider text-amber-200/80 font-semibold flex items-center gap-1.5">
             <Paintbrush className="w-3.5 h-3.5 text-primary" />
             Background Mode
-          </span>
-          <span className="text-[10px] font-mono text-primary font-bold">
-            {style.backgroundType || "COLOR"}
-          </span>
-        </label>
-
-        <Tabs
-          value={style.backgroundType || "COLOR"}
-          onValueChange={(val) => update("backgroundType", val)}
-          className="w-full"
-        >
-          <TabsList className="grid grid-cols-3 h-8 w-full bg-muted/70">
-            <TabsTrigger value="COLOR" className="text-[11px] py-1">
+          </label>
+          <div className="flex rounded-md bg-stone-900 p-0.5 border border-stone-800">
+            <button
+              type="button"
+              onClick={() => update("backgroundType", "COLOR")}
+              className={cn(
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer",
+                (style.backgroundType || "COLOR") === "COLOR"
+                  ? "bg-amber-600 text-white font-medium shadow-sm"
+                  : "text-stone-400 hover:text-white"
+              )}
+            >
               Color
-            </TabsTrigger>
-            <TabsTrigger value="PATTERN" className="text-[11px] py-1">
+            </button>
+            <button
+              type="button"
+              onClick={() => update("backgroundType", "PATTERN")}
+              className={cn(
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer",
+                style.backgroundType === "PATTERN"
+                  ? "bg-amber-600 text-white font-medium shadow-sm"
+                  : "text-stone-400 hover:text-white"
+              )}
+            >
               Patterns
-            </TabsTrigger>
-            <TabsTrigger value="IMAGE" className="text-[11px] py-1">
+            </button>
+            <button
+              type="button"
+              onClick={() => update("backgroundType", "IMAGE")}
+              className={cn(
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer",
+                style.backgroundType === "IMAGE"
+                  ? "bg-amber-600 text-white font-medium shadow-sm"
+                  : "text-stone-400 hover:text-white"
+              )}
+            >
               Image
-            </TabsTrigger>
-          </TabsList>
+            </button>
+          </div>
+        </div>
 
-          {/* Tab 1: Solid & Gradient Color */}
-          <TabsContent value="COLOR" className="space-y-3 pt-2">
+        {/* Mode 1: Solid & Gradient Color */}
+        {(style.backgroundType || "COLOR") === "COLOR" && (
+          <div className="space-y-3">
             <div className="grid grid-cols-4 gap-2">
               {colorPresets.map((preset) => (
                 <button
@@ -493,11 +513,12 @@ export function StyleInspector({
                   className="flex flex-col items-center gap-1 group cursor-pointer"
                 >
                   <div
-                    className={`w-full h-7 rounded border transition-all ${
+                    className={cn(
+                      "w-full h-7 rounded border transition-all",
                       style.backgroundColor === preset.hex
                         ? "ring-2 ring-primary ring-offset-1 border-transparent"
                         : "border-border/60 hover:scale-105"
-                    }`}
+                    )}
                     style={{ backgroundColor: preset.hex }}
                   />
                   <span className="text-[10px] text-muted-foreground truncate w-full text-center group-hover:text-foreground">
@@ -524,16 +545,18 @@ export function StyleInspector({
                 />
               </div>
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Tab 2: Sacred / Heritage Patterns */}
-          <TabsContent value="PATTERN" className="space-y-3 pt-2">
+        {/* Mode 2: Sacred / Heritage Patterns */}
+        {style.backgroundType === "PATTERN" && (
+          <div className="space-y-3">
             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
               <span>Curated Sacred Motifs:</span>
               <button
                 type="button"
                 onClick={() => update("backgroundPattern", "")}
-                className="text-[10px] text-primary hover:underline"
+                className="text-[10px] text-primary hover:underline cursor-pointer"
               >
                 Clear Pattern
               </button>
@@ -543,37 +566,38 @@ export function StyleInspector({
               {BACKGROUND_PATTERNS.map((pattern) => {
                 const isSelected = style.backgroundPattern === pattern.id;
                 return (
-                  <button
+                  <div
                     key={pattern.id}
-                    type="button"
                     onClick={() => {
                       onChange({
                         ...style,
                         backgroundType: "PATTERN",
                         backgroundPattern: pattern.id,
-                        backgroundOverlayOpacity: style.backgroundOverlayOpacity ?? 0.15,
+                        backgroundOverlayOpacity: style.backgroundOverlayOpacity ?? 0.2,
                       });
                     }}
-                    className={`p-2 rounded-lg border text-left flex flex-col gap-1 transition-all cursor-pointer relative overflow-hidden ${
+                    className={cn(
+                      "p-2 rounded-lg border text-left flex flex-col gap-1.5 transition-all cursor-pointer relative overflow-hidden",
                       isSelected
-                        ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
-                        : "border-border/70 hover:border-border hover:bg-muted/30"
-                    }`}
+                        ? "border-amber-500 bg-amber-500/10 ring-1 ring-amber-500 shadow-sm"
+                        : "border-stone-800 bg-stone-900/60 hover:border-stone-700 hover:bg-muted/30"
+                    )}
                   >
                     <div
-                      className="w-full h-12 rounded border border-border/40 relative overflow-hidden bg-[#FAF7F2] dark:bg-[#1E1B18]"
+                      className="w-full h-12 rounded border border-stone-800 relative overflow-hidden bg-[#FAF7F2] dark:bg-[#1E1B18]"
                       style={{
                         backgroundImage: `url("${pattern.svgDataUri}")`,
                         backgroundRepeat: "repeat",
+                        backgroundSize: "60px 60px",
                       }}
                     />
-                    <span className="font-serif font-bold text-[11px] text-foreground truncate">
+                    <span className="font-serif font-bold text-[11px] text-stone-200 truncate">
                       {pattern.name}
                     </span>
-                    <span className="text-[9px] text-muted-foreground line-clamp-1">
+                    <span className="text-[9px] text-stone-400 line-clamp-1">
                       {pattern.description}
                     </span>
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -597,26 +621,28 @@ export function StyleInspector({
             </div>
 
             <div className="space-y-1.5 pt-1">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-muted-foreground font-medium">Pattern Visibility:</span>
+              <div className="flex items-center justify-between text-[11px] text-stone-300">
+                <span>Pattern Opacity</span>
                 <span className="font-mono text-primary font-semibold">
-                  {Math.round((style.backgroundOverlayOpacity ?? 0.15) * 100)}%
+                  {Math.round((style.backgroundOverlayOpacity ?? 0.2) * 100)}%
                 </span>
               </div>
               <Input
                 type="range"
                 min={0.05}
-                max={0.8}
+                max={1.0}
                 step={0.05}
-                value={style.backgroundOverlayOpacity ?? 0.15}
+                value={style.backgroundOverlayOpacity ?? 0.2}
                 onChange={(e) => update("backgroundOverlayOpacity", parseFloat(e.target.value))}
                 className="cursor-pointer h-5"
               />
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Tab 3: Background Image Upload */}
-          <TabsContent value="IMAGE" className="space-y-3 pt-2">
+        {/* Mode 3: Background Image Upload */}
+        {style.backgroundType === "IMAGE" && (
+          <div className="space-y-3">
             <div className="space-y-1.5">
               <label className="text-[11px] text-muted-foreground font-medium flex items-center justify-between">
                 <span>Image Source</span>
@@ -647,27 +673,78 @@ export function StyleInspector({
               />
             </div>
 
+            {/* Background Size Cover / Contain Toggle */}
+            <div className="flex items-center justify-between text-[11px] pt-1">
+              <span className="text-muted-foreground">Image Fit</span>
+              <div className="flex rounded border border-border/80 p-0.5 bg-muted/30">
+                <button
+                  type="button"
+                  onClick={() => update("backgroundSize", "cover")}
+                  className={cn(
+                    "px-2 py-0.5 text-[10px] rounded cursor-pointer transition-all",
+                    (style.backgroundSize || "cover") === "cover"
+                      ? "bg-primary text-primary-foreground font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Cover
+                </button>
+                <button
+                  type="button"
+                  onClick={() => update("backgroundSize", "contain")}
+                  className={cn(
+                    "px-2 py-0.5 text-[10px] rounded cursor-pointer transition-all",
+                    style.backgroundSize === "contain"
+                      ? "bg-primary text-primary-foreground font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Contain
+                </button>
+              </div>
+            </div>
+
             {(style.backgroundImage || style.backgroundImageUrl) && (
-              <div className="relative w-full h-20 rounded-lg overflow-hidden border border-border shadow-inner group">
+              <div className="relative w-full h-24 rounded border border-stone-800 overflow-hidden shadow-inner group">
                 <div
-                  className="w-full h-full bg-cover bg-center"
+                  className="w-full h-full"
                   style={{
                     backgroundImage: `url("${style.backgroundImage || style.backgroundImageUrl}")`,
+                    backgroundSize: style.backgroundSize || "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
                   }}
                 />
                 <div
-                  className="absolute inset-0 bg-black pointer-events-none"
+                  className="absolute inset-0 bg-black pointer-events-none transition-opacity"
                   style={{ opacity: style.backgroundOverlayOpacity ?? 0.5 }}
                 />
-                <span className="absolute bottom-1 right-2 text-[9px] font-mono text-white/80 z-10 bg-black/60 px-1 rounded">
+                <div className="absolute top-1.5 right-1.5 z-10">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => {
+                      onChange({
+                        ...style,
+                        backgroundImage: "",
+                        backgroundImageUrl: "",
+                      });
+                    }}
+                    className="h-6 text-[10px] px-1.5"
+                  >
+                    Remove
+                  </Button>
+                </div>
+                <span className="absolute bottom-1.5 left-2 text-[9px] font-mono text-white/90 z-10 bg-black/70 px-1.5 py-0.5 rounded">
                   Overlay: {Math.round((style.backgroundOverlayOpacity ?? 0.5) * 100)}%
                 </span>
               </div>
             )}
 
             <div className="space-y-1.5 pt-1">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-muted-foreground font-medium">Dark Overlay Opacity:</span>
+              <div className="flex items-center justify-between text-[11px] text-stone-300">
+                <span>Dark Scrim / Overlay Opacity</span>
                 <span className="font-mono text-primary font-semibold">
                   {Math.round((style.backgroundOverlayOpacity ?? 0.5) * 100)}%
                 </span>
@@ -675,18 +752,18 @@ export function StyleInspector({
               <Input
                 type="range"
                 min={0}
-                max={0.95}
+                max={1.0}
                 step={0.05}
                 value={style.backgroundOverlayOpacity ?? 0.5}
                 onChange={(e) => update("backgroundOverlayOpacity", parseFloat(e.target.value))}
                 className="cursor-pointer h-5"
               />
               <span className="text-[10px] text-muted-foreground block">
-                Controls darkness to ensure readability of foreground text and media.
+                Controls dark scrim to ensure readability of foreground verses and gold accents.
               </span>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
 
       <Separator />
