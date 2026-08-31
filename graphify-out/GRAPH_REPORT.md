@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-08-31)
 
 ## Corpus Check
-- 124 files · ~78,046 words
+- 124 files · ~78,422 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 668 nodes · 1343 edges · 51 communities (38 shown, 13 thin omitted)
+- 670 nodes · 1346 edges · 50 communities (37 shown, 13 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0255d7ed`
+- Built from commit: `4fe9d562`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -47,17 +47,12 @@
 - [[_COMMUNITY_Community 36|Community 36]]
 - [[_COMMUNITY_Community 37|Community 37]]
 - [[_COMMUNITY_Community 38|Community 38]]
-- [[_COMMUNITY_Community 39|Community 39]]
-- [[_COMMUNITY_Community 40|Community 40]]
 - [[_COMMUNITY_Community 41|Community 41]]
 - [[_COMMUNITY_Community 42|Community 42]]
 - [[_COMMUNITY_Community 43|Community 43]]
-- [[_COMMUNITY_Community 44|Community 44]]
-- [[_COMMUNITY_Community 45|Community 45]]
 - [[_COMMUNITY_Community 46|Community 46]]
 - [[_COMMUNITY_Community 47|Community 47]]
 - [[_COMMUNITY_Community 48|Community 48]]
-- [[_COMMUNITY_Community 50|Community 50]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Button` - 32 edges
@@ -74,24 +69,24 @@
 ## Surprising Connections (you probably didn't know these)
 - `POST()` --calls--> `generateAndStoreArtworkQR()`  [EXTRACTED]
   src/app/api/admin/artworks/route.ts → src/lib/qr.ts
-- `POST()` --calls--> `uploadBuffer()`  [EXTRACTED]
-  src/app/api/admin/media/upload/route.ts → src/lib/storage.ts
 - `GET()` --calls--> `getMediaStream()`  [EXTRACTED]
   src/app/api/admin/media/vault/route.ts → src/lib/storage.ts
 - `GET()` --calls--> `generateQRCodeDataUrl()`  [EXTRACTED]
   src/app/api/admin/qr/route.ts → src/lib/qr.ts
+- `EventRsvpForm()` --calls--> `formatCurrency()`  [EXTRACTED]
+  src/components/public/event-rsvp-form.tsx → src/lib/formatters.ts
 - `Badge()` --calls--> `cn()`  [EXTRACTED]
   src/components/ui/badge.tsx → src/lib/utils.ts
 
-## Communities (51 total, 13 thin omitted)
+## Communities (50 total, 13 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.06
-Nodes (74): AiAssistantModal(), AiAssistantModalProps, DashboardLayoutManager(), DashboardWidgetData, iconRegistry, Artwork, Category, COLOR_PRESETS (+66 more)
+Cohesion: 0.07
+Nodes (61): AiAssistantModal(), AiAssistantModalProps, DashboardLayoutManager(), DashboardWidgetData, iconRegistry, Artwork, Category, COLOR_PRESETS (+53 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.47
-Nodes (8): generatePresignedDownloadUrl(), generatePresignedUploadUrl(), getMediaStream(), getStorageClient(), getStorageConfig(), StorageConfig, uploadBuffer(), GET()
+Cohesion: 0.10
+Nodes (28): POST(), formatCurrency(), generateAndStoreArtworkQR(), generateQRCodeBuffer(), generateQRCodeDataUrl(), QRCodeOptions, generatePresignedDownloadUrl(), generatePresignedUploadUrl() (+20 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.05
@@ -106,20 +101,20 @@ Cohesion: 0.17
 Nodes (10): NavItem, navItems, SheetContent, SheetContentProps, SheetDescription, SheetHeader(), SheetOverlay, SheetTitle (+2 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.07
-Nodes (26): devDependencies, eslint, eslint-config-next, prisma, tailwindcss, @tailwindcss/postcss, tsx, @types/node (+18 more)
+Cohesion: 0.17
+Nodes (12): devDependencies, eslint, eslint-config-next, prisma, tailwindcss, @tailwindcss/postcss, tsx, @types/node (+4 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.06
-Nodes (42): ArtworkSummary, EventFormData, EventFormModal(), EventFormModalProps, GalleryImageItem, ModernDateTimePicker(), ModernDateTimePickerProps, MONTH_NAMES (+34 more)
+Cohesion: 0.09
+Nodes (30): ArtworkSummary, EventFormData, EventFormModal(), EventFormModalProps, GalleryImageItem, ModernDateTimePicker(), ModernDateTimePickerProps, MONTH_NAMES (+22 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.17
-Nodes (13): BlogGridEmbed(), BlogPostSummary, ColumnBlock, iconMap, MediaBlockConfig, renderColumnBlock(), renderMarks(), renderMediaBlock() (+5 more)
+Cohesion: 0.25
+Nodes (8): scripts, build, dev, docker:dev, docker:dev:down, docker:dev:logs, lint, start
 
 ### Community 9 - "Community 9"
 Cohesion: 0.14
@@ -158,15 +153,15 @@ Cohesion: 0.25
 Nodes (7): 1. React Server Component (RSC) Boundaries, 2. Server-Side Data Fetching & Deduplication, 3. Zero-FOUC Theming & Hydration Safeguards, 4. Performance & Re-render Prevention, code:typescript (export async function getDashboardData() {), code:tsx (<ThemeProvider), Skill: Vercel React & Next.js 16 Best Practices
 
 ### Community 18 - "Community 18"
-Cohesion: 0.28
+Cohesion: 0.24
 Nodes (5): geistMono, geistSans, metadata, ThemeProvider(), Toaster()
 
 ### Community 21 - "Community 21"
-Cohesion: 0.24
-Nodes (5): AnimatedSection(), AnimatedSectionProps, DynamicPageSectionsProps, DynamicSectionItem, DynamicSubSectionItem
+Cohesion: 0.29
+Nodes (6): name, overrides, deepmerge-ts, eslint, private, version
 
 ### Community 29 - "Community 29"
-Cohesion: 0.10
+Cohesion: 0.15
 Nodes (3): { GET, POST }, auth, AuthSession
 
 ### Community 35 - "Community 35"
@@ -174,56 +169,36 @@ Cohesion: 0.39
 Nodes (6): POST(), AiConfig, CULTURAL_SYSTEM_PROMPT, generateAiContent(), GenerateOptions, getAiConfig()
 
 ### Community 36 - "Community 36"
-Cohesion: 0.24
-Nodes (8): DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSubContent, DropdownMenuSubTrigger
+Cohesion: 0.08
+Nodes (30): artisticBorderPresets, availableIcons, colorPresets, fontFamilies, StyleInspector(), StyleInspectorProps, cn(), AiConfig (+22 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.12
-Nodes (9): metadata, metadata, Footer(), FooterConfig, LegalLinkItem, SocialLinkItem, Navbar(), PageProps (+1 more)
-
-### Community 39 - "Community 39"
-Cohesion: 0.43
-Nodes (6): DynamicPublicPage(), generateMetadata(), getPageBySlug, PageProps, generateMetadata(), PageProps
-
-### Community 40 - "Community 40"
-Cohesion: 0.22
-Nodes (5): PageProps, metadata, Artwork, Category, GalleryGrid()
+Cohesion: 0.05
+Nodes (35): metadata, metadata, PageProps, metadata, metadata, metadata, globalForPrisma, metadata (+27 more)
 
 ### Community 43 - "Community 43"
-Cohesion: 0.09
-Nodes (26): columnPresets, isLightColor(), PageData, SectionData, SortableSection(), SubSectionData, artisticBorderPresets, availableIcons (+18 more)
-
-### Community 44 - "Community 44"
-Cohesion: 0.43
-Nodes (4): POST(), generateAndStoreArtworkQR(), generateQRCodeBuffer(), QRCodeOptions
-
-### Community 45 - "Community 45"
-Cohesion: 0.48
-Nodes (5): escapeXml(), generateWatermarkSvg(), WatermarkOptions, escapeXml(), POST()
-
-### Community 50 - "Community 50"
-Cohesion: 0.29
-Nodes (4): metadata, BlogArchiveClient(), BlogPostData, DynamicPageSections()
+Cohesion: 0.08
+Nodes (27): columnPresets, isLightColor(), PageData, SectionData, SortableSection(), SubSectionData, SectionStyle, ViewportMode (+19 more)
 
 ## Knowledge Gaps
-- **274 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+269 more)
+- **275 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+270 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Button` connect `Community 0` to `Community 4`, `Community 37`, `Community 36`, `Community 7`, `Community 40`, `Community 43`, `Community 21`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
-- **Why does `Badge()` connect `Community 0` to `Community 4`, `Community 37`, `Community 7`, `Community 40`, `Community 43`?**
+- **Why does `Button` connect `Community 0` to `Community 1`, `Community 4`, `Community 37`, `Community 36`, `Community 7`, `Community 43`?**
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
+- **Why does `Badge()` connect `Community 37` to `Community 0`, `Community 1`, `Community 4`, `Community 36`, `Community 7`, `Community 43`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 43` to `Community 0`, `Community 36`, `Community 4`, `Community 7`?**
+- **Why does `cn()` connect `Community 36` to `Community 0`, `Community 4`, `Community 37`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
 - **What connects `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig` to the rest of the system?**
-  _274 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _275 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.060698247138925104 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0745274914089347 - nodes in this community are weakly interconnected._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.09672830725462304 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.05405405405405406 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.06890756302521009 - nodes in this community are weakly interconnected._

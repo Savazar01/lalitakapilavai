@@ -75,10 +75,16 @@ export async function Navbar() {
           )}
           <div className="flex flex-col">
             <span className="font-serif font-bold text-lg tracking-tight text-foreground group-hover:text-primary transition-colors">
-              {settings?.siteName ? settings.siteName.split("—")[0].trim() : "Lalita Kapilavai"}
+              {settings?.siteName
+                ? settings.siteName.includes("—")
+                  ? settings.siteName.split("—")[0].trim()
+                  : settings.siteName
+                : "Lalita Kapilavai"}
             </span>
             <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
-              Sacred Art &amp; Carnatic Archive
+              {settings?.siteName?.includes("—")
+                ? settings.siteName.split("—").slice(1).join("—").trim()
+                : "Sacred Art & Carnatic Archive"}
             </span>
           </div>
         </Link>
@@ -165,10 +171,16 @@ export async function Navbar() {
             <SheetContent side="right" className="w-80 p-0 flex flex-col">
               <SheetHeader className="p-6 border-b border-border text-left">
                 <SheetTitle className="font-serif font-bold text-lg">
-                  Lalita Kapilavai
+                  {settings?.siteName
+                    ? settings.siteName.includes("—")
+                      ? settings.siteName.split("—")[0].trim()
+                      : settings.siteName
+                    : "Lalita Kapilavai"}
                 </SheetTitle>
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Archive Navigation
+                  {settings?.siteName?.includes("—")
+                    ? settings.siteName.split("—").slice(1).join("—").trim()
+                    : "Archive Navigation"}
                 </span>
               </SheetHeader>
 

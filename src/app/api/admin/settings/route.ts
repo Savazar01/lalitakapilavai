@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
@@ -70,6 +71,7 @@ export async function PUT(request: NextRequest) {
         body.watermarkFontSize !== undefined
           ? parseInt(body.watermarkFontSize)
           : undefined,
+      watermarkStyle: body.watermarkStyle !== undefined ? body.watermarkStyle : undefined,
       defaultCurrency: body.defaultCurrency,
       defaultTimezone: body.defaultTimezone,
       storageProvider: body.storageProvider,
@@ -103,6 +105,16 @@ export async function PUT(request: NextRequest) {
       updated = await prisma.systemSetting.create({
         data,
       });
+    }
+
+    // Purge full site cache hierarchy so Navbar, Footer, and Public layouts reflect immediately
+    try {
+      revalidatePath("/", "layout");
+      revalidatePath("/");
+      revalidatePath("/(public)", "layout");
+      revalidatePath("/admin/settings");
+    } catch (revErr) {
+      console.warn("Settings cache revalidation notice:", revErr);
     }
 
     return NextResponse.json(updated);

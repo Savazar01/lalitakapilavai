@@ -5,9 +5,9 @@
 FROM node:22-bookworm-slim AS base
 WORKDIR /app
 
-# Consolidate all required system packages in base layer once
+# Consolidate all required system packages and fonts in base layer once
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openssl ca-certificates netcat-openbsd && \
+    apt-get install -y --no-install-recommends openssl ca-certificates netcat-openbsd fonts-dejavu-core fonts-freefont-ttf fontconfig && \
     rm -rf /var/lib/apt/lists/*
 
 # Stage 1: Install dependencies with npm cache mount

@@ -114,6 +114,7 @@ export default function AdminSettingsPage() {
     watermarkText: "© Lalita Kapilavai - Sacred Art & Heritage",
     watermarkOpacity: 0.35,
     watermarkFontSize: 28,
+    watermarkStyle: "REPEAT_DIAGONAL",
     storageProvider: "R2",
     r2AccountId: "",
     r2BucketName: "lalitakapilavai-media",
@@ -189,6 +190,7 @@ export default function AdminSettingsPage() {
             watermarkText: data.watermarkText || "© Lalita Kapilavai - Sacred Art & Heritage",
             watermarkOpacity: data.watermarkOpacity ?? 0.35,
             watermarkFontSize: data.watermarkFontSize ?? 28,
+            watermarkStyle: data.watermarkStyle || "REPEAT_DIAGONAL",
             storageProvider: data.storageProvider || "R2",
             r2AccountId: data.r2AccountId || "",
             r2BucketName: data.r2BucketName || "lalitakapilavai-media",
@@ -646,13 +648,33 @@ export default function AdminSettingsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 text-xs">
-                  <div className="space-y-1.5">
-                    <Label className="font-semibold text-foreground">Watermark Stamp Text</Label>
-                    <Input
-                      value={form.watermarkText}
-                      onChange={(e) => setForm({ ...form, watermarkText: e.target.value })}
-                      className="text-xs font-serif"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Watermark Stamp Text</Label>
+                      <Input
+                        value={form.watermarkText}
+                        onChange={(e) => setForm({ ...form, watermarkText: e.target.value })}
+                        className="text-xs font-serif"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Watermark Style &amp; Placement</Label>
+                      <Select
+                        value={form.watermarkStyle}
+                        onValueChange={(val) => setForm({ ...form, watermarkStyle: val })}
+                      >
+                        <SelectTrigger className="text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="REPEAT_DIAGONAL">Full Diagonal Repeat (-25° subtle pattern)</SelectItem>
+                          <SelectItem value="BANNER">Bottom Protection Banner (Obsidian + Gold Line)</SelectItem>
+                          <SelectItem value="CORNER">Crisp Corner Stamp Badge (Bottom-Right)</SelectItem>
+                          <SelectItem value="BOTH">Diagonal Repeat + Bottom Protection Banner</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

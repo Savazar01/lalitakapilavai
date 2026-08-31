@@ -123,6 +123,7 @@ export async function POST(request: NextRequest) {
       text: watermarkText,
       opacity,
       fontSize: systemSettings?.watermarkFontSize || undefined,
+      style: systemSettings?.watermarkStyle || "REPEAT_DIAGONAL",
     });
 
     // 7. Generate Watermarked WebP Derivative

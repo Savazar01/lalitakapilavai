@@ -40,6 +40,7 @@ export async function Footer() {
     footerConfig?.contactPhone || settings?.contactPhone || "+91 98450 12345";
   const aboutText =
     footerConfig?.aboutText ||
+    settings?.siteDescription ||
     "Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.";
   const copyrightText =
     footerConfig?.copyrightText ||
@@ -98,9 +99,20 @@ export async function Footer() {
                   <Sparkles className="w-4 h-4 text-primary" />
                 </div>
               )}
-              <span className="font-serif font-bold text-lg text-foreground">
-                {settings?.siteName ? settings.siteName.split("—")[0].trim() : "Lalita Kapilavai"}
-              </span>
+              <div className="flex flex-col">
+                <span className="font-serif font-bold text-lg text-foreground">
+                  {settings?.siteName
+                    ? settings.siteName.includes("—")
+                      ? settings.siteName.split("—")[0].trim()
+                      : settings.siteName
+                    : "Lalita Kapilavai"}
+                </span>
+                {settings?.siteName?.includes("—") && (
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    {settings.siteName.split("—").slice(1).join("—").trim()}
+                  </span>
+                )}
+              </div>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md">
               {aboutText}

@@ -100,6 +100,7 @@ model SystemSetting {
   watermarkText     String   @default("© Lalita Kapilavai - Sacred Art & Heritage")
   watermarkOpacity  Float    @default(0.4)
   watermarkFontSize Int      @default(32)
+  watermarkStyle    String?  @default("REPEAT_DIAGONAL") // REPEAT_DIAGONAL, BANNER, CORNER, BOTH
 
   // Cloudflare R2 / AWS S3 storage settings
   storageProvider   String   @default("R2") // R2, S3, CUSTOM
