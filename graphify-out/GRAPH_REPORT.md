@@ -1,16 +1,16 @@
-# Graph Report - lalitakapilavai  (2026-08-30)
+# Graph Report - lalitakapilavai  (2026-08-31)
 
 ## Corpus Check
-- 123 files · ~75,651 words
+- 124 files · ~77,812 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 663 nodes · 1324 edges · 51 communities (37 shown, 14 thin omitted)
+- 668 nodes · 1340 edges · 52 communities (37 shown, 15 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1a510ad4`
+- Built from commit: `764e7b03`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -44,9 +44,11 @@
 - [[_COMMUNITY_Community 29|Community 29]]
 - [[_COMMUNITY_Community 33|Community 33]]
 - [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
 - [[_COMMUNITY_Community 37|Community 37]]
 - [[_COMMUNITY_Community 38|Community 38]]
 - [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 40|Community 40]]
 - [[_COMMUNITY_Community 41|Community 41]]
 - [[_COMMUNITY_Community 42|Community 42]]
 - [[_COMMUNITY_Community 43|Community 43]]
@@ -79,14 +81,14 @@
   src/app/api/admin/media/vault/route.ts → src/lib/storage.ts
 - `GET()` --calls--> `generateQRCodeDataUrl()`  [EXTRACTED]
   src/app/api/admin/qr/route.ts → src/lib/qr.ts
-- `Badge()` --calls--> `cn()`  [EXTRACTED]
-  src/components/ui/badge.tsx → src/lib/utils.ts
+- `SheetHeader()` --calls--> `cn()`  [EXTRACTED]
+  src/components/ui/sheet.tsx → src/lib/utils.ts
 
-## Communities (51 total, 14 thin omitted)
+## Communities (52 total, 15 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.07
-Nodes (68): AiAssistantModal(), AiAssistantModalProps, DashboardLayoutManager(), DashboardWidgetData, iconRegistry, Artwork, Category, COLOR_PRESETS (+60 more)
+Cohesion: 0.06
+Nodes (79): AiAssistantModal(), AiAssistantModalProps, DashboardLayoutManager(), DashboardWidgetData, iconRegistry, Artwork, Category, COLOR_PRESETS (+71 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.47
@@ -101,8 +103,8 @@ Cohesion: 0.07
 Nodes (34): 1. Architectural Stack, 2. Quickstart & Local Development, 3. Docker Containerization & Production Build, 4. Coolify VPS Deployment Workflow, 4. Zero-Touch Coolify Deployment (via `coolify` Network), 5. Architectural Documentation & Skills, 5-Step Deployment Runbook, Automated Container Lifecycle & Idempotency Hook (+26 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.07
-Nodes (32): NavItem, navItems, cn(), AiConfig, EmailConfig, FooterConfig, LegalLinkItem, SocialLinkItem (+24 more)
+Cohesion: 0.17
+Nodes (10): NavItem, navItems, SheetContent, SheetContentProps, SheetDescription, SheetHeader(), SheetOverlay, SheetTitle (+2 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.07
@@ -113,8 +115,8 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.07
-Nodes (39): ArtworkSummary, EventFormData, EventFormModal(), EventFormModalProps, GalleryImageItem, ModernDateTimePicker(), ModernDateTimePickerProps, MONTH_NAMES (+31 more)
+Cohesion: 0.06
+Nodes (44): ArtworkSummary, EventFormData, EventFormModal(), EventFormModalProps, GalleryImageItem, ModernDateTimePicker(), ModernDateTimePickerProps, MONTH_NAMES (+36 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.17
@@ -161,8 +163,8 @@ Cohesion: 0.28
 Nodes (5): geistMono, geistSans, metadata, ThemeProvider(), Toaster()
 
 ### Community 21 - "Community 21"
-Cohesion: 0.21
-Nodes (11): AnimatedSection(), AnimatedSectionProps, DynamicPageSectionsProps, DynamicSectionItem, DynamicSubSectionItem, DynamicPublicPage(), generateMetadata(), getPageBySlug (+3 more)
+Cohesion: 0.18
+Nodes (7): metadata, AnimatedSection(), AnimatedSectionProps, DynamicPageSections(), DynamicPageSectionsProps, DynamicSectionItem, DynamicSubSectionItem
 
 ### Community 29 - "Community 29"
 Cohesion: 0.11
@@ -172,17 +174,21 @@ Nodes (3): { GET, POST }, auth, AuthSession
 Cohesion: 0.39
 Nodes (6): POST(), AiConfig, CULTURAL_SYSTEM_PROMPT, generateAiContent(), GenerateOptions, getAiConfig()
 
+### Community 36 - "Community 36"
+Cohesion: 0.24
+Nodes (8): DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSubContent, DropdownMenuSubTrigger
+
 ### Community 37 - "Community 37"
 Cohesion: 0.12
-Nodes (9): metadata, metadata, Footer(), FooterConfig, LegalLinkItem, SocialLinkItem, Navbar(), PageProps (+1 more)
+Nodes (10): PageProps, metadata, metadata, Footer(), FooterConfig, LegalLinkItem, SocialLinkItem, GalleryGrid() (+2 more)
 
 ### Community 39 - "Community 39"
-Cohesion: 0.22
-Nodes (5): PageProps, metadata, Artwork, Category, GalleryGrid()
+Cohesion: 0.43
+Nodes (6): DynamicPublicPage(), generateMetadata(), getPageBySlug, PageProps, generateMetadata(), PageProps
 
 ### Community 43 - "Community 43"
-Cohesion: 0.12
-Nodes (17): columnPresets, isLightColor(), PageData, SectionData, SortableSection(), SubSectionData, artisticBorderPresets, availableIcons (+9 more)
+Cohesion: 0.11
+Nodes (21): columnPresets, isLightColor(), PageData, SectionData, SortableSection(), SubSectionData, artisticBorderPresets, availableIcons (+13 more)
 
 ### Community 44 - "Community 44"
 Cohesion: 0.43
@@ -193,27 +199,27 @@ Cohesion: 0.48
 Nodes (5): escapeXml(), generateWatermarkSvg(), WatermarkOptions, escapeXml(), POST()
 
 ### Community 50 - "Community 50"
-Cohesion: 0.29
-Nodes (4): metadata, BlogArchiveClient(), BlogPostData, DynamicPageSections()
+Cohesion: 0.33
+Nodes (3): metadata, BlogArchiveClient(), BlogPostData
 
 ## Knowledge Gaps
-- **273 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+268 more)
+- **274 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+269 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Button` connect `Community 0` to `Community 4`, `Community 36`, `Community 37`, `Community 7`, `Community 39`, `Community 43`?**
+- **Why does `Button` connect `Community 0` to `Community 4`, `Community 37`, `Community 36`, `Community 7`, `Community 40`, `Community 43`, `Community 21`?**
   _High betweenness centrality (0.038) - this node is a cross-community bridge._
-- **Why does `Badge()` connect `Community 0` to `Community 4`, `Community 37`, `Community 39`, `Community 7`, `Community 43`?**
+- **Why does `Badge()` connect `Community 0` to `Community 4`, `Community 37`, `Community 7`, `Community 40`, `Community 43`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 4` to `Community 0`, `Community 43`?**
+- **Why does `cn()` connect `Community 0` to `Community 43`, `Community 36`, `Community 4`, `Community 7`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig` to the rest of the system?**
-  _273 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _274 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.06738949124270226 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.057523809523809526 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.05405405405405406 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**

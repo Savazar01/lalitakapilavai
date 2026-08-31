@@ -24,7 +24,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import {
   ArrowLeft,
-  Save,
   Eye,
   Plus,
   Trash2,
@@ -40,6 +39,9 @@ import {
   ChevronDown,
   Upload,
   Image as ImageIcon,
+  Copy,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -48,6 +50,7 @@ import { ViewportSwitcher, ViewportMode } from "@/components/builder/viewport-sw
 import { StyleInspector, SectionStyle } from "@/components/builder/style-inspector";
 import { TiptapEditor } from "@/components/builder/tiptap-editor";
 import { ColumnBlock } from "@/components/public/tiptap-renderer";
+import { getPatternById } from "@/lib/background-patterns";
 
 export function isLightColor(colorStr?: string | null): boolean {
   if (!colorStr) return false;
@@ -89,10 +92,14 @@ interface SectionData {
   id: string;
   title: string;
   gridSpan: number;
-  backgroundColor?: string;
-  customCssClass?: string;
-  paddingTop?: number;
-  paddingBottom?: number;
+  backgroundColor?: string | null;
+  backgroundType?: "COLOR" | "PATTERN" | "IMAGE" | null;
+  backgroundPattern?: string | null;
+  backgroundImage?: string | null;
+  backgroundOverlayOpacity?: number | null;
+  customCssClass?: string | null;
+  paddingTop?: number | null;
+  paddingBottom?: number | null;
   subSections: SubSectionData[];
 }
 
@@ -143,18 +150,26 @@ const columnPresets = [
 function SortableSection({
   section,
   index,
+  totalSections,
   isSelected,
   onSelect,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  onDuplicate,
   onUpdateSubSectionContent,
   onSelectSubSection,
   selectedSubSectionIndex,
 }: {
   section: SectionData;
   index: number;
+  totalSections: number;
   isSelected: boolean;
   onSelect: () => void;
   onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onDuplicate: () => void;
   onUpdateSubSectionContent: (subIdx: number, content: Record<string, unknown>) => void;
   onSelectSubSection: (subIdx: number) => void;
   selectedSubSectionIndex: number | null;
@@ -168,6 +183,11 @@ function SortableSection({
     isDragging,
   } = useSortable({ id: section.id });
 
+  const isImageBg = section.backgroundType === "IMAGE" && !!section.backgroundImage;
+  const isPatternBg = section.backgroundType === "PATTERN" && !!section.backgroundPattern;
+  const pattern = isPatternBg ? getPatternById(section.backgroundPattern) : null;
+  const overlayOpacity = section.backgroundOverlayOpacity ?? 0.5;
+
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -175,6 +195,14 @@ function SortableSection({
     backgroundColor: section.backgroundColor || undefined,
     paddingTop: `${section.paddingTop ?? 48}px`,
     paddingBottom: `${section.paddingBottom ?? 48}px`,
+    ...(isImageBg
+      ? {
+          backgroundImage: `url("${section.backgroundImage}")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }
+      : {}),
   };
 
   const isSectionLight = isLightColor(section.backgroundColor);
@@ -304,53 +332,145 @@ function SortableSection({
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group rounded-xl border-2 transition-all my-4 ${
+      className={`relative group rounded-xl border-2 transition-all my-4 overflow-hidden ${
         isSelected
           ? "border-primary ring-2 ring-primary/20 shadow-lg"
           : "border-border/60 hover:border-border"
       }`}
     >
-      {/* Section Quick Controls Header */}
-      <div className="absolute top-2 left-2 z-20 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity bg-card/90 backdrop-blur-md px-2 py-1 rounded-md border border-border shadow-sm">
-        <button
-          type="button"
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing p-1 text-muted-foreground hover:text-foreground"
-          title="Drag to reorder section"
-        >
-          <GripVertical className="w-3.5 h-3.5" />
-        </button>
-        <span className="text-[11px] font-semibold text-foreground">
-          Section {index + 1}: {section.title}
-        </span>
+      {/* Background Image Dark Overlay */}
+      {isImageBg && (
+        <div
+          className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 z-0"
+          style={{ opacity: overlayOpacity }}
+        />
+      )}
+
+      {/* Background Pattern Layer */}
+      {pattern && (
+        <div
+          className="absolute inset-0 pointer-events-none transition-opacity duration-300 z-0"
+          style={{
+            backgroundImage: `url("${pattern.svgDataUri}")`,
+            backgroundRepeat: "repeat",
+            opacity: overlayOpacity,
+          }}
+        />
+      )}
+
+      {/* Section Dedicated Header & Rearranging Bar */}
+      <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-card/95 backdrop-blur-md rounded-t-[10px] border-b border-border/80 text-xs select-none relative z-20 mb-3">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+            title="Drag to reorder section"
+          >
+            <GripVertical className="w-3.5 h-3.5" />
+          </button>
+          <span className="font-serif font-bold text-foreground text-xs flex items-center gap-1.5">
+            <span className="w-5 h-5 rounded bg-primary/15 text-primary text-[10px] flex items-center justify-center font-mono font-bold">
+              {index + 1}
+            </span>
+            {section.title || `Section ${index + 1}`}
+          </span>
+          {section.backgroundType === "PATTERN" && (
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+              Pattern: {section.backgroundPattern || "none"}
+            </span>
+          )}
+          {section.backgroundType === "IMAGE" && (
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-500 border border-sky-500/20">
+              Image Bg ({Math.round((section.backgroundOverlayOpacity ?? 0.5) * 100)}% overlay)
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1">
+          {/* Move Up */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveUp();
+            }}
+            disabled={index === 0}
+            className="h-6 w-6 p-0 hover:bg-accent disabled:opacity-30 cursor-pointer"
+            title="Move Section Up (↑)"
+          >
+            <ArrowUp className="w-3.5 h-3.5" />
+          </Button>
+
+          {/* Move Down */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveDown();
+            }}
+            disabled={index === totalSections - 1}
+            className="h-6 w-6 p-0 hover:bg-accent disabled:opacity-30 cursor-pointer"
+            title="Move Section Down (↓)"
+          >
+            <ArrowDown className="w-3.5 h-3.5" />
+          </Button>
+
+          {/* Duplicate Section */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate();
+            }}
+            className="h-6 w-6 p-0 hover:bg-accent text-muted-foreground hover:text-foreground cursor-pointer"
+            title="Duplicate Section"
+          >
+            <Copy className="w-3.5 h-3.5" />
+          </Button>
+
+          {/* Style Section Inspector Trigger */}
+          <Button
+            type="button"
+            variant={isSelected && selectedSubSectionIndex === null ? "default" : "secondary"}
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect();
+            }}
+            className="h-6 text-[11px] px-2 gap-1 cursor-pointer"
+            title="Configure Section Background & Spacing"
+          >
+            <Sliders className="w-3 h-3 text-primary" />
+            Style
+          </Button>
+
+          {/* Delete Section */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="h-6 w-6 p-0 text-destructive hover:bg-destructive/15 cursor-pointer"
+            title="Delete Section"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+        </div>
       </div>
 
-      <div className="absolute top-2 right-2 z-20 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={onSelect}
-          className="h-7 text-xs px-2 gap-1 bg-card/90 backdrop-blur-md border border-border"
-        >
-          <Sliders className="w-3 h-3 text-primary" />
-          Style
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onDelete}
-          className="h-7 w-7 p-0 text-destructive bg-card/90 backdrop-blur-md hover:bg-destructive/10"
-          title="Delete Section"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </Button>
-      </div>
-
-      {/* 12-Column Responsive Grid Row */}
-      <div className="grid grid-cols-12 gap-4 px-4 sm:px-6">
+      {/* 12-Column Responsive Grid Row with relative z-10 */}
+      <div className="grid grid-cols-12 gap-4 px-4 sm:px-6 relative z-10">
         {section.subSections.map((col, colIdx) => {
           const colSpanClass =
             col.gridSpan === 12
@@ -1002,6 +1122,44 @@ export default function VisualPageBuilder() {
     setPresetDialogOpen(false);
   };
 
+  // Move Section Up or Down
+  const handleMoveSection = (index: number, direction: "up" | "down") => {
+    if (!page) return;
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= page.sections.length) return;
+    const reordered = arrayMove(page.sections, index, targetIndex);
+    setPage({
+      ...page,
+      sections: reordered,
+    });
+    toast.success(`Moved section ${direction === "up" ? "up" : "down"}`);
+  };
+
+  // Duplicate Section
+  const handleDuplicateSection = (index: number) => {
+    if (!page) return;
+    const src = page.sections[index];
+    const newSec: SectionData = {
+      ...src,
+      id: crypto.randomUUID(),
+      title: `${src.title || "Section"} (Copy)`,
+      subSections: src.subSections.map((sub, sIdx) => ({
+        ...sub,
+        id: crypto.randomUUID(),
+        title: sub.title ? `${sub.title} (Copy)` : `Column ${sIdx + 1}`,
+      })),
+    };
+    const newSections = [...page.sections];
+    newSections.splice(index + 1, 0, newSec);
+    setPage({
+      ...page,
+      sections: newSections,
+    });
+    setSelectedSectionId(newSec.id);
+    setSelectedSubIndex(null);
+    toast.success("Section duplicated successfully!");
+  };
+
   // Delete Section
   const handleDeleteSection = (sectionId: string) => {
     if (!page) return;
@@ -1064,7 +1222,11 @@ export default function VisualPageBuilder() {
         setPage({ ...page, isPublished });
         setSavedSuccess(true);
         setTimeout(() => setSavedSuccess(false), 2500);
-        toast.success("Page layout saved successfully!");
+        if (isPublished) {
+          toast.success("Page layout published live! Public website cache revalidated.");
+        } else {
+          toast.success("Page saved as draft.");
+        }
       } else {
         const err = await res.json().catch(() => ({}));
         toast.error(err.error || "Failed to save changes");
@@ -1073,7 +1235,6 @@ export default function VisualPageBuilder() {
       console.error(e);
       toast.error("Error saving page");
     } finally {
-
       setSaving(false);
     }
   };
@@ -1117,42 +1278,45 @@ export default function VisualPageBuilder() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          <Link href={`/${page.slug}`} target="_blank">
+          <Link href={page.slug === "home" ? "/" : `/${page.slug}`} target="_blank">
             <Button
               variant="outline"
               size="sm"
-              className="h-8 text-xs gap-1.5 hidden md:inline-flex"
+              className="h-8 text-xs gap-1.5 hidden md:inline-flex cursor-pointer"
             >
               <Eye className="w-3.5 h-3.5" />
               Live Preview
             </Button>
           </Link>
 
+          {/* Save as Draft */}
           <Button
-            variant={page.isPublished ? "gold" : "outline"}
+            variant="outline"
             size="sm"
-            onClick={() => handleSave(!page.isPublished)}
-            className="h-8 text-xs gap-1"
+            onClick={() => handleSave(false)}
+            disabled={saving}
+            className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
           >
             <Globe className="w-3.5 h-3.5" />
-            {page.isPublished ? "Published" : "Draft"}
+            Save as Draft
           </Button>
 
+          {/* Save & Publish */}
           <Button
-            variant="default"
+            variant="gold"
             size="sm"
-            onClick={() => handleSave()}
+            onClick={() => handleSave(true)}
             disabled={saving}
-            className="h-8 text-xs gap-1.5 font-bold"
+            className="h-8 text-xs gap-1.5 font-bold shadow-md cursor-pointer"
           >
             {saving ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : savedSuccess ? (
-              <Check className="w-3.5 h-3.5 text-emerald-500" />
+            ) : savedSuccess && page.isPublished ? (
+              <Check className="w-3.5 h-3.5 text-black" />
             ) : (
-              <Save className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5 text-black" />
             )}
-            {savedSuccess ? "Saved!" : "Save"}
+            {savedSuccess && page.isPublished ? "Published Live!" : "Save & Publish"}
           </Button>
         </div>
       </header>
@@ -1185,6 +1349,7 @@ export default function VisualPageBuilder() {
                     key={section.id}
                     section={section}
                     index={idx}
+                    totalSections={page.sections.length}
                     isSelected={selectedSectionId === section.id}
                     selectedSubSectionIndex={
                       selectedSectionId === section.id ? selectedSubIndex : null
@@ -1197,6 +1362,9 @@ export default function VisualPageBuilder() {
                       setSelectedSectionId(section.id);
                       setSelectedSubIndex(subIdx);
                     }}
+                    onMoveUp={() => handleMoveSection(idx, "up")}
+                    onMoveDown={() => handleMoveSection(idx, "down")}
+                    onDuplicate={() => handleDuplicateSection(idx)}
                     onDelete={() => handleDeleteSection(section.id)}
                     onUpdateSubSectionContent={(subIdx, content) =>
                       handleUpdateSubContent(section.id, subIdx, content)
@@ -1237,9 +1405,32 @@ export default function VisualPageBuilder() {
             <StyleInspector
               isSubSection={selectedSubIndex !== null}
               style={{
-                backgroundColor: currentSection.backgroundColor,
-                paddingTop: currentSection.paddingTop,
-                paddingBottom: currentSection.paddingBottom,
+                backgroundColor:
+                  (selectedSubIndex !== null
+                    ? (subStyle.backgroundColor as string) || currentSection.backgroundColor
+                    : currentSection.backgroundColor) || undefined,
+                backgroundType:
+                  selectedSubIndex !== null
+                    ? (subStyle.backgroundType as "COLOR" | "PATTERN" | "IMAGE") || "COLOR"
+                    : (currentSection.backgroundType as "COLOR" | "PATTERN" | "IMAGE") || "COLOR",
+                backgroundPattern:
+                  selectedSubIndex !== null
+                    ? subStyle.backgroundPattern || ""
+                    : currentSection.backgroundPattern || "",
+                backgroundImage:
+                  selectedSubIndex !== null
+                    ? subStyle.backgroundImage || ""
+                    : currentSection.backgroundImage || "",
+                backgroundImageUrl:
+                  selectedSubIndex !== null
+                    ? subStyle.backgroundImage || ""
+                    : currentSection.backgroundImage || "",
+                backgroundOverlayOpacity:
+                  selectedSubIndex !== null
+                    ? subStyle.backgroundOverlayOpacity ?? 0.5
+                    : currentSection.backgroundOverlayOpacity ?? 0.5,
+                paddingTop: currentSection.paddingTop ?? undefined,
+                paddingBottom: currentSection.paddingBottom ?? undefined,
                 gridSpan: selectedSub?.gridSpan,
                 mediaType: (subMedia?.mediaType as "NONE" | "IMAGE" | "VIDEO" | "ICON" | "AUDIO_PLAYER") || "NONE",
                 mediaUrl: (subMedia?.mediaUrl as string) || "",
@@ -1282,6 +1473,11 @@ export default function VisualPageBuilder() {
                             borderRadius: updated.borderRadius,
                             boxShadow: updated.boxShadow,
                             ornamentalFrame: updated.ornamentalFrame,
+                            backgroundColor: updated.backgroundColor,
+                            backgroundType: updated.backgroundType || "COLOR",
+                            backgroundPattern: updated.backgroundPattern || null,
+                            backgroundImage: updated.backgroundImage || null,
+                            backgroundOverlayOpacity: updated.backgroundOverlayOpacity ?? 0.5,
                           },
                           _media: {
                             mediaType: updated.mediaType || "NONE",
@@ -1303,6 +1499,10 @@ export default function VisualPageBuilder() {
                     return {
                       ...sec,
                       backgroundColor: updated.backgroundColor,
+                      backgroundType: updated.backgroundType || "COLOR",
+                      backgroundPattern: updated.backgroundPattern || null,
+                      backgroundImage: updated.backgroundImage || null,
+                      backgroundOverlayOpacity: updated.backgroundOverlayOpacity ?? 0.5,
                       paddingTop: updated.paddingTop,
                       paddingBottom: updated.paddingBottom,
                     };

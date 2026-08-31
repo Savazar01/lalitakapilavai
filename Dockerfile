@@ -8,19 +8,18 @@ WORKDIR /app
 # Consolidate all required system packages in base layer once
 RUN apt-get update && \
     apt-get install -y --no-install-recommends openssl ca-certificates netcat-openbsd && \
-    rm -rf /var/lib/apt/lists/* && \
-    npm install -g npm@latest
+    rm -rf /var/lib/apt/lists/*
 
 # Stage 1: Install dependencies with npm cache mount
 FROM base AS deps
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc* ./
 RUN --mount=type=cache,target=/root/.npm npm ci --loglevel=error
 
 # Development stage for local multi-container live-reloading (inherits deps)
 FROM deps AS dev
 WORKDIR /app
 COPY prisma ./prisma
-RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; fi
+RUN if [ -f "./prisma/schema.prisma" ]; then ./node_modules/.bin/prisma generate; fi
 
 ENV NODE_ENV=development
 ENV PORT=3060
@@ -45,7 +44,7 @@ ENV BETTER_AUTH_URL="http://localhost:3060"
 ENV NEXT_PUBLIC_APP_URL="http://localhost:3060"
 
 # Generate Prisma client with glibc engine
-RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; fi
+RUN if [ -f "./prisma/schema.prisma" ]; then ./node_modules/.bin/prisma generate; fi
 
 # Fast Next.js production compilation with cache mount
 RUN --mount=type=cache,target=/app/.next/cache npm run build

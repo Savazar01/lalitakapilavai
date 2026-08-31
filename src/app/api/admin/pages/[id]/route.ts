@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
@@ -95,6 +96,13 @@ export async function PUT(
               orderIndex: sIdx + 1,
               gridSpan: sec.gridSpan || 12,
               backgroundColor: sec.backgroundColor || null,
+              backgroundType: sec.backgroundType || "COLOR",
+              backgroundPattern: sec.backgroundPattern || null,
+              backgroundImage: sec.backgroundImage || null,
+              backgroundOverlayOpacity:
+                sec.backgroundOverlayOpacity !== undefined && sec.backgroundOverlayOpacity !== null
+                  ? parseFloat(String(sec.backgroundOverlayOpacity))
+                  : 0.5,
               customCssClass: sec.customCssClass || null,
             },
           });
@@ -102,6 +110,11 @@ export async function PUT(
           if (Array.isArray(sec.subSections)) {
             for (let subIdx = 0; subIdx < sec.subSections.length; subIdx++) {
               const sub = sec.subSections[subIdx];
+              const subStyle =
+                typeof sub.content === "object" && sub.content !== null
+                  ? ((sub.content as Record<string, unknown>)._style as Record<string, unknown> | undefined)
+                  : undefined;
+
               await tx.subSection.create({
                 data: {
                   sectionId: newSection.id,
@@ -110,6 +123,15 @@ export async function PUT(
                   gridSpan: sub.gridSpan || 12,
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   content: (sub.content || {}) as any,
+                  backgroundType: sub.backgroundType || (subStyle?.backgroundType as string) || "COLOR",
+                  backgroundPattern: sub.backgroundPattern || (subStyle?.backgroundPattern as string) || null,
+                  backgroundImage: sub.backgroundImage || (subStyle?.backgroundImage as string) || null,
+                  backgroundOverlayOpacity:
+                    sub.backgroundOverlayOpacity !== undefined && sub.backgroundOverlayOpacity !== null
+                      ? parseFloat(String(sub.backgroundOverlayOpacity))
+                      : subStyle?.backgroundOverlayOpacity !== undefined && subStyle?.backgroundOverlayOpacity !== null
+                      ? parseFloat(String(subStyle.backgroundOverlayOpacity))
+                      : 0.5,
                 },
               });
             }
@@ -119,6 +141,20 @@ export async function PUT(
 
       return page;
     });
+
+    // Revalidate public routes and admin page list so changes reflect instantly
+    try {
+      if (updatedPage.slug === "home" || updatedPage.slug === "index") {
+        revalidatePath("/");
+        revalidatePath("/(public)", "page");
+      } else {
+        revalidatePath(`/${updatedPage.slug}`);
+        revalidatePath(`/(public)/${updatedPage.slug}`, "page");
+      }
+      revalidatePath("/admin/pages");
+    } catch (revErr) {
+      console.warn("Revalidation warning (non-fatal):", revErr);
+    }
 
     return NextResponse.json(updatedPage);
   } catch (error: unknown) {

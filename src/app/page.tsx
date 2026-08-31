@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Palette, Music, BookOpen, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata(): Promise<Metadata> {
   try {

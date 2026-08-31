@@ -11,6 +11,7 @@ interface PageProps {
 }
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // Cached database page query
 const getPageBySlug = cache(async (slug: string) => {

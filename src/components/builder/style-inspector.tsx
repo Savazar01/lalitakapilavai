@@ -33,12 +33,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { BACKGROUND_PATTERNS } from "@/lib/background-patterns";
 
 export interface SectionStyle {
+  // Background Mode & Styling
+  backgroundType?: "COLOR" | "PATTERN" | "IMAGE";
   backgroundColor?: string;
   backgroundGradient?: string;
+  backgroundPattern?: string;
+  backgroundImage?: string;
   backgroundImageUrl?: string;
   backgroundOverlayOpacity?: number;
+  backgroundSize?: "cover" | "contain";
+  backgroundPosition?: string;
   fontFamily?: string;
   fontSize?: string;
   textColor?: string;
@@ -119,6 +127,7 @@ export function StyleInspector({
   isSubSection = false,
 }: StyleInspectorProps) {
   const [uploadingImage, setUploadingImage] = React.useState(false);
+  const [uploadingBgImage, setUploadingBgImage] = React.useState(false);
 
   const update = (key: keyof SectionStyle, value: unknown) => {
     onChange({
@@ -154,6 +163,43 @@ export function StyleInspector({
       toast.error(err instanceof Error ? err.message : "Media upload failed");
     } finally {
       setUploadingImage(false);
+    }
+  };
+
+  const handleBgImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingBgImage(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("mediaType", "general");
+    body.append("isArtwork", "false");
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      const imgUrl =
+        data.publicUrl ||
+        data.watermarkedUrl ||
+        data.primaryImageUrl ||
+        data.rawUrl;
+      onChange({
+        ...style,
+        backgroundType: "IMAGE",
+        backgroundImage: imgUrl,
+        backgroundImageUrl: imgUrl,
+      });
+      toast.success("Background image uploaded successfully!");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploadingBgImage(false);
     }
   };
 
@@ -407,55 +453,240 @@ export function StyleInspector({
         </div>
       )}
 
-      {/* Background Section */}
+      {/* Background Section with Mode Tabs */}
       <div className="space-y-3">
-        <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <Paintbrush className="w-3.5 h-3.5 text-primary" />
-          Background Styling
+        <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <Paintbrush className="w-3.5 h-3.5 text-primary" />
+            Background Mode
+          </span>
+          <span className="text-[10px] font-mono text-primary font-bold">
+            {style.backgroundType || "COLOR"}
+          </span>
         </label>
 
-        {/* Color Presets */}
-        <div className="grid grid-cols-4 gap-2">
-          {colorPresets.map((preset) => (
-            <button
-              key={preset.hex}
-              type="button"
-              onClick={() => update("backgroundColor", preset.hex)}
-              className="flex flex-col items-center gap-1 group cursor-pointer"
-            >
-              <div
-                className={`w-full h-7 rounded border transition-all ${
-                  style.backgroundColor === preset.hex
-                    ? "ring-2 ring-primary ring-offset-1 border-transparent"
-                    : "border-border/60 hover:scale-105"
-                }`}
-                style={{ backgroundColor: preset.hex }}
-              />
-              <span className="text-[10px] text-muted-foreground truncate w-full text-center group-hover:text-foreground">
-                {preset.name}
-              </span>
-            </button>
-          ))}
-        </div>
+        <Tabs
+          value={style.backgroundType || "COLOR"}
+          onValueChange={(val) => update("backgroundType", val)}
+          className="w-full"
+        >
+          <TabsList className="grid grid-cols-3 h-8 w-full bg-muted/70">
+            <TabsTrigger value="COLOR" className="text-[11px] py-1">
+              Color
+            </TabsTrigger>
+            <TabsTrigger value="PATTERN" className="text-[11px] py-1">
+              Patterns
+            </TabsTrigger>
+            <TabsTrigger value="IMAGE" className="text-[11px] py-1">
+              Image
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Custom Hex */}
-        <div className="flex items-center gap-2 pt-1">
-          <label className="text-[11px] text-muted-foreground font-medium">Hex Color:</label>
-          <div className="flex-1 flex items-center gap-1">
-            <input
-              type="color"
-              value={style.backgroundColor || "#FAF7F2"}
-              onChange={(e) => update("backgroundColor", e.target.value)}
-              className="w-7 h-7 rounded border border-border cursor-pointer bg-transparent"
-            />
-            <Input
-              value={style.backgroundColor || ""}
-              onChange={(e) => update("backgroundColor", e.target.value)}
-              placeholder="#FFFFFF"
-              className="font-mono text-xs h-7 uppercase"
-            />
-          </div>
-        </div>
+          {/* Tab 1: Solid & Gradient Color */}
+          <TabsContent value="COLOR" className="space-y-3 pt-2">
+            <div className="grid grid-cols-4 gap-2">
+              {colorPresets.map((preset) => (
+                <button
+                  key={preset.hex}
+                  type="button"
+                  onClick={() => update("backgroundColor", preset.hex)}
+                  className="flex flex-col items-center gap-1 group cursor-pointer"
+                >
+                  <div
+                    className={`w-full h-7 rounded border transition-all ${
+                      style.backgroundColor === preset.hex
+                        ? "ring-2 ring-primary ring-offset-1 border-transparent"
+                        : "border-border/60 hover:scale-105"
+                    }`}
+                    style={{ backgroundColor: preset.hex }}
+                  />
+                  <span className="text-[10px] text-muted-foreground truncate w-full text-center group-hover:text-foreground">
+                    {preset.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <label className="text-[11px] text-muted-foreground font-medium">Hex Color:</label>
+              <div className="flex-1 flex items-center gap-1">
+                <input
+                  type="color"
+                  value={style.backgroundColor || "#FAF7F2"}
+                  onChange={(e) => update("backgroundColor", e.target.value)}
+                  className="w-7 h-7 rounded border border-border cursor-pointer bg-transparent"
+                />
+                <Input
+                  value={style.backgroundColor || ""}
+                  onChange={(e) => update("backgroundColor", e.target.value)}
+                  placeholder="#FFFFFF"
+                  className="font-mono text-xs h-7 uppercase"
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Tab 2: Sacred / Heritage Patterns */}
+          <TabsContent value="PATTERN" className="space-y-3 pt-2">
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+              <span>Curated Sacred Motifs:</span>
+              <button
+                type="button"
+                onClick={() => update("backgroundPattern", "")}
+                className="text-[10px] text-primary hover:underline"
+              >
+                Clear Pattern
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
+              {BACKGROUND_PATTERNS.map((pattern) => {
+                const isSelected = style.backgroundPattern === pattern.id;
+                return (
+                  <button
+                    key={pattern.id}
+                    type="button"
+                    onClick={() => {
+                      onChange({
+                        ...style,
+                        backgroundType: "PATTERN",
+                        backgroundPattern: pattern.id,
+                        backgroundOverlayOpacity: style.backgroundOverlayOpacity ?? 0.15,
+                      });
+                    }}
+                    className={`p-2 rounded-lg border text-left flex flex-col gap-1 transition-all cursor-pointer relative overflow-hidden ${
+                      isSelected
+                        ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
+                        : "border-border/70 hover:border-border hover:bg-muted/30"
+                    }`}
+                  >
+                    <div
+                      className="w-full h-12 rounded border border-border/40 relative overflow-hidden bg-[#FAF7F2] dark:bg-[#1E1B18]"
+                      style={{
+                        backgroundImage: `url("${pattern.svgDataUri}")`,
+                        backgroundRepeat: "repeat",
+                      }}
+                    />
+                    <span className="font-serif font-bold text-[11px] text-foreground truncate">
+                      {pattern.name}
+                    </span>
+                    <span className="text-[9px] text-muted-foreground line-clamp-1">
+                      {pattern.description}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-2 pt-1 border-t border-border/40">
+              <label className="text-[11px] text-muted-foreground font-medium">Base Tint:</label>
+              <div className="flex-1 flex items-center gap-1">
+                <input
+                  type="color"
+                  value={style.backgroundColor || "#FAF7F2"}
+                  onChange={(e) => update("backgroundColor", e.target.value)}
+                  className="w-6 h-6 rounded border border-border cursor-pointer bg-transparent"
+                />
+                <Input
+                  value={style.backgroundColor || ""}
+                  onChange={(e) => update("backgroundColor", e.target.value)}
+                  placeholder="#FAF7F2"
+                  className="font-mono text-[11px] h-6 uppercase"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground font-medium">Pattern Visibility:</span>
+                <span className="font-mono text-primary font-semibold">
+                  {Math.round((style.backgroundOverlayOpacity ?? 0.15) * 100)}%
+                </span>
+              </div>
+              <Input
+                type="range"
+                min={0.05}
+                max={0.8}
+                step={0.05}
+                value={style.backgroundOverlayOpacity ?? 0.15}
+                onChange={(e) => update("backgroundOverlayOpacity", parseFloat(e.target.value))}
+                className="cursor-pointer h-5"
+              />
+            </div>
+          </TabsContent>
+
+          {/* Tab 3: Background Image Upload */}
+          <TabsContent value="IMAGE" className="space-y-3 pt-2">
+            <div className="space-y-1.5">
+              <label className="text-[11px] text-muted-foreground font-medium flex items-center justify-between">
+                <span>Image Source</span>
+                <label className="cursor-pointer text-[10px] text-primary hover:underline flex items-center gap-1">
+                  <UploadCloud className="w-3 h-3" />
+                  {uploadingBgImage ? "Uploading..." : "Upload File"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,image/tiff"
+                    onChange={handleBgImageUpload}
+                    className="hidden"
+                    disabled={uploadingBgImage}
+                  />
+                </label>
+              </label>
+              <Input
+                value={style.backgroundImage || style.backgroundImageUrl || ""}
+                onChange={(e) => {
+                  onChange({
+                    ...style,
+                    backgroundType: "IMAGE",
+                    backgroundImage: e.target.value,
+                    backgroundImageUrl: e.target.value,
+                  });
+                }}
+                placeholder="https://media.lalitakapilavai.com/..."
+                className="text-xs font-mono"
+              />
+            </div>
+
+            {(style.backgroundImage || style.backgroundImageUrl) && (
+              <div className="relative w-full h-20 rounded-lg overflow-hidden border border-border shadow-inner group">
+                <div
+                  className="w-full h-full bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url("${style.backgroundImage || style.backgroundImageUrl}")`,
+                  }}
+                />
+                <div
+                  className="absolute inset-0 bg-black pointer-events-none"
+                  style={{ opacity: style.backgroundOverlayOpacity ?? 0.5 }}
+                />
+                <span className="absolute bottom-1 right-2 text-[9px] font-mono text-white/80 z-10 bg-black/60 px-1 rounded">
+                  Overlay: {Math.round((style.backgroundOverlayOpacity ?? 0.5) * 100)}%
+                </span>
+              </div>
+            )}
+
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground font-medium">Dark Overlay Opacity:</span>
+                <span className="font-mono text-primary font-semibold">
+                  {Math.round((style.backgroundOverlayOpacity ?? 0.5) * 100)}%
+                </span>
+              </div>
+              <Input
+                type="range"
+                min={0}
+                max={0.95}
+                step={0.05}
+                value={style.backgroundOverlayOpacity ?? 0.5}
+                onChange={(e) => update("backgroundOverlayOpacity", parseFloat(e.target.value))}
+                className="cursor-pointer h-5"
+              />
+              <span className="text-[10px] text-muted-foreground block">
+                Controls darkness to ensure readability of foreground text and media.
+              </span>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <Separator />

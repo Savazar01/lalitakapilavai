@@ -189,34 +189,42 @@ model Page {
 }
 
 model PageSection {
-  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  pageId          String        @db.Uuid
-  title           String?
-  slug            String?
-  orderIndex      Int           @default(0)
-  gridSpan        Int           @default(12) // 1 to 12 responsive grid span
-  backgroundColor String?
-  customCssClass  String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                       String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  pageId                   String        @db.Uuid
+  title                    String?
+  slug                     String?
+  orderIndex               Int           @default(0)
+  gridSpan                 Int           @default(12) // 1 to 12 responsive grid span
+  backgroundColor          String?
+  backgroundType           String?       @default("COLOR") // COLOR, PATTERN, IMAGE
+  backgroundPattern        String?
+  backgroundImage          String?
+  backgroundOverlayOpacity  Float?        @default(0.5)
+  customCssClass           String?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
 
-  page            Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  subSections     SubSection[]
+  page                     Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  subSections              SubSection[]
 
   @@map("page_sections")
 }
 
 model SubSection {
-  id         String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  sectionId  String      @db.Uuid
-  title      String?
-  orderIndex Int         @default(0)
-  gridSpan   Int         @default(12) // 1 to 12 responsive grid span
-  content    Json        // Rich block JSON content
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id                       String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sectionId                String      @db.Uuid
+  title                    String?
+  orderIndex               Int         @default(0)
+  gridSpan                 Int         @default(12) // 1 to 12 responsive grid span
+  content                  Json        // Rich block JSON content
+  backgroundType           String?     @default("COLOR") // COLOR, PATTERN, IMAGE
+  backgroundPattern        String?
+  backgroundImage          String?
+  backgroundOverlayOpacity  Float?      @default(0.5)
+  createdAt                DateTime    @default(now())
+  updatedAt                DateTime    @updatedAt
 
-  section    PageSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  section                  PageSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
   @@map("sub_sections")
 }
