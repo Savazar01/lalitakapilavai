@@ -532,6 +532,19 @@ model ECatalog {
   pdfUrl             String?        // Optional pre-compiled static PDF asset
   downloadablePdfUrl String?
   themeColor         String         @default("gold")
+  orientation        String         @default("portrait") // "portrait" | "landscape"
+
+  // Global Catalog Theme & Framing
+  // { backgroundColor, textColor, frameStyle: "none"|"gold-fillet"|"double-fillet"|"silk-border", accentColor }
+  themeConfig        Json?
+
+  // Page-Specific Customizations
+  // { backgroundColor, backgroundImage, frameStyle, showDate, showCurator, subtitle }
+  coverConfig        Json?
+  // { title, contentHtml, backgroundImage, backgroundColor, frameStyle }
+  essayConfig        Json?
+  // { isEnabled: boolean, title, contentHtml, backgroundImage, backgroundColor, frameStyle, contactDetails }
+  endPageConfig      Json?
 
   // Linked Event / Exhibition (Optional)
   eventId            String?        @db.Uuid

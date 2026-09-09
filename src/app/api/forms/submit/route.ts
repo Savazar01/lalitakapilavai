@@ -16,6 +16,9 @@ export async function POST(req: NextRequest) {
       comments,
       formTitle,
       pageSlug,
+      notifyEmail,
+      recipientEmails,
+      emailSubjectTemplate,
       customFields,
     } = body;
 
@@ -48,46 +51,74 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 2. Dispatch non-blocking outbound email notification to adminAlertEmail
-    try {
-      const settings = await prisma.systemSetting.findFirst();
-      const emailConfig = (settings?.emailConfig as Record<string, unknown> | null) || {};
-      const adminEmail = settings?.adminAlertEmail || (emailConfig.fromEmail as string) || "contact@lalitakapilavai.com";
+    // 2. Dispatch outbound email notification if enabled (notifyEmail !== false)
+    if (notifyEmail !== false) {
+      try {
+        const settings = await prisma.systemSetting.findFirst();
+        const emailConfig = (settings?.emailConfig as Record<string, unknown> | null) || {};
+        
+        // Determine recipient list: custom per-form recipients or system fallback
+        let targetRecipients: string[] = [];
+        if (typeof recipientEmails === "string" && recipientEmails.trim()) {
+          targetRecipients = recipientEmails
+            .split(",")
+            .map((e) => e.trim())
+            .filter((e) => e.length > 0 && e.includes("@"));
+        } else if (Array.isArray(recipientEmails) && recipientEmails.length > 0) {
+          targetRecipients = recipientEmails
+            .map((e) => String(e).trim())
+            .filter((e) => e.length > 0 && e.includes("@"));
+        }
 
-      const host = (emailConfig.smtpHost as string) || "smtp.gmail.com";
-      const port = Number(emailConfig.smtpPort) || 587;
-      const user = (emailConfig.smtpUser as string) || "";
-      const pass = (emailConfig.smtpPassword as string) || "";
-      const fromEmail = (emailConfig.fromEmail as string) || user || "contact@lalitakapilavai.com";
-      const fromName = (emailConfig.fromName as string) || "Lalita Kapilavai Archive";
+        if (targetRecipients.length === 0) {
+          const defaultAdmin = settings?.adminAlertEmail || (emailConfig.fromEmail as string) || "contact@lalitakapilavai.com";
+          targetRecipients = [defaultAdmin];
+        }
 
-      if (user && pass) {
-        const transporter = nodemailer.createTransport({
-          host,
-          port,
-          secure: port === 465,
-          auth: {
-            user,
-            pass,
-          },
-          tls: {
-            rejectUnauthorized: false,
-          },
-        });
+        const host = (emailConfig.smtpHost as string) || "smtp.gmail.com";
+        const port = Number(emailConfig.smtpPort) || 587;
+        const user = (emailConfig.smtpUser as string) || "";
+        const pass = (emailConfig.smtpPassword as string) || "";
+        const fromEmail = (emailConfig.fromEmail as string) || user || "contact@lalitakapilavai.com";
+        const fromName = (emailConfig.fromName as string) || "Lalita Kapilavai Archive";
 
-        // Format custom fields nicely
-        const customRows = Object.entries(customFields || {})
-          .map(
-            ([k, v]) =>
-              `<tr><td style="padding: 8px 12px; color: #E6C65A; font-weight: bold; border-bottom: 1px solid #332E27;">${k}</td><td style="padding: 8px 12px; color: #FAF7F2; border-bottom: 1px solid #332E27;">${String(v)}</td></tr>`
-          )
-          .join("");
+        if (user && pass) {
+          const transporter = nodemailer.createTransport({
+            host,
+            port,
+            secure: port === 465,
+            auth: {
+              user,
+              pass,
+            },
+            tls: {
+              rejectUnauthorized: false,
+            },
+          });
 
-        await transporter.sendMail({
-          from: `"${fromName}" <${fromEmail}>`,
-          to: adminEmail,
-          replyTo: trimmedEmail,
-          subject: `✨ New Inquiry: ${titleStr} [${trimmedName}]`,
+          // Compile subject line with template support
+          let emailSubject = `✨ New Inquiry: ${titleStr} [${trimmedName}]`;
+          if (emailSubjectTemplate && typeof emailSubjectTemplate === "string" && emailSubjectTemplate.trim()) {
+            emailSubject = emailSubjectTemplate
+              .replace(/\{\{formTitle\}\}/gi, titleStr)
+              .replace(/\{\{fullName\}\}/gi, trimmedName)
+              .replace(/\{\{name\}\}/gi, trimmedName)
+              .replace(/\{\{pageSlug\}\}/gi, pageStr);
+          }
+
+          // Format custom fields nicely
+          const customRows = Object.entries(customFields || {})
+            .map(
+              ([k, v]) =>
+                `<tr><td style="padding: 8px 12px; color: #E6C65A; font-weight: bold; border-bottom: 1px solid #332E27;">${k}</td><td style="padding: 8px 12px; color: #FAF7F2; border-bottom: 1px solid #332E27;">${typeof v === "boolean" ? (v ? "Yes" : "No") : String(v)}</td></tr>`
+            )
+            .join("");
+
+          await transporter.sendMail({
+            from: `"${fromName}" <${fromEmail}>`,
+            to: targetRecipients.join(", "),
+            replyTo: trimmedEmail,
+            subject: emailSubject,
           html: `
             <div style="font-family: Georgia, serif; background: #0F0E0D; color: #FAF7F2; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto; border: 1px solid #D4AF37;">
               <div style="border-bottom: 1px solid #D4AF37; padding-bottom: 16px; margin-bottom: 20px;">
@@ -129,6 +160,7 @@ export async function POST(req: NextRequest) {
     } catch (emailErr) {
       console.warn("Outbound email notification notice:", emailErr);
     }
+  }
 
     return NextResponse.json({ success: true, leadId: lead.id });
   } catch (error: unknown) {

@@ -35,6 +35,9 @@ export interface DynamicFormBlockProps {
   formSubtitle?: string;
   submitButtonText?: string;
   successMessage?: string;
+  notifyEmail?: boolean;
+  recipientEmails?: string;
+  emailSubjectTemplate?: string;
   fields?: FormFieldConfig[];
   pageSlug?: string;
   className?: string;
@@ -45,6 +48,9 @@ export function DynamicFormBlock({
   formSubtitle = "Direct correspondence with the atelier desk of Lalita Kapilavai.",
   submitButtonText = "Submit Inquiry",
   successMessage = "Thank you for your correspondence. The curatorial desk will respond shortly.",
+  notifyEmail = true,
+  recipientEmails = "",
+  emailSubjectTemplate = "",
   fields = [
     {
       id: "name",
@@ -135,6 +141,9 @@ export function DynamicFormBlock({
         message: message.trim() || undefined,
         formTitle,
         pageSlug,
+        notifyEmail,
+        recipientEmails: recipientEmails.trim() || undefined,
+        emailSubjectTemplate: emailSubjectTemplate.trim() || undefined,
         customFields,
       };
 

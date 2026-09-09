@@ -396,6 +396,8 @@ export interface ColumnBlock {
   submitButtonText?: string;
   successMessage?: string;
   notifyEmail?: boolean;
+  recipientEmails?: string;
+  emailSubjectTemplate?: string;
   fields?: FormFieldConfig[];
   pageSlug?: string;
 }
@@ -513,6 +515,9 @@ function renderColumnBlock(block: ColumnBlock): React.ReactNode {
           formSubtitle={block.formSubtitle}
           submitButtonText={block.submitButtonText}
           successMessage={block.successMessage}
+          notifyEmail={block.notifyEmail}
+          recipientEmails={block.recipientEmails}
+          emailSubjectTemplate={block.emailSubjectTemplate}
           fields={block.fields}
           pageSlug={block.pageSlug}
         />

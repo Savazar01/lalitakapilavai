@@ -47,6 +47,8 @@ export interface FormBlockData {
   submitButtonText?: string;
   successMessage?: string;
   notifyEmail?: boolean;
+  recipientEmails?: string;
+  emailSubjectTemplate?: string;
   fields?: FormFieldConfig[];
 }
 
@@ -73,6 +75,9 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
   const successMessage =
     data.successMessage ??
     "Thank you for your correspondence. The curatorial desk will respond shortly.";
+  const notifyEmail = data.notifyEmail ?? true;
+  const recipientEmails = data.recipientEmails ?? "";
+  const emailSubjectTemplate = data.emailSubjectTemplate ?? "";
   const fields = data.fields ?? [
     {
       id: "name",
@@ -129,6 +134,9 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
       formSubtitle,
       submitButtonText,
       successMessage,
+      notifyEmail,
+      recipientEmails,
+      emailSubjectTemplate,
       fields,
       ...patch,
     });
@@ -249,6 +257,63 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
             className="text-xs"
             placeholder="Thank you for your correspondence..."
           />
+        </div>
+
+        {/* Dedicated Email & Notification Routing */}
+        <div className="pt-3 border-t border-border/60 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="font-semibold text-foreground flex items-center gap-1.5">
+                Outbound Email Alerts
+              </Label>
+              <p className="text-[11px] text-muted-foreground">
+                Dispatch an email notification whenever a visitor submits this form.
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={notifyEmail}
+                onChange={(e) => updateConfig({ notifyEmail: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          {notifyEmail && (
+            <div className="space-y-3 pt-2">
+              <div className="space-y-1.5">
+                <Label className="font-semibold text-foreground">
+                  Custom Recipient Email(s)
+                </Label>
+                <Input
+                  value={recipientEmails}
+                  onChange={(e) => updateConfig({ recipientEmails: e.target.value })}
+                  placeholder="e.g. curator@lalitakapilavai.com, sales@lalitakapilavai.com"
+                  className="text-xs font-mono"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Comma-separated list of recipients. Leave blank to automatically route to the global admin alert email.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="font-semibold text-foreground">
+                  Custom Email Subject Template
+                </Label>
+                <Input
+                  value={emailSubjectTemplate}
+                  onChange={(e) => updateConfig({ emailSubjectTemplate: e.target.value })}
+                  placeholder="e.g. Inbound Inquiry: {{formTitle}} - {{fullName}}"
+                  className="text-xs"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Optional. Available template tokens: <code className="text-primary font-mono font-semibold">{"{{formTitle}}"}</code>, <code className="text-primary font-mono font-semibold">{"{{fullName}}"}</code>, <code className="text-primary font-mono font-semibold">{"{{pageSlug}}"}</code>.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

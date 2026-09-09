@@ -489,6 +489,9 @@ function SortableSection({
     formSubtitle?: string;
     submitButtonText?: string;
     successMessage?: string;
+    notifyEmail?: boolean;
+    recipientEmails?: string;
+    emailSubjectTemplate?: string;
     fields?: FormFieldConfig[];
   } | null>(null);
 
@@ -1248,6 +1251,9 @@ function SortableSection({
                                   formSubtitle: block.formSubtitle,
                                   submitButtonText: block.submitButtonText,
                                   successMessage: block.successMessage,
+                                  notifyEmail: block.notifyEmail,
+                                  recipientEmails: block.recipientEmails,
+                                  emailSubjectTemplate: block.emailSubjectTemplate,
                                   fields: block.fields,
                                 })
                               }
@@ -1281,6 +1287,9 @@ function SortableSection({
                               formSubtitle={block.formSubtitle}
                               submitButtonText={block.submitButtonText}
                               successMessage={block.successMessage}
+                              notifyEmail={block.notifyEmail}
+                              recipientEmails={block.recipientEmails}
+                              emailSubjectTemplate={block.emailSubjectTemplate}
                               fields={block.fields}
                               pageSlug="page-builder"
                             />
@@ -1572,6 +1581,9 @@ function SortableSection({
                 formSubtitle: activeFormModal.formSubtitle,
                 submitButtonText: activeFormModal.submitButtonText,
                 successMessage: activeFormModal.successMessage,
+                notifyEmail: activeFormModal.notifyEmail,
+                recipientEmails: activeFormModal.recipientEmails,
+                emailSubjectTemplate: activeFormModal.emailSubjectTemplate,
                 fields: activeFormModal.fields,
               }}
               onChange={(updated) => {
@@ -1580,6 +1592,9 @@ function SortableSection({
                   formSubtitle: updated.formSubtitle,
                   submitButtonText: updated.submitButtonText,
                   successMessage: updated.successMessage,
+                  notifyEmail: updated.notifyEmail,
+                  recipientEmails: updated.recipientEmails,
+                  emailSubjectTemplate: updated.emailSubjectTemplate,
                   fields: updated.fields,
                 });
                 setActiveFormModal((prev) =>
@@ -1590,6 +1605,9 @@ function SortableSection({
                         formSubtitle: updated.formSubtitle,
                         submitButtonText: updated.submitButtonText,
                         successMessage: updated.successMessage,
+                        notifyEmail: updated.notifyEmail,
+                        recipientEmails: updated.recipientEmails,
+                        emailSubjectTemplate: updated.emailSubjectTemplate,
                         fields: updated.fields,
                       }
                     : null

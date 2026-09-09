@@ -102,3 +102,102 @@ body {
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   min-height: 100vh;
 }
+
+/* -------------------------------------------------------------------------- */
+/* High-Fidelity e-Catalog Print & PDF Publication Stylesheet                 */
+/* -------------------------------------------------------------------------- */
+
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background-color: #1C1814 !important;
+    color: #FAF7F2 !important;
+  }
+
+  /* Suppress navigation, footer, and interactive utility toolbars */
+  nav, footer, .print-hidden, [data-catalog-toolbar="true"] {
+    display: none !important;
+  }
+
+  .catalog-document {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Strict Discrete Page-Break Enforcement */
+  .catalog-page {
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    padding: 10mm !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  /* The final page must not trigger a blank trailing page */
+  .catalog-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* Luxury Frame Fillers in Print */
+  .catalog-frame {
+    height: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 8mm !important;
+    border-radius: 4px !important;
+  }
+
+  .catalog-frame-gold {
+    border: 2.5px solid #D4AF37 !important;
+    box-shadow: inset 0 0 0 3px #1C1814, inset 0 0 0 4.5px #D4AF37 !important;
+  }
+
+  .catalog-frame-double {
+    border: 4px double #D4AF37 !important;
+  }
+
+  .catalog-frame-silk {
+    border: 3px solid #C25E34 !important;
+    box-shadow: inset 0 0 0 3px #1C1814, inset 0 0 0 4px #D4AF37 !important;
+  }
+
+  /* Image scaling to guarantee 100% 1-plate-per-page fit */
+  .plate-image-container {
+    max-height: 55vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .plate-image-container img {
+    max-height: 52vh !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+  }
+}

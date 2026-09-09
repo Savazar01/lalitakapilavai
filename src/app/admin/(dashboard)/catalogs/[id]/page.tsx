@@ -22,6 +22,7 @@ import {
   FileDown,
   Star,
   Search,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,6 +71,39 @@ interface CatalogPlate {
   artwork: ArtworkOption;
 }
 
+interface ECatalogThemeConfig {
+  backgroundColor?: string;
+  textColor?: string;
+  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+  accentColor?: string;
+}
+
+interface ECatalogCoverConfig {
+  backgroundColor?: string;
+  backgroundImage?: string;
+  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+  showDate?: boolean;
+  showCurator?: boolean;
+}
+
+interface ECatalogEssayConfig {
+  title?: string;
+  contentHtml?: string;
+  backgroundImage?: string;
+  backgroundColor?: string;
+  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+}
+
+interface ECatalogEndPageConfig {
+  isEnabled?: boolean;
+  title?: string;
+  contentHtml?: string;
+  backgroundImage?: string;
+  backgroundColor?: string;
+  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+  contactDetails?: string;
+}
+
 interface ECatalogDetail {
   id: string;
   title: string;
@@ -79,6 +113,11 @@ interface ECatalogDetail {
   forewordBy: string | null;
   coverImageUrl: string | null;
   themeColor: string;
+  orientation?: string;
+  themeConfig?: ECatalogThemeConfig | null;
+  coverConfig?: ECatalogCoverConfig | null;
+  essayConfig?: ECatalogEssayConfig | null;
+  endPageConfig?: ECatalogEndPageConfig | null;
   isPublished: boolean;
   downloadablePdfUrl: string | null;
   eventId: string | null;
@@ -108,9 +147,43 @@ export default function AdminCatalogStudioPage() {
   const [forewordBy, setForewordBy] = React.useState("");
   const [coverImageUrl, setCoverImageUrl] = React.useState("");
   const [themeColor, setThemeColor] = React.useState("gold");
+  const [orientation, setOrientation] = React.useState<"portrait" | "landscape">("portrait");
   const [isPublished, setIsPublished] = React.useState(false);
   const [downloadablePdfUrl, setDownloadablePdfUrl] = React.useState("");
   const [eventId, setEventId] = React.useState<string>("none");
+
+  // Advanced Layout, Framing & Publication configs
+  const [themeConfig, setThemeConfig] = React.useState<ECatalogThemeConfig>({
+    backgroundColor: "#1C1814",
+    textColor: "#FAF7F2",
+    frameStyle: "gold-fillet",
+    accentColor: "#D4AF37",
+  });
+
+  const [coverConfig, setCoverConfig] = React.useState<ECatalogCoverConfig>({
+    backgroundColor: "#1C1814",
+    backgroundImage: "",
+    frameStyle: "gold-fillet",
+    showDate: true,
+    showCurator: true,
+  });
+
+  const [essayConfig, setEssayConfig] = React.useState<ECatalogEssayConfig>({
+    title: "Curatorial Monograph & Scholarly Statement",
+    backgroundImage: "",
+    backgroundColor: "#1C1814",
+    frameStyle: "gold-fillet",
+  });
+
+  const [endPageConfig, setEndPageConfig] = React.useState<ECatalogEndPageConfig>({
+    isEnabled: true,
+    title: "Colophon & Atelier Heritage",
+    contentHtml: "<p>Published by the Atelier of Lalita Kapilavai. Specializing in classical Tanjore 22k gold leaf iconography and Carnatic musicianship.</p><p>For acquisitions, private viewing recitals, or scholarly monograph requests, contact the studio directly.</p>",
+    backgroundImage: "",
+    backgroundColor: "#1C1814",
+    frameStyle: "gold-fillet",
+    contactDetails: "Email: contact@lalitakapilavai.com | Web: lalitakapilavai.com",
+  });
 
   // Artwork plates state
   const [plates, setPlates] = React.useState<CatalogPlate[]>([]);
@@ -142,6 +215,11 @@ export default function AdminCatalogStudioPage() {
           setForewordBy(catData.forewordBy || "");
           setCoverImageUrl(catData.coverImageUrl || "");
           setThemeColor(catData.themeColor || "gold");
+          setOrientation(catData.orientation === "landscape" ? "landscape" : "portrait");
+          if (catData.themeConfig) setThemeConfig(catData.themeConfig);
+          if (catData.coverConfig) setCoverConfig(catData.coverConfig);
+          if (catData.essayConfig) setEssayConfig(catData.essayConfig);
+          if (catData.endPageConfig) setEndPageConfig(catData.endPageConfig);
           setIsPublished(Boolean(catData.isPublished));
           setDownloadablePdfUrl(catData.downloadablePdfUrl || "");
           setEventId(catData.eventId || "none");
@@ -190,6 +268,11 @@ export default function AdminCatalogStudioPage() {
         forewordBy: forewordBy.trim() || null,
         coverImageUrl: coverImageUrl || null,
         themeColor,
+        orientation,
+        themeConfig,
+        coverConfig,
+        essayConfig,
+        endPageConfig,
         isPublished,
         downloadablePdfUrl: downloadablePdfUrl.trim() || null,
         eventId: eventId === "none" ? null : eventId,
@@ -346,9 +429,9 @@ export default function AdminCatalogStudioPage() {
 
       {/* Curation Studio Tabs */}
       <Tabs defaultValue="metadata" className="space-y-6">
-        <TabsList className="bg-muted/60 p-1 border border-border/80">
+        <TabsList className="bg-muted/60 p-1 border border-border/80 flex flex-wrap h-auto gap-1">
           <TabsTrigger value="metadata" className="text-xs flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5" /> 1. Metadata &amp; Cover
+            <BookOpen className="w-3.5 h-3.5" /> 1. Cover &amp; Framing
           </TabsTrigger>
           <TabsTrigger value="editorial" className="text-xs flex items-center gap-1.5">
             <FileText className="w-3.5 h-3.5" /> 2. Curatorial Essay
@@ -356,8 +439,11 @@ export default function AdminCatalogStudioPage() {
           <TabsTrigger value="plates" className="text-xs flex items-center gap-1.5">
             <Palette className="w-3.5 h-3.5" /> 3. Artwork Plates ({plates.length})
           </TabsTrigger>
+          <TabsTrigger value="colophon" className="text-xs flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" /> 4. Colophon &amp; End Page
+          </TabsTrigger>
           <TabsTrigger value="pdf" className="text-xs flex items-center gap-1.5">
-            <FileDown className="w-3.5 h-3.5" /> 4. Publication &amp; PDF
+            <FileDown className="w-3.5 h-3.5" /> 5. Publication &amp; Export
           </TabsTrigger>
         </TabsList>
 
@@ -438,9 +524,53 @@ export default function AdminCatalogStudioPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Publication Layout &amp; Orientation</label>
+                  <Select
+                    value={orientation}
+                    onValueChange={(val: "portrait" | "landscape") => setOrientation(val)}
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Select Print Orientation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="portrait">A4 Portrait (Classical Monograph)</SelectItem>
+                      <SelectItem value="landscape">A4 Landscape (Panoramic Gallery Album)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground">
+                    Determines viewport ratio and strict browser print sheet dimensions.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Ornamental Frame Style</label>
+                  <Select
+                    value={themeConfig.frameStyle || "gold-fillet"}
+                    onValueChange={(val: "none" | "gold-fillet" | "double-fillet" | "silk-border") =>
+                      setThemeConfig((prev) => ({ ...prev, frameStyle: val }))
+                    }
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Select Framing Style" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gold-fillet">Classical Gold Fillet (22k Temple Border)</SelectItem>
+                      <SelectItem value="double-fillet">Royal Double Fillet (Museum Archival)</SelectItem>
+                      <SelectItem value="silk-border">Sacred Silk Border (Terracotta / Parchment)</SelectItem>
+                      <SelectItem value="none">Minimal Frame (Border-less Modern)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground">
+                    Applies gold leaf borders, corner medallions, and framing accents across all catalog pages.
+                  </p>
+                </div>
+              </div>
+
               <div className="space-y-1.5 pt-2">
                 <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <ImageIcon className="w-3.5 h-3.5 text-primary" /> Front Cover Image
+                  <ImageIcon className="w-3.5 h-3.5 text-primary" /> Front Cover Image Plate
                 </label>
                 <MediaUploader
                   value={coverImageUrl}
@@ -449,6 +579,58 @@ export default function AdminCatalogStudioPage() {
                   mediaType="general"
                   description="High-resolution visual representing the front cover of the digital book."
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Catalog Background Tone</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={themeConfig.backgroundColor || "#1C1814"}
+                      onChange={(e) =>
+                        setThemeConfig((prev) => ({ ...prev, backgroundColor: e.target.value }))
+                      }
+                      className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                    />
+                    <Input
+                      value={themeConfig.backgroundColor || "#1C1814"}
+                      onChange={(e) =>
+                        setThemeConfig((prev) => ({ ...prev, backgroundColor: e.target.value }))
+                      }
+                      className="text-xs font-mono"
+                      placeholder="#1C1814"
+                    />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    Luxury dark obsidian (#1C1814) or warm ivory parchment (#FAF7F2).
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Typography Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={themeConfig.textColor || "#FAF7F2"}
+                      onChange={(e) =>
+                        setThemeConfig((prev) => ({ ...prev, textColor: e.target.value }))
+                      }
+                      className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                    />
+                    <Input
+                      value={themeConfig.textColor || "#FAF7F2"}
+                      onChange={(e) =>
+                        setThemeConfig((prev) => ({ ...prev, textColor: e.target.value }))
+                      }
+                      className="text-xs font-mono"
+                      placeholder="#FAF7F2"
+                    />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    High contrast text color for screen and print rendering.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -644,7 +826,79 @@ export default function AdminCatalogStudioPage() {
           )}
         </TabsContent>
 
-        {/* Tab 4: Publication & PDF */}
+        {/* Tab 4: Colophon & End Page */}
+        <TabsContent value="colophon" className="space-y-5">
+          <Card className="border border-border/80 bg-card">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-serif font-bold">Colophon &amp; Closing Page</CardTitle>
+                  <CardDescription className="text-xs">
+                    Scholarly colophon, artist biography, atelier provenance, copyright, and studio contact details.
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-foreground">Include End Page:</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={endPageConfig.isEnabled ?? true}
+                      onChange={(e) =>
+                        setEndPageConfig((prev) => ({ ...prev, isEnabled: e.target.checked }))
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                  </label>
+                </div>
+              </div>
+            </CardHeader>
+
+            {endPageConfig.isEnabled !== false && (
+              <CardContent className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Colophon Title</label>
+                  <Input
+                    value={endPageConfig.title || ""}
+                    onChange={(e) =>
+                      setEndPageConfig((prev) => ({ ...prev, title: e.target.value }))
+                    }
+                    placeholder="e.g. Colophon & Atelier Heritage"
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Closing Statement / Artist Biography</label>
+                  <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
+                    <TiptapEditor
+                      content={endPageConfig.contentHtml || ""}
+                      onChange={(_, html) =>
+                        setEndPageConfig((prev) => ({ ...prev, contentHtml: html }))
+                      }
+                      placeholder="Compose concluding scholarly remarks, artist background, technique provenance, or exhibition credits..."
+                      className="min-h-[220px]"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-2">
+                  <label className="text-xs font-semibold text-foreground">Atelier Contact &amp; Copyright Notice</label>
+                  <Input
+                    value={endPageConfig.contactDetails || ""}
+                    onChange={(e) =>
+                      setEndPageConfig((prev) => ({ ...prev, contactDetails: e.target.value }))
+                    }
+                    placeholder="e.g. Atelier of Lalita Kapilavai | contact@lalitakapilavai.com | All rights reserved."
+                    className="text-xs font-mono"
+                  />
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        </TabsContent>
+
+        {/* Tab 5: Publication & PDF */}
         <TabsContent value="pdf" className="space-y-5">
           <Card className="border border-border/80 bg-card">
             <CardHeader className="pb-3">
