@@ -235,16 +235,28 @@ model SubSection {
 // -----------------------------------------------------------------------------
 
 model ArtCategory {
-  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name         String    @unique // Tanjore, Mysore, Pahari, Pichwai, Kalamkari, Cheriyal, Miscellaneous
-  slug         String    @unique
-  description  String?   @db.Text
-  coverImage   String?
-  displayOrder Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name           String    @unique // Tanjore, Mysore, Pahari, Pichwai, Kalamkari, Cheriyal, Miscellaneous
+  slug           String    @unique
+  description    String?   @db.Text
+  coverImage     String?
+  displayOrder   Int       @default(0)
 
-  artworks     Artwork[]
+  // Configurable Hero Banner Elements
+  badgeLabel     String?   @default("Traditional Fine Art School")
+  heroTitle      String?   // Defaults to category name if null
+  curatorialNote String?   @db.Text // Rich Tiptap HTML content
+
+  // Banner Styling Configurations
+  bannerHeight   Int?      @default(360) // in pixels
+  overlayOpacity Float?    @default(0.45) // 0.0 to 1.0
+  imagePosition  String?   @default("center") // "center" | "top" | "bottom"
+  borderStyle    String?   @default("gold-fillet") // "none" | "gold-fillet" | "subtle"
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  artworks       Artwork[]
 
   @@map("art_categories")
 }
@@ -279,6 +291,7 @@ model Artwork {
   events             ArtworkOnEvent[]
   leads              Lead[]
   ragaLinks          ArtworkRagaLink[]
+  eCatalogItems      ECatalogItem[]
 
   @@map("artworks")
 }
@@ -401,6 +414,7 @@ model Event {
   artworks           ArtworkOnEvent[]
   registrations      EventRegistration[]
   leads              Lead[]
+  eCatalogs          ECatalog[]
 
   @@map("events")
 }
@@ -495,4 +509,57 @@ model DashboardWidget {
   updatedAt   DateTime @updatedAt
 
   @@map("dashboard_widgets")
+}
+
+// -----------------------------------------------------------------------------
+// Digital Exhibition e-Catalogs & Booklets
+// -----------------------------------------------------------------------------
+
+model ECatalog {
+  id                 String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title              String
+  slug               String         @unique
+  subtitle           String?
+  curatorNote        String?        @db.Text
+  curatorialEssay    String?        @db.Text
+  forewordBy         String?
+  coverImage         String?
+  coverImageUrl      String?
+  pdfUrl             String?        // Optional pre-compiled static PDF asset
+  downloadablePdfUrl String?
+  themeColor         String         @default("gold")
+
+  // Linked Event / Exhibition (Optional)
+  eventId            String?        @db.Uuid
+  event              Event?         @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  // Custom Introductory Sections (Cover, Preface, Artist Bio, Colophon)
+  // Stored as JSON array: [{ id: string, title: string, contentHtml: string, orderIndex: number }]
+  introSections      Json?
+
+  // Curated Artworks Selection
+  items              ECatalogItem[]
+
+  isPublished        Boolean        @default(false)
+  downloadEnabled    Boolean        @default(true)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@map("e_catalogs")
+}
+
+model ECatalogItem {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  catalogId      String   @db.Uuid
+  catalog        ECatalog @relation(fields: [catalogId], references: [id], onDelete: Cascade)
+  artworkId      String   @db.Uuid
+  artwork        Artwork  @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  orderIndex     Int      @default(0)
+  pageNumber     Int      @default(1)
+  customNote     String?  @db.Text
+  curatorialNote String?  @db.Text
+  highlightPlate Boolean  @default(false)
+
+  @@unique([catalogId, artworkId])
+  @@map("e_catalog_items")
 }

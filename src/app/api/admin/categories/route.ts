@@ -39,7 +39,20 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, slug, description, coverImage, displayOrder } = body;
+    const {
+      name,
+      slug,
+      description,
+      curatorialNote,
+      coverImage,
+      displayOrder,
+      badgeLabel,
+      heroTitle,
+      bannerHeight,
+      overlayOpacity,
+      imagePosition,
+      borderStyle,
+    } = body;
 
     if (!name || !slug) {
       return NextResponse.json(
@@ -70,8 +83,15 @@ export async function POST(request: NextRequest) {
         name,
         slug: cleanSlug,
         description: description || null,
+        curatorialNote: curatorialNote || description || null,
         coverImage: coverImage || null,
         displayOrder: displayOrder ?? 0,
+        badgeLabel: badgeLabel || "Traditional Fine Art School",
+        heroTitle: heroTitle || null,
+        bannerHeight: bannerHeight ? parseInt(String(bannerHeight), 10) : 360,
+        overlayOpacity: overlayOpacity !== undefined ? parseFloat(String(overlayOpacity)) : 0.45,
+        imagePosition: imagePosition || "center",
+        borderStyle: borderStyle || "gold-fillet",
       },
     });
 
@@ -93,7 +113,21 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, slug, description, coverImage, displayOrder } = body;
+    const {
+      id,
+      name,
+      slug,
+      description,
+      curatorialNote,
+      coverImage,
+      displayOrder,
+      badgeLabel,
+      heroTitle,
+      bannerHeight,
+      overlayOpacity,
+      imagePosition,
+      borderStyle,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Category ID required" }, { status: 400 });
@@ -104,9 +138,16 @@ export async function PUT(request: NextRequest) {
       data: {
         name,
         slug,
-        description,
-        coverImage,
-        displayOrder,
+        description: description || null,
+        curatorialNote: curatorialNote || description || null,
+        coverImage: coverImage || null,
+        displayOrder: displayOrder ?? 0,
+        badgeLabel: badgeLabel || "Traditional Fine Art School",
+        heroTitle: heroTitle || null,
+        bannerHeight: bannerHeight ? parseInt(String(bannerHeight), 10) : 360,
+        overlayOpacity: overlayOpacity !== undefined ? parseFloat(String(overlayOpacity)) : 0.45,
+        imagePosition: imagePosition || "center",
+        borderStyle: borderStyle || "gold-fillet",
       },
     });
 

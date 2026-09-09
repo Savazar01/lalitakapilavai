@@ -35,6 +35,15 @@ import {
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { MediaUploader } from "@/components/admin/media-uploader";
+import { TiptapEditor } from "@/components/builder/tiptap-editor";
+import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 interface ArtCategoryItem {
@@ -42,8 +51,15 @@ interface ArtCategoryItem {
   name: string;
   slug: string;
   description: string | null;
+  curatorialNote?: string | null;
   coverImage: string | null;
   displayOrder: number;
+  badgeLabel?: string | null;
+  heroTitle?: string | null;
+  bannerHeight?: number | null;
+  overlayOpacity?: number | null;
+  imagePosition?: string | null;
+  borderStyle?: string | null;
   _count?: {
     artworks: number;
   };
@@ -68,8 +84,15 @@ export default function AdminCategoriesPage() {
     name: "",
     slug: "",
     description: "",
+    curatorialNote: "",
     coverImage: "",
     displayOrder: 0,
+    badgeLabel: "Traditional Fine Art School",
+    heroTitle: "",
+    bannerHeight: 360,
+    overlayOpacity: 0.45,
+    imagePosition: "center",
+    borderStyle: "gold-fillet",
   });
 
   const fetchCategories = React.useCallback(() => {
@@ -97,8 +120,15 @@ export default function AdminCategoriesPage() {
       name: "",
       slug: "",
       description: "",
+      curatorialNote: "",
       coverImage: "",
       displayOrder: categories.length + 1,
+      badgeLabel: "Traditional Fine Art School",
+      heroTitle: "",
+      bannerHeight: 360,
+      overlayOpacity: 0.45,
+      imagePosition: "center",
+      borderStyle: "gold-fillet",
     });
     setError(null);
     setModalOpen(true);
@@ -110,8 +140,15 @@ export default function AdminCategoriesPage() {
       name: cat.name,
       slug: cat.slug,
       description: cat.description || "",
+      curatorialNote: cat.curatorialNote || cat.description || "",
       coverImage: cat.coverImage || "",
       displayOrder: cat.displayOrder,
+      badgeLabel: cat.badgeLabel || "Traditional Fine Art School",
+      heroTitle: cat.heroTitle || "",
+      bannerHeight: cat.bannerHeight || 360,
+      overlayOpacity: cat.overlayOpacity !== undefined && cat.overlayOpacity !== null ? cat.overlayOpacity : 0.45,
+      imagePosition: cat.imagePosition || "center",
+      borderStyle: cat.borderStyle || "gold-fillet",
     });
     setError(null);
     setModalOpen(true);
@@ -333,82 +370,220 @@ export default function AdminCategoriesPage() {
 
       {/* Create / Edit Dialog */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="max-w-3xl w-full max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-serif text-xl">
               {editingCategory ? "Edit Art Category" : "Add Art Category"}
             </DialogTitle>
             <DialogDescription className="text-xs">
-              Configure fine art school name, permalink slug, and curatorial overview.
+              Configure fine art school metadata, dynamic hero banner presentation, and rich curatorial notes.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <form onSubmit={handleSubmit} className="space-y-5 pt-2">
             {error && (
               <div className="p-3 text-xs rounded-md bg-destructive/10 border border-destructive/30 text-destructive font-medium">
                 {error}
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Category Name *</label>
-              <Input
-                required
-                value={formData.name}
-                onChange={(e) => handleAutoSlug(e.target.value)}
-                placeholder="e.g. Tanjore Paintings"
-                className="text-xs"
-              />
+            {/* Core Identification */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Category Name *</label>
+                <Input
+                  required
+                  value={formData.name}
+                  onChange={(e) => handleAutoSlug(e.target.value)}
+                  placeholder="e.g. Tanjore Paintings"
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Slug (URL identifier) *</label>
+                <Input
+                  required
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="e.g. tanjore-paintings"
+                  className="text-xs font-mono"
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Slug (URL identifier) *</label>
-              <Input
-                required
-                value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                placeholder="e.g. tanjore-paintings"
-                className="text-xs font-mono"
-              />
+            {/* Hero Header Customization */}
+            <div className="rounded-lg border border-border/70 bg-muted/20 p-4 space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                <Palette className="w-3.5 h-3.5" /> Hero Banner &amp; Typography Customization
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Badge Pill Label</label>
+                  <Input
+                    value={formData.badgeLabel}
+                    onChange={(e) => setFormData({ ...formData, badgeLabel: e.target.value })}
+                    placeholder="e.g. Traditional Fine Art School"
+                    className="text-xs"
+                  />
+                  <span className="text-[10px] text-muted-foreground">Appears above the hero title in an illuminated badge.</span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Hero Title Override</label>
+                  <Input
+                    value={formData.heroTitle}
+                    onChange={(e) => setFormData({ ...formData, heroTitle: e.target.value })}
+                    placeholder="Defaults to Category Name if blank"
+                    className="text-xs"
+                  />
+                  <span className="text-[10px] text-muted-foreground">Leave blank to inherit the Category Name.</span>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                  <ImageIcon className="w-3.5 h-3.5 text-primary" /> Category Cover Image
+                </label>
+                <MediaUploader
+                  value={formData.coverImage}
+                  onUploadComplete={(url) => setFormData((prev) => ({ ...prev, coverImage: url }))}
+                  onRemove={() => setFormData((prev) => ({ ...prev, coverImage: "" }))}
+                  mediaType="general"
+                  description="High-resolution banner artwork (WebP, JPG, PNG up to 25MB)."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-semibold text-foreground">Banner Height</label>
+                    <span className="text-[11px] font-mono text-primary font-bold">{formData.bannerHeight}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={200}
+                    max={600}
+                    step={10}
+                    value={formData.bannerHeight}
+                    onChange={(e) => setFormData({ ...formData, bannerHeight: parseInt(e.target.value) || 360 })}
+                    className="w-full accent-primary cursor-pointer h-1.5 bg-border rounded-lg"
+                  />
+                  <span className="text-[10px] text-muted-foreground">Range: 200px (compact) to 600px (cinematic).</span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-semibold text-foreground">Overlay Scrim Opacity</label>
+                    <span className="text-[11px] font-mono text-primary font-bold">{Math.round(formData.overlayOpacity * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={formData.overlayOpacity}
+                    onChange={(e) => setFormData({ ...formData, overlayOpacity: parseFloat(e.target.value) || 0 })}
+                    className="w-full accent-primary cursor-pointer h-1.5 bg-border rounded-lg"
+                  />
+                  <span className="text-[10px] text-muted-foreground">Dark gradient scrim for optimal text contrast.</span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Image Focal Point</label>
+                  <Select
+                    value={formData.imagePosition}
+                    onValueChange={(val) => setFormData({ ...formData, imagePosition: val })}
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Alignment" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="top">Top</SelectItem>
+                      <SelectItem value="bottom">Bottom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Border Framing Style</label>
+                  <Select
+                    value={formData.borderStyle}
+                    onValueChange={(val) => setFormData({ ...formData, borderStyle: val })}
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Border Style" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gold-fillet">Classical Gold Fillet</SelectItem>
+                      <SelectItem value="subtle">Subtle Minimal</SelectItem>
+                      <SelectItem value="none">None (Full Bleed)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                    <ArrowUpDown className="w-3.5 h-3.5 text-primary" /> Display Order
+                  </label>
+                  <Input
+                    type="number"
+                    value={formData.displayOrder}
+                    onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+                    className="text-xs font-mono"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground flex items-center gap-1">
-                <ArrowUpDown className="w-3 h-3 text-primary" /> Display Order
-              </label>
-              <Input
-                type="number"
-                value={formData.displayOrder}
-                onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
-                className="text-xs font-mono"
-              />
+            {/* Curatorial Description & Note (WYSIWYG) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">
+                  Curatorial Note &amp; Historical Context
+                </label>
+                <AiAssistantModal
+                  initialContext={`${formData.name ? `School: ${formData.name}\n` : ""}${formData.curatorialNote || formData.description || ""}`}
+                  onApply={(aiText) => {
+                    setFormData((prev) => {
+                      const newParagraph = `<p>${aiText.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br/>")}</p>`;
+                      const updated = prev.curatorialNote ? `${prev.curatorialNote}${newParagraph}` : newParagraph;
+                      return {
+                        ...prev,
+                        curatorialNote: updated,
+                        description: prev.description || aiText.slice(0, 180),
+                      };
+                    });
+                  }}
+                  triggerLabel="✨ AI Curatorial Note"
+                />
+              </div>
+
+              <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
+                <TiptapEditor
+                  content={formData.curatorialNote}
+                  onChange={(_, html) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      curatorialNote: html,
+                      // keep plain text description excerpt in sync for SEO fallback
+                      description: prev.description || html.replace(/<[^>]+>/g, "").slice(0, 180),
+                    }))
+                  }
+                  placeholder="Elaborate on classical school heritage, gold foil application, natural mineral pigments, and iconography..."
+                  className="min-h-[160px]"
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                Rich text will be formatted curating this collection on public gallery headers.
+              </p>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground flex items-center gap-1">
-                <ImageIcon className="w-3 h-3 text-primary" /> Category Cover Image
-              </label>
-              <MediaUploader
-                value={formData.coverImage}
-                onUploadComplete={(url) => setFormData((prev) => ({ ...prev, coverImage: url }))}
-                onRemove={() => setFormData((prev) => ({ ...prev, coverImage: "" }))}
-                mediaType="general"
-                description="WebP, JPG, PNG up to 25MB. Displayed in public gallery headers."
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Curatorial Description</label>
-              <textarea
-                rows={3}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Historical context, materials, and significance of this painting school..."
-                className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              />
-            </div>
-
-            <DialogFooter className="pt-2">
+            <DialogFooter className="pt-3 border-t border-border/80">
               <Button
                 type="button"
                 variant="outline"
@@ -421,11 +596,11 @@ export default function AdminCategoriesPage() {
               <Button
                 type="submit"
                 size="sm"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
                 disabled={submitting}
               >
                 {submitting && <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />}
-                {editingCategory ? "Update Category" : "Create Category"}
+                {editingCategory ? "Save Changes" : "Create Category"}
               </Button>
             </DialogFooter>
           </form>
