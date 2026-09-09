@@ -533,6 +533,7 @@ model ECatalog {
   downloadablePdfUrl String?
   themeColor         String         @default("gold")
   orientation        String         @default("portrait") // "portrait" | "landscape"
+  plateLayout        String         @default("SIDE_BY_SIDE") // "SIDE_BY_SIDE" | "STACKED"
 
   // Global Catalog Theme & Framing
   // { backgroundColor, textColor, frameStyle: "none"|"gold-fillet"|"double-fillet"|"silk-border", accentColor }
@@ -576,6 +577,7 @@ model ECatalogItem {
   customNote     String?  @db.Text
   curatorialNote String?  @db.Text
   highlightPlate Boolean  @default(false)
+  plateLayout    String?  // Optional per-plate override: "SIDE_BY_SIDE" | "STACKED"
 
   @@unique([catalogId, artworkId])
   @@map("e_catalog_items")

@@ -23,6 +23,7 @@ import {
   Star,
   Search,
   Sparkles,
+  LayoutTemplate,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,6 +69,7 @@ interface CatalogPlate {
   pageNumber: number;
   curatorialNote?: string | null;
   highlightPlate: boolean;
+  plateLayout?: "SIDE_BY_SIDE" | "STACKED" | null;
   artwork: ArtworkOption;
 }
 
@@ -114,6 +116,7 @@ interface ECatalogDetail {
   coverImageUrl: string | null;
   themeColor: string;
   orientation?: string;
+  plateLayout?: "SIDE_BY_SIDE" | "STACKED";
   themeConfig?: ECatalogThemeConfig | null;
   coverConfig?: ECatalogCoverConfig | null;
   essayConfig?: ECatalogEssayConfig | null;
@@ -148,6 +151,7 @@ export default function AdminCatalogStudioPage() {
   const [coverImageUrl, setCoverImageUrl] = React.useState("");
   const [themeColor, setThemeColor] = React.useState("gold");
   const [orientation, setOrientation] = React.useState<"portrait" | "landscape">("portrait");
+  const [plateLayout, setPlateLayout] = React.useState<"SIDE_BY_SIDE" | "STACKED">("SIDE_BY_SIDE");
   const [isPublished, setIsPublished] = React.useState(false);
   const [downloadablePdfUrl, setDownloadablePdfUrl] = React.useState("");
   const [eventId, setEventId] = React.useState<string>("none");
@@ -216,6 +220,7 @@ export default function AdminCatalogStudioPage() {
           setCoverImageUrl(catData.coverImageUrl || "");
           setThemeColor(catData.themeColor || "gold");
           setOrientation(catData.orientation === "landscape" ? "landscape" : "portrait");
+          setPlateLayout(catData.plateLayout === "STACKED" ? "STACKED" : "SIDE_BY_SIDE");
           if (catData.themeConfig) setThemeConfig(catData.themeConfig);
           if (catData.coverConfig) setCoverConfig(catData.coverConfig);
           if (catData.essayConfig) setEssayConfig(catData.essayConfig);
@@ -269,6 +274,7 @@ export default function AdminCatalogStudioPage() {
         coverImageUrl: coverImageUrl || null,
         themeColor,
         orientation,
+        plateLayout,
         themeConfig,
         coverConfig,
         essayConfig,
@@ -281,6 +287,7 @@ export default function AdminCatalogStudioPage() {
           pageNumber: idx + 1,
           curatorialNote: p.curatorialNote || null,
           highlightPlate: p.highlightPlate,
+          plateLayout: p.plateLayout || null,
         })),
       };
 
@@ -524,7 +531,7 @@ export default function AdminCatalogStudioPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/60">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-foreground">Publication Layout &amp; Orientation</label>
                   <Select
@@ -564,6 +571,30 @@ export default function AdminCatalogStudioPage() {
                   </Select>
                   <p className="text-[10px] text-muted-foreground">
                     Applies gold leaf borders, corner medallions, and framing accents across all catalog pages.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <span>Plate Display Layout</span>
+                    <Badge variant="outline" className="text-[9px] px-1 py-0 text-primary border-primary/30">
+                      {plateLayout === "SIDE_BY_SIDE" ? "Side-by-Side" : "Stacked"}
+                    </Badge>
+                  </label>
+                  <Select
+                    value={plateLayout}
+                    onValueChange={(val: "SIDE_BY_SIDE" | "STACKED") => setPlateLayout(val)}
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Select Plate Layout" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SIDE_BY_SIDE">Side-by-Side (55:45 Monograph)</SelectItem>
+                      <SelectItem value="STACKED">Stacked (Centered Image Above)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground">
+                    Image left + specifications right vs. centered top/bottom stack.
                   </p>
                 </div>
               </div>
@@ -687,6 +718,32 @@ export default function AdminCatalogStudioPage() {
 
         {/* Tab 3: Artwork Plates */}
         <TabsContent value="plates" className="space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-primary/20 bg-primary/5">
+            <div className="flex items-center gap-2.5">
+              <LayoutTemplate className="w-4 h-4 text-primary shrink-0" />
+              <div>
+                <div className="text-xs font-semibold text-foreground flex items-center gap-2">
+                  <span>Plate Display Presentation:</span>
+                  <Badge variant="outline" className="text-[10px] font-mono border-primary/40 text-primary bg-primary/10">
+                    {plateLayout === "SIDE_BY_SIDE" ? "Side-by-Side (55:45 Monograph)" : "Stacked (Top/Bottom)"}
+                  </Badge>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Default layout for all plates. You can also override layout individually per masterwork below.
+                </p>
+              </div>
+            </div>
+            <Select value={plateLayout} onValueChange={(val: "SIDE_BY_SIDE" | "STACKED") => setPlateLayout(val)}>
+              <SelectTrigger className="w-[200px] text-xs h-8 bg-background">
+                <SelectValue placeholder="Select Plate Layout" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="SIDE_BY_SIDE">Side-by-Side (Recommended)</SelectItem>
+                <SelectItem value="STACKED">Stacked (Centered Image Above)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-serif font-bold text-foreground">
@@ -804,21 +861,44 @@ export default function AdminCatalogStudioPage() {
                     </div>
                   </div>
 
-                  {/* Curatorial Plate Note */}
-                  <div className="mt-3 pt-3 border-t border-border/60">
-                    <Input
-                      value={plate.curatorialNote || ""}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setPlates((prev) => {
-                          const copy = [...prev];
-                          copy[index].curatorialNote = val;
-                          return copy;
-                        });
-                      }}
-                      placeholder="Add plate commentary, iconographic symbolism, or provenance note for this artwork..."
-                      className="text-xs bg-muted/20"
-                    />
+                  {/* Curatorial Plate Note & Plate Layout Override */}
+                  <div className="mt-3 pt-3 border-t border-border/60 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                    <div className="md:col-span-3">
+                      <Input
+                        value={plate.curatorialNote || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setPlates((prev) => {
+                            const copy = [...prev];
+                            copy[index].curatorialNote = val;
+                            return copy;
+                          });
+                        }}
+                        placeholder="Add plate commentary, iconographic symbolism, or provenance note for this artwork..."
+                        className="text-xs bg-muted/20"
+                      />
+                    </div>
+                    <div>
+                      <Select
+                        value={plate.plateLayout || "DEFAULT"}
+                        onValueChange={(val) => {
+                          setPlates((prev) => {
+                            const copy = [...prev];
+                            copy[index].plateLayout = val === "DEFAULT" ? null : (val as "SIDE_BY_SIDE" | "STACKED");
+                            return copy;
+                          });
+                        }}
+                      >
+                        <SelectTrigger className="text-xs h-9 bg-muted/20">
+                          <SelectValue placeholder="Plate Layout" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DEFAULT">Default ({plateLayout === "SIDE_BY_SIDE" ? "Side-by-Side" : "Stacked"})</SelectItem>
+                          <SelectItem value="SIDE_BY_SIDE">Side-by-Side (55:45)</SelectItem>
+                          <SelectItem value="STACKED">Stacked (Top/Bottom)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </Card>
               ))}
@@ -926,6 +1006,26 @@ export default function AdminCatalogStudioPage() {
                 >
                   {isPublished ? "Published (Live)" : "Draft (Private)"}
                 </Button>
+              </div>
+
+              {/* Layout & Specs Summary */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 rounded-lg border border-border/60 bg-muted/10 text-xs">
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground block">Orientation</span>
+                  <span className="font-semibold text-foreground capitalize">{orientation}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground block">Plate Layout</span>
+                  <span className="font-semibold text-primary">{plateLayout === "SIDE_BY_SIDE" ? "Side-by-Side (55:45)" : "Stacked"}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground block">Framing Style</span>
+                  <span className="font-semibold text-foreground capitalize">{themeConfig.frameStyle || "gold-fillet"}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground block">Total Plates</span>
+                  <span className="font-semibold text-foreground">{plates.length} Masterworks</span>
+                </div>
               </div>
 
               <div className="space-y-1.5">

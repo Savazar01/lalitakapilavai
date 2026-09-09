@@ -80,6 +80,7 @@ export async function PUT(
       coverImageUrl,
       themeColor,
       orientation,
+      plateLayout,
       themeConfig,
       coverConfig,
       essayConfig,
@@ -129,6 +130,7 @@ export async function PUT(
         coverImageUrl: coverImageUrl !== undefined ? coverImageUrl : existing.coverImageUrl,
         themeColor: themeColor !== undefined ? themeColor : existing.themeColor,
         orientation: orientation !== undefined ? orientation : (existing.orientation || "portrait"),
+        plateLayout: plateLayout !== undefined ? plateLayout : (existing.plateLayout || "SIDE_BY_SIDE"),
         themeConfig: themeConfig !== undefined ? themeConfig : existing.themeConfig,
         coverConfig: coverConfig !== undefined ? coverConfig : existing.coverConfig,
         essayConfig: essayConfig !== undefined ? essayConfig : existing.essayConfig,
@@ -151,12 +153,13 @@ export async function PUT(
         // Re-insert sorted plates
         if (items.length > 0) {
           await tx.eCatalogItem.createMany({
-            data: items.map((item: { artworkId: string; pageNumber?: number; curatorialNote?: string; highlightPlate?: boolean }, idx: number) => ({
+            data: items.map((item: { artworkId: string; pageNumber?: number; curatorialNote?: string; highlightPlate?: boolean; plateLayout?: string }, idx: number) => ({
               catalogId: id,
               artworkId: item.artworkId,
               pageNumber: typeof item.pageNumber === "number" ? item.pageNumber : idx + 1,
               curatorialNote: item.curatorialNote || null,
               highlightPlate: Boolean(item.highlightPlate),
+              plateLayout: item.plateLayout || null,
             })),
           });
         }

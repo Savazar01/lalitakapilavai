@@ -209,81 +209,177 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {/* PAGES 3 to N: ARTWORK PLATES (Strictly 1 Masterwork Per Page)      */}
         {/* ------------------------------------------------------------------ */}
-        {catalog.items.map((item, idx) => (
-          <section
-            key={item.id}
-            className="catalog-page plate-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none"
-          >
-            <div className={`catalog-frame ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
-              {/* Plate Header (Plate number & Traditional school) */}
-              <div className="flex items-center justify-between border-b border-primary/20 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-primary/15 text-primary font-mono font-bold text-xs flex items-center justify-center border border-primary/30">
-                    {item.pageNumber || idx + 1}
-                  </div>
-                  <span className="text-xs font-mono uppercase text-muted-foreground font-semibold">
-                    Plate {item.pageNumber || idx + 1} of {catalog.items.length}
-                  </span>
-                </div>
-                <span className="text-xs font-mono text-primary font-bold uppercase">
-                  {item.artwork.category?.name || "Traditional Indian School"}
-                </span>
-              </div>
+        {catalog.items.map((item, idx) => {
+          const layoutMode = item.plateLayout || catalog.plateLayout || "SIDE_BY_SIDE";
 
-              {/* Centered Visual Container */}
-              <div className="plate-image-container py-2 flex-1 flex items-center justify-center">
-                <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-md group max-h-[50vh] print:max-h-[52vh]">
-                  <img
-                    src={item.artwork.primaryImageUrl}
-                    alt={item.artwork.title}
-                    className="w-full h-auto object-contain max-h-[48vh] print:max-h-[52vh] mx-auto group-hover:scale-101 transition-transform duration-500"
-                  />
-                  <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
-                    <ShieldCheck className="w-3 h-3 text-primary" />
-                    <span className="text-[9px] font-mono font-semibold text-primary">
-                      22k Gold Foil Masterwork
+          return (
+            <section
+              key={item.id}
+              className="catalog-page plate-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none"
+            >
+              <div
+                className={`catalog-frame ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+              >
+                {/* Plate Header (Plate number & Traditional school) */}
+                <div className="flex items-center justify-between border-b border-primary/20 pb-2.5 mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-primary/15 text-primary font-mono font-bold text-xs flex items-center justify-center border border-primary/30">
+                      {item.pageNumber || idx + 1}
+                    </div>
+                    <span className="text-xs font-mono uppercase text-muted-foreground font-semibold">
+                      Plate {item.pageNumber || idx + 1} of {catalog.items.length}
                     </span>
                   </div>
-                </div>
-              </div>
-
-              {/* Plate Specifications & Curatorial Commentary */}
-              <div className="pt-3 border-t border-primary/20 space-y-2.5">
-                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-serif font-bold text-foreground leading-tight">
-                      {item.artwork.title}
-                    </h3>
-                    <p className="text-xs text-stone-400 font-sans mt-0.5">
-                      {item.artwork.medium || "Natural Mineral Pigments & 22k Gold Foil"}
-                      {item.artwork.dimensions ? ` • ${item.artwork.dimensions}` : ""}
-                      {item.artwork.yearCreated ? ` • ${item.artwork.yearCreated}` : ""}
-                    </p>
-                  </div>
-                  <div className="print-hidden">
-                    <Link
-                      href={`/artwork/${item.artwork.slug}`}
-                      target="_blank"
-                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold"
-                    >
-                      Archive Provenance <ExternalLink className="w-2.5 h-2.5" />
-                    </Link>
-                  </div>
+                  <span className="text-xs font-mono text-primary font-bold uppercase">
+                    {item.artwork.category?.name || "Traditional Indian School"}
+                  </span>
                 </div>
 
-                {item.curatorialNote ? (
-                  <p className="text-xs text-foreground/90 leading-relaxed italic bg-muted/20 p-2.5 rounded-lg border border-border/60">
-                    &ldquo;{item.curatorialNote}&rdquo;
-                  </p>
-                ) : item.artwork.description ? (
-                  <div className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                    <TiptapRenderer content={item.artwork.description} />
+                {/* Conditional Plate Layout */}
+                {layoutMode === "SIDE_BY_SIDE" ? (
+                  <div className="plate-body-grid grid grid-cols-1 md:grid-cols-12 print:grid-cols-12 gap-6 items-center flex-1 my-auto overflow-hidden">
+                    {/* Left Column: Framed Masterwork Plate */}
+                    <div className="plate-image-col md:col-span-7 print:col-span-7 flex items-center justify-center max-h-[68vh] print:max-h-[62vh]">
+                      <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group max-h-full">
+                        <img
+                          src={item.artwork.primaryImageUrl}
+                          alt={item.artwork.title}
+                          className="max-h-[60vh] print:max-h-[58vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
+                        />
+                        <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
+                          <ShieldCheck className="w-3 h-3 text-primary" />
+                          <span className="text-[9px] font-mono font-semibold text-primary">
+                            {item.artwork.hasGoldFoil ? "22k Gold Foil Masterwork" : "Traditional Classical Masterwork"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Curatorial Details & Specifications */}
+                    <div className="plate-details-col md:col-span-5 print:col-span-5 flex flex-col justify-center space-y-3.5 text-left">
+                      <div>
+                        <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-2 font-mono uppercase tracking-wider">
+                          {item.artwork.category?.name || "Traditional Indian School"}
+                        </span>
+                        <h3 className="text-2xl sm:text-3xl font-serif text-foreground font-bold leading-tight">
+                          {item.artwork.title}
+                        </h3>
+                        <p className="text-sm text-stone-400 font-serif mt-1">
+                          {item.artwork.category?.name || "Traditional Fine Art"}
+                          {item.artwork.yearCreated ? ` • ${item.artwork.yearCreated}` : ""}
+                        </p>
+                      </div>
+
+                      <div className="space-y-1.5 text-xs text-foreground/90 border-t border-primary/20 pt-3">
+                        <p>
+                          <strong className="text-muted-foreground font-mono text-[11px] uppercase mr-1">Medium:</strong>
+                          <span>{item.artwork.medium || "Natural Mineral Pigments & 22k Jaipur Gold Foil"}</span>
+                        </p>
+                        {item.artwork.dimensions && (
+                          <p>
+                            <strong className="text-muted-foreground font-mono text-[11px] uppercase mr-1">Dimensions:</strong>
+                            <span>{item.artwork.dimensions}</span>
+                          </p>
+                        )}
+                        {item.artwork.goldPurity && (
+                          <p>
+                            <strong className="text-muted-foreground font-mono text-[11px] uppercase mr-1">Gold Leaf:</strong>
+                            <span>{item.artwork.goldPurity}</span>
+                          </p>
+                        )}
+                      </div>
+
+                      {(item.curatorialNote || item.artwork.description) && (
+                        <div className="border-t border-primary/20 pt-3">
+                          {item.curatorialNote ? (
+                            <p className="text-xs text-foreground/90 leading-relaxed italic bg-muted/20 p-3 rounded-lg border border-border/60">
+                              &ldquo;{item.curatorialNote}&rdquo;
+                            </p>
+                          ) : (
+                            <div className="text-xs text-muted-foreground leading-relaxed">
+                              <TiptapRenderer content={item.artwork.description!} />
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="print-hidden pt-1">
+                        <Link
+                          href={`/artwork/${item.artwork.slug}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-semibold"
+                        >
+                          View Full Masterwork Archive <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
-                ) : null}
+                ) : (
+                  /* STACKED LAYOUT FALLBACK */
+                  <div className="plate-body-stacked flex flex-col items-center justify-between flex-1 my-auto w-full">
+                    {/* Centered Visual Container */}
+                    <div className="plate-image-container py-2 flex-1 flex items-center justify-center">
+                      <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-md group max-h-[50vh] print:max-h-[52vh]">
+                        <img
+                          src={item.artwork.primaryImageUrl}
+                          alt={item.artwork.title}
+                          className="w-full h-auto object-contain max-h-[48vh] print:max-h-[52vh] mx-auto group-hover:scale-101 transition-transform duration-500"
+                        />
+                        <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
+                          <ShieldCheck className="w-3 h-3 text-primary" />
+                          <span className="text-[9px] font-mono font-semibold text-primary">
+                            {item.artwork.hasGoldFoil ? "22k Gold Foil Masterwork" : "Traditional Classical Masterwork"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Plate Specifications & Curatorial Commentary */}
+                    <div className="pt-3 border-t border-primary/20 space-y-2.5 w-full text-left">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div>
+                          <h3 className="text-xl sm:text-2xl font-serif font-bold text-foreground leading-tight">
+                            {item.artwork.title}
+                          </h3>
+                          <p className="text-xs text-stone-400 font-sans mt-0.5">
+                            {item.artwork.medium || "Natural Mineral Pigments & 22k Gold Foil"}
+                            {item.artwork.dimensions ? ` • ${item.artwork.dimensions}` : ""}
+                            {item.artwork.yearCreated ? ` • ${item.artwork.yearCreated}` : ""}
+                          </p>
+                        </div>
+                        <div className="print-hidden">
+                          <Link
+                            href={`/artwork/${item.artwork.slug}`}
+                            target="_blank"
+                            className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold"
+                          >
+                            Archive Provenance <ExternalLink className="w-2.5 h-2.5" />
+                          </Link>
+                        </div>
+                      </div>
+
+                      {item.curatorialNote ? (
+                        <p className="text-xs text-foreground/90 leading-relaxed italic bg-muted/20 p-2.5 rounded-lg border border-border/60">
+                          &ldquo;{item.curatorialNote}&rdquo;
+                        </p>
+                      ) : item.artwork.description ? (
+                        <div className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                          <TiptapRenderer content={item.artwork.description} />
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                )}
+
+                {/* Bottom Footer Stamp */}
+                <div className="text-[10px] text-muted-foreground/70 text-center border-t border-primary/20 pt-2 mt-auto flex items-center justify-between">
+                  <span>© {catalog.title} • Lalita Kapilavai Sacred Art Archive</span>
+                  <span className="font-mono text-[9px] uppercase tracking-wider">Plate {item.pageNumber || idx + 1}</span>
+                </div>
               </div>
-            </div>
-          </section>
-        ))}
+            </section>
+          );
+        })}
 
         {/* ------------------------------------------------------------------ */}
         {/* FINAL PAGE: COLOPHON & ATELIER HERITAGE (When Enabled)             */}
