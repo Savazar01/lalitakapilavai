@@ -153,13 +153,25 @@ export async function PUT(
         // Re-insert sorted plates
         if (items.length > 0) {
           await tx.eCatalogItem.createMany({
-            data: items.map((item: { artworkId: string; pageNumber?: number; curatorialNote?: string; highlightPlate?: boolean; plateLayout?: string }, idx: number) => ({
+            data: items.map((item: {
+              artworkId: string;
+              pageNumber?: number;
+              curatorialNote?: string;
+              highlightPlate?: boolean;
+              plateLayout?: string;
+              customTitle?: string;
+              customSubtitle?: string;
+              showPlateNumber?: boolean;
+            }, idx: number) => ({
               catalogId: id,
               artworkId: item.artworkId,
               pageNumber: typeof item.pageNumber === "number" ? item.pageNumber : idx + 1,
               curatorialNote: item.curatorialNote || null,
               highlightPlate: Boolean(item.highlightPlate),
               plateLayout: item.plateLayout || null,
+              customTitle: item.customTitle ? item.customTitle.trim() : null,
+              customSubtitle: item.customSubtitle ? item.customSubtitle.trim() : null,
+              showPlateNumber: item.showPlateNumber !== false,
             })),
           });
         }

@@ -578,6 +578,9 @@ model ECatalogItem {
   curatorialNote String?  @db.Text
   highlightPlate Boolean  @default(false)
   plateLayout    String?  // Optional per-plate override: "SIDE_BY_SIDE" | "STACKED"
+  customTitle    String?  // Custom page heading (defaults to artwork title)
+  customSubtitle String?  // Custom subheading/tagline (defaults to category/school)
+  showPlateNumber Boolean @default(true) // Toggle for "Plate X of Y" badge
 
   @@unique([catalogId, artworkId])
   @@map("e_catalog_items")

@@ -6,6 +6,7 @@ import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
 import { CatalogPrintButton } from "@/components/public/catalog-print-button";
+import { getPatternById } from "@/lib/background-patterns";
 import {
   BookOpen,
   ArrowLeft,
@@ -21,6 +22,54 @@ interface PageProps {
 }
 
 export const dynamic = "force-dynamic";
+
+function CatalogBackgroundLayer({
+  bgMode,
+  pattern,
+  patternOpacity,
+  bgImage,
+  overlayOpacity,
+}: {
+  bgMode: string;
+  pattern?: ReturnType<typeof getPatternById>;
+  patternOpacity: number;
+  bgImage?: string;
+  overlayOpacity: number;
+}) {
+  if (bgMode === "pattern" && pattern) {
+    return (
+      <div
+        aria-hidden="true"
+        className="catalog-bg-layer absolute inset-0 pointer-events-none z-0 overflow-hidden"
+        style={{
+          backgroundImage: `url("${pattern.svgDataUri}")`,
+          backgroundRepeat: "repeat",
+          opacity: patternOpacity,
+        }}
+      />
+    );
+  }
+
+  if (bgMode === "image" && bgImage) {
+    return (
+      <div
+        aria-hidden="true"
+        className="catalog-bg-layer absolute inset-0 pointer-events-none z-0 overflow-hidden"
+      >
+        <div
+          className="absolute inset-0 w-full h-full bg-cover bg-center"
+          style={{ backgroundImage: `url("${bgImage}")` }}
+        />
+        <div
+          className="absolute inset-0 bg-black"
+          style={{ opacity: overlayOpacity }}
+        />
+      </div>
+    );
+  }
+
+  return null;
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -81,6 +130,15 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const bgColor = (themeConfig.backgroundColor as string) || "#1C1814";
   const textColor = (themeConfig.textColor as string) || "#FAF7F2";
 
+  const bgMode = (themeConfig.backgroundMode as string) || "color";
+  const bgPatternId = themeConfig.backgroundPattern as string | undefined;
+  const patternOpacity =
+    typeof themeConfig.patternOpacity === "number" ? themeConfig.patternOpacity : 0.15;
+  const bgImage = themeConfig.backgroundImage as string | undefined;
+  const overlayOpacity =
+    typeof themeConfig.overlayOpacity === "number" ? themeConfig.overlayOpacity : 0.4;
+  const pattern = getPatternById(bgPatternId);
+
   return (
     <div
       style={{ backgroundColor: bgColor, color: textColor }}
@@ -128,7 +186,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* PAGE 1: BOOK COVER (Strict Single Page on Print)                   */}
         {/* ------------------------------------------------------------------ */}
         <section className="catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none">
-          <div className={`catalog-frame ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+          <CatalogBackgroundLayer
+            bgMode={bgMode}
+            pattern={pattern}
+            patternOpacity={patternOpacity}
+            bgImage={bgImage}
+            overlayOpacity={overlayOpacity}
+          />
+          <div className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
             {/* Header / Subtitle */}
             <div className="space-y-4 pt-2">
               <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full">
@@ -186,7 +251,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {catalog.curatorialEssay && (
           <section className="catalog-page essay-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none">
-            <div className={`catalog-frame ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+            <CatalogBackgroundLayer
+              bgMode={bgMode}
+              pattern={pattern}
+              patternOpacity={patternOpacity}
+              bgImage={bgImage}
+              overlayOpacity={overlayOpacity}
+            />
+            <div className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
               <div className="border-b border-primary/20 pb-3 flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
                   Curatorial Statement &amp; Scholarly Monograph
@@ -211,25 +283,44 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {catalog.items.map((item, idx) => {
           const layoutMode = item.plateLayout || catalog.plateLayout || "SIDE_BY_SIDE";
+          const displayTitle = item.customTitle?.trim() || item.artwork.title;
+          const displaySubtitle =
+            item.customSubtitle?.trim() ||
+            item.artwork.category?.name ||
+            "Traditional Fine Art";
+          const showPlateNumber = item.showPlateNumber !== false;
 
           return (
             <section
               key={item.id}
               className="catalog-page plate-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none"
             >
+              <CatalogBackgroundLayer
+                bgMode={bgMode}
+                pattern={pattern}
+                patternOpacity={patternOpacity}
+                bgImage={bgImage}
+                overlayOpacity={overlayOpacity}
+              />
               <div
-                className={`catalog-frame ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+                className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
               >
                 {/* Plate Header (Plate number & Traditional school) */}
                 <div className="flex items-center justify-between border-b border-primary/20 pb-2.5 mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-primary/15 text-primary font-mono font-bold text-xs flex items-center justify-center border border-primary/30">
-                      {item.pageNumber || idx + 1}
+                  {showPlateNumber ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-primary/15 text-primary font-mono font-bold text-xs flex items-center justify-center border border-primary/30">
+                        {item.pageNumber || idx + 1}
+                      </div>
+                      <span className="text-xs font-mono uppercase text-muted-foreground font-semibold">
+                        Plate {item.pageNumber || idx + 1} of {catalog.items.length}
+                      </span>
                     </div>
-                    <span className="text-xs font-mono uppercase text-muted-foreground font-semibold">
-                      Plate {item.pageNumber || idx + 1} of {catalog.items.length}
+                  ) : (
+                    <span className="text-xs font-mono uppercase text-primary/80 font-medium tracking-wide">
+                      Masterwork Plate
                     </span>
-                  </div>
+                  )}
                   <span className="text-xs font-mono text-primary font-bold uppercase">
                     {item.artwork.category?.name || "Traditional Indian School"}
                   </span>
@@ -237,14 +328,23 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
 
                 {/* Conditional Plate Layout */}
                 {layoutMode === "SIDE_BY_SIDE" ? (
-                  <div className="plate-body-grid grid grid-cols-1 md:grid-cols-12 print:grid-cols-12 gap-6 items-center flex-1 my-auto overflow-hidden">
+                  <div
+                    className="catalog-plate-body plate-body-grid flex-1 my-auto overflow-hidden w-full"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "58% 38%",
+                      gap: "4%",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
                     {/* Left Column: Framed Masterwork Plate */}
-                    <div className="plate-image-col md:col-span-7 print:col-span-7 flex items-center justify-center max-h-[68vh] print:max-h-[62vh]">
+                    <div className="plate-image-col flex items-center justify-center max-h-[64vh] print:max-h-[60vh] w-full">
                       <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group max-h-full">
                         <img
                           src={item.artwork.primaryImageUrl}
-                          alt={item.artwork.title}
-                          className="max-h-[60vh] print:max-h-[58vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
+                          alt={displayTitle}
+                          className="max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
                         />
                         <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
                           <ShieldCheck className="w-3 h-3 text-primary" />
@@ -256,16 +356,16 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                     </div>
 
                     {/* Right Column: Curatorial Details & Specifications */}
-                    <div className="plate-details-col md:col-span-5 print:col-span-5 flex flex-col justify-center space-y-3.5 text-left">
+                    <div className="plate-details-col flex flex-col justify-center space-y-3.5 text-left w-full overflow-hidden">
                       <div>
                         <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-2 font-mono uppercase tracking-wider">
                           {item.artwork.category?.name || "Traditional Indian School"}
                         </span>
                         <h3 className="text-2xl sm:text-3xl font-serif text-foreground font-bold leading-tight">
-                          {item.artwork.title}
+                          {displayTitle}
                         </h3>
                         <p className="text-sm text-stone-400 font-serif mt-1">
-                          {item.artwork.category?.name || "Traditional Fine Art"}
+                          {displaySubtitle}
                           {item.artwork.yearCreated ? ` • ${item.artwork.yearCreated}` : ""}
                         </p>
                       </div>
@@ -322,7 +422,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-md group max-h-[50vh] print:max-h-[52vh]">
                         <img
                           src={item.artwork.primaryImageUrl}
-                          alt={item.artwork.title}
+                          alt={displayTitle}
                           className="w-full h-auto object-contain max-h-[48vh] print:max-h-[52vh] mx-auto group-hover:scale-101 transition-transform duration-500"
                         />
                         <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
@@ -339,10 +439,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                         <div>
                           <h3 className="text-xl sm:text-2xl font-serif font-bold text-foreground leading-tight">
-                            {item.artwork.title}
+                            {displayTitle}
                           </h3>
                           <p className="text-xs text-stone-400 font-sans mt-0.5">
-                            {item.artwork.medium || "Natural Mineral Pigments & 22k Gold Foil"}
+                            {displaySubtitle}
                             {item.artwork.dimensions ? ` • ${item.artwork.dimensions}` : ""}
                             {item.artwork.yearCreated ? ` • ${item.artwork.yearCreated}` : ""}
                           </p>
@@ -374,7 +474,15 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 {/* Bottom Footer Stamp */}
                 <div className="text-[10px] text-muted-foreground/70 text-center border-t border-primary/20 pt-2 mt-auto flex items-center justify-between">
                   <span>© {catalog.title} • Lalita Kapilavai Sacred Art Archive</span>
-                  <span className="font-mono text-[9px] uppercase tracking-wider">Plate {item.pageNumber || idx + 1}</span>
+                  {showPlateNumber ? (
+                    <span className="font-mono text-[9px] uppercase tracking-wider">
+                      Plate {item.pageNumber || idx + 1}
+                    </span>
+                  ) : (
+                    <span className="font-mono text-[9px] uppercase tracking-wider">
+                      Atelier Monograph
+                    </span>
+                  )}
                 </div>
               </div>
             </section>
@@ -386,7 +494,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {endPageConfig.isEnabled !== false && (
           <section className="catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none">
-            <div className={`catalog-frame ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
+            <CatalogBackgroundLayer
+              bgMode={bgMode}
+              pattern={pattern}
+              patternOpacity={patternOpacity}
+              bgImage={bgImage}
+              overlayOpacity={overlayOpacity}
+            />
+            <div className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
               <div className="space-y-3 pt-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
                   Colophon &amp; Publication Details

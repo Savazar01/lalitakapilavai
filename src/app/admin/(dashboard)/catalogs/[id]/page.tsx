@@ -49,14 +49,15 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { BACKGROUND_PATTERNS } from "@/lib/background-patterns";
 
 interface ArtworkOption {
   id: string;
   title: string;
   slug: string;
-  medium: string;
-  dimensions?: string | null;
   primaryImageUrl: string;
+  medium: string | null;
+  dimensions: string | null;
   yearCreated: number | null;
   category?: {
     name: string;
@@ -70,11 +71,19 @@ interface CatalogPlate {
   curatorialNote?: string | null;
   highlightPlate: boolean;
   plateLayout?: "SIDE_BY_SIDE" | "STACKED" | null;
+  customTitle?: string | null;
+  customSubtitle?: string | null;
+  showPlateNumber?: boolean;
   artwork: ArtworkOption;
 }
 
 interface ECatalogThemeConfig {
+  backgroundMode?: "COLOR" | "PATTERN" | "IMAGE";
   backgroundColor?: string;
+  backgroundPattern?: string;
+  patternOpacity?: number;
+  backgroundImage?: string;
+  overlayOpacity?: number;
   textColor?: string;
   frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
   accentColor?: string;
@@ -158,7 +167,12 @@ export default function AdminCatalogStudioPage() {
 
   // Advanced Layout, Framing & Publication configs
   const [themeConfig, setThemeConfig] = React.useState<ECatalogThemeConfig>({
+    backgroundMode: "COLOR",
     backgroundColor: "#1C1814",
+    backgroundPattern: "mandala-filigree",
+    patternOpacity: 0.15,
+    backgroundImage: "",
+    overlayOpacity: 0.5,
     textColor: "#FAF7F2",
     frameStyle: "gold-fillet",
     accentColor: "#D4AF37",
@@ -221,7 +235,19 @@ export default function AdminCatalogStudioPage() {
           setThemeColor(catData.themeColor || "gold");
           setOrientation(catData.orientation === "landscape" ? "landscape" : "portrait");
           setPlateLayout(catData.plateLayout === "STACKED" ? "STACKED" : "SIDE_BY_SIDE");
-          if (catData.themeConfig) setThemeConfig(catData.themeConfig);
+          if (catData.themeConfig) {
+            setThemeConfig({
+              backgroundMode: catData.themeConfig.backgroundMode || "COLOR",
+              backgroundColor: catData.themeConfig.backgroundColor || "#1C1814",
+              backgroundPattern: catData.themeConfig.backgroundPattern || "mandala-filigree",
+              patternOpacity: typeof catData.themeConfig.patternOpacity === "number" ? catData.themeConfig.patternOpacity : 0.15,
+              backgroundImage: catData.themeConfig.backgroundImage || "",
+              overlayOpacity: typeof catData.themeConfig.overlayOpacity === "number" ? catData.themeConfig.overlayOpacity : 0.5,
+              textColor: catData.themeConfig.textColor || "#FAF7F2",
+              frameStyle: catData.themeConfig.frameStyle || "gold-fillet",
+              accentColor: catData.themeConfig.accentColor || "#D4AF37",
+            });
+          }
           if (catData.coverConfig) setCoverConfig(catData.coverConfig);
           if (catData.essayConfig) setEssayConfig(catData.essayConfig);
           if (catData.endPageConfig) setEndPageConfig(catData.endPageConfig);
@@ -288,6 +314,9 @@ export default function AdminCatalogStudioPage() {
           curatorialNote: p.curatorialNote || null,
           highlightPlate: p.highlightPlate,
           plateLayout: p.plateLayout || null,
+          customTitle: p.customTitle ? p.customTitle.trim() : null,
+          customSubtitle: p.customSubtitle ? p.customSubtitle.trim() : null,
+          showPlateNumber: p.showPlateNumber !== false,
         })),
       };
 
@@ -612,56 +641,261 @@ export default function AdminCatalogStudioPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/60">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Catalog Background Tone</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={themeConfig.backgroundColor || "#1C1814"}
-                      onChange={(e) =>
-                        setThemeConfig((prev) => ({ ...prev, backgroundColor: e.target.value }))
-                      }
-                      className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
-                    />
-                    <Input
-                      value={themeConfig.backgroundColor || "#1C1814"}
-                      onChange={(e) =>
-                        setThemeConfig((prev) => ({ ...prev, backgroundColor: e.target.value }))
-                      }
-                      className="text-xs font-mono"
-                      placeholder="#1C1814"
-                    />
+              <div className="space-y-4 pt-4 border-t border-border/60">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" /> Catalog Background Styling
+                    </label>
+                    <p className="text-[11px] text-muted-foreground">
+                      Configure how backgrounds render across all digital reader pages and PDF prints.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-muted-foreground">
-                    Luxury dark obsidian (#1C1814) or warm ivory parchment (#FAF7F2).
-                  </p>
+                  <div className="flex items-center gap-1 p-0.5 rounded-lg border border-border bg-muted/30">
+                    <button
+                      type="button"
+                      onClick={() => setThemeConfig((prev) => ({ ...prev, backgroundMode: "COLOR" }))}
+                      className={`px-3 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                        (themeConfig.backgroundMode || "COLOR") === "COLOR"
+                          ? "bg-primary text-primary-foreground shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Solid Color
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setThemeConfig((prev) => ({ ...prev, backgroundMode: "PATTERN" }))}
+                      className={`px-3 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                        themeConfig.backgroundMode === "PATTERN"
+                          ? "bg-primary text-primary-foreground shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Sacred Patterns
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setThemeConfig((prev) => ({ ...prev, backgroundMode: "IMAGE" }))}
+                      className={`px-3 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                        themeConfig.backgroundMode === "IMAGE"
+                          ? "bg-primary text-primary-foreground shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Background Image
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Typography Color</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={themeConfig.textColor || "#FAF7F2"}
-                      onChange={(e) =>
-                        setThemeConfig((prev) => ({ ...prev, textColor: e.target.value }))
-                      }
-                      className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
-                    />
-                    <Input
-                      value={themeConfig.textColor || "#FAF7F2"}
-                      onChange={(e) =>
-                        setThemeConfig((prev) => ({ ...prev, textColor: e.target.value }))
-                      }
-                      className="text-xs font-mono"
-                      placeholder="#FAF7F2"
-                    />
+                {/* Mode 1: Solid Color */}
+                {(themeConfig.backgroundMode || "COLOR") === "COLOR" && (
+                  <div className="p-4 rounded-xl border border-border/80 bg-muted/10 space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-foreground">Base Background Color</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={themeConfig.backgroundColor || "#1C1814"}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({ ...prev, backgroundColor: e.target.value }))
+                            }
+                            className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                          />
+                          <Input
+                            value={themeConfig.backgroundColor || "#1C1814"}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({ ...prev, backgroundColor: e.target.value }))
+                            }
+                            className="text-xs font-mono"
+                            placeholder="#1C1814"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-foreground">Typography Color</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={themeConfig.textColor || "#FAF7F2"}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({ ...prev, textColor: e.target.value }))
+                            }
+                            className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                          />
+                          <Input
+                            value={themeConfig.textColor || "#FAF7F2"}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({ ...prev, textColor: e.target.value }))
+                            }
+                            className="text-xs font-mono"
+                            placeholder="#FAF7F2"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-border/40">
+                      <span className="text-[11px] text-muted-foreground font-medium block mb-2">Heritage Color Presets:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { name: "Obsidian Night", bg: "#1C1814", text: "#FAF7F2" },
+                          { name: "Deep Charcoal", bg: "#121110", text: "#F5EBE1" },
+                          { name: "Warm Parchment", bg: "#FBF8F1", text: "#1C1814" },
+                          { name: "Antique Raw Silk", bg: "#EFECE6", text: "#1C1814" },
+                          { name: "Sacred Terracotta", bg: "#2A1810", text: "#FAF7F2" },
+                          { name: "Temple Teak", bg: "#241E19", text: "#FAF7F2" },
+                        ].map((preset) => (
+                          <button
+                            key={preset.name}
+                            type="button"
+                            onClick={() =>
+                              setThemeConfig((prev) => ({
+                                ...prev,
+                                backgroundColor: preset.bg,
+                                textColor: preset.text,
+                              }))
+                            }
+                            className="text-xs px-2.5 py-1 rounded-md border border-border/80 hover:border-primary/50 flex items-center gap-1.5 bg-background transition-colors cursor-pointer"
+                          >
+                            <span className="w-2.5 h-2.5 rounded-full border border-border" style={{ backgroundColor: preset.bg }} />
+                            <span>{preset.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-[10px] text-muted-foreground">
-                    High contrast text color for screen and print rendering.
-                  </p>
-                </div>
+                )}
+
+                {/* Mode 2: Sacred Patterns */}
+                {themeConfig.backgroundMode === "PATTERN" && (
+                  <div className="p-4 rounded-xl border border-border/80 bg-muted/10 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-foreground">Base Canvas Color</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={themeConfig.backgroundColor || "#1C1814"}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({ ...prev, backgroundColor: e.target.value }))
+                            }
+                            className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                          />
+                          <Input
+                            value={themeConfig.backgroundColor || "#1C1814"}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({ ...prev, backgroundColor: e.target.value }))
+                            }
+                            className="text-xs font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-semibold text-foreground">Pattern Opacity</label>
+                          <span className="text-xs font-mono text-primary font-bold">
+                            {Math.round(((themeConfig.patternOpacity ?? 0.15)) * 100)}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.05"
+                          max="0.6"
+                          step="0.01"
+                          value={themeConfig.patternOpacity ?? 0.15}
+                          onChange={(e) =>
+                            setThemeConfig((prev) => ({ ...prev, patternOpacity: parseFloat(e.target.value) }))
+                          }
+                          className="w-full accent-primary cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-foreground block">Select Sacred Heritage Pattern</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {BACKGROUND_PATTERNS.map((p) => {
+                          const isSelected = (themeConfig.backgroundPattern || "mandala-filigree") === p.id;
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => setThemeConfig((prev) => ({ ...prev, backgroundPattern: p.id }))}
+                              className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between h-28 relative overflow-hidden group cursor-pointer ${
+                                isSelected
+                                  ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
+                                  : "border-border/80 bg-background hover:border-primary/40"
+                              }`}
+                            >
+                              <div
+                                className="absolute inset-0 pointer-events-none opacity-20 group-hover:opacity-30 transition-opacity"
+                                style={{
+                                  backgroundImage: `url("${p.svgDataUri}")`,
+                                  backgroundRepeat: "repeat",
+                                }}
+                              />
+                              <div className="relative z-10 flex items-center justify-between w-full">
+                                <span className="text-[10px] font-mono uppercase text-primary font-semibold">
+                                  {p.category}
+                                </span>
+                                {isSelected && <Check className="w-3.5 h-3.5 text-primary" />}
+                              </div>
+                              <div className="relative z-10">
+                                <h5 className="text-xs font-serif font-bold text-foreground truncate">{p.name}</h5>
+                                <p className="text-[10px] text-muted-foreground line-clamp-1">{p.description}</p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mode 3: Background Image */}
+                {themeConfig.backgroundMode === "IMAGE" && (
+                  <div className="p-4 rounded-xl border border-border/80 bg-muted/10 space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        <ImageIcon className="w-3.5 h-3.5 text-primary" /> Full-Bleed Background Image
+                      </label>
+                      <MediaUploader
+                        value={themeConfig.backgroundImage || ""}
+                        onUploadComplete={(url) => setThemeConfig((prev) => ({ ...prev, backgroundImage: url }))}
+                        onRemove={() => setThemeConfig((prev) => ({ ...prev, backgroundImage: "" }))}
+                        mediaType="general"
+                        description="High-resolution textural background or fine art wash for catalog pages."
+                      />
+                    </div>
+
+                    <div className="space-y-1.5 pt-2 border-t border-border/40">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-foreground">Dark Overlay Scrim Opacity</label>
+                        <span className="text-xs font-mono text-primary font-bold">
+                          {Math.round(((themeConfig.overlayOpacity ?? 0.5)) * 100)}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="0.9"
+                        step="0.05"
+                        value={themeConfig.overlayOpacity ?? 0.5}
+                        onChange={(e) =>
+                          setThemeConfig((prev) => ({ ...prev, overlayOpacity: parseFloat(e.target.value) }))
+                        }
+                        className="w-full accent-primary cursor-pointer"
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        Controls dark scrim overlay to ensure optimal legibility for typography and gold plate frames.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -861,8 +1095,70 @@ export default function AdminCatalogStudioPage() {
                     </div>
                   </div>
 
+                  {/* Custom Page Heading & Subheading Configuration */}
+                  <div className="mt-3 pt-3 border-t border-border/60 grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                    <div className="sm:col-span-5 space-y-1">
+                      <label className="text-[11px] font-semibold text-foreground flex items-center justify-between">
+                        <span>Plate Heading</span>
+                        <span className="text-[10px] text-muted-foreground font-normal">Defaults to title</span>
+                      </label>
+                      <Input
+                        value={plate.customTitle || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setPlates((prev) => {
+                            const copy = [...prev];
+                            copy[index].customTitle = val;
+                            return copy;
+                          });
+                        }}
+                        placeholder={plate.artwork.title}
+                        className="text-xs bg-muted/20"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-4 space-y-1">
+                      <label className="text-[11px] font-semibold text-foreground flex items-center justify-between">
+                        <span>Subheading / Provenance</span>
+                        <span className="text-[10px] text-muted-foreground font-normal">Tagline</span>
+                      </label>
+                      <Input
+                        value={plate.customSubtitle || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setPlates((prev) => {
+                            const copy = [...prev];
+                            copy[index].customSubtitle = val;
+                            return copy;
+                          });
+                        }}
+                        placeholder={`${plate.artwork.category?.name || "Traditional Indian School"}${plate.artwork.yearCreated ? ` • ${plate.artwork.yearCreated}` : ""}`}
+                        className="text-xs bg-muted/20"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3 space-y-1 pb-1">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs select-none">
+                        <input
+                          type="checkbox"
+                          checked={plate.showPlateNumber ?? true}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setPlates((prev) => {
+                              const copy = [...prev];
+                              copy[index].showPlateNumber = checked;
+                              return copy;
+                            });
+                          }}
+                          className="rounded border-border accent-primary w-4 h-4 cursor-pointer"
+                        />
+                        <span className="text-[11px] font-medium text-foreground">Show &quot;Plate X of Y&quot;</span>
+                      </label>
+                    </div>
+                  </div>
+
                   {/* Curatorial Plate Note & Plate Layout Override */}
-                  <div className="mt-3 pt-3 border-t border-border/60 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                  <div className="mt-2.5 pt-2.5 border-t border-border/40 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
                     <div className="md:col-span-3">
                       <Input
                         value={plate.curatorialNote || ""}
