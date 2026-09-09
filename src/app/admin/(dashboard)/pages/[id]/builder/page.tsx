@@ -1239,7 +1239,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "TEXT");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
+                    isSectionLight
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                  }`}
                 >
                   + Text
                 </button>
@@ -1249,7 +1253,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "IMAGE");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
+                    isSectionLight
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                  }`}
                 >
                   + Image
                 </button>
@@ -1259,7 +1267,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "VIDEO");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
+                    isSectionLight
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                  }`}
                 >
                   + Video
                 </button>
@@ -1269,7 +1281,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "AUDIO");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
+                    isSectionLight
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                  }`}
                 >
                   + Audio
                 </button>
@@ -1279,7 +1295,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "DIVIDER");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
+                    isSectionLight
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                  }`}
                 >
                   + Divider
                 </button>
@@ -1289,7 +1309,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "BUTTON");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground transition-all"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
+                    isSectionLight
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                  }`}
                 >
                   + Button
                 </button>
@@ -1299,7 +1323,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "BLOG_GRID");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-primary/40 hover:border-primary bg-primary/10 hover:bg-primary/20 text-primary font-semibold transition-all cursor-pointer"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold ${
+                    isSectionLight
+                      ? "border-amber-600 bg-amber-100/90 hover:bg-amber-200 text-amber-950 shadow-2xs"
+                      : "border-primary/40 hover:border-primary bg-primary/10 hover:bg-primary/20 text-primary"
+                  }`}
                 >
                   + 4-Col Blog Grid
                 </button>
@@ -1309,7 +1337,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "PDF_VIEWER");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-amber-500/40 hover:border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-semibold transition-all cursor-pointer flex items-center gap-1"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
+                    isSectionLight
+                      ? "border-amber-600 bg-amber-100/90 hover:bg-amber-200 text-amber-950 shadow-2xs"
+                      : "border-amber-500/40 hover:border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400"
+                  }`}
                 >
                   <FileText className="w-2.5 h-2.5" /> + PDF Document
                 </button>
@@ -1319,7 +1351,11 @@ function SortableSection({
                     e.stopPropagation();
                     addBlockToCol(colIdx, "ARTIST_TIMELINE");
                   }}
-                  className="px-1.5 py-0.5 text-[9px] rounded border border-primary/40 hover:border-primary bg-primary/15 hover:bg-primary/25 text-primary font-semibold transition-all cursor-pointer flex items-center gap-1"
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
+                    isSectionLight
+                      ? "border-amber-600 bg-amber-100/90 hover:bg-amber-200 text-amber-950 shadow-2xs"
+                      : "border-primary/40 hover:border-primary bg-primary/15 hover:bg-primary/25 text-primary"
+                  }`}
                 >
                   <History className="w-2.5 h-2.5" /> + Artist Timeline
                 </button>

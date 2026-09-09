@@ -314,8 +314,12 @@ export function TiptapEditor({
   };
 
   const btnInactiveClass = isLight
-    ? "text-stone-700 hover:text-stone-950 hover:bg-stone-200/60"
-    : "text-muted-foreground hover:text-foreground";
+    ? "text-stone-800 hover:text-stone-950 hover:bg-stone-200/80"
+    : "text-stone-300 hover:text-foreground hover:bg-stone-800/60";
+
+  const btnActiveClass = isLight
+    ? "bg-amber-400 text-stone-950 font-bold shadow-xs border border-amber-500/80"
+    : "bg-amber-500/20 text-amber-300 font-bold shadow-xs border border-amber-500/50";
 
   return (
     <div className="w-full relative group">
@@ -451,8 +455,8 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={`h-7 px-1.5 text-xs font-serif font-bold ${
-              editor.isActive("heading", { level: 1 }) ? "bg-primary/20 text-primary" : btnInactiveClass
+            className={`h-7 px-1.5 text-xs font-serif ${
+              editor.isActive("heading", { level: 1 }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Heading 1"
           >
@@ -464,8 +468,8 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={`h-7 px-1.5 text-xs font-serif font-bold ${
-              editor.isActive("heading", { level: 2 }) ? "bg-primary/20 text-primary" : btnInactiveClass
+            className={`h-7 px-1.5 text-xs font-serif ${
+              editor.isActive("heading", { level: 2 }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Heading 2"
           >
@@ -477,8 +481,8 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={`h-7 px-1.5 text-xs font-serif font-bold ${
-              editor.isActive("heading", { level: 3 }) ? "bg-primary/20 text-primary" : btnInactiveClass
+            className={`h-7 px-1.5 text-xs font-serif ${
+              editor.isActive("heading", { level: 3 }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Heading 3"
           >
@@ -490,8 +494,8 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-            className={`h-7 px-1.5 text-xs font-serif font-bold ${
-              editor.isActive("heading", { level: 4 }) ? "bg-primary/20 text-primary" : btnInactiveClass
+            className={`h-7 px-1.5 text-xs font-serif ${
+              editor.isActive("heading", { level: 4 }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Heading 4"
           >

@@ -55,33 +55,38 @@ export async function Footer() {
     footerConfig?.copyrightText ||
     `© ${new Date().getFullYear()} ${siteName}. All sacred rights reserved.`;
 
-  // Zero-hardcoding dynamic social channels resolution:
-  // Strictly filter only non-empty, explicitly configured platforms
+  // Dynamic social channels resolution:
+  // Direct settings fields (instagramUrl, etc.) take precedence. If footerConfig has extra channels (e.g. SoundCloud, X), add them.
   const configuredSocials: { platform: string; url: string }[] = [];
 
-  if (settings?.instagramUrl && settings.instagramUrl.trim().length > 0) {
-    configuredSocials.push({ platform: "Instagram", url: settings.instagramUrl.trim() });
+  const directInstagram = settings?.instagramUrl?.trim();
+  const directFacebook = settings?.facebookUrl?.trim();
+  const directYouTube = settings?.youtubeUrl?.trim();
+  const directPinterest = settings?.pinterestUrl?.trim();
+
+  if (directInstagram) {
+    configuredSocials.push({ platform: "Instagram", url: directInstagram });
   }
-  if (settings?.facebookUrl && settings.facebookUrl.trim().length > 0) {
-    configuredSocials.push({ platform: "Facebook", url: settings.facebookUrl.trim() });
+  if (directFacebook) {
+    configuredSocials.push({ platform: "Facebook", url: directFacebook });
   }
-  if (settings?.youtubeUrl && settings.youtubeUrl.trim().length > 0) {
-    configuredSocials.push({ platform: "YouTube", url: settings.youtubeUrl.trim() });
+  if (directYouTube) {
+    configuredSocials.push({ platform: "YouTube", url: directYouTube });
   }
-  if (settings?.pinterestUrl && settings.pinterestUrl.trim().length > 0) {
-    configuredSocials.push({ platform: "Pinterest", url: settings.pinterestUrl.trim() });
+  if (directPinterest) {
+    configuredSocials.push({ platform: "Pinterest", url: directPinterest });
   }
 
   if (Array.isArray(footerConfig?.socialLinks)) {
     footerConfig.socialLinks.forEach((link) => {
-      if (link.url && link.url.trim().length > 0) {
+      const trimmedUrl = link.url?.trim();
+      if (link.isVisible !== false && trimmedUrl && trimmedUrl.length > 0) {
         const existingIdx = configuredSocials.findIndex(
-          (s) => s.platform.toLowerCase() === link.platform.toLowerCase()
+          (s) => s.platform.toLowerCase() === link.platform.trim().toLowerCase()
         );
-        if (existingIdx >= 0) {
-          configuredSocials[existingIdx].url = link.url.trim();
-        } else {
-          configuredSocials.push({ platform: link.platform.trim(), url: link.url.trim() });
+        // Only add if not already set by direct columns or update if direct column was empty
+        if (existingIdx === -1) {
+          configuredSocials.push({ platform: link.platform.trim(), url: trimmedUrl });
         }
       }
     });

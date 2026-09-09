@@ -20,6 +20,8 @@ import {
   Loader2,
   Eye,
   FileDown,
+  Star,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +53,7 @@ interface ArtworkOption {
   title: string;
   slug: string;
   medium: string;
+  dimensions?: string | null;
   primaryImageUrl: string;
   yearCreated: number | null;
   category?: {
@@ -145,8 +148,12 @@ export default function AdminCatalogStudioPage() {
           setPlates(catData.items || []);
         }
 
-        if (!ignore && artRes.ok && artData.artworks) {
-          setAvailableArtworks(artData.artworks);
+        if (!ignore && artRes.ok) {
+          if (Array.isArray(artData)) {
+            setAvailableArtworks(artData);
+          } else if (artData && Array.isArray(artData.artworks)) {
+            setAvailableArtworks(artData.artworks);
+          }
         }
 
         if (!ignore && evtRes.ok && Array.isArray(evtData)) {
@@ -235,23 +242,32 @@ export default function AdminCatalogStudioPage() {
     setPlates(updated);
   };
 
-  const addArtworkPlate = (art: ArtworkOption) => {
-    if (plates.some((p) => p.artworkId === art.id)) {
-      toast.info("This artwork is already added to the catalog");
-      return;
-    }
-
-    const newPlate: CatalogPlate = {
-      artworkId: art.id,
-      pageNumber: plates.length + 1,
-      curatorialNote: "",
-      highlightPlate: false,
-      artwork: art,
-    };
-
-    setPlates((prev) => [...prev, newPlate]);
-    toast.success(`Added "${art.title}" to catalog plates`);
+  const toggleHighlightPlate = (index: number) => {
+    setPlates((prev) => {
+      const copy = [...prev];
+      copy[index].highlightPlate = !copy[index].highlightPlate;
+      return copy;
+    });
   };
+
+  const toggleArtworkPlate = (art: ArtworkOption) => {
+    const existingIndex = plates.findIndex((p) => p.artworkId === art.id);
+    if (existingIndex >= 0) {
+      removePlate(existingIndex);
+      toast.info(`Removed "${art.title}" from catalog plates`);
+    } else {
+      const newPlate: CatalogPlate = {
+        artworkId: art.id,
+        pageNumber: plates.length + 1,
+        curatorialNote: "",
+        highlightPlate: false,
+        artwork: art,
+      };
+      setPlates((prev) => [...prev, newPlate]);
+      toast.success(`Added "${art.title}" to catalog plates`);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -559,7 +575,21 @@ export default function AdminCatalogStudioPage() {
                     </div>
 
                     {/* Controls & Ordering */}
-                    <div className="flex items-center gap-1 shrink-0 self-end sm:self-auto">
+                    <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                      <Button
+                        variant={plate.highlightPlate ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleHighlightPlate(index)}
+                        className={`h-7 px-2 text-[11px] gap-1 cursor-pointer ${
+                          plate.highlightPlate
+                            ? "bg-primary text-primary-foreground font-semibold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                        title="Toggle Exhibition Highlight Plate"
+                      >
+                        <Star className={`w-3 h-3 ${plate.highlightPlate ? "fill-current" : ""}`} />
+                        {plate.highlightPlate ? "Highlight" : "Feature"}
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -663,75 +693,118 @@ export default function AdminCatalogStudioPage() {
 
       {/* Artwork Picker Dialog */}
       <Dialog open={artworkPickerOpen} onOpenChange={setArtworkPickerOpen}>
-        <DialogContent className="max-w-2xl w-full max-h-[85vh] flex flex-col">
+        <DialogContent className="max-w-3xl w-full max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="font-serif text-lg">Select Masterworks for Catalog</DialogTitle>
             <DialogDescription className="text-xs">
-              Click on artworks to include them as plates in this digital catalog.
+              Click any artwork card to toggle its inclusion in this digital exhibition catalog. Selected masterworks will appear in the plate sequence.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-2">
-            <Input
-              placeholder="Search by title or medium..."
-              value={artworkSearch}
-              onChange={(e) => setArtworkSearch(e.target.value)}
-              className="text-xs"
-            />
+          <div className="py-2 flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search artworks by title, school, or medium..."
+                value={artworkSearch}
+                onChange={(e) => setArtworkSearch(e.target.value)}
+                className="text-xs pl-8"
+              />
+            </div>
+            <Badge variant="outline" className="text-xs shrink-0 font-mono py-1 px-2.5">
+              {plates.length} of {availableArtworks.length} Selected
+            </Badge>
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-2 pr-1 max-h-[50vh]">
-            {availableArtworks
-              .filter((a) => a.title.toLowerCase().includes(artworkSearch.toLowerCase()) || (a.medium && a.medium.toLowerCase().includes(artworkSearch.toLowerCase())))
-              .map((art) => {
-                const isSelected = plates.some((p) => p.artworkId === art.id);
-                return (
-                  <div
-                    key={art.id}
-                    onClick={() => !isSelected && addArtworkPlate(art)}
-                    className={`flex items-center justify-between p-2.5 rounded-lg border transition-all ${
-                      isSelected
-                        ? "bg-primary/10 border-primary/40 opacity-60 cursor-not-allowed"
-                        : "bg-card border-border/80 hover:border-primary/50 cursor-pointer hover:bg-muted/40"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-12 h-12 rounded-md overflow-hidden border border-border bg-background shrink-0">
-                        <img
-                          src={art.primaryImageUrl}
-                          alt={art.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-serif font-bold text-foreground truncate">
-                          {art.title}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground truncate">
-                          {art.category?.name || "Traditional School"} • {art.medium}
-                        </p>
-                      </div>
-                    </div>
+          <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 max-h-[55vh]">
+            {availableArtworks.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground border border-dashed rounded-lg">
+                No artworks found in your collection archive. Add masterworks in the Artwork Catalog first.
+              </div>
+            ) : availableArtworks.filter((a) =>
+                a.title.toLowerCase().includes(artworkSearch.toLowerCase()) ||
+                (a.medium && a.medium.toLowerCase().includes(artworkSearch.toLowerCase())) ||
+                (a.category?.name && a.category.name.toLowerCase().includes(artworkSearch.toLowerCase()))
+              ).length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground border border-dashed rounded-lg">
+                No artworks matched your search query &ldquo;{artworkSearch}&rdquo;.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {availableArtworks
+                  .filter((a) =>
+                    a.title.toLowerCase().includes(artworkSearch.toLowerCase()) ||
+                    (a.medium && a.medium.toLowerCase().includes(artworkSearch.toLowerCase())) ||
+                    (a.category?.name && a.category.name.toLowerCase().includes(artworkSearch.toLowerCase()))
+                  )
+                  .map((art) => {
+                    const isSelected = plates.some((p) => p.artworkId === art.id);
+                    const plateIndex = plates.findIndex((p) => p.artworkId === art.id);
 
-                    <div className="shrink-0">
-                      {isSelected ? (
-                        <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
-                          <Check className="w-3 h-3 mr-1" /> Added
-                        </Badge>
-                      ) : (
-                        <Button size="sm" variant="ghost" className="h-7 text-xs text-primary">
-                          <Plus className="w-3.5 h-3.5 mr-1" /> Add Plate
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                    return (
+                      <div
+                        key={art.id}
+                        onClick={() => toggleArtworkPlate(art)}
+                        className={`group relative flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none ${
+                          isSelected
+                            ? "border-primary/80 bg-primary/10 shadow-sm ring-2 ring-primary/30"
+                            : "border-border/80 bg-card hover:border-primary/50 hover:bg-muted/30"
+                        }`}
+                      >
+                        {/* Artwork Thumbnail */}
+                        <div className="w-16 h-16 rounded-lg overflow-hidden border border-border bg-background shrink-0 shadow-sm relative">
+                          <img
+                            src={art.primaryImageUrl}
+                            alt={art.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          {isSelected && (
+                            <div className="absolute top-1 left-1 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-mono font-bold shadow-md">
+                              {plateIndex + 1}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Artwork Metadata */}
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-start justify-between gap-1">
+                            <h4 className="text-xs font-serif font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                              {art.title}
+                            </h4>
+                            {isSelected ? (
+                              <Badge className="text-[10px] bg-primary text-primary-foreground shrink-0 px-1.5 py-0">
+                                <Check className="w-2.5 h-2.5 mr-0.5" /> Included
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-[10px] text-muted-foreground shrink-0 px-1.5 py-0">
+                                + Add
+                              </Badge>
+                            )}
+                          </div>
+
+                          <p className="text-[11px] text-primary/90 font-mono truncate">
+                            {art.category?.name || "Traditional School"}
+                          </p>
+
+                          <p className="text-[10px] text-muted-foreground truncate">
+                            {art.medium}
+                            {art.dimensions ? ` • ${art.dimensions}` : ""}
+                            {art.yearCreated ? ` • ${art.yearCreated}` : ""}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </div>
 
-          <DialogFooter className="pt-2 border-t border-border">
-            <Button size="sm" onClick={() => setArtworkPickerOpen(false)}>
-              Done Selecting
+          <DialogFooter className="pt-3 border-t border-border flex items-center justify-between sm:justify-between">
+            <span className="text-xs text-muted-foreground font-mono">
+              {plates.length} plate{plates.length === 1 ? "" : "s"} ready for sequencing
+            </span>
+            <Button size="sm" onClick={() => setArtworkPickerOpen(false)} className="cursor-pointer">
+              Done Selecting ({plates.length})
             </Button>
           </DialogFooter>
         </DialogContent>

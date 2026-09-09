@@ -290,9 +290,42 @@ export default function AdminSettingsPage() {
     setSuccessMsg(null);
 
     try {
+      // Synchronize social URLs bi-directionally with footerConfig.socialLinks
+      const updatedFooterSocials = [...(footerConfig.socialLinks || [])];
+      const platformMap: Record<string, string> = {
+        Instagram: form.instagramUrl?.trim() || "",
+        YouTube: form.youtubeUrl?.trim() || "",
+        Facebook: form.facebookUrl?.trim() || "",
+        Pinterest: form.pinterestUrl?.trim() || "",
+      };
+
+      Object.entries(platformMap).forEach(([platform, url]) => {
+        const existingIdx = updatedFooterSocials.findIndex(
+          (s) => s.platform.toLowerCase() === platform.toLowerCase()
+        );
+        if (existingIdx >= 0) {
+          updatedFooterSocials[existingIdx] = {
+            ...updatedFooterSocials[existingIdx],
+            url,
+            isVisible: Boolean(url),
+          };
+        } else if (url) {
+          updatedFooterSocials.push({
+            platform,
+            url,
+            isVisible: true,
+          });
+        }
+      });
+
+      const updatedFooterConfig = {
+        ...footerConfig,
+        socialLinks: updatedFooterSocials,
+      };
+
       const payload = {
         ...form,
-        footerConfig,
+        footerConfig: updatedFooterConfig,
         emailConfig,
         aiConfig,
       };

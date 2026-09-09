@@ -113,9 +113,9 @@ export function AiAssistantModal({
         variant="outline"
         size="sm"
         onClick={handleOpen}
-        className={`text-xs border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary font-medium transition-colors ${triggerClassName}`}
+        className={`text-xs border-amber-600/70 bg-amber-500/15 hover:bg-amber-500/25 text-amber-900 dark:text-amber-200 font-semibold transition-all shadow-xs cursor-pointer ${triggerClassName}`}
       >
-        <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
+        <Sparkles className="w-3.5 h-3.5 mr-1 text-amber-600 dark:text-amber-300" />
         {triggerLabel}
       </Button>
 

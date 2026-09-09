@@ -112,6 +112,8 @@ export async function PUT(request: NextRequest) {
       revalidatePath("/", "layout");
       revalidatePath("/");
       revalidatePath("/(public)", "layout");
+      revalidatePath("/gallery", "layout");
+      revalidatePath("/catalogs", "layout");
       revalidatePath("/admin/settings");
     } catch (revErr) {
       console.warn("Settings cache revalidation notice:", revErr);

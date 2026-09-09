@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
+import { CatalogPrintButton } from "@/components/public/catalog-print-button";
 import {
   BookOpen,
   ArrowLeft,
@@ -62,13 +63,13 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground print:bg-white print:text-black">
+    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground print:bg-white print:text-stone-950">
       {/* Hide standard navbar when printing */}
       <div className="print:hidden">
         <Navbar />
       </div>
 
-      <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 w-full space-y-16">
+      <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 w-full space-y-16 print:p-0 print:m-0 print:max-w-none print:space-y-0">
         {/* Navigation & Actions Top Bar */}
         <div className="flex items-center justify-between border-b border-border/70 pb-4 print:hidden">
           <Link
@@ -80,74 +81,82 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           </Link>
 
           <div className="flex items-center gap-3">
+            <CatalogPrintButton catalogTitle={catalog.title} />
+
             {catalog.downloadablePdfUrl ? (
               <a
                 href={catalog.downloadablePdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 px-3.5 py-1.5 rounded-md shadow-sm transition-all"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-secondary text-secondary-foreground hover:bg-secondary/80 px-3.5 py-1.5 rounded-md border border-border shadow-sm transition-all"
               >
                 <Download className="w-3.5 h-3.5" />
-                Download PDF Edition
+                Pre-Compiled PDF
               </a>
             ) : null}
           </div>
         </div>
 
-        {/* BOOK COVER SECTION (Foil-Embossed Editorial Style) */}
-        <section className="relative rounded-3xl overflow-hidden border-2 border-primary/30 bg-gradient-to-b from-card via-background to-card shadow-2xl p-8 sm:p-14 text-center space-y-6">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full">
-            <Sparkles className="w-3.5 h-3.5" />
-            Exhibition Monograph &amp; Digital Archive
+        {/* BOOK COVER SECTION (Foil-Embossed Editorial Style - Page 1 on Print) */}
+        <section className="relative rounded-3xl overflow-hidden border-2 border-primary/30 bg-gradient-to-b from-card via-background to-card shadow-2xl p-8 sm:p-14 text-center space-y-6 print:border-none print:shadow-none print:p-8 print:min-h-screen print:flex print:flex-col print:justify-between print:page-break-after-always print:break-after-page">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full print:bg-transparent print:border-stone-400 print:text-stone-900">
+              <Sparkles className="w-3.5 h-3.5" />
+              Exhibition Monograph &amp; Digital Archive
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-sm print:text-4xl print:text-black">
+              {catalog.title}
+            </h1>
+
+            {catalog.subtitle && (
+              <p className="text-sm sm:text-lg font-serif italic text-muted-foreground max-w-2xl mx-auto print:text-stone-700">
+                {catalog.subtitle}
+              </p>
+            )}
+
+            {catalog.forewordBy && (
+              <div className="pt-2 text-xs uppercase tracking-widest text-foreground/80 font-mono print:text-stone-800">
+                Curated by <span className="text-primary font-bold print:text-stone-950">{catalog.forewordBy}</span>
+              </div>
+            )}
+
+            {catalog.event && (
+              <div className="inline-flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-lg border border-border print:border-stone-300 print:text-stone-800">
+                <Calendar className="w-3.5 h-3.5 text-primary print:text-stone-800" />
+                <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}, {catalog.event.city}</span>
+              </div>
+            )}
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-sm">
-            {catalog.title}
-          </h1>
-
-          {catalog.subtitle && (
-            <p className="text-sm sm:text-lg font-serif italic text-muted-foreground max-w-2xl mx-auto">
-              {catalog.subtitle}
-            </p>
-          )}
-
-          {catalog.forewordBy && (
-            <div className="pt-2 text-xs uppercase tracking-widest text-foreground/80 font-mono">
-              Curated by <span className="text-primary font-bold">{catalog.forewordBy}</span>
-            </div>
-          )}
-
-          {catalog.event && (
-            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-lg border border-border">
-              <Calendar className="w-3.5 h-3.5 text-primary" />
-              <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}, {catalog.event.city}</span>
-            </div>
-          )}
-
           {catalog.coverImageUrl && (
-            <div className="pt-6 max-w-2xl mx-auto">
-              <div className="rounded-2xl overflow-hidden border border-primary/30 shadow-2xl">
+            <div className="pt-6 max-w-2xl mx-auto print:pt-4">
+              <div className="rounded-2xl overflow-hidden border border-primary/30 shadow-2xl print:border-none print:shadow-none">
                 <img
                   src={catalog.coverImageUrl}
                   alt={catalog.title}
-                  className="w-full h-auto object-cover max-h-[500px]"
+                  className="w-full h-auto object-cover max-h-[480px] print:max-h-[550px] mx-auto"
                 />
               </div>
             </div>
           )}
+
+          <div className="hidden print:block text-[11px] font-mono text-stone-500 pt-8">
+            Published by the Atelier of Lalita Kapilavai • Sacred Art &amp; Heritage
+          </div>
         </section>
 
-        {/* CURATORIAL ESSAY & FOREWORD SECTION */}
+        {/* CURATORIAL ESSAY & FOREWORD SECTION (Page 2+ on Print) */}
         {catalog.curatorialEssay && (
-          <section className="space-y-6 max-w-3xl mx-auto bg-card/40 border border-border/80 rounded-2xl p-8 sm:p-12 shadow-sm">
-            <div className="border-b border-border/60 pb-3 flex items-center justify-between">
-              <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+          <section className="space-y-6 max-w-3xl mx-auto bg-card/40 border border-border/80 rounded-2xl p-8 sm:p-12 shadow-sm print:max-w-none print:border-none print:shadow-none print:p-8 print:page-break-after-always print:break-after-page">
+            <div className="border-b border-border/60 pb-3 flex items-center justify-between print:border-stone-400">
+              <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold print:text-stone-900">
                 Curatorial Monograph
               </span>
-              <BookOpen className="w-4 h-4 text-primary" />
+              <BookOpen className="w-4 h-4 text-primary print:text-stone-900" />
             </div>
 
-            <div className="prose prose-sm sm:prose-base dark:prose-invert font-serif leading-relaxed text-foreground/90 max-w-none">
+            <div className="prose prose-sm sm:prose-base dark:prose-invert font-serif leading-relaxed text-foreground/90 max-w-none print:text-stone-900 print:text-justify">
               <TiptapRenderer content={catalog.curatorialEssay} />
             </div>
           </section>
@@ -171,7 +180,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             {catalog.items.map((item, idx) => (
               <article
                 key={item.id}
-                className="rounded-3xl border border-border/80 bg-card overflow-hidden shadow-lg p-6 sm:p-10 transition-all hover:border-primary/40 break-inside-avoid print:shadow-none print:border print:p-6"
+                className="rounded-3xl border border-border/80 bg-card overflow-hidden shadow-lg p-6 sm:p-10 transition-all hover:border-primary/40 break-inside-avoid print:shadow-none print:border-none print:p-8 print:break-after-page print:page-break-after-always print:min-h-[85vh] flex flex-col justify-center"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                   {/* Plate Artwork Visual */}
