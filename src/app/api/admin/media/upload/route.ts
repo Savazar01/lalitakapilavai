@@ -37,6 +37,34 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const inputBuffer = Buffer.from(arrayBuffer);
 
+    // 2b. PDF Document Upload Bypass (Curatorial Monographs, Exhibition Catalogs, CVs)
+    const isPdf =
+      file.type === "application/pdf" ||
+      file.name.toLowerCase().endsWith(".pdf") ||
+      formData.get("mediaType") === "document";
+
+    if (isPdf) {
+      const assetId = crypto.randomUUID();
+      const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const docKey = `documents/${assetId}_${sanitizedName}`;
+      const uploadResult = await uploadBuffer(
+        inputBuffer,
+        docKey,
+        "application/pdf",
+        false
+      );
+
+      return NextResponse.json({
+        success: true,
+        assetId,
+        publicUrl: uploadResult.publicUrl,
+        fileUrl: uploadResult.publicUrl,
+        fileName: file.name,
+        mediaType: "document",
+        fileSizeBytes: inputBuffer.length,
+      });
+    }
+
     // 3. Extract Image Metadata via Sharp & Validate Format
     const allowedFormats = ["jpeg", "jpg", "png", "webp", "gif", "tiff", "tif"];
     const metadata = await sharp(inputBuffer).metadata();

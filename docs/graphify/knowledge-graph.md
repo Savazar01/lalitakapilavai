@@ -53,28 +53,30 @@ graph LR
     subgraph Public_Presentation
         Home["/ (Home Hero)"]
         Gallery["/gallery (Animated Masonry + Multi-Currency)"]
-        ArtDetail["/artwork/[slug] (ArtCanvasViewer + Protected Canvas + QR Lead Capture)"]
+        CategoryGallery["/gallery/[categorySlug] (Category Hero Banner & Curated Artworks)"]
+        ArtDetail["/artwork/[slug] (ArtCanvasViewer + Protected Canvas + Tiptap Rich Description + QR Lead Capture)"]
         EventsPage["/events (Calendar & Recitals)"]
         EventDetail["/events/[slug] (Exhibition Catalog + Localized Dates + RSVP Form)"]
-        DynamicPage["/[slug] (12-Column SSR Page + Rich Media: Images, Videos, Icons, Audio)"]
+        DynamicPage["/[slug] (12-Column SSR Page + Rich Media: Images, Videos, Icons, Audio, PDF Viewer, Artist Timeline)"]
+        DynamicFooter["Footer (Prisma-Synced Nav + Dynamic Configured Socials)"]
     end
 
     subgraph Admin_Control_Plane
         AdminDash["/admin (Overview Dashboard)"]
-        ArtAdmin["/admin/artworks (Catalog, Currency, Vault & QR Gen)"]
+        ArtAdmin["/admin/artworks (Catalog, Currency, Vault, AI Provenance & Tiptap Description)"]
         EventAdmin["/admin/events (Schedule, Localized Timezones & Linker)"]
-        PagesAdmin["/admin/pages (12-Col Visual Page Builder + Media Blocks)"]
+        PagesAdmin["/admin/pages (12-Col Visual Page Builder + Media Blocks + PDF Viewer + Artist Timeline)"]
         NavAdmin["/admin/navigation (2-Tier Menus Console)"]
-        CatAdmin["/admin/categories (7 Classical Painting Schools Manager)"]
+        CatAdmin["/admin/categories (7 Classical Painting Schools Manager + Local MediaUploader)"]
         LeadAdmin["/admin/leads (Exhibition QR CRM, Status Tracker & CSV Export)"]
         PostAdmin["/admin/posts (Blog & AEO Editorial Desk with Schema.org Preview)"]
         UserAdmin["/admin/users (Superadmin RBAC Suite: Roles, Passwords & Account Lifecycle)"]
-        SettingAdmin["/admin/settings (Watermark Vault, R2/S3 Endpoints & Socials)"]
+        SettingAdmin["/admin/settings (Watermark Vault, R2/S3 Endpoints & Dynamic Socials)"]
         ProfileAdmin["/admin/profile (User Details, Password Change & Session Revocation)"]
     end
 
     subgraph API_Endpoints
-        MediaUpload["POST /api/admin/media/upload (Sharp Watermarking Pipeline)"]
+        MediaUpload["POST /api/admin/media/upload (Sharp Watermarking Pipeline + PDF Document Direct Stream)"]
         ArtworkAPI["/api/admin/artworks/* (CRUD + Currency)"]
         EventAPI["/api/admin/events/* (CRUD + Global Addresses + Auto-Currency + Timezones)"]
         CatAPI["/api/admin/categories/* (CRUD)"]
@@ -106,8 +108,8 @@ graph LR
 graph TD
     Builder["12-Column Visual Page Builder (/admin/pages/[id]/builder)"]
     ContrastEngine["Background-Aware Contrast Engine (Luminance & Preset Detector)"]
-    MultiRowPartition["Multi-Row Column Partitioning (Nested Sub-Sections: Text, Image, Video, Audio, Divider, CTA Button)"]
-    ArtisticFraming["Artistic Customization Engine (Gold/Terracotta/Silk/Charcoal Borders, Radii, Gold Radiant Glow, Traditional Fillets)"]
+    MultiRowPartition["Multi-Row Column Partitioning (Nested Sub-Sections: Text, Image, Video, Audio, Divider, CTA Button, PDF Viewer, Artist Timeline)"]
+    ArtisticFraming["Artistic Customization Engine (Gold/Terracotta/Silk/Charcoal Borders, Radii, Gold Radiant Glow, Traditional Fillets, 0px/None Zero Border)"]
     PublicSSR["Public SSR Dynamic Page Renderer (/[slug])"]
 
     Builder --> ContrastEngine
@@ -124,9 +126,11 @@ graph TD
 
 ```mermaid
 graph TD
-    ClientUpload["Multi-Format Dropzone & File Pickers (JPEG, JPG, PNG, WEBP, GIF, TIFF)"]
+    ClientUpload["Multi-Format Dropzone & File Pickers (MediaUploader: JPEG, PNG, WEBP, GIF, TIFF, PDF)"]
     UploadAPI["POST /api/admin/media/upload"]
-    SharpEngine["Sharp Ingestion & Processing Pipeline"]
+    DocBypass{"Is PDF Document?"}
+    SharpEngine["Sharp Ingestion & Watermarking Pipeline (Images)"]
+    StreamUpload["Direct Binary Streaming Pipeline (PDF Documents)"]
     MasterVault["Original Master Asset Vault (Preserved Format)"]
     WatermarkDeriv["Semi-Transparent Copyright Watermarked WebP (85% Quality)"]
     NormalizedPayload["Normalized Response Payload (watermarkedUrl, publicUrl, primaryImageUrl, protectedS3Key, vaultKey)"]
@@ -134,14 +138,20 @@ graph TD
     SonnerToaster["Global Sonner Toaster (UI-UX-Pro-Max Warm Parchment & Obsidian Gold)"]
     ConfirmModal["Radix ConfirmDialog (Destructive Actions: Artworks, Events, Categories, Pages, Posts, Nav)"]
     TiptapModal["Radix Dialog Link Editor (Zero Browser Prompts)"]
+    TimelineModal["Interactive Heritage Timeline Inspector (Milestones, Category Badges & Layouts)"]
 
     ClientUpload --> UploadAPI
-    UploadAPI --> SharpEngine
+    UploadAPI --> DocBypass
+    DocBypass -->|No (Image)| SharpEngine
+    DocBypass -->|Yes (PDF)| StreamUpload
     SharpEngine --> MasterVault
     SharpEngine --> WatermarkDeriv
+    StreamUpload --> MasterVault
     UploadAPI --> NormalizedPayload
     NormalizedPayload --> SonnerToaster
     ConfirmModal -->|Safe Interactive Confirmations| Admin_Control_Plane
     TiptapModal -->|Visual Hyperlink Management| Builder
+    TimelineModal -->|Milestone Serialization| Builder
 ```
+
 

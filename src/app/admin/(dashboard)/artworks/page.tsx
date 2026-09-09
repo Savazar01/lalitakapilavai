@@ -39,6 +39,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
+import { TiptapEditor } from "@/components/builder/tiptap-editor";
 import {
   Table,
   TableHeader,
@@ -800,7 +801,7 @@ export default function ArtworksAdminPage() {
 
       {/* Artwork Create / Edit Modal */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleSaveArtwork}>
             <DialogHeader>
               <DialogTitle>
@@ -1085,23 +1086,29 @@ export default function ArtworksAdminPage() {
                 </div>
               </div>
 
-              {/* Description */}
-              <div className="space-y-1">
+              {/* Description WYSIWYG */}
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-foreground">Artistic Commentary &amp; Provenance</label>
                   <AiAssistantModal
                     initialContext={`${title ? `Artwork Title: ${title}\n` : ""}${medium ? `Medium: ${medium}\n` : ""}${description || ""}`}
-                    onApply={(aiText) => setDescription(aiText)}
+                    onApply={(aiText) => {
+                      setDescription((prev) => {
+                        const newParagraph = `<p>${aiText.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br/>")}</p>`;
+                        return prev ? `${prev}${newParagraph}` : newParagraph;
+                      });
+                    }}
                     triggerLabel="✨ AI Provenance"
                   />
                 </div>
-                <textarea
-                  rows={3}
-                  placeholder="Detailed iconographic description, spiritual symbolism, and Carnatic raga links..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+                <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
+                  <TiptapEditor
+                    content={description}
+                    onChange={(_, html) => setDescription(html)}
+                    placeholder="Detailed iconographic description, spiritual symbolism, and Carnatic raga links..."
+                    className="min-h-[140px]"
+                  />
+                </div>
               </div>
             </div>
 

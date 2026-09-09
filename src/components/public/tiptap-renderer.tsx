@@ -15,6 +15,8 @@ import {
   Volume2,
 } from "lucide-react";
 import { BlogGridEmbed } from "@/components/public/blog-grid-embed";
+import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
+import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
 
 interface TiptapMark {
   type: string;
@@ -41,6 +43,8 @@ interface MediaBlockConfig {
   audioTitle?: string;
   audioUrl?: string;
   videoUrl?: string;
+  hasBorder?: boolean;
+  borderWidth?: number;
 }
 
 interface TiptapRendererProps {
@@ -249,12 +253,16 @@ function renderMediaBlock(media: MediaBlockConfig): React.ReactNode {
         ? "rounded-full aspect-square max-w-[240px] mx-auto"
         : "rounded-lg";
 
+    const showBorder = media.hasBorder !== false && media.borderWidth !== 0;
+
     return (
       <div className="mb-6 overflow-hidden flex justify-center">
         <img
           src={media.mediaUrl}
           alt={media.mediaAlt || "Cultural archive imagery"}
-          className={`w-full object-cover shadow-lg border border-border/80 ${aspectClass} ${radiusClass}`}
+          className={`w-full object-cover shadow-lg ${
+            showBorder ? "border border-border/80" : "border-0"
+          } ${aspectClass} ${radiusClass}`}
           loading="lazy"
         />
       </div>
@@ -337,12 +345,23 @@ function renderMediaBlock(media: MediaBlockConfig): React.ReactNode {
 
 export interface ColumnBlock {
   id: string;
-  type: "TEXT" | "IMAGE" | "VIDEO" | "AUDIO" | "DIVIDER" | "BUTTON" | "BLOG_GRID";
+  type:
+    | "TEXT"
+    | "IMAGE"
+    | "VIDEO"
+    | "AUDIO"
+    | "DIVIDER"
+    | "BUTTON"
+    | "BLOG_GRID"
+    | "PDF_VIEWER"
+    | "ARTIST_TIMELINE";
   content?: Record<string, unknown>;
   mediaUrl?: string;
   mediaAlt?: string;
   mediaAspectRatio?: string;
   mediaBorderRadius?: string;
+  hasBorder?: boolean;
+  borderWidth?: number;
   videoUrl?: string;
   audioUrl?: string;
   audioTitle?: string;
@@ -351,6 +370,24 @@ export interface ColumnBlock {
   buttonUrl?: string;
   buttonVariant?: "gold" | "outline" | "temple";
   blogLimit?: number;
+  // PDF Viewer Properties
+  pdfUrl?: string;
+  fileUrl?: string;
+  pdfFileName?: string;
+  fileName?: string;
+  pdfTitle?: string;
+  title?: string;
+  pdfHeight?: number;
+  height?: number;
+  pdfAllowDownload?: boolean;
+  allowDownload?: boolean;
+  // Timeline Properties
+  timelineItems?: TimelineMilestone[];
+  timelineLayout?: "alternating" | "compact" | "horizontal";
+  timelineTitle?: string;
+  timelineSubtitle?: string;
+  subtitle?: string;
+  showFilters?: boolean;
 }
 
 function renderColumnBlock(block: ColumnBlock): React.ReactNode {
@@ -363,6 +400,8 @@ function renderColumnBlock(block: ColumnBlock): React.ReactNode {
           mediaAlt: block.mediaAlt,
           mediaAspectRatio: block.mediaAspectRatio,
           mediaBorderRadius: block.mediaBorderRadius,
+          hasBorder: block.hasBorder,
+          borderWidth: block.borderWidth,
         })}
       </div>
     );
@@ -424,6 +463,34 @@ function renderColumnBlock(block: ColumnBlock): React.ReactNode {
     return (
       <div key={block.id} className="py-6 w-full">
         <BlogGridEmbed limit={block.blogLimit || 4} />
+      </div>
+    );
+  }
+
+  if (block.type === "PDF_VIEWER") {
+    return (
+      <div key={block.id} className="py-4 w-full">
+        <PdfViewerBlock
+          fileUrl={block.fileUrl || block.pdfUrl}
+          fileName={block.fileName || block.pdfFileName}
+          title={block.title || block.pdfTitle}
+          height={block.height || block.pdfHeight}
+          allowDownload={block.allowDownload ?? block.pdfAllowDownload ?? true}
+        />
+      </div>
+    );
+  }
+
+  if (block.type === "ARTIST_TIMELINE") {
+    return (
+      <div key={block.id} className="py-4 w-full">
+        <TimelineBlock
+          items={block.timelineItems}
+          layout={block.timelineLayout}
+          title={block.title || block.timelineTitle}
+          subtitle={block.subtitle || block.timelineSubtitle}
+          showFilters={block.showFilters !== false}
+        />
       </div>
     );
   }

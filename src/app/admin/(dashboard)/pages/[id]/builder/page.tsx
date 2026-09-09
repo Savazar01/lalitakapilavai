@@ -42,6 +42,8 @@ import {
   Copy,
   ArrowUp,
   ArrowDown,
+  FileText,
+  History,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -51,6 +53,9 @@ import { StyleInspector, SectionStyle } from "@/components/builder/style-inspect
 import { TiptapEditor } from "@/components/builder/tiptap-editor";
 import { ColumnBlock } from "@/components/public/tiptap-renderer";
 import { getPatternById } from "@/lib/background-patterns";
+import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
+import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
+import { TimelineInspector } from "@/components/builder/timeline-inspector";
 
 export function isLightColor(colorStr?: string | null): boolean {
   if (!colorStr) return false;
@@ -97,6 +102,7 @@ interface SectionData {
   backgroundPattern?: string | null;
   backgroundImage?: string | null;
   backgroundOverlayOpacity?: number | null;
+  backgroundSize?: "cover" | "contain" | null;
   customCssClass?: string | null;
   paddingTop?: number | null;
   paddingBottom?: number | null;
@@ -188,6 +194,10 @@ function SortableSection({
   const pattern = isPatternBg ? getPatternById(section.backgroundPattern) : null;
   const overlayOpacity = section.backgroundOverlayOpacity ?? 0.5;
 
+  const isContain =
+    section.backgroundSize === "contain" ||
+    (section.customCssClass && section.customCssClass.includes("bg-contain"));
+
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -198,9 +208,9 @@ function SortableSection({
     ...(isImageBg
       ? {
           backgroundImage: `url("${section.backgroundImage}")`,
-          backgroundSize: "cover",
+          backgroundSize: isContain ? "contain" : "cover",
           backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          backgroundRepeat: isContain ? "no-repeat" : "no-repeat",
         }
       : {}),
   };
@@ -262,6 +272,55 @@ function SortableSection({
           }
         : {}),
       ...(type === "BLOG_GRID" ? { blogLimit: 4 } : {}),
+      ...(type === "PDF_VIEWER"
+        ? {
+            fileUrl: "",
+            fileName: "Catalog.pdf",
+            title: "Archival Monograph & Curatorial Catalog",
+            height: 650,
+            allowDownload: true,
+          }
+        : {}),
+      ...(type === "ARTIST_TIMELINE"
+        ? {
+            title: "Artistic Journey & Honors",
+            subtitle: "A chronological trajectory of Thanjavur mastery, solo recitals, and prestigious recognitions.",
+            timelineLayout: "alternating",
+            showFilters: true,
+            timelineItems: [
+              {
+                id: "m-1",
+                period: "1985 - 1992",
+                category: "Education",
+                title: "Traditional Gurukula Training",
+                subtitle: "Rigorous Tanjore Iconography Apprenticeship",
+                location: "Thanjavur, Tamil Nadu",
+                description:
+                  "Mastered 22-karat gold foil embossing, natural mineral pigments, and Mukha-varnam facial iconography under senior traditional acharyas.",
+              },
+              {
+                id: "m-2",
+                period: "2004",
+                category: "Solo Exhibition",
+                title: "Swarna Devatha: Golden Pantheon",
+                subtitle: "Retrospective Exhibition",
+                location: "National Gallery of Modern Art, New Delhi",
+                description:
+                  "Curated exhibition of 28 classical Thanjavur devotional panels depicting Navagrahas and Ashta Lakshmis.",
+              },
+              {
+                id: "m-3",
+                period: "2018",
+                category: "Award/Honor",
+                title: "Rashtriya Kala Ratna",
+                subtitle: "National Heritage Recognition",
+                location: "Chennai, Tamil Nadu",
+                description:
+                  "Conferred in recognition of four decades of preservation of authentic 22k gold leaf Thanjavur technique and classical Carnatic musicianship.",
+              },
+            ],
+          }
+        : {}),
     };
 
     currentBlocks.push(newBlock);
@@ -327,6 +386,47 @@ function SortableSection({
       setUploadingBlockId(null);
     }
   };
+
+  const handleBlockPdfUpload = async (
+    colIdx: number,
+    blockId: string,
+    file: File
+  ) => {
+    setUploadingBlockId(blockId);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("mediaType", "document");
+    body.append("isArtwork", "false");
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      const url = data.publicUrl || data.url;
+      updateBlock(colIdx, blockId, {
+        fileUrl: url,
+        fileName: file.name,
+      });
+      toast.success("PDF document uploaded successfully!");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload document");
+    } finally {
+      setUploadingBlockId(null);
+    }
+  };
+
+  const [activeTimelineModal, setActiveTimelineModal] = React.useState<{
+    colIdx: number;
+    blockId: string;
+    items?: TimelineMilestone[];
+    layout?: "alternating" | "compact" | "horizontal";
+    title?: string;
+    subtitle?: string;
+  } | null>(null);
 
   return (
     <div
@@ -494,13 +594,15 @@ function SortableSection({
           const colObj = (typeof col.content === "object" ? col.content : {}) as Record<string, unknown>;
           const colStyle = (col.style || colObj?._style || {}) as SectionStyle;
 
+          const isZeroBorder = colStyle.borderWidth === 0 || colStyle.borderStyle === "none";
+
           const borderStyleObj: React.CSSProperties = {
             borderColor:
-              colStyle.borderColor && colStyle.borderColor !== "transparent"
+              !isZeroBorder && colStyle.borderColor && colStyle.borderColor !== "transparent"
                 ? colStyle.borderColor
                 : undefined,
-            borderWidth: colStyle.borderWidth ? `${colStyle.borderWidth}px` : undefined,
-            borderStyle: (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
+            borderWidth: isZeroBorder ? "0px" : colStyle.borderWidth ? `${colStyle.borderWidth}px` : undefined,
+            borderStyle: isZeroBorder ? "none" : (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
           };
 
           let radiusClass = "rounded-lg";
@@ -514,13 +616,21 @@ function SortableSection({
             glowClass = "shadow-[0_0_25px_rgba(212,175,55,0.25)]";
           if (colStyle.boxShadow === "soft") glowClass = "shadow-md";
 
+          const borderClass = isZeroBorder
+            ? "border-0"
+            : isColSelected
+            ? "border-primary/80 border"
+            : isSectionLight
+            ? "border-stone-300/80 hover:border-stone-400 border"
+            : "border-border/40 hover:border-primary/40 border";
+
           const bgColClass = isSectionLight
             ? isColSelected
-              ? "bg-white/95 border-primary/80"
-              : "bg-white/85 border-stone-300/80 hover:border-stone-400 text-stone-900"
+              ? "bg-white/95"
+              : "bg-white/85 text-stone-900"
             : isColSelected
-            ? "bg-primary/5 border-primary/80 text-foreground"
-            : "bg-card/40 border-border/40 hover:border-primary/40 text-foreground";
+            ? "bg-primary/5 text-foreground"
+            : "bg-card/40 text-foreground";
 
           const blocks = (Array.isArray(colObj.blocks) ? colObj.blocks : null) as ColumnBlock[] | null;
 
@@ -532,7 +642,7 @@ function SortableSection({
                 onSelectSubSection(colIdx);
               }}
               style={borderStyleObj}
-              className={`${colSpanClass} p-3 transition-all relative ${radiusClass} ${glowClass} ${bgColClass} border`}
+              className={`${colSpanClass} p-3 transition-all relative ${radiusClass} ${glowClass} ${bgColClass} ${borderClass}`}
             >
               {/* Ornamental Frame Fillets */}
               {colStyle.ornamentalFrame && (
@@ -627,7 +737,13 @@ function SortableSection({
                         <div className="space-y-2">
                           {/* Image preview with aspect-ratio styling */}
                           {block.mediaUrl ? (
-                            <div className="relative group rounded-md overflow-hidden border border-border/80 bg-background/50 flex items-center justify-center">
+                            <div
+                              className={`relative group rounded-md overflow-hidden bg-background/50 flex items-center justify-center transition-all ${
+                                block.hasBorder === false
+                                  ? "border-0 shadow-none"
+                                  : "border border-border/80 shadow-xs"
+                              }`}
+                            >
                               <img
                                 src={block.mediaUrl}
                                 alt={block.mediaAlt || "Block image"}
@@ -717,6 +833,21 @@ function SortableSection({
                                   <option value="3:4">3:4 Portrait</option>
                                 </select>
                               </div>
+
+                              {/* Image Border Toggle */}
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-muted-foreground">Border:</span>
+                                <select
+                                  value={block.hasBorder === false ? "none" : "framed"}
+                                  onChange={(e) =>
+                                    updateBlock(colIdx, block.id, { hasBorder: e.target.value === "framed" })
+                                  }
+                                  className="text-xs py-1 px-1.5 rounded border border-border bg-background text-foreground cursor-pointer"
+                                >
+                                  <option value="framed">Framed</option>
+                                  <option value="none">None (0px)</option>
+                                </select>
+                              </div>
                             </div>
 
                             {/* Direct URL + Alt */}
@@ -740,6 +871,182 @@ function SortableSection({
                                 className="text-xs p-1.5 rounded border border-border bg-background text-foreground"
                               />
                             </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {block.type === "PDF_VIEWER" && (
+                        <div className="p-3 rounded-lg border border-primary/40 bg-card space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                              <FileText className="w-4 h-4 text-primary" /> PDF Monograph / Curatorial Catalog
+                            </span>
+                            {block.fileUrl && (
+                              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                Document Attached
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="text-[10px] text-muted-foreground block mb-1">Catalog / Document Title</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Lalita Kapilavai Tanjore Retrospective Catalog"
+                                value={block.title || ""}
+                                onChange={(e) => updateBlock(colIdx, block.id, { title: e.target.value })}
+                                className="w-full text-xs p-1.5 rounded border border-border bg-background text-foreground"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] text-muted-foreground block mb-1">Download Filename</label>
+                              <input
+                                type="text"
+                                placeholder="Catalog.pdf"
+                                value={block.fileName || ""}
+                                onChange={(e) => updateBlock(colIdx, block.id, { fileName: e.target.value })}
+                                className="w-full text-xs p-1.5 rounded border border-border bg-background text-foreground font-mono"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-3">
+                            <label className="cursor-pointer">
+                              <input
+                                type="file"
+                                accept="application/pdf"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleBlockPdfUpload(colIdx, block.id, file);
+                                }}
+                                disabled={uploadingBlockId === block.id}
+                              />
+                              <span className="inline-flex items-center justify-center px-3 py-1.5 rounded text-xs font-medium border border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary transition-colors cursor-pointer shadow-xs">
+                                {uploadingBlockId === block.id ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                                ) : (
+                                  <Upload className="w-3.5 h-3.5 mr-1.5" />
+                                )}
+                                {uploadingBlockId === block.id ? "Uploading PDF..." : "Upload PDF from Computer"}
+                              </span>
+                            </label>
+
+                            <div className="flex-1 min-w-[180px]">
+                              <input
+                                type="text"
+                                placeholder="Or direct PDF URL (https://...)"
+                                value={block.fileUrl || ""}
+                                onChange={(e) => updateBlock(colIdx, block.id, { fileUrl: e.target.value })}
+                                className="w-full text-xs p-1.5 rounded border border-border bg-background text-foreground font-mono"
+                              />
+                            </div>
+
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-muted-foreground">Height:</span>
+                              <input
+                                type="number"
+                                min={350}
+                                max={1200}
+                                step={50}
+                                value={block.height || 650}
+                                onChange={(e) => updateBlock(colIdx, block.id, { height: parseInt(e.target.value, 10) || 650 })}
+                                className="w-16 text-xs p-1 rounded border border-border bg-background text-foreground"
+                              />
+                              <span className="text-[10px] text-muted-foreground">px</span>
+                            </div>
+
+                            <label className="flex items-center gap-1.5 cursor-pointer text-xs text-foreground">
+                              <input
+                                type="checkbox"
+                                checked={block.allowDownload !== false}
+                                onChange={(e) => updateBlock(colIdx, block.id, { allowDownload: e.target.checked })}
+                                className="rounded border-border"
+                              />
+                              Allow Download
+                            </label>
+                          </div>
+
+                          {block.fileUrl ? (
+                            <div className="pt-2">
+                              <PdfViewerBlock
+                                fileUrl={block.fileUrl}
+                                fileName={block.fileName}
+                                title={block.title}
+                                height={Math.min(block.height || 450, 450)}
+                                allowDownload={block.allowDownload}
+                              />
+                            </div>
+                          ) : (
+                            <div className="p-4 rounded border border-dashed border-border/80 text-center text-xs text-muted-foreground">
+                              No PDF selected. Upload or paste a URL to preview.
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {block.type === "ARTIST_TIMELINE" && (
+                        <div className="p-3 rounded-lg border border-primary/40 bg-card space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                              <History className="w-4 h-4 text-primary" /> Interactive Artist Heritage Timeline
+                            </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                setActiveTimelineModal({
+                                  colIdx,
+                                  blockId: block.id,
+                                  items: (block.timelineItems || []) as TimelineMilestone[],
+                                  layout: block.timelineLayout || "alternating",
+                                  title: block.title,
+                                  subtitle: block.subtitle,
+                                })
+                              }
+                              className="text-xs h-7 border-primary/40 text-primary hover:bg-primary/10 gap-1"
+                            >
+                              <Sliders className="w-3 h-3" /> Configure Milestones ({(block.timelineItems || []).length})
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input
+                              type="text"
+                              placeholder="Timeline Title (e.g. Artistic Trajectory & Honors)"
+                              value={block.title || ""}
+                              onChange={(e) => updateBlock(colIdx, block.id, { title: e.target.value })}
+                              className="text-xs p-1.5 rounded border border-border bg-background text-foreground"
+                            />
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-muted-foreground shrink-0">Layout:</span>
+                              <select
+                                value={block.timelineLayout || "alternating"}
+                                onChange={(e) =>
+                                  updateBlock(colIdx, block.id, {
+                                    timelineLayout: e.target.value as "alternating" | "compact" | "horizontal",
+                                  })
+                                }
+                                className="w-full text-xs p-1.5 rounded border border-border bg-background text-foreground"
+                              >
+                                <option value="alternating">Alternating Zig-Zag</option>
+                                <option value="compact">Compact Left Rail</option>
+                                <option value="horizontal">Horizontal Scroll Rail</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          {/* Embedded Timeline Preview */}
+                          <div className="pt-2 border-t border-border/40 max-h-96 overflow-y-auto rounded bg-background/50 p-2">
+                            <TimelineBlock
+                              items={(block.timelineItems || []) as TimelineMilestone[]}
+                              layout={block.timelineLayout || "alternating"}
+                              title={block.title}
+                              subtitle={block.subtitle}
+                              showFilters={block.showFilters !== false}
+                            />
                           </div>
                         </div>
                       )}
@@ -996,11 +1303,78 @@ function SortableSection({
                 >
                   + 4-Col Blog Grid
                 </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "PDF_VIEWER");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-amber-500/40 hover:border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-semibold transition-all cursor-pointer flex items-center gap-1"
+                >
+                  <FileText className="w-2.5 h-2.5" /> + PDF Document
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "ARTIST_TIMELINE");
+                  }}
+                  className="px-1.5 py-0.5 text-[9px] rounded border border-primary/40 hover:border-primary bg-primary/15 hover:bg-primary/25 text-primary font-semibold transition-all cursor-pointer flex items-center gap-1"
+                >
+                  <History className="w-2.5 h-2.5" /> + Artist Timeline
+                </button>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Timeline Configuration Dialog */}
+      {activeTimelineModal && (
+        <Dialog
+          open={!!activeTimelineModal}
+          onOpenChange={(open) => {
+            if (!open) setActiveTimelineModal(null);
+          }}
+        >
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-xl text-primary flex items-center gap-2">
+                <History className="w-5 h-5" /> Configure Artist Heritage Milestones
+              </DialogTitle>
+              <DialogDescription>
+                Add, reorder, or edit milestone achievements, exhibitions, and recognitions for this timeline block.
+              </DialogDescription>
+            </DialogHeader>
+
+            <TimelineInspector
+              items={activeTimelineModal.items}
+              layout={activeTimelineModal.layout}
+              title={activeTimelineModal.title}
+              subtitle={activeTimelineModal.subtitle}
+              onChange={(data) => {
+                updateBlock(activeTimelineModal.colIdx, activeTimelineModal.blockId, {
+                  timelineItems: data.items,
+                  timelineLayout: data.layout,
+                  title: data.title,
+                  subtitle: data.subtitle,
+                });
+                setActiveTimelineModal((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        items: data.items,
+                        layout: data.layout,
+                        title: data.title,
+                        subtitle: data.subtitle,
+                      }
+                    : null
+                );
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
@@ -1429,6 +1803,11 @@ export default function VisualPageBuilder() {
                   selectedSubIndex !== null
                     ? subStyle.backgroundOverlayOpacity ?? 0.5
                     : currentSection.backgroundOverlayOpacity ?? 0.5,
+                backgroundSize:
+                  selectedSubIndex !== null
+                    ? subStyle.backgroundSize || "cover"
+                    : currentSection.backgroundSize ||
+                      (currentSection.customCssClass?.includes("bg-contain") ? "contain" : "cover"),
                 paddingTop: currentSection.paddingTop ?? undefined,
                 paddingBottom: currentSection.paddingBottom ?? undefined,
                 gridSpan: selectedSub?.gridSpan,
@@ -1478,6 +1857,7 @@ export default function VisualPageBuilder() {
                             backgroundPattern: updated.backgroundPattern || null,
                             backgroundImage: updated.backgroundImage || null,
                             backgroundOverlayOpacity: updated.backgroundOverlayOpacity ?? 0.5,
+                            backgroundSize: updated.backgroundSize || "cover",
                           },
                           _media: {
                             mediaType: updated.mediaType || "NONE",
@@ -1496,6 +1876,13 @@ export default function VisualPageBuilder() {
                       };
                       return { ...sec, subSections: newSubs };
                     }
+                    // Section-level update
+                    const updatedClasses = (sec.customCssClass || "")
+                      .split(" ")
+                      .filter((c) => c && c !== "bg-contain" && c !== "bg-cover");
+                    if (updated.backgroundSize === "contain") {
+                      updatedClasses.push("bg-contain");
+                    }
                     return {
                       ...sec,
                       backgroundColor: updated.backgroundColor,
@@ -1503,6 +1890,8 @@ export default function VisualPageBuilder() {
                       backgroundPattern: updated.backgroundPattern || null,
                       backgroundImage: updated.backgroundImage || null,
                       backgroundOverlayOpacity: updated.backgroundOverlayOpacity ?? 0.5,
+                      backgroundSize: updated.backgroundSize || "cover",
+                      customCssClass: updatedClasses.join(" ").trim() || null,
                       paddingTop: updated.paddingTop,
                       paddingBottom: updated.paddingBottom,
                     };

@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { MediaUploader } from "@/components/admin/media-uploader";
 
 
 interface ArtCategoryItem {
@@ -260,14 +261,29 @@ export default function AdminCategoriesPage() {
               className="border border-border/80 bg-card hover:border-primary/40 transition-all hover:shadow-md flex flex-col justify-between"
             >
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <CardTitle className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
-                      <span>{cat.name}</span>
-                    </CardTitle>
-                    <code className="text-[11px] text-muted-foreground font-mono">
-                      /{cat.slug}
-                    </code>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    {cat.coverImage ? (
+                      <div className="w-12 h-12 rounded-md overflow-hidden border border-border/80 bg-background shrink-0 mt-0.5 shadow-sm">
+                        <img
+                          src={cat.coverImage}
+                          alt={cat.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <Palette className="w-4 h-4 text-primary" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <CardTitle className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
+                        <span className="truncate">{cat.name}</span>
+                      </CardTitle>
+                      <code className="text-[11px] text-muted-foreground font-mono">
+                        /{cat.slug}
+                      </code>
+                    </div>
                   </div>
                   <Badge variant="outline" className="text-[10px] font-mono shrink-0">
                     Order: {cat.displayOrder}
@@ -356,30 +372,29 @@ export default function AdminCategoriesPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground flex items-center gap-1">
-                  <ArrowUpDown className="w-3 h-3 text-primary" /> Display Order
-                </label>
-                <Input
-                  type="number"
-                  value={formData.displayOrder}
-                  onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
-                  className="text-xs font-mono"
-                />
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                <ArrowUpDown className="w-3 h-3 text-primary" /> Display Order
+              </label>
+              <Input
+                type="number"
+                value={formData.displayOrder}
+                onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+                className="text-xs font-mono"
+              />
+            </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground flex items-center gap-1">
-                  <ImageIcon className="w-3 h-3 text-primary" /> Cover Image URL
-                </label>
-                <Input
-                  value={formData.coverImage}
-                  onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-                  placeholder="https://..."
-                  className="text-xs"
-                />
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                <ImageIcon className="w-3 h-3 text-primary" /> Category Cover Image
+              </label>
+              <MediaUploader
+                value={formData.coverImage}
+                onUploadComplete={(url) => setFormData((prev) => ({ ...prev, coverImage: url }))}
+                onRemove={() => setFormData((prev) => ({ ...prev, coverImage: "" }))}
+                mediaType="general"
+                description="WebP, JPG, PNG up to 25MB. Displayed in public gallery headers."
+              />
             </div>
 
             <div className="space-y-1.5">

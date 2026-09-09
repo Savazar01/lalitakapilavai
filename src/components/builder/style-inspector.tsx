@@ -69,7 +69,7 @@ export interface SectionStyle {
   // Artistic Accents & Fine Art Framing
   borderColor?: string;
   borderWidth?: number;
-  borderStyle?: "solid" | "double" | "inset" | "dashed";
+  borderStyle?: "solid" | "double" | "inset" | "dashed" | "none";
   borderRadius?: "none" | "rounded-md" | "rounded-2xl" | "rounded-t-full";
   boxShadow?: "none" | "soft" | "gold-glow";
   ornamentalFrame?: boolean;
@@ -870,8 +870,23 @@ export function StyleInspector({
               <button
                 key={b.name}
                 type="button"
-                onClick={() => update("borderColor", b.hex)}
+                onClick={() => {
+                  if (b.hex === "transparent" || b.name === "None") {
+                    onChange({
+                      ...style,
+                      borderColor: "transparent",
+                      borderWidth: 0,
+                    });
+                  } else {
+                    onChange({
+                      ...style,
+                      borderColor: b.hex,
+                      borderWidth: !style.borderWidth || style.borderWidth === 0 ? 1 : style.borderWidth,
+                    });
+                  }
+                }}
                 className={`h-7 rounded border text-[9px] font-semibold flex items-center justify-center transition-all ${
+                  (b.hex === "transparent" && (style.borderWidth === 0 || style.borderColor === "transparent")) ||
                   style.borderColor === b.hex
                     ? "border-primary ring-1 ring-primary scale-105"
                     : "border-border/60 hover:border-primary/50"
@@ -894,7 +909,25 @@ export function StyleInspector({
             <label className="text-[11px] text-muted-foreground">Border Width</label>
             <Select
               value={String(style.borderWidth ?? 0)}
-              onValueChange={(val) => update("borderWidth", parseInt(val, 10))}
+              onValueChange={(val) => {
+                const widthNum = parseInt(val, 10);
+                if (widthNum === 0) {
+                  onChange({
+                    ...style,
+                    borderWidth: 0,
+                    borderColor: "transparent",
+                  });
+                } else {
+                  onChange({
+                    ...style,
+                    borderWidth: widthNum,
+                    borderColor:
+                      style.borderColor && style.borderColor !== "transparent"
+                        ? style.borderColor
+                        : "#D4AF37",
+                  });
+                }
+              }}
             >
               <SelectTrigger className="text-xs h-8">
                 <SelectValue />

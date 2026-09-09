@@ -7,6 +7,7 @@ import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { ArtCanvasViewer } from "@/components/public/art-canvas-viewer";
 import { ExhibitionQrModal } from "@/components/public/exhibition-qr-modal";
+import { TiptapRenderer } from "@/components/public/tiptap-renderer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/formatters";
@@ -199,9 +200,9 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               <h3 className="font-serif font-bold text-sm text-foreground uppercase tracking-wider">
                 Iconographic Commentary &amp; Symbolism
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                {artwork.description}
-              </p>
+              <div className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                <TiptapRenderer content={artwork.description} />
+              </div>
             </div>
 
             {/* Carnatic Musical Synesthesia Card */}

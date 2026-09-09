@@ -24,7 +24,16 @@ interface FooterConfig {
 }
 
 export async function Footer() {
-  const settings = await prisma.systemSetting.findFirst().catch(() => null);
+  const [settings, menuItems] = await Promise.all([
+    prisma.systemSetting.findFirst().catch(() => null),
+    prisma.menuItem
+      .findMany({
+        where: { isActive: true, parentId: null },
+        orderBy: { orderIndex: "asc" },
+        take: 8,
+      })
+      .catch(() => []),
+  ]);
 
   const footerConfig = (settings?.footerConfig as FooterConfig | null) || null;
 
@@ -46,24 +55,41 @@ export async function Footer() {
     footerConfig?.copyrightText ||
     `© ${new Date().getFullYear()} ${siteName}. All sacred rights reserved.`;
 
-  // Default fallback social links if not customized
-  const defaultSocials: SocialLinkItem[] = [
-    {
-      platform: "Instagram",
-      url: settings?.instagramUrl || "https://instagram.com/lalitakapilavai",
-      isVisible: !!settings?.instagramUrl || true,
-    },
-    {
-      platform: "YouTube",
-      url: settings?.youtubeUrl || "https://youtube.com/@lalitakapilavai",
-      isVisible: !!settings?.youtubeUrl || true,
-    },
-  ];
+  // Zero-hardcoding dynamic social channels resolution:
+  // Strictly filter only non-empty, explicitly configured platforms
+  const configuredSocials: { platform: string; url: string }[] = [];
 
-  const socialLinks: SocialLinkItem[] =
-    footerConfig?.socialLinks && footerConfig.socialLinks.length > 0
-      ? footerConfig.socialLinks.filter((s) => s.isVisible && s.url)
-      : defaultSocials;
+  if (settings?.instagramUrl && settings.instagramUrl.trim().length > 0) {
+    configuredSocials.push({ platform: "Instagram", url: settings.instagramUrl.trim() });
+  }
+  if (settings?.facebookUrl && settings.facebookUrl.trim().length > 0) {
+    configuredSocials.push({ platform: "Facebook", url: settings.facebookUrl.trim() });
+  }
+  if (settings?.youtubeUrl && settings.youtubeUrl.trim().length > 0) {
+    configuredSocials.push({ platform: "YouTube", url: settings.youtubeUrl.trim() });
+  }
+  if (settings?.pinterestUrl && settings.pinterestUrl.trim().length > 0) {
+    configuredSocials.push({ platform: "Pinterest", url: settings.pinterestUrl.trim() });
+  }
+
+  if (Array.isArray(footerConfig?.socialLinks)) {
+    footerConfig.socialLinks.forEach((link) => {
+      if (link.url && link.url.trim().length > 0) {
+        const existingIdx = configuredSocials.findIndex(
+          (s) => s.platform.toLowerCase() === link.platform.toLowerCase()
+        );
+        if (existingIdx >= 0) {
+          configuredSocials[existingIdx].url = link.url.trim();
+        } else {
+          configuredSocials.push({ platform: link.platform.trim(), url: link.url.trim() });
+        }
+      }
+    });
+  }
+
+  const activeSocials = configuredSocials.filter(
+    (s) => s.url && s.url.trim().length > 0
+  );
 
   // Default fallback legal links if not customized
   const defaultLegal: LegalLinkItem[] = [
@@ -122,37 +148,49 @@ export async function Footer() {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Dynamic Navigation Links (Synchronized with Header & Navigation Manager) */}
           <div className="space-y-3">
             <h4 className="font-serif font-bold text-sm text-foreground uppercase tracking-wider">
-              Galleries &amp; Heritage
+              Navigation
             </h4>
             <ul className="space-y-2 text-xs text-muted-foreground">
-              <li>
-                <Link href="/gallery/tanjore-paintings" className="hover:text-primary transition-colors">
-                  Tanjore Gold Leaf Collection
-                </Link>
-              </li>
-              <li>
-                <Link href="/gallery/mysore-traditional" className="hover:text-primary transition-colors">
-                  Mysore Classical School
-                </Link>
-              </li>
-              <li>
-                <Link href="/music" className="hover:text-primary transition-colors">
-                  Carnatic Vocal Recordings
-                </Link>
-              </li>
-              <li>
-                <Link href="/events" className="hover:text-primary transition-colors">
-                  Exhibitions &amp; Concerts
-                </Link>
-              </li>
-              <li>
-                <Link href="/blogs" className="hover:text-primary transition-colors">
-                  Sacred Art Chronicles
-                </Link>
-              </li>
+              {menuItems.length > 0 ? (
+                menuItems.map((item) => (
+                  <li key={item.id}>
+                    <Link
+                      href={item.path}
+                      target={item.openInNewTab ? "_blank" : undefined}
+                      rel={item.openInNewTab ? "noopener noreferrer" : undefined}
+                      className="hover:text-primary transition-colors inline-block"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li>
+                    <Link href="/gallery" className="hover:text-primary transition-colors">
+                      Art Gallery
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/music" className="hover:text-primary transition-colors">
+                      Carnatic Music
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/events" className="hover:text-primary transition-colors">
+                      Exhibitions &amp; Events
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/blogs" className="hover:text-primary transition-colors">
+                      Sacred Art Chronicles
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -172,7 +210,7 @@ export async function Footer() {
                 <Phone className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span>{contactPhone}</span>
               </li>
-              {socialLinks.map((s) => (
+              {activeSocials.map((s) => (
                 <li key={s.platform}>
                   <a
                     href={s.url}

@@ -49,6 +49,22 @@ export function DynamicPageSections({
             ? Number(section.backgroundOverlayOpacity)
             : 0.5;
 
+        const isContain =
+          section.customCssClass?.includes("bg-contain") ||
+          (section as unknown as { backgroundSize?: string }).backgroundSize === "contain";
+
+        const bgSizeStyle: React.CSSProperties = isContain
+          ? {
+              backgroundSize: "contain",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+            }
+          : {
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+            };
+
         const sectionStyle: React.CSSProperties = {
           backgroundColor: section.backgroundColor || undefined,
           paddingTop: "48px",
@@ -56,9 +72,7 @@ export function DynamicPageSections({
           ...(isImageBg
             ? {
                 backgroundImage: `url("${section.backgroundImage}")`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
+                ...bgSizeStyle,
               }
             : {}),
         };
@@ -125,17 +139,33 @@ export function DynamicPageSections({
                     backgroundImage?: string;
                     backgroundOverlayOpacity?: number;
                     backgroundColor?: string;
+                    backgroundSize?: "cover" | "contain";
                   };
 
+                  const isColContain = colStyle.backgroundSize === "contain";
+                  const isZeroBorder =
+                    colStyle.borderWidth === 0 || colStyle.borderColor === "transparent";
+
                   const borderStyleObj: React.CSSProperties = {
-                    borderColor:
-                      colStyle.borderColor && colStyle.borderColor !== "transparent"
-                        ? colStyle.borderColor
-                        : undefined,
-                    borderWidth: colStyle.borderWidth ? `${colStyle.borderWidth}px` : undefined,
-                    borderStyle:
-                      (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
+                    borderColor: isZeroBorder ? "transparent" : colStyle.borderColor || undefined,
+                    borderWidth: isZeroBorder
+                      ? "0px"
+                      : colStyle.borderWidth
+                      ? `${colStyle.borderWidth}px`
+                      : undefined,
+                    borderStyle: isZeroBorder
+                      ? "none"
+                      : (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
+                    border: isZeroBorder ? "none" : undefined,
                     backgroundColor: colStyle.backgroundColor || undefined,
+                    ...(colStyle.backgroundType === "IMAGE" && colStyle.backgroundImage
+                      ? {
+                          backgroundImage: `url("${colStyle.backgroundImage}")`,
+                          backgroundSize: isColContain ? "contain" : "cover",
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "center",
+                        }
+                      : {}),
                   };
 
                   let radiusClass = "";
@@ -150,12 +180,12 @@ export function DynamicPageSections({
                   if (colStyle.boxShadow === "soft") glowClass = "shadow-lg";
 
                   const hasCustomStyling = !!(
-                    colStyle.borderColor ||
-                    colStyle.borderWidth ||
+                    (!isZeroBorder && (colStyle.borderColor || colStyle.borderWidth)) ||
                     colStyle.borderRadius ||
                     colStyle.boxShadow ||
                     colStyle.ornamentalFrame ||
-                    colStyle.backgroundColor
+                    colStyle.backgroundColor ||
+                    colStyle.backgroundImage
                   );
 
                   return (

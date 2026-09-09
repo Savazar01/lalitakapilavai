@@ -83,22 +83,49 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
         </div>
 
         {/* Category Hero Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            Traditional Fine Art School
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground">
-            {currentCategory.name}
-          </h1>
-          {currentCategory.description ? (
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              {currentCategory.description}
-            </p>
+        <div className="max-w-4xl mx-auto mb-12 space-y-6">
+          {currentCategory.coverImage ? (
+            <div className="relative w-full h-48 sm:h-64 md:h-80 rounded-2xl overflow-hidden border border-primary/30 shadow-xl group">
+              <img
+                src={currentCategory.coverImage}
+                alt={currentCategory.name}
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 text-left">
+                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest mb-1.5 bg-background/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-primary/20">
+                  <Sparkles className="w-3 h-3" />
+                  Traditional Fine Art School
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-foreground drop-shadow-sm">
+                  {currentCategory.name}
+                </h1>
+                {currentCategory.description && (
+                  <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed max-w-2xl mt-1 line-clamp-2">
+                    {currentCategory.description}
+                  </p>
+                )}
+              </div>
+            </div>
           ) : (
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Curated masterworks representing centuries of sacred iconography, authentic craftsmanship, and traditional gold leaf relief by Lalita Kapilavai.
-            </p>
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
+                <Sparkles className="w-3.5 h-3.5" />
+                Traditional Fine Art School
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground">
+                {currentCategory.name}
+              </h1>
+              {currentCategory.description ? (
+                <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                  {currentCategory.description}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Curated masterworks representing centuries of sacred iconography, authentic craftsmanship, and traditional gold leaf relief by Lalita Kapilavai.
+                </p>
+              )}
+            </div>
           )}
         </div>
 
