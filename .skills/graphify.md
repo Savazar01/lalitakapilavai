@@ -31,7 +31,7 @@ graph TD
 - `(Artwork)-[:INSPIRED_BY { harmonyNote: String }]->(Raga)`: Links visual motifs (e.g. Krishna, Devi, Rama) with the melodic raga mood (*Bhakti, Shanta, Karuna*).
 - `(Composition)-[:SET_TO_RAGA]->(Raga)`: Associates recorded Carnatic compositions with musical scale frameworks.
 - `(ArtworkOnEvent)-[:EXHIBITS { displayOrder: Int }]->(Event)`: Maps physical gallery exhibitions, virtual displays, and concert visuals.
-- `(Lead)-[:INQUIRED_ABOUT { source: "QR_SCAN" | "WEB_FORM" }]->(Artwork)`: Tracks provenance of buyer/collector inquiries from physical gallery QR cards directly into the CRM.
+- `(Lead)-[:INQUIRED_ABOUT { source: "QR_SCAN" | "PAGE_FORM" | "WEB_FORM" }]->(Artwork | Page)`: Tracks provenance of buyer/collector inquiries from physical gallery QR cards or bespoke visual form builder blocks directly into the CRM with custom JSON fields.
 
 ---
 

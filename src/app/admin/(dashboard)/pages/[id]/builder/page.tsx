@@ -56,6 +56,8 @@ import { getPatternById } from "@/lib/background-patterns";
 import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
 import { TimelineInspector } from "@/components/builder/timeline-inspector";
+import { FormBlockInspector, FormFieldConfig } from "@/components/builder/form-block-inspector";
+import { DynamicFormBlock } from "@/components/public/blocks/dynamic-form-block";
 
 export function isLightColor(colorStr?: string | null): boolean {
   if (!colorStr) return false;
@@ -321,6 +323,58 @@ function SortableSection({
             ],
           }
         : {}),
+      ...(type === "FORM_BLOCK"
+        ? {
+            formTitle: "Send Curatorial Inquiry",
+            formSubtitle: "Direct correspondence with the atelier desk of Lalita Kapilavai.",
+            submitButtonText: "Submit Inquiry",
+            successMessage: "Thank you for your correspondence. The curatorial desk will respond shortly.",
+            fields: [
+              {
+                id: "name",
+                label: "Full Name",
+                type: "text" as const,
+                required: true,
+                placeholder: "e.g. Smt. Gayatri Iyer",
+              },
+              {
+                id: "email",
+                label: "Email Address",
+                type: "email" as const,
+                required: true,
+                placeholder: "curator@example.com",
+              },
+              {
+                id: "phone",
+                label: "Phone / WhatsApp",
+                type: "tel" as const,
+                required: false,
+                placeholder: "+91 98450 12345",
+              },
+              {
+                id: "inquiry_type",
+                label: "Inquiry Type",
+                type: "select" as const,
+                required: false,
+                placeholder: "Select an option",
+                options: [
+                  "Artwork Acquisition",
+                  "Commission Work",
+                  "Private Viewing / RSVP",
+                  "Carnatic Music Recital",
+                  "General Curatorial Question",
+                ],
+              },
+              {
+                id: "message",
+                label: "Message / Commentary",
+                type: "textarea" as const,
+                required: true,
+                placeholder: "Specify masterwork inquiries, dimensions, or bespoke requirements...",
+              },
+            ],
+          }
+        : {}),
     };
 
     currentBlocks.push(newBlock);
@@ -426,6 +480,16 @@ function SortableSection({
     layout?: "alternating" | "compact" | "horizontal";
     title?: string;
     subtitle?: string;
+  } | null>(null);
+
+  const [activeFormModal, setActiveFormModal] = React.useState<{
+    colIdx: number;
+    blockId: string;
+    formTitle?: string;
+    formSubtitle?: string;
+    submitButtonText?: string;
+    successMessage?: string;
+    fields?: FormFieldConfig[];
   } | null>(null);
 
   return (
@@ -1165,6 +1229,64 @@ function SortableSection({
                           </div>
                         </div>
                       )}
+
+                      {block.type === "FORM_BLOCK" && (
+                        <div className="p-3.5 rounded-xl border border-primary/40 bg-card space-y-3 shadow-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                              <FileText className="w-4 h-4 text-primary" /> Curatorial Inquiry &amp; Lead Form
+                            </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                setActiveFormModal({
+                                  colIdx,
+                                  blockId: block.id,
+                                  formTitle: block.formTitle,
+                                  formSubtitle: block.formSubtitle,
+                                  submitButtonText: block.submitButtonText,
+                                  successMessage: block.successMessage,
+                                  fields: block.fields,
+                                })
+                              }
+                              className="text-xs h-7 border-primary/40 text-primary hover:bg-primary/10 gap-1 cursor-pointer"
+                            >
+                              <Sliders className="w-3 h-3" /> Configure Form ({(block.fields || []).length} fields)
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input
+                              type="text"
+                              placeholder="Form Title (e.g. Send Curatorial Inquiry)"
+                              value={block.formTitle || ""}
+                              onChange={(e) => updateBlock(colIdx, block.id, { formTitle: e.target.value })}
+                              className="text-xs p-1.5 rounded border border-border bg-background text-foreground"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Button Text (e.g. Submit Inquiry)"
+                              value={block.submitButtonText || ""}
+                              onChange={(e) => updateBlock(colIdx, block.id, { submitButtonText: e.target.value })}
+                              className="text-xs p-1.5 rounded border border-border bg-background text-foreground"
+                            />
+                          </div>
+
+                          {/* Interactive Preview of the Form */}
+                          <div className="pt-2 border-t border-border/40 max-h-96 overflow-y-auto rounded bg-background/40 p-2">
+                            <DynamicFormBlock
+                              formTitle={block.formTitle}
+                              formSubtitle={block.formSubtitle}
+                              submitButtonText={block.submitButtonText}
+                              successMessage={block.successMessage}
+                              fields={block.fields}
+                              pageSlug="page-builder"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1359,6 +1481,20 @@ function SortableSection({
                 >
                   <History className="w-2.5 h-2.5" /> + Artist Timeline
                 </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "FORM_BLOCK");
+                  }}
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
+                    isSectionLight
+                      ? "border-amber-600 bg-amber-100/90 hover:bg-amber-200 text-amber-950 shadow-2xs"
+                      : "border-primary/40 hover:border-primary bg-primary/15 hover:bg-primary/25 text-primary"
+                  }`}
+                >
+                  <FileText className="w-2.5 h-2.5" /> + Contact / Lead Form
+                </button>
               </div>
             </div>
           );
@@ -1403,6 +1539,58 @@ function SortableSection({
                         layout: data.layout,
                         title: data.title,
                         subtitle: data.subtitle,
+                      }
+                    : null
+                );
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Form Configuration Dialog */}
+      {activeFormModal && (
+        <Dialog
+          open={!!activeFormModal}
+          onOpenChange={(open) => {
+            if (!open) setActiveFormModal(null);
+          }}
+        >
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-xl text-primary flex items-center gap-2">
+                <FileText className="w-5 h-5" /> Configure Dynamic Curatorial Form
+              </DialogTitle>
+              <DialogDescription>
+                Customize form title, submit button label, success notices, and dynamic visitor input fields.
+              </DialogDescription>
+            </DialogHeader>
+
+            <FormBlockInspector
+              data={{
+                formTitle: activeFormModal.formTitle,
+                formSubtitle: activeFormModal.formSubtitle,
+                submitButtonText: activeFormModal.submitButtonText,
+                successMessage: activeFormModal.successMessage,
+                fields: activeFormModal.fields,
+              }}
+              onChange={(updated) => {
+                updateBlock(activeFormModal.colIdx, activeFormModal.blockId, {
+                  formTitle: updated.formTitle,
+                  formSubtitle: updated.formSubtitle,
+                  submitButtonText: updated.submitButtonText,
+                  successMessage: updated.successMessage,
+                  fields: updated.fields,
+                });
+                setActiveFormModal((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        formTitle: updated.formTitle,
+                        formSubtitle: updated.formSubtitle,
+                        submitButtonText: updated.submitButtonText,
+                        successMessage: updated.successMessage,
+                        fields: updated.fields,
                       }
                     : null
                 );

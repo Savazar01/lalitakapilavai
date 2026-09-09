@@ -455,6 +455,10 @@ model Lead {
   subject         String?
   message         String      @db.Text
   status          LeadStatus  @default(NEW)
+  formTitle       String?     // e.g. "General Contact", "Private Viewing RSVP", "Commission Request"
+  pageSlug        String?     // e.g. "contact", "about-me", "home"
+  source          String      @default("PAGE_FORM") // "PAGE_FORM", "QR_SCAN", "EVENT_RSVP"
+  customFields    Json?       // Key-value store of dynamic fields
   sourceArtworkId String?     @db.Uuid // Linked artwork for physical exhibition QR scans or direct inquiries
   sourceEventId   String?     @db.Uuid
   createdAt       DateTime    @default(now())

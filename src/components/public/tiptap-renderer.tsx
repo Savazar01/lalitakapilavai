@@ -17,6 +17,7 @@ import {
 import { BlogGridEmbed } from "@/components/public/blog-grid-embed";
 import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
+import { DynamicFormBlock, FormFieldConfig } from "@/components/public/blocks/dynamic-form-block";
 
 interface TiptapMark {
   type: string;
@@ -354,7 +355,8 @@ export interface ColumnBlock {
     | "BUTTON"
     | "BLOG_GRID"
     | "PDF_VIEWER"
-    | "ARTIST_TIMELINE";
+    | "ARTIST_TIMELINE"
+    | "FORM_BLOCK";
   content?: Record<string, unknown>;
   mediaUrl?: string;
   mediaAlt?: string;
@@ -388,6 +390,14 @@ export interface ColumnBlock {
   timelineSubtitle?: string;
   subtitle?: string;
   showFilters?: boolean;
+  // Form Block Properties
+  formTitle?: string;
+  formSubtitle?: string;
+  submitButtonText?: string;
+  successMessage?: string;
+  notifyEmail?: boolean;
+  fields?: FormFieldConfig[];
+  pageSlug?: string;
 }
 
 function renderColumnBlock(block: ColumnBlock): React.ReactNode {
@@ -490,6 +500,21 @@ function renderColumnBlock(block: ColumnBlock): React.ReactNode {
           title={block.title || block.timelineTitle}
           subtitle={block.subtitle || block.timelineSubtitle}
           showFilters={block.showFilters !== false}
+        />
+      </div>
+    );
+  }
+
+  if (block.type === "FORM_BLOCK") {
+    return (
+      <div key={block.id} className="py-4 w-full">
+        <DynamicFormBlock
+          formTitle={block.formTitle}
+          formSubtitle={block.formSubtitle}
+          submitButtonText={block.submitButtonText}
+          successMessage={block.successMessage}
+          fields={block.fields}
+          pageSlug={block.pageSlug}
         />
       </div>
     );

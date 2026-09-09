@@ -23,6 +23,8 @@ interface FooterConfig {
   legalLinks?: LegalLinkItem[];
 }
 
+export const dynamic = "force-dynamic";
+
 export async function Footer() {
   const [settings, menuItems] = await Promise.all([
     prisma.systemSetting.findFirst().catch(() => null),
@@ -55,9 +57,9 @@ export async function Footer() {
     footerConfig?.copyrightText ||
     `© ${new Date().getFullYear()} ${siteName}. All sacred rights reserved.`;
 
-  // Dynamic social channels resolution:
-  // Direct settings fields (instagramUrl, etc.) take precedence. If footerConfig has extra channels (e.g. SoundCloud, X), add them.
-  const configuredSocials: { platform: string; url: string }[] = [];
+  // Strict Zero-Fallback Social Channels Extraction:
+  // Direct setting values strictly govern the standard channels. If empty/blank, they MUST NOT render.
+  const activeSocials: { platform: string; url: string }[] = [];
 
   const directInstagram = settings?.instagramUrl?.trim();
   const directFacebook = settings?.facebookUrl?.trim();
@@ -65,36 +67,37 @@ export async function Footer() {
   const directPinterest = settings?.pinterestUrl?.trim();
 
   if (directInstagram) {
-    configuredSocials.push({ platform: "Instagram", url: directInstagram });
+    activeSocials.push({ platform: "Instagram", url: directInstagram });
   }
   if (directFacebook) {
-    configuredSocials.push({ platform: "Facebook", url: directFacebook });
+    activeSocials.push({ platform: "Facebook", url: directFacebook });
   }
   if (directYouTube) {
-    configuredSocials.push({ platform: "YouTube", url: directYouTube });
+    activeSocials.push({ platform: "YouTube", url: directYouTube });
   }
   if (directPinterest) {
-    configuredSocials.push({ platform: "Pinterest", url: directPinterest });
+    activeSocials.push({ platform: "Pinterest", url: directPinterest });
   }
+
+  // Standard platforms are strictly governed by their direct columns above.
+  // Auxiliary platforms (e.g. SoundCloud, X / Twitter) in footerConfig.socialLinks are included only if non-empty and visible.
+  const standardPlatforms = new Set(["instagram", "facebook", "youtube", "pinterest"]);
 
   if (Array.isArray(footerConfig?.socialLinks)) {
     footerConfig.socialLinks.forEach((link) => {
-      const trimmedUrl = link.url?.trim();
-      if (link.isVisible !== false && trimmedUrl && trimmedUrl.length > 0) {
-        const existingIdx = configuredSocials.findIndex(
-          (s) => s.platform.toLowerCase() === link.platform.trim().toLowerCase()
-        );
-        // Only add if not already set by direct columns or update if direct column was empty
-        if (existingIdx === -1) {
-          configuredSocials.push({ platform: link.platform.trim(), url: trimmedUrl });
+      const pName = (link.platform || "").trim();
+      const pKey = pName.toLowerCase();
+      const trimmedUrl = (link.url || "").trim();
+
+      // Only allow auxiliary platforms from footerConfig (never resurrect empty standard channels)
+      if (!standardPlatforms.has(pKey) && link.isVisible !== false && trimmedUrl.length > 0) {
+        const alreadyExists = activeSocials.some((s) => s.platform.toLowerCase() === pKey);
+        if (!alreadyExists) {
+          activeSocials.push({ platform: pName, url: trimmedUrl });
         }
       }
     });
   }
-
-  const activeSocials = configuredSocials.filter(
-    (s) => s.url && s.url.trim().length > 0
-  );
 
   // Default fallback legal links if not customized
   const defaultLegal: LegalLinkItem[] = [

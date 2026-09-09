@@ -53,6 +53,10 @@ interface LeadItem {
   message: string;
   status: "NEW" | "CONTACTED" | "IN_DISCUSSION" | "QUALIFIED" | "CLOSED" | "ARCHIVED";
   createdAt: string;
+  source?: string;
+  formTitle?: string | null;
+  pageSlug?: string | null;
+  customFields?: Record<string, unknown> | null;
   sourceArtwork: {
     id: string;
     title: string;
@@ -330,9 +334,28 @@ export default function AdminLeadsPage() {
                               {lead.sourceEvent.title}
                             </span>
                           </div>
+                        ) : lead.formTitle || lead.pageSlug ? (
+                          <div className="flex flex-col gap-1">
+                            <Badge
+                              variant="outline"
+                              className="w-fit text-[10px] bg-primary/10 text-primary border-primary/30"
+                            >
+                              {lead.formTitle || "Page Form"}
+                            </Badge>
+                            {lead.pageSlug && (
+                              <Link
+                                href={`/${lead.pageSlug}`}
+                                target="_blank"
+                                className="text-[11px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                              >
+                                /{lead.pageSlug}
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </Link>
+                            )}
+                          </div>
                         ) : (
                           <Badge variant="outline" className="text-[10px]">
-                            Inbound Web
+                            {lead.source || "Inbound Web"}
                           </Badge>
                         )}
                       </td>
@@ -493,6 +516,26 @@ export default function AdminLeadsPage() {
                 </div>
               )}
 
+              {(selectedLead.formTitle || selectedLead.pageSlug) && (
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <span className="text-[10px] text-primary uppercase font-semibold flex items-center gap-1">
+                    Originating Visual Page Form
+                  </span>
+                  <p className="text-foreground font-semibold mt-1">
+                    {selectedLead.formTitle || "Custom Form Submission"}
+                  </p>
+                  {selectedLead.pageSlug && (
+                    <Link
+                      href={`/${selectedLead.pageSlug}`}
+                      target="_blank"
+                      className="text-[11px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mt-1"
+                    >
+                      View Live Page: /{selectedLead.pageSlug} <ExternalLink className="w-2.5 h-2.5" />
+                    </Link>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-1">
                 <span className="text-[10px] text-muted-foreground uppercase font-semibold">
                   Subject
@@ -510,6 +553,40 @@ export default function AdminLeadsPage() {
                   {selectedLead.message}
                 </div>
               </div>
+
+              {selectedLead.customFields && typeof selectedLead.customFields === "object" && Object.keys(selectedLead.customFields).length > 0 && (
+                <div className="space-y-1.5 pt-2 border-t border-border">
+                  <span className="text-[10px] text-muted-foreground uppercase font-semibold">
+                    Dynamic Form Custom Fields
+                  </span>
+                  <div className="rounded-md border border-border overflow-hidden">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-muted/50 border-b border-border text-[10px] text-muted-foreground uppercase">
+                        <tr>
+                          <th className="p-2">Field</th>
+                          <th className="p-2">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/60">
+                        {Object.entries(selectedLead.customFields).map(([key, val]) => (
+                          <tr key={key} className="hover:bg-muted/10">
+                            <td className="p-2 font-medium text-muted-foreground capitalize">
+                              {key.replace(/([A-Z])/g, " $1")}
+                            </td>
+                            <td className="p-2 text-foreground font-mono text-[11px]">
+                              {typeof val === "boolean"
+                                ? val ? "Yes / Selected" : "No / Unselected"
+                                : typeof val === "object"
+                                ? JSON.stringify(val)
+                                : String(val)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
 
               <div className="pt-2 flex items-center justify-between border-t border-border">
                 <span className="text-xs font-semibold text-foreground">Update Lead Status:</span>

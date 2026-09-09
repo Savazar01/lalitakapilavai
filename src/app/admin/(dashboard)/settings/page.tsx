@@ -139,10 +139,10 @@ export default function AdminSettingsPage() {
     contactPhone: "+91 98450 12345",
     copyrightText: "© 2026 Lalita Kapilavai. All sacred rights reserved.",
     socialLinks: [
-      { platform: "Instagram", url: "https://instagram.com/lalitakapilavai", isVisible: true },
-      { platform: "YouTube", url: "https://youtube.com/@lalitakapilavai", isVisible: true },
+      { platform: "Instagram", url: "", isVisible: false },
+      { platform: "YouTube", url: "", isVisible: false },
       { platform: "Facebook", url: "", isVisible: false },
-      { platform: "SoundCloud", url: "", isVisible: false },
+      { platform: "Pinterest", url: "", isVisible: false },
     ],
     legalLinks: [
       { label: "Privacy Policy", url: "/privacy", isVisible: true },
