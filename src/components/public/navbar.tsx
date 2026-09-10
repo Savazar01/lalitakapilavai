@@ -18,7 +18,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ChevronDown, ChevronRight, Menu as MenuIcon, Sparkles } from "lucide-react";
+import { ChevronDown, Menu as MenuIcon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export async function Navbar() {
@@ -151,15 +151,9 @@ export async function Navbar() {
                     return (
                       <DropdownMenuSub key={sub.id}>
                         <DropdownMenuSubTrigger className="flex items-center justify-between px-3 py-2 rounded text-xs font-serif text-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer data-[state=open]:bg-primary/10 data-[state=open]:text-primary">
-                          <Link
-                            href={sub.path}
-                            target={sub.openInNewTab ? "_blank" : undefined}
-                            className="font-semibold flex-1 text-left"
-                            onClick={(e) => e.stopPropagation()}
-                          >
+                          <span className="font-semibold flex-1 text-left">
                             {sub.label}
-                          </Link>
-                          <ChevronRight className="w-3.5 h-3.5 text-primary/70 ml-2 shrink-0" />
+                          </span>
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent className="min-w-[200px] p-1.5 bg-card/95 backdrop-blur-md border border-primary/30 shadow-2xl rounded-lg">
                           <DropdownMenuItem asChild>
