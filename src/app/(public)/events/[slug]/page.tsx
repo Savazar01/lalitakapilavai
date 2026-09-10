@@ -9,6 +9,9 @@ import { Footer } from "@/components/public/footer";
 import { EventRsvpForm } from "@/components/public/event-rsvp-form";
 import { formatEventSchedule } from "@/lib/geo-timezone";
 import { Badge } from "@/components/ui/badge";
+import { TiptapRenderer } from "@/components/public/tiptap-renderer";
+import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
+import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import {
   Calendar,
   MapPin,
@@ -19,6 +22,7 @@ import {
   Mail,
   Phone,
   ImageIcon,
+  FileText,
 } from "lucide-react";
 
 interface PageProps {
@@ -28,8 +32,13 @@ interface PageProps {
 export const dynamic = "force-dynamic";
 
 interface GalleryPhoto {
+  id?: string;
   url: string;
   caption?: string;
+  title?: string;
+  alt?: string;
+  linkType?: "none" | "artwork" | "category" | "custom";
+  linkTarget?: string;
 }
 
 const getEventBySlug = cache(async (slug: string) => {
@@ -72,7 +81,16 @@ export default async function EventDetailPage({ params }: PageProps) {
   }
 
   const banner = event.bannerImage || event.posterUrl;
-  const gallery = (Array.isArray(event.galleryImages) ? event.galleryImages : []) as unknown as GalleryPhoto[];
+  const rawGallery = (Array.isArray(event.galleryImages) ? event.galleryImages : []) as unknown as GalleryPhoto[];
+  const galleryItems: MediaGalleryItem[] = rawGallery.map((photo, idx) => ({
+    id: photo.id || `event-gal-${idx}`,
+    url: photo.url,
+    title: photo.title || photo.caption || undefined,
+    caption: photo.caption || undefined,
+    alt: photo.alt || photo.caption || photo.title || `Exhibition Photograph ${idx + 1}`,
+    linkType: (photo.linkType as "none" | "artwork" | "category" | "custom") || "none",
+    linkTarget: photo.linkTarget,
+  }));
   const scheduleFormatted = formatEventSchedule(event.startDate, event.endDate, event.timezone);
 
   return (
@@ -177,13 +195,13 @@ export default async function EventDetailPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Curatorial Background & Program Notes */}
+            {/* Curatorial Background & Program Notes (Rendered via TiptapRenderer) */}
             <div className="space-y-3">
               <h3 className="font-serif font-bold text-base sm:text-lg text-foreground tracking-wide">
                 Exhibition Overview &amp; Program Notes
               </h3>
-              <div className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line space-y-2">
-                {event.description}
+              <div className="text-muted-foreground leading-relaxed">
+                <TiptapRenderer content={event.description} className="text-xs sm:text-sm leading-relaxed" />
               </div>
             </div>
 
@@ -251,8 +269,33 @@ export default async function EventDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Event Photo Gallery */}
-        {gallery.length > 0 && (
+        {/* Archival Monograph & Event PDF Brochure (If Provided) */}
+        {event.brochurePdfUrl && (
+          <section className="pt-8 border-t border-border/80 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="font-serif font-bold text-xl sm:text-2xl text-foreground flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary" />
+                  {event.brochureTitle || "Exhibition Monograph & Program Brochure"}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Official archival catalog, curatorial essay, and collector notes prepared for this event.
+                </p>
+              </div>
+            </div>
+
+            <PdfViewerBlock
+              fileUrl={event.brochurePdfUrl}
+              title={event.brochureTitle || "Exhibition Monograph & Program Brochure"}
+              fileName={`${event.slug}-brochure.pdf`}
+              allowDownload={event.brochureDownloadable !== false}
+              height={650}
+            />
+          </section>
+        )}
+
+        {/* Event Photo Gallery (Multi-Mode: Carousel / Scroll / Collage) */}
+        {galleryItems.length > 0 && (
           <section className="pt-8 border-t border-border/80 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
@@ -266,33 +309,16 @@ export default async function EventDetailPage({ params }: PageProps) {
               </div>
 
               <Badge variant="outline" className="text-xs font-mono self-start sm:self-center">
-                {gallery.length} Photograph{gallery.length === 1 ? "" : "s"}
+                {galleryItems.length} Photograph{galleryItems.length === 1 ? "" : "s"}
               </Badge>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {gallery.map((photo, index) => (
-                <div
-                  key={index}
-                  className="rounded-xl overflow-hidden border border-border bg-card shadow-sm group hover:border-primary/50 transition-all flex flex-col"
-                >
-                  <div className="relative aspect-[4/3] w-full bg-muted/30 overflow-hidden">
-                    <Image
-                      src={photo.url}
-                      alt={photo.caption || `Event Gallery ${index + 1}`}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
-                  {photo.caption && (
-                    <div className="p-3 text-xs text-muted-foreground font-medium">
-                      {photo.caption}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <MediaGalleryBlock
+              items={galleryItems}
+              displayMode={(event.galleryDisplayMode?.toLowerCase() as "carousel" | "scroll" | "collage") || "carousel"}
+              autoplayTimer={event.galleryAutoplayTimer || 4}
+              frameStyle="heritage"
+            />
           </section>
         )}
 

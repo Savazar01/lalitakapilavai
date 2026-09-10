@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-09-10)
 
 ## Corpus Check
-- 139 files · ~101,841 words
+- 139 files · ~103,237 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 740 nodes · 1619 edges · 51 communities (38 shown, 13 thin omitted)
+- 740 nodes · 1628 edges · 52 communities (39 shown, 13 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d40388c2`
+- Built from commit: `64653cff`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -84,7 +84,7 @@
 - `GET()` --calls--> `getMediaStream()`  [EXTRACTED]
   src/app/api/admin/media/vault/route.ts → src/lib/storage.ts
 
-## Communities (51 total, 13 thin omitted)
+## Communities (52 total, 13 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -159,8 +159,8 @@ Cohesion: 0.24
 Nodes (5): geistMono, geistSans, metadata, ThemeProvider(), Toaster()
 
 ### Community 29 - "Community 29"
-Cohesion: 0.10
-Nodes (3): { GET, POST }, auth, AuthSession
+Cohesion: 0.09
+Nodes (4): { GET, POST }, auth, AuthSession, RouteParams
 
 ### Community 35 - "Community 35"
 Cohesion: 0.39
@@ -219,11 +219,11 @@ Nodes (3): checkAdminAuth(), GET(), POST()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Button` connect `Community 0` to `Community 4`, `Community 37`, `Community 36`, `Community 7`, `Community 40`, `Community 43`, `Community 44`, `Community 51`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
 - **Why does `Badge()` connect `Community 0` to `Community 4`, `Community 36`, `Community 7`, `Community 40`, `Community 44`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Why does `cn()` connect `Community 36` to `Community 0`, `Community 44`, `Community 4`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **What connects `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig` to the rest of the system?**
   _299 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**

@@ -15,6 +15,12 @@ import {
   Image as ImageIcon,
   Check,
   Globe,
+  FileText,
+  ChevronUp,
+  ChevronDown,
+  LayoutGrid,
+  Sliders,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +37,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 import { ModernDateTimePicker } from "@/components/admin/modern-datetime-picker";
+import { TiptapEditor } from "@/components/builder/tiptap-editor";
 import {
   getAllCountries,
   findCountry,
@@ -40,8 +47,13 @@ import {
 import { SUPPORTED_CURRENCIES } from "@/lib/formatters";
 
 export interface GalleryImageItem {
+  id?: string;
   url: string;
   caption?: string;
+  title?: string;
+  alt?: string;
+  linkType?: "none" | "artwork" | "category" | "custom";
+  linkTarget?: string;
 }
 
 export interface EventFormData {
@@ -64,6 +76,11 @@ export interface EventFormData {
   posterUrl?: string | null;
   bannerImage?: string | null;
   galleryImages?: GalleryImageItem[] | null;
+  galleryDisplayMode?: string | null;
+  galleryAutoplayTimer?: number | null;
+  brochurePdfUrl?: string | null;
+  brochureTitle?: string | null;
+  brochureDownloadable?: boolean | null;
   maxCapacity?: number | null;
   registrationFee?: number | null;
   currency: string;
@@ -177,6 +194,21 @@ function EventFormContent({
   const [galleryImages, setGalleryImages] = React.useState<GalleryImageItem[]>(
     Array.isArray(initialEvent?.galleryImages) ? initialEvent.galleryImages : []
   );
+  const [galleryDisplayMode, setGalleryDisplayMode] = React.useState<string>(
+    initialEvent?.galleryDisplayMode || "CAROUSEL"
+  );
+  const [galleryAutoplayTimer, setGalleryAutoplayTimer] = React.useState<number>(
+    initialEvent?.galleryAutoplayTimer ?? 4
+  );
+  const [brochurePdfUrl, setBrochurePdfUrl] = React.useState<string>(
+    initialEvent?.brochurePdfUrl || ""
+  );
+  const [brochureTitle, setBrochureTitle] = React.useState<string>(
+    initialEvent?.brochureTitle || "Exhibition Monograph & Program Brochure"
+  );
+  const [brochureDownloadable, setBrochureDownloadable] = React.useState<boolean>(
+    initialEvent?.brochureDownloadable !== false
+  );
   const [selectedArtworkIds, setSelectedArtworkIds] = React.useState<string[]>(
     initialEvent?.artworkIds || []
   );
@@ -185,6 +217,7 @@ function EventFormContent({
   const [saving, setSaving] = React.useState(false);
   const [uploadingBanner, setUploadingBanner] = React.useState(false);
   const [uploadingGallery, setUploadingGallery] = React.useState(false);
+  const [uploadingBrochure, setUploadingBrochure] = React.useState(false);
 
   // Countries and Timezones Data
   const countries = React.useMemo(() => getAllCountries(), []);
@@ -273,7 +306,16 @@ function EventFormContent({
         const data = await res.json();
         if (res.ok) {
           const imgUrl = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl || data.rawUrl;
-          newItems.push({ url: imgUrl, caption: file.name.replace(/\.[^/.]+$/, "") });
+          const cleanName = file.name.replace(/\.[^/.]+$/, "");
+          newItems.push({
+            id: `gal-${Date.now()}-${i}`,
+            url: imgUrl,
+            title: cleanName,
+            caption: "",
+            alt: cleanName,
+            linkType: "none",
+            linkTarget: "",
+          });
         }
       }
 
@@ -290,10 +332,55 @@ function EventFormContent({
     setGalleryImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateGalleryCaption = (index: number, caption: string) => {
+  const moveGalleryImage = (index: number, direction: "up" | "down") => {
+    setGalleryImages((prev) => {
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[targetIndex];
+      copy[targetIndex] = temp;
+      return copy;
+    });
+  };
+
+  const updateGalleryItemField = (index: number, field: keyof GalleryImageItem, val: string) => {
     setGalleryImages((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, caption } : item))
+      prev.map((item, i) => (i === index ? { ...item, [field]: val } : item))
     );
+  };
+
+  // Upload Brochure PDF
+  const handleBrochureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      toast.error("Please select a valid PDF file");
+      return;
+    }
+
+    setUploadingBrochure(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("watermark", "false");
+
+    try {
+      const res = await fetch("/api/admin/media/upload", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to upload brochure");
+
+      const pdfUrl = data.publicUrl || data.rawUrl;
+      setBrochurePdfUrl(pdfUrl);
+      if (!brochureTitle || brochureTitle === "Exhibition Monograph & Program Brochure") {
+        setBrochureTitle(file.name.replace(/\.[^/.]+$/, ""));
+      }
+      toast.success("PDF Brochure uploaded successfully");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Brochure upload failed");
+    } finally {
+      setUploadingBrochure(false);
+    }
   };
 
   // Toggle artwork selection
@@ -333,6 +420,11 @@ function EventFormContent({
       posterUrl: bannerImage || null,
       bannerImage: bannerImage || null,
       galleryImages: galleryImages.length > 0 ? galleryImages : null,
+      galleryDisplayMode,
+      galleryAutoplayTimer,
+      brochurePdfUrl: brochurePdfUrl.trim() || null,
+      brochureTitle: brochureTitle.trim() || "Exhibition Monograph & Program Brochure",
+      brochureDownloadable,
       maxCapacity: maxCapacity ? parseInt(maxCapacity, 10) : null,
       registrationFee: registrationFee ? parseFloat(registrationFee) : 0,
       currency: currency || "INR",
@@ -396,12 +488,13 @@ function EventFormContent({
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
           <div className="px-6 pt-3 border-b border-border/60 bg-card">
-            <TabsList className="grid grid-cols-6 h-9 bg-muted/40 p-1 text-xs">
+            <TabsList className="grid grid-cols-7 h-9 bg-muted/40 p-1 text-xs">
               <TabsTrigger value="general" className="text-xs">General</TabsTrigger>
               <TabsTrigger value="dates" className="text-xs">Dates &amp; Timezone</TabsTrigger>
               <TabsTrigger value="venue" className="text-xs">Venue &amp; Address</TabsTrigger>
               <TabsTrigger value="contacts" className="text-xs">Curator Contact</TabsTrigger>
               <TabsTrigger value="media" className="text-xs">Banner &amp; Gallery</TabsTrigger>
+              <TabsTrigger value="brochure" className="text-xs">Brochure (PDF)</TabsTrigger>
               <TabsTrigger value="artworks" className="text-xs">Artworks ({selectedArtworkIds.length})</TabsTrigger>
             </TabsList>
           </div>
@@ -468,28 +561,29 @@ function EventFormContent({
                 </div>
               </div>
 
-              {/* Rich Description */}
+              {/* Rich Description with WYSIWYG Tiptap Editor */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-foreground">
-                    Description &amp; Program Notes
+                    Description &amp; Program Notes (WYSIWYG)
                   </label>
                   <AiAssistantModal
                     initialContext={`${title ? `Event: ${title}\n` : ""}${venueName || venue ? `Venue: ${venueName || venue}\n` : ""}${description || ""}`}
                     onApply={(generated: string) => {
-                      setDescription((prev) => (prev ? `${prev}\n\n${generated}` : generated));
+                      setDescription((prev) => (prev ? `${prev}<br/><br/>${generated}` : generated));
                     }}
                     triggerLabel="✨ AI Assist"
                     triggerClassName="h-6 text-[11px] px-2 text-primary border-primary/40 hover:bg-primary/10"
                   />
                 </div>
-                <textarea
-                  rows={6}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Provide curatorial background, featured ragas, traditional techniques, or collector notes..."
-                  className="w-full bg-card border border-border text-foreground text-xs rounded-lg p-3 focus:ring-1 focus:ring-primary focus:outline-none resize-y leading-relaxed font-sans"
-                />
+                <div className="rounded-md border border-border bg-card/60 p-1 shadow-xs">
+                  <TiptapEditor
+                    content={description}
+                    onChange={(_, html) => setDescription(html)}
+                    placeholder="Provide curatorial background, featured ragas, traditional techniques, or collector notes..."
+                    className="min-h-[160px]"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center gap-6 pt-2">
@@ -797,19 +891,19 @@ function EventFormContent({
                 )}
               </div>
 
-              {/* Multi-Image Event Gallery */}
-              <div className="space-y-3 pt-4 border-t border-border/60">
-                <div className="flex items-center justify-between">
+              {/* Multi-Image Event Gallery Studio */}
+              <div className="space-y-4 pt-4 border-t border-border/60">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <span className="text-xs font-semibold text-foreground block">
-                      Event Photo Gallery ({galleryImages.length})
+                      Event Photo Gallery Studio ({galleryImages.length})
                     </span>
                     <span className="text-[11px] text-muted-foreground">
-                      Exhibition hall previews, stage setup, or historical photographs.
+                      Multi-mode media showcase supporting auto-carousels, smooth scroll tracks, and heritage collages.
                     </span>
                   </div>
 
-                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors">
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors self-start sm:self-auto">
                     <Upload className="w-3.5 h-3.5 text-primary" />
                     {uploadingGallery ? "Uploading..." : "Add Photos"}
                     <input
@@ -823,40 +917,163 @@ function EventFormContent({
                   </label>
                 </div>
 
+                {/* Display Mode & Settings Bar */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 rounded-xl border border-border bg-muted/20">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <LayoutGrid className="w-3.5 h-3.5 text-primary" />
+                      Gallery Display Engine
+                    </label>
+                    <select
+                      value={galleryDisplayMode}
+                      onChange={(e) => setGalleryDisplayMode(e.target.value)}
+                      className="w-full bg-card border border-border text-foreground text-xs rounded-lg px-3 py-1.5 focus:ring-1 focus:ring-primary focus:outline-none"
+                    >
+                      <option value="CAROUSEL">Auto-playing Carousel (High-Fidelity Slides)</option>
+                      <option value="SCROLL">Smooth Horizontal Scroll Track (Swipeable)</option>
+                      <option value="COLLAGE">5-Photo Heritage Collage (Bento Grid)</option>
+                    </select>
+                  </div>
+
+                  {galleryDisplayMode === "CAROUSEL" ? (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                          <Sliders className="w-3.5 h-3.5 text-primary" />
+                          Autoplay Transition Interval
+                        </label>
+                        <span className="font-mono text-xs text-primary font-semibold">
+                          {galleryAutoplayTimer}s
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={2}
+                        max={10}
+                        step={1}
+                        value={galleryAutoplayTimer}
+                        onChange={(e) => setGalleryAutoplayTimer(parseInt(e.target.value, 10))}
+                        className="w-full accent-primary cursor-pointer"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+                        <span>2s (Fast)</span>
+                        <span>4s (Default)</span>
+                        <span>10s (Slow)</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 text-xs text-muted-foreground flex flex-col justify-center">
+                      <span className="font-medium text-foreground">Presentation Mode</span>
+                      <p className="text-[11px] leading-relaxed">
+                        {galleryDisplayMode === "SCROLL"
+                          ? "Displays full-height responsive cards along an overflow-x scroll container."
+                          : "Curates the first 5 images in a golden ratio masonry collage; extras open in lightbox."}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 {galleryImages.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-border/80 p-6 text-center text-xs text-muted-foreground bg-muted/10">
                     No gallery photos attached. Click &quot;Add Photos&quot; to upload multiple images.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {galleryImages.map((img, idx) => (
                       <div
-                        key={idx}
-                        className="rounded-lg border border-border bg-card overflow-hidden flex flex-col space-y-2 p-2"
+                        key={img.id || idx}
+                        className="rounded-lg border border-border bg-card overflow-hidden flex flex-col space-y-2 p-2.5 shadow-xs"
                       >
-                        <div className="relative h-32 w-full rounded overflow-hidden bg-muted/30">
+                        <div className="relative h-36 w-full rounded-md overflow-hidden bg-muted/30">
                           <Image
                             src={img.url}
-                            alt={img.caption || `Gallery ${idx + 1}`}
+                            alt={img.title || img.caption || `Gallery ${idx + 1}`}
                             fill
                             className="object-cover"
                           />
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryImage(idx)}
-                            className="absolute top-1.5 right-1.5 bg-black/70 hover:bg-destructive text-white p-1 rounded-full transition-colors"
-                            title="Delete Photo"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
+                          <div className="absolute top-1.5 left-1.5 bg-black/75 backdrop-blur-xs text-white px-1.5 py-0.5 rounded text-[10px] font-mono">
+                            #{idx + 1}
+                          </div>
+
+                          <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => moveGalleryImage(idx, "up")}
+                              className="bg-black/70 hover:bg-primary disabled:opacity-30 text-white p-1 rounded transition-colors"
+                              title="Move Left / Earlier"
+                            >
+                              <ChevronUp className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === galleryImages.length - 1}
+                              onClick={() => moveGalleryImage(idx, "down")}
+                              className="bg-black/70 hover:bg-primary disabled:opacity-30 text-white p-1 rounded transition-colors"
+                              title="Move Right / Later"
+                            >
+                              <ChevronDown className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryImage(idx)}
+                              className="bg-black/70 hover:bg-destructive text-white p-1 rounded transition-colors"
+                              title="Delete Photo"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
                         </div>
 
-                        <Input
-                          placeholder="Add photo caption..."
-                          value={img.caption || ""}
-                          onChange={(e) => updateGalleryCaption(idx, e.target.value)}
-                          className="text-xs h-7"
-                        />
+                        <div className="space-y-1.5">
+                          <Input
+                            placeholder="Photo Title / Heading..."
+                            value={img.title || ""}
+                            onChange={(e) => updateGalleryItemField(idx, "title", e.target.value)}
+                            className="text-xs h-7"
+                          />
+                          <Input
+                            placeholder="Photo Caption / Commentary..."
+                            value={img.caption || ""}
+                            onChange={(e) => updateGalleryItemField(idx, "caption", e.target.value)}
+                            className="text-xs h-7"
+                          />
+
+                          {/* Optional Link Configuration */}
+                          <div className="pt-1 flex items-center gap-1.5">
+                            <select
+                              value={img.linkType || "none"}
+                              onChange={(e) => updateGalleryItemField(idx, "linkType", e.target.value)}
+                              className="bg-muted/40 border border-border text-foreground text-[10px] rounded px-1.5 py-1 focus:outline-none"
+                            >
+                              <option value="none">No Link</option>
+                              <option value="artwork">Link to Artwork</option>
+                              <option value="custom">Custom URL</option>
+                            </select>
+
+                            {img.linkType === "artwork" ? (
+                              <select
+                                value={img.linkTarget || ""}
+                                onChange={(e) => updateGalleryItemField(idx, "linkTarget", e.target.value)}
+                                className="flex-1 bg-card border border-border text-foreground text-[10px] rounded px-1.5 py-1 focus:outline-none truncate"
+                              >
+                                <option value="">Select Artwork...</option>
+                                {artworksCatalog.map((art) => (
+                                  <option key={art.id} value={art.slug}>
+                                    {art.title}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : img.linkType === "custom" ? (
+                              <Input
+                                placeholder="https://... or /page"
+                                value={img.linkTarget || ""}
+                                onChange={(e) => updateGalleryItemField(idx, "linkTarget", e.target.value)}
+                                className="text-[10px] h-6 flex-1 py-0"
+                              />
+                            ) : null}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -864,7 +1081,141 @@ function EventFormContent({
               </div>
             </TabsContent>
 
-            {/* TAB 6: EXHIBITION ARTWORKS CATALOG */}
+            {/* TAB 6: EVENT PDF BROCHURE / MONOGRAPH */}
+            <TabsContent value="brochure" className="m-0 space-y-6">
+              <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 text-xs flex items-start gap-3">
+                <FileText className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <span className="font-semibold text-foreground block text-sm">
+                    Exhibition Monograph &amp; Event Brochure Engine
+                  </span>
+                  <p className="text-muted-foreground leading-relaxed text-xs">
+                    Upload a high-fidelity archival PDF catalog, concert program, or exhibition monograph. An interactive document viewer with download capabilities will be embedded directly into the public event page.
+                  </p>
+                </div>
+              </div>
+
+              {/* Upload Controls */}
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground block">
+                      Program Brochure File (PDF)
+                    </label>
+                    <span className="text-[11px] text-muted-foreground">
+                      Upload archival document in PDF format (up to 50MB).
+                    </span>
+                  </div>
+
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors self-start sm:self-auto">
+                    <Upload className="w-3.5 h-3.5 text-primary" />
+                    {uploadingBrochure ? "Uploading PDF..." : "Upload Brochure (PDF)"}
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      disabled={uploadingBrochure}
+                      onChange={handleBrochureUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">
+                      Document Title
+                    </label>
+                    <Input
+                      placeholder="e.g. Exhibition Monograph & Program Brochure"
+                      value={brochureTitle}
+                      onChange={(e) => setBrochureTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">
+                      Direct PDF URL (Manual / CDN)
+                    </label>
+                    <Input
+                      placeholder="https://... or /uploads/brochure.pdf"
+                      value={brochurePdfUrl}
+                      onChange={(e) => setBrochurePdfUrl(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={brochureDownloadable}
+                      onChange={(e) => setBrochureDownloadable(e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    Enable Attendee PDF Download Button on Public Page
+                  </label>
+                </div>
+              </div>
+
+              {/* PDF Preview Card */}
+              {brochurePdfUrl ? (
+                <div className="rounded-xl border border-primary/30 bg-card p-4 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-serif font-bold text-sm text-foreground">
+                          {brochureTitle || "Exhibition Monograph"}
+                        </h4>
+                        <span className="text-[11px] text-muted-foreground font-mono truncate max-w-md block">
+                          {brochurePdfUrl}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={brochurePdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded border border-border hover:border-primary/40 hover:text-primary transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Preview
+                      </a>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setBrochurePdfUrl("")}
+                        className="h-7 text-xs"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1" />
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Embedded PDF iframe preview */}
+                  <div className="rounded-lg overflow-hidden border border-border h-64 bg-muted/20">
+                    <iframe
+                      src={`${brochurePdfUrl}#toolbar=0`}
+                      className="w-full h-full border-0"
+                      title={brochureTitle}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-border/80 p-8 text-center text-xs text-muted-foreground bg-muted/10">
+                  <FileText className="w-8 h-8 text-primary mx-auto mb-2 opacity-40" />
+                  No brochure attached. Click &quot;Upload Brochure (PDF)&quot; above to attach a monograph.
+                </div>
+              )}
+            </TabsContent>
+
+            {/* TAB 7: EXHIBITION ARTWORKS CATALOG */}
             <TabsContent value="artworks" className="m-0 space-y-4">
               <div className="flex items-center justify-between">
                 <div>

@@ -72,7 +72,12 @@ interface EventItem {
   endDate?: string | null;
   posterUrl?: string | null;
   bannerImage?: string | null;
-  galleryImages?: { url: string; caption?: string }[] | null;
+  galleryImages?: { url: string; caption?: string; title?: string; id?: string; linkType?: string; linkTarget?: string }[] | null;
+  galleryDisplayMode?: string | null;
+  galleryAutoplayTimer?: number | null;
+  brochurePdfUrl?: string | null;
+  brochureTitle?: string | null;
+  brochureDownloadable?: boolean | null;
   maxCapacity: number | null;
   registrationFee: number | null;
   currency?: string;
@@ -164,6 +169,11 @@ export default function EventsAdminPage() {
           posterUrl: fullEvent.posterUrl || "",
           bannerImage: fullEvent.bannerImage || fullEvent.posterUrl || "",
           galleryImages: fullEvent.galleryImages || [],
+          galleryDisplayMode: fullEvent.galleryDisplayMode || "CAROUSEL",
+          galleryAutoplayTimer: fullEvent.galleryAutoplayTimer !== undefined ? fullEvent.galleryAutoplayTimer : 4,
+          brochurePdfUrl: fullEvent.brochurePdfUrl || "",
+          brochureTitle: fullEvent.brochureTitle || "Exhibition Monograph & Program Brochure",
+          brochureDownloadable: fullEvent.brochureDownloadable !== false,
           maxCapacity: fullEvent.maxCapacity,
           registrationFee: fullEvent.registrationFee ? Number(fullEvent.registrationFee) : 0,
           currency: fullEvent.currency || "INR",

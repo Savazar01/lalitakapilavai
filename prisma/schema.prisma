@@ -400,6 +400,11 @@ model Event {
   posterUrl          String?
   bannerImage        String?
   galleryImages      Json?
+  brochurePdfUrl        String?
+  brochureTitle         String?             @default("Exhibition Monograph & Program Brochure")
+  brochureDownloadable  Boolean             @default(true)
+  galleryDisplayMode    String?             @default("CAROUSEL") // "CAROUSEL" | "SCROLL" | "COLLAGE"
+  galleryAutoplayTimer  Int?                @default(4)
   maxCapacity        Int?
   registrationFee    Decimal?            @db.Decimal(10, 2)
   currency           String              @default("INR")
