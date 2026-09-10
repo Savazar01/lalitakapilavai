@@ -4,7 +4,6 @@ import { uploadBuffer } from "@/lib/storage";
 import prisma from "@/lib/prisma";
 import sharp from "sharp";
 import crypto from "crypto";
-import heicConvert from "heic-convert";
 import { generateWatermarkSvg } from "@/lib/watermark";
 
 
@@ -81,6 +80,12 @@ export async function POST(request: NextRequest) {
 
     if (isHeic) {
       try {
+        // Dynamic import avoids module resolution crashes at route initialization
+        const heicConvertModule = await import("heic-convert");
+        const heicConvert = (
+          "default" in heicConvertModule ? heicConvertModule.default : heicConvertModule
+        ) as typeof import("heic-convert");
+
         // Transcode Apple HEIC buffer into high-fidelity JPEG
         // 95% quality preserves 22k gold leaf foil, gesso reliefs, and fine brushwork micro-textures
         const convertedArrayBuffer = await heicConvert({
