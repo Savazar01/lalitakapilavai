@@ -54,6 +54,12 @@ import {
   CatalogBackgroundControl,
   type CatalogBackgroundConfig,
 } from "@/components/admin/catalog-background-control";
+import {
+  CatalogMatrixStudio,
+  reconcileMatrixCells,
+  type MatrixCellSegment,
+  type CatalogMatrixConfig,
+} from "@/components/admin/catalog-matrix-studio";
 
 export type MagazineLayoutType =
   | "1_COL"
@@ -62,7 +68,8 @@ export type MagazineLayoutType =
   | "ASYMMETRIC_30_70"
   | "3_COL"
   | "4_COL"
-  | "6_COL";
+  | "6_COL"
+  | "MATRIX";
 
 export interface CustomPageSegment {
   id: string;
@@ -161,6 +168,8 @@ interface ECatalogThemeConfig {
 interface ECatalogCoverConfig extends CatalogBackgroundConfig {
   showDate?: boolean;
   showCurator?: boolean;
+  useMatrixLayout?: boolean;
+  matrixConfig?: CatalogMatrixConfig;
 }
 
 interface ECatalogEssayConfig extends CatalogBackgroundConfig {
@@ -173,6 +182,8 @@ interface ECatalogEndPageConfig extends CatalogBackgroundConfig {
   title?: string;
   contentHtml?: string;
   contactDetails?: string;
+  useMatrixLayout?: boolean;
+  matrixConfig?: CatalogMatrixConfig;
 }
 
 interface ECatalogCustomPageItem extends CatalogBackgroundConfig {
@@ -184,6 +195,18 @@ interface ECatalogCustomPageItem extends CatalogBackgroundConfig {
   pageLayout?: string;
   contentHtml?: string;
   segments: CustomPageSegment[];
+  matrixRows?: number;
+  matrixCols?: number;
+  rowHeights?: string;
+  colWidths?: string;
+  hasHeader?: boolean;
+  headerHtml?: string | null;
+  hasFooter?: boolean;
+  footerHtml?: string | null;
+  verticalSpineMode?: "NONE" | "LEFT" | "RIGHT";
+  verticalSpineHtml?: string | null;
+  verticalSpineWidth?: string;
+  matrixSegments?: MatrixCellSegment[];
 }
 
 interface ECatalogDetail {
@@ -339,7 +362,18 @@ export default function AdminCatalogStudioPage() {
               layoutType?: string;
               pageLayout?: string;
               contentHtml?: string;
-              segments?: CustomPageSegment[];
+              segments?: CustomPageSegment[] | MatrixCellSegment[];
+              matrixRows?: number;
+              matrixCols?: number;
+              rowHeights?: string;
+              colWidths?: string;
+              hasHeader?: boolean;
+              headerHtml?: string | null;
+              hasFooter?: boolean;
+              footerHtml?: string | null;
+              verticalSpineMode?: "NONE" | "LEFT" | "RIGHT";
+              verticalSpineHtml?: string | null;
+              verticalSpineWidth?: string;
               backgroundType?: "COLOR" | "PATTERN" | "IMAGE";
               backgroundColor?: string;
               backgroundPattern?: string;
@@ -349,7 +383,29 @@ export default function AdminCatalogStudioPage() {
               frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
             }) => {
               const layout = (cp.layoutType || cp.pageLayout || "2_COL") as MagazineLayoutType;
-              const segments = initSegmentsForLayout(layout, cp.segments, cp.contentHtml);
+              const isMatrix = layout === "MATRIX";
+              const matrixRows = cp.matrixRows || 2;
+              const matrixCols = cp.matrixCols || 2;
+
+              let matrixSegments: MatrixCellSegment[] | undefined;
+              let segments: CustomPageSegment[];
+
+              if (isMatrix) {
+                matrixSegments = reconcileMatrixCells(
+                  matrixRows,
+                  matrixCols,
+                  (Array.isArray(cp.segments) ? cp.segments : []) as MatrixCellSegment[],
+                  cp.contentHtml || ""
+                );
+                segments = matrixSegments.map((ms) => ({
+                  id: ms.id,
+                  title: ms.title,
+                  contentHtml: ms.contentHtml,
+                }));
+              } else {
+                segments = initSegmentsForLayout(layout, cp.segments as CustomPageSegment[], cp.contentHtml);
+              }
+
               return {
                 id: cp.id,
                 pageNumber: cp.pageNumber,
@@ -359,6 +415,18 @@ export default function AdminCatalogStudioPage() {
                 pageLayout: layout,
                 contentHtml: cp.contentHtml || "",
                 segments,
+                matrixRows,
+                matrixCols,
+                rowHeights: cp.rowHeights || Array(matrixRows).fill("1fr").join(" "),
+                colWidths: cp.colWidths || Array(matrixCols).fill("1fr").join(" "),
+                hasHeader: Boolean(cp.hasHeader),
+                headerHtml: cp.headerHtml || null,
+                hasFooter: Boolean(cp.hasFooter),
+                footerHtml: cp.footerHtml || null,
+                verticalSpineMode: cp.verticalSpineMode || "NONE",
+                verticalSpineHtml: cp.verticalSpineHtml || null,
+                verticalSpineWidth: cp.verticalSpineWidth || "25%",
+                matrixSegments,
                 backgroundType: cp.backgroundType || "COLOR",
                 backgroundColor: cp.backgroundColor || "#FAF7F2",
                 backgroundPattern: cp.backgroundPattern || "mandala-filigree",
@@ -429,7 +497,18 @@ export default function AdminCatalogStudioPage() {
           layoutType: cp.layoutType || "2_COL",
           pageLayout: cp.layoutType || "2_COL",
           contentHtml: cp.contentHtml || null,
-          segments: cp.segments || [],
+          segments: cp.layoutType === "MATRIX" ? (cp.matrixSegments || cp.segments || []) : (cp.segments || []),
+          matrixRows: cp.matrixRows || 2,
+          matrixCols: cp.matrixCols || 2,
+          rowHeights: cp.rowHeights || null,
+          colWidths: cp.colWidths || null,
+          hasHeader: Boolean(cp.hasHeader),
+          headerHtml: cp.headerHtml || null,
+          hasFooter: Boolean(cp.hasFooter),
+          footerHtml: cp.footerHtml || null,
+          verticalSpineMode: cp.verticalSpineMode || "NONE",
+          verticalSpineHtml: cp.verticalSpineHtml || null,
+          verticalSpineWidth: cp.verticalSpineWidth || "25%",
           backgroundType: cp.backgroundType || "COLOR",
           backgroundColor: cp.backgroundColor || "#FAF7F2",
           backgroundPattern: cp.backgroundPattern || null,
@@ -474,7 +553,18 @@ export default function AdminCatalogStudioPage() {
             layoutType?: string;
             pageLayout?: string;
             contentHtml?: string;
-            segments?: CustomPageSegment[];
+            segments?: CustomPageSegment[] | MatrixCellSegment[];
+            matrixRows?: number;
+            matrixCols?: number;
+            rowHeights?: string;
+            colWidths?: string;
+            hasHeader?: boolean;
+            headerHtml?: string | null;
+            hasFooter?: boolean;
+            footerHtml?: string | null;
+            verticalSpineMode?: "NONE" | "LEFT" | "RIGHT";
+            verticalSpineHtml?: string | null;
+            verticalSpineWidth?: string;
             backgroundType?: "COLOR" | "PATTERN" | "IMAGE";
             backgroundColor?: string;
             backgroundPattern?: string;
@@ -484,7 +574,29 @@ export default function AdminCatalogStudioPage() {
             frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
           }) => {
             const layout = (cp.layoutType || cp.pageLayout || "2_COL") as MagazineLayoutType;
-            const segments = initSegmentsForLayout(layout, cp.segments, cp.contentHtml);
+            const isMatrix = layout === "MATRIX";
+            const matrixRows = cp.matrixRows || 2;
+            const matrixCols = cp.matrixCols || 2;
+
+            let matrixSegments: MatrixCellSegment[] | undefined;
+            let segments: CustomPageSegment[];
+
+            if (isMatrix) {
+              matrixSegments = reconcileMatrixCells(
+                matrixRows,
+                matrixCols,
+                (Array.isArray(cp.segments) ? cp.segments : []) as MatrixCellSegment[],
+                cp.contentHtml || ""
+              );
+              segments = matrixSegments.map((ms) => ({
+                id: ms.id,
+                title: ms.title,
+                contentHtml: ms.contentHtml,
+              }));
+            } else {
+              segments = initSegmentsForLayout(layout, cp.segments as CustomPageSegment[], cp.contentHtml);
+            }
+
             return {
               id: cp.id,
               pageNumber: cp.pageNumber,
@@ -494,6 +606,18 @@ export default function AdminCatalogStudioPage() {
               pageLayout: layout,
               contentHtml: cp.contentHtml || "",
               segments,
+              matrixRows,
+              matrixCols,
+              rowHeights: cp.rowHeights || Array(matrixRows).fill("1fr").join(" "),
+              colWidths: cp.colWidths || Array(matrixCols).fill("1fr").join(" "),
+              hasHeader: Boolean(cp.hasHeader),
+              headerHtml: cp.headerHtml || null,
+              hasFooter: Boolean(cp.hasFooter),
+              footerHtml: cp.footerHtml || null,
+              verticalSpineMode: cp.verticalSpineMode || "NONE",
+              verticalSpineHtml: cp.verticalSpineHtml || null,
+              verticalSpineWidth: cp.verticalSpineWidth || "25%",
+              matrixSegments,
               backgroundType: cp.backgroundType || "COLOR",
               backgroundColor: cp.backgroundColor || "#FAF7F2",
               backgroundPattern: cp.backgroundPattern || "mandala-filigree",
@@ -611,7 +735,30 @@ export default function AdminCatalogStudioPage() {
       const target = { ...copy[pageIdx] };
       target.layoutType = newLayout;
       target.pageLayout = newLayout;
-      target.segments = initSegmentsForLayout(newLayout, target.segments, target.contentHtml);
+      if (newLayout === "MATRIX") {
+        const rows = target.matrixRows || 2;
+        const cols = target.matrixCols || 2;
+        target.matrixRows = rows;
+        target.matrixCols = cols;
+        target.rowHeights = target.rowHeights || Array(rows).fill("1fr").join(" ");
+        target.colWidths = target.colWidths || Array(cols).fill("1fr").join(" ");
+        target.verticalSpineMode = target.verticalSpineMode || "NONE";
+        target.verticalSpineWidth = target.verticalSpineWidth || "25%";
+        const reconciled = reconcileMatrixCells(
+          rows,
+          cols,
+          target.matrixSegments || [],
+          target.contentHtml || ""
+        );
+        target.matrixSegments = reconciled;
+        target.segments = reconciled.map((ms) => ({
+          id: ms.id,
+          title: ms.title,
+          contentHtml: ms.contentHtml,
+        }));
+      } else {
+        target.segments = initSegmentsForLayout(newLayout, target.segments, target.contentHtml);
+      }
       copy[pageIdx] = target;
       return copy;
     });
@@ -1161,6 +1308,98 @@ export default function AdminCatalogStudioPage() {
                   </div>
                 )}
               </div>
+
+                {/* Advanced Matrix Cover Layout Engine */}
+                <div className="pt-4 border-t border-border/60 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-primary" /> Advanced Matrix Cover Layout Engine (Optional)
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        Enable an InDesign-grade multi-cell visual matrix layout for the front cover instead of standard single-image banner.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-foreground">Matrix Cover:</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(coverConfig.useMatrixLayout)}
+                          onChange={(e) =>
+                            setCoverConfig((prev) => ({
+                              ...prev,
+                              useMatrixLayout: e.target.checked,
+                              matrixConfig: prev.matrixConfig || {
+                                matrixRows: 2,
+                                matrixCols: 2,
+                                rowHeights: "1fr 1fr",
+                                colWidths: "1fr 1fr",
+                                hasHeader: false,
+                                hasFooter: false,
+                                verticalSpineMode: "NONE",
+                                segments: reconcileMatrixCells(2, 2, []),
+                              },
+                            }))
+                          }
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {coverConfig.useMatrixLayout && (
+                    <div className="pt-2">
+                      <CatalogMatrixStudio
+                        pageTitle={title || "Catalog Front Cover"}
+                        pageType="COVER"
+                        config={
+                          coverConfig.matrixConfig || {
+                            matrixRows: 2,
+                            matrixCols: 2,
+                            rowHeights: "1fr 1fr",
+                            colWidths: "1fr 1fr",
+                            hasHeader: false,
+                            hasFooter: false,
+                            verticalSpineMode: "NONE",
+                            segments: reconcileMatrixCells(2, 2, []),
+                          }
+                        }
+                        onChange={(upd) =>
+                          setCoverConfig((prev) => {
+                            const currentMatrix = prev.matrixConfig || {
+                              matrixRows: 2,
+                              matrixCols: 2,
+                              rowHeights: "1fr 1fr",
+                              colWidths: "1fr 1fr",
+                              hasHeader: false,
+                              hasFooter: false,
+                              verticalSpineMode: "NONE",
+                              segments: reconcileMatrixCells(2, 2, []),
+                            };
+                            const newRows = upd.matrixRows ?? currentMatrix.matrixRows;
+                            const newCols = upd.matrixCols ?? currentMatrix.matrixCols;
+                            let newSegments = upd.segments ?? currentMatrix.segments;
+                            if (newSegments) {
+                              newSegments = reconcileMatrixCells(newRows, newCols, newSegments);
+                            }
+                            return {
+                              ...prev,
+                              matrixConfig: {
+                                ...currentMatrix,
+                                ...upd,
+                                matrixRows: newRows,
+                                matrixCols: newCols,
+                                segments: newSegments,
+                              },
+                            };
+                          })
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -1360,6 +1599,7 @@ export default function AdminCatalogStudioPage() {
                             <SelectItem value="3_COL">3-Column Magazine Spread (33:33:33)</SelectItem>
                             <SelectItem value="4_COL">4-Column Grid (Archival &amp; Footnotes)</SelectItem>
                             <SelectItem value="6_COL">6-Column Gallery Matrix</SelectItem>
+                            <SelectItem value="MATRIX">✨ Advanced Matrix Grid Engine (InDesign Grade)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -1375,93 +1615,136 @@ export default function AdminCatalogStudioPage() {
                       />
                     </div>
 
-                    {/* Multi-Segment Independent Column Studio */}
-                    <div className="space-y-3 pt-2">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <label className="text-xs font-serif font-bold text-foreground">
-                            Multi-Segment Column Studio ({page.segments?.length || 1} Columns)
-                          </label>
-                          <p className="text-[11px] text-muted-foreground">
-                            Each column functions independently with its own typography, headings, images, and AI polish.
-                          </p>
-                        </div>
-                        <Badge variant="outline" className="text-[10px] font-mono text-primary border-primary/30">
-                          {page.layoutType || "2_COL"} Spacing
-                        </Badge>
+                    {page.layoutType === "MATRIX" ? (
+                      /* Advanced InDesign Matrix Grid Studio */
+                      <div className="pt-2">
+                        <CatalogMatrixStudio
+                          pageTitle={page.title || `Editorial Page ${pIdx + 1}`}
+                          pageType="MAGAZINE"
+                          config={{
+                            matrixRows: page.matrixRows || 2,
+                            matrixCols: page.matrixCols || 2,
+                            rowHeights: page.rowHeights,
+                            colWidths: page.colWidths,
+                            hasHeader: Boolean(page.hasHeader),
+                            headerHtml: page.headerHtml,
+                            hasFooter: Boolean(page.hasFooter),
+                            footerHtml: page.footerHtml,
+                            verticalSpineMode: page.verticalSpineMode || "NONE",
+                            verticalSpineHtml: page.verticalSpineHtml,
+                            verticalSpineWidth: page.verticalSpineWidth,
+                            segments: page.matrixSegments || reconcileMatrixCells(page.matrixRows || 2, page.matrixCols || 2, [], page.contentHtml || ""),
+                          }}
+                          onChange={(upd) => {
+                            const newRows = upd.matrixRows ?? page.matrixRows ?? 2;
+                            const newCols = upd.matrixCols ?? page.matrixCols ?? 2;
+                            let newMatrixSegments = upd.segments ?? page.matrixSegments;
+                            if (newMatrixSegments) {
+                              newMatrixSegments = reconcileMatrixCells(newRows, newCols, newMatrixSegments);
+                            }
+                            updateCustomPage(pIdx, {
+                              ...upd,
+                              matrixRows: newRows,
+                              matrixCols: newCols,
+                              matrixSegments: newMatrixSegments,
+                              segments: newMatrixSegments ? newMatrixSegments.map((ms) => ({
+                                id: ms.id,
+                                title: ms.title,
+                                contentHtml: ms.contentHtml,
+                              })) : page.segments,
+                            });
+                          }}
+                        />
                       </div>
+                    ) : (
+                      /* Multi-Segment Independent Column Studio */
+                      <div className="space-y-3 pt-2">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <label className="text-xs font-serif font-bold text-foreground">
+                              Multi-Segment Column Studio ({page.segments?.length || 1} Columns)
+                            </label>
+                            <p className="text-[11px] text-muted-foreground">
+                              Each column functions independently with its own typography, headings, images, and AI polish.
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="text-[10px] font-mono text-primary border-primary/30">
+                            {page.layoutType || "2_COL"} Spacing
+                          </Badge>
+                        </div>
 
-                      <div
-                        className={`grid gap-4 ${
-                          page.layoutType === "1_COL"
-                            ? "grid-cols-1"
-                            : page.layoutType === "2_COL"
-                            ? "grid-cols-1 md:grid-cols-2"
-                            : page.layoutType === "ASYMMETRIC_70_30"
-                            ? "grid-cols-1 md:grid-cols-12"
-                            : page.layoutType === "ASYMMETRIC_30_70"
-                            ? "grid-cols-1 md:grid-cols-12"
-                            : page.layoutType === "3_COL"
-                            ? "grid-cols-1 md:grid-cols-3"
-                            : page.layoutType === "4_COL"
-                            ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
-                            : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
-                        }`}
-                      >
-                        {page.segments?.map((seg, sIdx) => {
-                          const colSpan =
-                            page.layoutType === "ASYMMETRIC_70_30"
-                              ? sIdx === 0
-                                ? "md:col-span-8"
-                                : "md:col-span-4"
+                        <div
+                          className={`grid gap-4 ${
+                            page.layoutType === "1_COL"
+                              ? "grid-cols-1"
+                              : page.layoutType === "2_COL"
+                              ? "grid-cols-1 md:grid-cols-2"
+                              : page.layoutType === "ASYMMETRIC_70_30"
+                              ? "grid-cols-1 md:grid-cols-12"
                               : page.layoutType === "ASYMMETRIC_30_70"
-                              ? sIdx === 0
-                                ? "md:col-span-4"
-                                : "md:col-span-8"
-                              : "";
+                              ? "grid-cols-1 md:grid-cols-12"
+                              : page.layoutType === "3_COL"
+                              ? "grid-cols-1 md:grid-cols-3"
+                              : page.layoutType === "4_COL"
+                              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
+                              : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
+                          }`}
+                        >
+                          {page.segments?.map((seg, sIdx) => {
+                            const colSpan =
+                              page.layoutType === "ASYMMETRIC_70_30"
+                                ? sIdx === 0
+                                  ? "md:col-span-8"
+                                  : "md:col-span-4"
+                                : page.layoutType === "ASYMMETRIC_30_70"
+                                ? sIdx === 0
+                                  ? "md:col-span-4"
+                                  : "md:col-span-8"
+                                : "";
 
-                          return (
-                            <div
-                              key={seg.id || `seg-${sIdx}`}
-                              className={`space-y-2 p-3 rounded-xl border border-border/80 bg-card/90 flex flex-col justify-between shadow-xs ${colSpan}`}
-                            >
-                              <div className="flex items-center justify-between gap-2 pb-2 border-b border-border/50">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="w-5 h-5 rounded-full bg-primary/10 text-primary border border-primary/30 flex items-center justify-center text-[10px] font-mono font-bold">
-                                    {sIdx + 1}
-                                  </span>
-                                  <span className="text-xs font-serif font-bold text-foreground">
-                                    {seg.title || `Column ${sIdx + 1}`}
-                                  </span>
+                            return (
+                              <div
+                                key={seg.id || `seg-${sIdx}`}
+                                className={`space-y-2 p-3 rounded-xl border border-border/80 bg-card/90 flex flex-col justify-between shadow-xs ${colSpan}`}
+                              >
+                                <div className="flex items-center justify-between gap-2 pb-2 border-b border-border/50">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-5 h-5 rounded-full bg-primary/10 text-primary border border-primary/30 flex items-center justify-center text-[10px] font-mono font-bold">
+                                      {sIdx + 1}
+                                    </span>
+                                    <span className="text-xs font-serif font-bold text-foreground">
+                                      {seg.title || `Column ${sIdx + 1}`}
+                                    </span>
+                                  </div>
+
+                                  <AiAssistantModal
+                                    initialContext={`Article: ${page.title || "Sacred Art Monograph"}\nColumn ${sIdx + 1}:\n${seg.contentHtml || ""}`}
+                                    onApply={(aiText) => {
+                                      const newP = `<p>${aiText.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br/>")}</p>`;
+                                      updateCustomPageSegment(
+                                        pIdx,
+                                        sIdx,
+                                        seg.contentHtml ? `${seg.contentHtml}${newP}` : newP
+                                      );
+                                    }}
+                                    triggerLabel="✨ AI Polish"
+                                  />
                                 </div>
 
-                                <AiAssistantModal
-                                  initialContext={`Article: ${page.title || "Sacred Art Monograph"}\nColumn ${sIdx + 1}:\n${seg.contentHtml || ""}`}
-                                  onApply={(aiText) => {
-                                    const newP = `<p>${aiText.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br/>")}</p>`;
-                                    updateCustomPageSegment(
-                                      pIdx,
-                                      sIdx,
-                                      seg.contentHtml ? `${seg.contentHtml}${newP}` : newP
-                                    );
-                                  }}
-                                  triggerLabel="✨ AI Polish"
-                                />
+                                <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm flex-1">
+                                  <TiptapEditor
+                                    content={seg.contentHtml}
+                                    onChange={(_, html) => updateCustomPageSegment(pIdx, sIdx, html)}
+                                    placeholder={`Compose text, drop caps, or insert photos for Column ${sIdx + 1}...`}
+                                    className="min-h-[200px]"
+                                  />
+                                </div>
                               </div>
-
-                              <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm flex-1">
-                                <TiptapEditor
-                                  content={seg.contentHtml}
-                                  onChange={(_, html) => updateCustomPageSegment(pIdx, sIdx, html)}
-                                  placeholder={`Compose text, drop caps, or insert photos for Column ${sIdx + 1}...`}
-                                  className="min-h-[200px]"
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -1804,6 +2087,97 @@ export default function AdminCatalogStudioPage() {
                     placeholder="e.g. Atelier of Lalita Kapilavai | contact@lalitakapilavai.com | All rights reserved."
                     className="text-xs font-mono"
                   />
+                </div>
+                {/* Advanced Matrix Colophon Layout Engine */}
+                <div className="pt-4 border-t border-border/60 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-primary" /> Advanced Matrix Colophon Layout Engine (Optional)
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        Switch this colophon from a standard single column into an InDesign-grade multi-cell visual matrix layout.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-foreground">Matrix Colophon:</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(endPageConfig.useMatrixLayout)}
+                          onChange={(e) =>
+                            setEndPageConfig((prev) => ({
+                              ...prev,
+                              useMatrixLayout: e.target.checked,
+                              matrixConfig: prev.matrixConfig || {
+                                matrixRows: 2,
+                                matrixCols: 2,
+                                rowHeights: "1fr 1fr",
+                                colWidths: "1fr 1fr",
+                                hasHeader: false,
+                                hasFooter: false,
+                                verticalSpineMode: "NONE",
+                                segments: reconcileMatrixCells(2, 2, []),
+                              },
+                            }))
+                          }
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {endPageConfig.useMatrixLayout && (
+                    <div className="pt-2">
+                      <CatalogMatrixStudio
+                        pageTitle={endPageConfig.title || "Colophon & Atelier Heritage"}
+                        pageType="END_PAGE"
+                        config={
+                          endPageConfig.matrixConfig || {
+                            matrixRows: 2,
+                            matrixCols: 2,
+                            rowHeights: "1fr 1fr",
+                            colWidths: "1fr 1fr",
+                            hasHeader: false,
+                            hasFooter: false,
+                            verticalSpineMode: "NONE",
+                            segments: reconcileMatrixCells(2, 2, []),
+                          }
+                        }
+                        onChange={(upd) =>
+                          setEndPageConfig((prev) => {
+                            const currentMatrix = prev.matrixConfig || {
+                              matrixRows: 2,
+                              matrixCols: 2,
+                              rowHeights: "1fr 1fr",
+                              colWidths: "1fr 1fr",
+                              hasHeader: false,
+                              hasFooter: false,
+                              verticalSpineMode: "NONE",
+                              segments: reconcileMatrixCells(2, 2, []),
+                            };
+                            const newRows = upd.matrixRows ?? currentMatrix.matrixRows;
+                            const newCols = upd.matrixCols ?? currentMatrix.matrixCols;
+                            let newSegments = upd.segments ?? currentMatrix.segments;
+                            if (newSegments) {
+                              newSegments = reconcileMatrixCells(newRows, newCols, newSegments);
+                            }
+                            return {
+                              ...prev,
+                              matrixConfig: {
+                                ...currentMatrix,
+                                ...upd,
+                                matrixRows: newRows,
+                                matrixCols: newCols,
+                                segments: newSegments,
+                              },
+                            };
+                          })
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
               </CardContent>
             )}

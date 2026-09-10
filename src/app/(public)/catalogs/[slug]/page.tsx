@@ -16,6 +16,7 @@ import {
   ExternalLink,
   ShieldCheck,
 } from "lucide-react";
+import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -301,74 +302,119 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {/* PAGE 1: BOOK COVER (Strict Single Page on Print)                   */}
         {/* ------------------------------------------------------------------ */}
-        <section
-          className="catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none"
-          style={coverBgColor ? { backgroundColor: coverBgColor } : undefined}
-        >
-          <CatalogBackgroundLayer
-            bgType={coverBgType}
-            patternId={coverBgPattern}
-            patternOpacity={coverPatternOpacity}
-            bgImage={coverBgImage}
-            overlayOpacity={coverOverlayOpacity}
-            fallbackBgMode={bgMode}
-            fallbackPattern={pattern}
-            fallbackPatternOpacity={patternOpacity}
-            fallbackBgImage={bgImage}
-            fallbackOverlayOpacity={overlayOpacity}
-          />
-          <div className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
-            {/* Header / Subtitle */}
-            <div className="space-y-4 pt-2">
-              <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full">
-                <Sparkles className="w-3.5 h-3.5" />
-                Exhibition Monograph &amp; Archival Collection
-              </div>
-
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-md">
-                {catalog.title}
-              </h1>
-
-              {catalog.subtitle && (
-                <p className="text-sm sm:text-base font-serif italic text-muted-foreground max-w-xl mx-auto">
-                  {catalog.subtitle}
-                </p>
-              )}
-
-              {catalog.forewordBy && (
-                <div className="pt-2 text-xs uppercase tracking-widest text-foreground/80 font-mono">
-                  Curated by <span className="text-primary font-bold">{catalog.forewordBy}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Visual Cover Plate */}
-            {catalog.coverImageUrl && (
-              <div className="plate-image-container py-4 flex-1 flex items-center justify-center">
-                <div className="rounded-xl overflow-hidden border border-primary/30 shadow-2xl max-h-[44vh] print:max-h-[50vh]">
-                  <img
-                    src={catalog.coverImageUrl}
-                    alt={catalog.title}
-                    className="w-full h-auto object-contain max-h-[44vh] print:max-h-[50vh] mx-auto"
+        {coverConfig.useMatrixLayout && coverConfig.matrixConfig ? (
+          (() => {
+            const mc = coverConfig.matrixConfig as Record<string, unknown>;
+            const matrixSegments = Array.isArray(mc.segments)
+              ? (mc.segments as unknown as { id: string; row: number; col: number; rowSpan?: number; colSpan?: number; title?: string; contentHtml: string }[])
+              : [];
+            return (
+              <CatalogMatrixPage
+                pageNumber="1"
+                pageTitle={catalog.title}
+                pageSubtitle={catalog.subtitle}
+                matrixRows={(mc.matrixRows as number) || 2}
+                matrixCols={(mc.matrixCols as number) || 2}
+                rowHeights={mc.rowHeights as string | undefined}
+                colWidths={mc.colWidths as string | undefined}
+                hasHeader={Boolean(mc.hasHeader)}
+                headerHtml={mc.headerHtml as string | undefined}
+                hasFooter={Boolean(mc.hasFooter)}
+                footerHtml={mc.footerHtml as string | undefined}
+                verticalSpineMode={(mc.verticalSpineMode as string) || "NONE"}
+                verticalSpineHtml={mc.verticalSpineHtml as string | undefined}
+                verticalSpineWidth={mc.verticalSpineWidth as string | undefined}
+                segments={matrixSegments}
+                frameClass={coverFrameClass}
+                backgroundColor={coverBgColor}
+                backgroundLayer={
+                  <CatalogBackgroundLayer
+                    bgType={coverBgType}
+                    patternId={coverBgPattern}
+                    patternOpacity={coverPatternOpacity}
+                    bgImage={coverBgImage}
+                    overlayOpacity={coverOverlayOpacity}
+                    fallbackBgMode={bgMode}
+                    fallbackPattern={pattern}
+                    fallbackPatternOpacity={patternOpacity}
+                    fallbackBgImage={bgImage}
+                    fallbackOverlayOpacity={overlayOpacity}
                   />
+                }
+                catalogTitle={catalog.title}
+              />
+            );
+          })()
+        ) : (
+          <section
+            className="catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none"
+            style={coverBgColor ? { backgroundColor: coverBgColor } : undefined}
+          >
+            <CatalogBackgroundLayer
+              bgType={coverBgType}
+              patternId={coverBgPattern}
+              patternOpacity={coverPatternOpacity}
+              bgImage={coverBgImage}
+              overlayOpacity={coverOverlayOpacity}
+              fallbackBgMode={bgMode}
+              fallbackPattern={pattern}
+              fallbackPatternOpacity={patternOpacity}
+              fallbackBgImage={bgImage}
+              fallbackOverlayOpacity={overlayOpacity}
+            />
+            <div className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+              {/* Header / Subtitle */}
+              <div className="space-y-4 pt-2">
+                <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Exhibition Monograph &amp; Archival Collection
                 </div>
-              </div>
-            )}
 
-            {/* Footer Notice */}
-            <div className="pt-4 border-t border-primary/20 space-y-1">
-              {catalog.event && (
-                <div className="inline-flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                  <Calendar className="w-3 h-3 text-primary" />
-                  <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-md">
+                  {catalog.title}
+                </h1>
+
+                {catalog.subtitle && (
+                  <p className="text-sm sm:text-base font-serif italic text-muted-foreground max-w-xl mx-auto">
+                    {catalog.subtitle}
+                  </p>
+                )}
+
+                {catalog.forewordBy && (
+                  <div className="pt-2 text-xs uppercase tracking-widest text-foreground/80 font-mono">
+                    Curated by <span className="text-primary font-bold">{catalog.forewordBy}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Visual Cover Plate */}
+              {catalog.coverImageUrl && (
+                <div className="plate-image-container py-4 flex-1 flex items-center justify-center">
+                  <div className="rounded-xl overflow-hidden border border-primary/30 shadow-2xl max-h-[44vh] print:max-h-[50vh]">
+                    <img
+                      src={catalog.coverImageUrl}
+                      alt={catalog.title}
+                      className="w-full h-auto object-contain max-h-[44vh] print:max-h-[50vh] mx-auto"
+                    />
+                  </div>
                 </div>
               )}
-              <p className="text-[11px] font-mono text-muted-foreground/70">
-                Published by the Atelier of Lalita Kapilavai • Sacred Art &amp; Heritage
-              </p>
+
+              {/* Footer Notice */}
+              <div className="pt-4 border-t border-primary/20 space-y-1">
+                {catalog.event && (
+                  <div className="inline-flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                    <Calendar className="w-3 h-3 text-primary" />
+                    <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
+                  </div>
+                )}
+                <p className="text-[11px] font-mono text-muted-foreground/70">
+                  Published by the Atelier of Lalita Kapilavai • Sacred Art &amp; Heritage
+                </p>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* ------------------------------------------------------------------ */}
         {/* PAGE 2: CURATORIAL ESSAY (If Present, Strict Single Page on Print) */}
@@ -415,6 +461,55 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {catalog.customPages && catalog.customPages.map((page, pIdx) => {
           const pageFrameClass = getFrameClass(page.frameStyle || frameStyle);
+
+          const bgLayerNode = (
+            <CatalogBackgroundLayer
+              bgType={page.backgroundType || undefined}
+              patternId={page.backgroundPattern || undefined}
+              patternOpacity={page.patternOpacity ?? undefined}
+              bgImage={page.backgroundImage || undefined}
+              overlayOpacity={page.overlayOpacity ?? undefined}
+              fallbackBgMode={bgMode}
+              fallbackPattern={pattern}
+              fallbackPatternOpacity={patternOpacity}
+              fallbackBgImage={bgImage}
+              fallbackOverlayOpacity={overlayOpacity}
+            />
+          );
+
+          // InDesign Matrix Grid Engine Page
+          if (page.layoutType === "MATRIX") {
+            const matrixSegments = Array.isArray(page.segments)
+              ? (page.segments as unknown as { id: string; row: number; col: number; rowSpan?: number; colSpan?: number; title?: string; contentHtml: string }[])
+              : [];
+
+            return (
+              <CatalogMatrixPage
+                key={page.id}
+                pageNumber={page.pageNumber || pIdx + 1}
+                pageTitle={page.title}
+                pageSubtitle={page.subtitle}
+                matrixRows={page.matrixRows || 2}
+                matrixCols={page.matrixCols || 2}
+                rowHeights={page.rowHeights}
+                colWidths={page.colWidths}
+                hasHeader={page.hasHeader}
+                headerHtml={page.headerHtml}
+                hasFooter={page.hasFooter}
+                footerHtml={page.footerHtml}
+                verticalSpineMode={page.verticalSpineMode || "NONE"}
+                verticalSpineHtml={page.verticalSpineHtml}
+                verticalSpineWidth={page.verticalSpineWidth}
+                segments={matrixSegments}
+                frameClass={pageFrameClass}
+                backgroundColor={page.backgroundColor}
+                backgroundLayer={bgLayerNode}
+                catalogTitle={catalog.title}
+                fallbackContentHtml={page.contentHtml}
+              />
+            );
+          }
+
           const gridClass = getMagazineGridClass(page.layoutType, page.pageLayout);
           const segments = Array.isArray(page.segments)
             ? (page.segments as unknown as { id: string; colSpan: number; contentHtml: string }[])
@@ -426,18 +521,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               className="catalog-page catalog-magazine-page editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
               style={page.backgroundColor ? { backgroundColor: page.backgroundColor } : undefined}
             >
-              <CatalogBackgroundLayer
-                bgType={page.backgroundType || undefined}
-                patternId={page.backgroundPattern || undefined}
-                patternOpacity={page.patternOpacity ?? undefined}
-                bgImage={page.backgroundImage || undefined}
-                overlayOpacity={page.overlayOpacity ?? undefined}
-                fallbackBgMode={bgMode}
-                fallbackPattern={pattern}
-                fallbackPatternOpacity={patternOpacity}
-                fallbackBgImage={bgImage}
-                fallbackOverlayOpacity={overlayOpacity}
-              />
+              {bgLayerNode}
               <div className={`catalog-frame relative z-10 ${pageFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
                 {/* Editorial Page Header */}
                 {(page.title || page.subtitle) && (
@@ -706,53 +790,99 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* FINAL PAGE: COLOPHON & ATELIER HERITAGE (When Enabled)             */}
         {/* ------------------------------------------------------------------ */}
         {endPageConfig.isEnabled !== false && (
-          <section
-            className="catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
-            style={endBgColor ? { backgroundColor: endBgColor } : undefined}
-          >
-            <CatalogBackgroundLayer
-              bgType={endBgType}
-              patternId={endBgPattern}
-              patternOpacity={endPatternOpacity}
-              bgImage={endBgImage}
-              overlayOpacity={endOverlayOpacity}
-              fallbackBgMode={bgMode}
-              fallbackPattern={pattern}
-              fallbackPatternOpacity={patternOpacity}
-              fallbackBgImage={bgImage}
-              fallbackOverlayOpacity={overlayOpacity}
-            />
-            <div className={`catalog-frame relative z-10 ${endFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
-              <div className="space-y-3 pt-4">
-                <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
-                  Colophon &amp; Publication Details
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-serif font-bold">
-                  {(endPageConfig.title as string) || "Colophon & Atelier Heritage"}
-                </h2>
-              </div>
+          endPageConfig.useMatrixLayout && endPageConfig.matrixConfig ? (
+            (() => {
+              const mc = endPageConfig.matrixConfig as Record<string, unknown>;
+              const matrixSegments = Array.isArray(mc.segments)
+                ? (mc.segments as unknown as { id: string; row: number; col: number; rowSpan?: number; colSpan?: number; title?: string; contentHtml: string }[])
+                : [];
+              return (
+                <CatalogMatrixPage
+                  pageNumber="End"
+                  pageTitle={(endPageConfig.title as string) || "Colophon & Atelier Heritage"}
+                  pageSubtitle="Publication Details & Atelier Lineage"
+                  matrixRows={(mc.matrixRows as number) || 2}
+                  matrixCols={(mc.matrixCols as number) || 2}
+                  rowHeights={mc.rowHeights as string | undefined}
+                  colWidths={mc.colWidths as string | undefined}
+                  hasHeader={Boolean(mc.hasHeader)}
+                  headerHtml={mc.headerHtml as string | undefined}
+                  hasFooter={Boolean(mc.hasFooter)}
+                  footerHtml={mc.footerHtml as string | undefined}
+                  verticalSpineMode={(mc.verticalSpineMode as string) || "NONE"}
+                  verticalSpineHtml={mc.verticalSpineHtml as string | undefined}
+                  verticalSpineWidth={mc.verticalSpineWidth as string | undefined}
+                  segments={matrixSegments}
+                  frameClass={endFrameClass}
+                  backgroundColor={endBgColor}
+                  backgroundLayer={
+                    <CatalogBackgroundLayer
+                      bgType={endBgType}
+                      patternId={endBgPattern}
+                      patternOpacity={endPatternOpacity}
+                      bgImage={endBgImage}
+                      overlayOpacity={endOverlayOpacity}
+                      fallbackBgMode={bgMode}
+                      fallbackPattern={pattern}
+                      fallbackPatternOpacity={patternOpacity}
+                      fallbackBgImage={bgImage}
+                      fallbackOverlayOpacity={overlayOpacity}
+                    />
+                  }
+                  catalogTitle={catalog.title}
+                  fallbackContentHtml={endPageConfig.contentHtml as string}
+                />
+              );
+            })()
+          ) : (
+            <section
+              className="catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
+              style={endBgColor ? { backgroundColor: endBgColor } : undefined}
+            >
+              <CatalogBackgroundLayer
+                bgType={endBgType}
+                patternId={endBgPattern}
+                patternOpacity={endPatternOpacity}
+                bgImage={endBgImage}
+                overlayOpacity={endOverlayOpacity}
+                fallbackBgMode={bgMode}
+                fallbackPattern={pattern}
+                fallbackPatternOpacity={patternOpacity}
+                fallbackBgImage={bgImage}
+                fallbackOverlayOpacity={overlayOpacity}
+              />
+              <div className={`catalog-frame relative z-10 ${endFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
+                <div className="space-y-3 pt-4">
+                  <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+                    Colophon &amp; Publication Details
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-serif font-bold">
+                    {(endPageConfig.title as string) || "Colophon & Atelier Heritage"}
+                  </h2>
+                </div>
 
-              <div className="prose prose-sm dark:prose-invert font-serif leading-relaxed text-foreground/85 max-w-xl mx-auto flex-1 flex flex-col justify-center">
-                {endPageConfig.contentHtml ? (
-                  <TiptapRenderer content={endPageConfig.contentHtml as string} />
-                ) : (
+                <div className="prose prose-sm dark:prose-invert font-serif leading-relaxed text-foreground/85 max-w-xl mx-auto flex-1 flex flex-col justify-center">
+                  {endPageConfig.contentHtml ? (
+                    <TiptapRenderer content={endPageConfig.contentHtml as string} />
+                  ) : (
+                    <p>
+                      Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic 22k gold foil Thanjavur art and classical Carnatic musicianship.
+                    </p>
+                  )}
+                </div>
+
+                <div className="pt-6 border-t border-primary/20 space-y-2 text-xs text-muted-foreground font-mono">
                   <p>
-                    Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic 22k gold foil Thanjavur art and classical Carnatic musicianship.
+                    {(endPageConfig.contactDetails as string) ||
+                      "Atelier of Lalita Kapilavai • contact@lalitakapilavai.com • All rights reserved."}
                   </p>
-                )}
+                  <p className="text-[10px] text-muted-foreground/60">
+                    Reproduction of sacred iconography and Tanjore masterworks strictly prohibited without written consent.
+                  </p>
+                </div>
               </div>
-
-              <div className="pt-6 border-t border-primary/20 space-y-2 text-xs text-muted-foreground font-mono">
-                <p>
-                  {(endPageConfig.contactDetails as string) ||
-                    "Atelier of Lalita Kapilavai • contact@lalitakapilavai.com • All rights reserved."}
-                </p>
-                <p className="text-[10px] text-muted-foreground/60">
-                  Reproduction of sacred iconography and Tanjore masterworks strictly prohibited without written consent.
-                </p>
-              </div>
-            </div>
-          </section>
+            </section>
+          )
         )}
       </main>
 

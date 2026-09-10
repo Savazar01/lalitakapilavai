@@ -592,6 +592,19 @@ model ECatalogCustomPage {
   sections          Json?     // Optional structured blocks
   segments          Json?     // Array of segment objects: [{ id, title, contentHtml, image, caption, widthRatio }]
 
+  // Matrix & Layout Definition
+  matrixRows        Int       @default(2)
+  matrixCols        Int       @default(2)
+  rowHeights        String?   @default("1fr 1fr")
+  colWidths         String?   @default("1fr 1fr")
+  hasHeader         Boolean   @default(false)
+  headerHtml        String?   @db.Text
+  hasFooter         Boolean   @default(false)
+  footerHtml        String?   @db.Text
+  verticalSpineMode String    @default("NONE") // "NONE" | "LEFT" | "RIGHT"
+  verticalSpineHtml String?   @db.Text
+  verticalSpineWidth String?  @default("25%")
+
   // Background Styling Suite
   backgroundType    String    @default("COLOR") // "COLOR" | "PATTERN" | "IMAGE"
   backgroundColor   String?   @default("#FAF7F2")
@@ -605,6 +618,36 @@ model ECatalogCustomPage {
   updatedAt         DateTime  @updatedAt
 
   @@map("e_catalog_custom_pages")
+}
+
+model ECatalogTemplate {
+  id                 String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title              String
+  description        String?
+  targetPageType     String    @default("MAGAZINE") // "COVER" | "MAGAZINE" | "END_PAGE"
+  matrixRows         Int       @default(2)
+  matrixCols         Int       @default(2)
+  rowHeights         String?   @default("1fr 1fr")
+  colWidths          String?   @default("1fr 1fr")
+  hasHeader          Boolean   @default(false)
+  headerHtml         String?   @db.Text
+  hasFooter          Boolean   @default(false)
+  footerHtml         String?   @db.Text
+  verticalSpineMode  String    @default("NONE") // "NONE" | "LEFT" | "RIGHT"
+  verticalSpineHtml  String?   @db.Text
+  verticalSpineWidth String?   @default("25%")
+  segments           Json?     // Skeleton matrix segments [{ row, col, rowSpan, colSpan, title, contentHtml }]
+  frameStyle         String?   @default("gold-fillet")
+  backgroundType     String?   @default("COLOR")
+  backgroundColor    String?   @default("#FAF7F2")
+  backgroundPattern  String?
+  patternOpacity     Float?    @default(0.15)
+  backgroundImage    String?
+  overlayOpacity     Float?    @default(0.2)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@map("e_catalog_templates")
 }
 
 model ECatalogItem {

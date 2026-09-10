@@ -352,4 +352,59 @@ body {
     column-count: 2 !important;
     column-gap: 8mm !important;
   }
+
+  .catalog-matrix-page-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    break-after: page !important;
+    page-break-after: always !important;
+    break-inside: avoid !important;
+    box-sizing: border-box !important;
+    padding: 8mm !important;
+  }
+
+  .catalog-matrix-body {
+    display: flex !important;
+    height: 100% !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+    gap: 4mm !important;
+  }
+
+  .catalog-matrix-grid {
+    display: grid !important;
+    height: 100% !important;
+    flex: 1 1 auto !important;
+    gap: 3.5mm !important;
+    overflow: hidden !important;
+  }
+
+  .catalog-matrix-cell {
+    overflow: hidden !important;
+    break-inside: avoid !important;
+    font-size: 9.5pt !important;
+    line-height: 1.45 !important;
+  }
+
+  .catalog-matrix-spine {
+    overflow: hidden !important;
+    break-inside: avoid !important;
+    font-size: 9pt !important;
+    padding-right: 3mm !important;
+  }
+
+  .catalog-running-header {
+    flex-shrink: 0 !important;
+    margin-bottom: 3mm !important;
+    padding-bottom: 2mm !important;
+  }
+
+  .catalog-running-footer {
+    flex-shrink: 0 !important;
+    margin-top: auto !important;
+    padding-top: 2mm !important;
+  }
 }

@@ -164,6 +164,17 @@ export async function PUT(
               contentHtml?: string;
               sections?: unknown;
               segments?: unknown;
+              matrixRows?: number;
+              matrixCols?: number;
+              rowHeights?: string;
+              colWidths?: string;
+              hasHeader?: boolean;
+              headerHtml?: string;
+              hasFooter?: boolean;
+              footerHtml?: string;
+              verticalSpineMode?: string;
+              verticalSpineHtml?: string;
+              verticalSpineWidth?: string;
               backgroundType?: string;
               backgroundColor?: string;
               backgroundPattern?: string;
@@ -191,6 +202,17 @@ export async function PUT(
                 contentHtml,
                 sections: page.sections !== undefined ? (page.sections as unknown as Prisma.InputJsonValue) : undefined,
                 segments: page.segments !== undefined ? (page.segments as unknown as Prisma.InputJsonValue) : undefined,
+                matrixRows: typeof page.matrixRows === "number" ? Math.min(6, Math.max(1, page.matrixRows)) : 2,
+                matrixCols: typeof page.matrixCols === "number" ? Math.min(6, Math.max(1, page.matrixCols)) : 2,
+                rowHeights: page.rowHeights ? String(page.rowHeights) : "1fr 1fr",
+                colWidths: page.colWidths ? String(page.colWidths) : "1fr 1fr",
+                hasHeader: Boolean(page.hasHeader),
+                headerHtml: page.headerHtml ? String(page.headerHtml) : null,
+                hasFooter: Boolean(page.hasFooter),
+                footerHtml: page.footerHtml ? String(page.footerHtml) : null,
+                verticalSpineMode: ["NONE", "LEFT", "RIGHT"].includes(page.verticalSpineMode || "") ? (page.verticalSpineMode as string) : "NONE",
+                verticalSpineHtml: page.verticalSpineHtml ? String(page.verticalSpineHtml) : null,
+                verticalSpineWidth: page.verticalSpineWidth ? String(page.verticalSpineWidth) : "25%",
                 backgroundType: page.backgroundType || "COLOR",
                 backgroundColor: page.backgroundColor || "#FAF7F2",
                 backgroundPattern: page.backgroundPattern || null,
