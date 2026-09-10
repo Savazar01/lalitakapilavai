@@ -253,6 +253,11 @@ model ArtCategory {
   imagePosition  String?   @default("center") // "center" | "top" | "bottom"
   borderStyle    String?   @default("gold-fillet") // "none" | "gold-fillet" | "subtle"
 
+  // Self-referencing Parent-Child relationship
+  parentId       String?       @db.Uuid
+  parent         ArtCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children       ArtCategory[] @relation("CategoryHierarchy")
+
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -560,6 +565,9 @@ model ECatalog {
   // Stored as JSON array: [{ id: string, title: string, contentHtml: string, orderIndex: number }]
   introSections      Json?
 
+  // Custom Editorial & Magazine Pages
+  customPages        ECatalogCustomPage[]
+
   // Curated Artworks Selection
   items              ECatalogItem[]
 
@@ -569,6 +577,25 @@ model ECatalog {
   updatedAt          DateTime       @updatedAt
 
   @@map("e_catalogs")
+}
+
+model ECatalogCustomPage {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  catalogId       String    @db.Uuid
+  catalog         ECatalog  @relation(fields: [catalogId], references: [id], onDelete: Cascade)
+  pageNumber      Int       @default(1)
+  title           String?   // e.g. "Sacred Iconography & Nayaka Influence"
+  subtitle        String?   // e.g. "Scholarly commentary and dynastic patronage"
+  pageLayout      String    @default("SINGLE_COLUMN") // "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE"
+  contentHtml     String?   @db.Text
+  sections        Json?     // Optional structured blocks
+  backgroundImage String?
+  backgroundColor String?
+  frameStyle      String?   @default("gold-fillet")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("e_catalog_custom_pages")
 }
 
 model ECatalogItem {

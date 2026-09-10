@@ -285,4 +285,20 @@ body {
     object-fit: contain !important;
     margin: 0 auto !important;
   }
+
+  /* Multi-Page Magazine Editorial Page Print Rules */
+  .editorial-page {
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  .editorial-columns-2 {
+    column-count: 2 !important;
+    column-gap: 8mm !important;
+  }
 }

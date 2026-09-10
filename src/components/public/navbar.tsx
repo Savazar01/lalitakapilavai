@@ -7,6 +7,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
@@ -15,7 +18,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ChevronDown, Menu as MenuIcon, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu as MenuIcon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export async function Navbar() {
@@ -49,6 +52,12 @@ export async function Navbar() {
         children: {
           where: { isActive: true },
           orderBy: { orderIndex: "asc" },
+          include: {
+            children: {
+              where: { isActive: true },
+              orderBy: { orderIndex: "asc" },
+            },
+          },
         },
       },
     }),
@@ -122,22 +131,60 @@ export async function Navbar() {
                   align="start"
                   className="w-56 p-1.5 bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-lg"
                 >
-                  {item.children.map((sub) => (
-                    <DropdownMenuItem key={sub.id} asChild>
-                      <Link
-                        href={sub.path}
-                        target={sub.openInNewTab ? "_blank" : undefined}
-                        className="flex flex-col items-start px-3 py-2 rounded text-xs font-serif text-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
-                      >
-                        <span className="font-semibold">{sub.label}</span>
-                        {sub.children && sub.children.length > 0 && (
-                          <span className="text-[10px] text-muted-foreground mt-0.5">
-                            {sub.children.map((c) => c.label).join(", ")}
-                          </span>
-                        )}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
+                  {item.children.map((sub) => {
+                    const hasTier3 = sub.children && sub.children.length > 0;
+
+                    if (!hasTier3) {
+                      return (
+                        <DropdownMenuItem key={sub.id} asChild>
+                          <Link
+                            href={sub.path}
+                            target={sub.openInNewTab ? "_blank" : undefined}
+                            className="flex items-center justify-between px-3 py-2 rounded text-xs font-serif text-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer w-full"
+                          >
+                            <span className="font-semibold">{sub.label}</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    }
+
+                    return (
+                      <DropdownMenuSub key={sub.id}>
+                        <DropdownMenuSubTrigger className="flex items-center justify-between px-3 py-2 rounded text-xs font-serif text-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer data-[state=open]:bg-primary/10 data-[state=open]:text-primary">
+                          <Link
+                            href={sub.path}
+                            target={sub.openInNewTab ? "_blank" : undefined}
+                            className="font-semibold flex-1 text-left"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {sub.label}
+                          </Link>
+                          <ChevronRight className="w-3.5 h-3.5 text-primary/70 ml-2 shrink-0" />
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent className="min-w-[200px] p-1.5 bg-card/95 backdrop-blur-md border border-primary/30 shadow-2xl rounded-lg">
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href={sub.path}
+                              className="px-3 py-1.5 text-[11px] font-mono font-bold uppercase text-primary tracking-wider hover:bg-primary/10 rounded cursor-pointer block border-b border-border/40 mb-1"
+                            >
+                              All {sub.label}
+                            </Link>
+                          </DropdownMenuItem>
+                          {sub.children.map((tier3) => (
+                            <DropdownMenuItem key={tier3.id} asChild>
+                              <Link
+                                href={tier3.path}
+                                target={tier3.openInNewTab ? "_blank" : undefined}
+                                className="px-3 py-2 rounded text-xs font-serif text-foreground/90 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer block"
+                              >
+                                {tier3.label}
+                              </Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    );
+                  })}
                 </DropdownMenuContent>
               </DropdownMenu>
             );
@@ -197,13 +244,29 @@ export async function Navbar() {
                     {item.children && item.children.length > 0 && (
                       <div className="pl-4 space-y-1 border-l-2 border-primary/30 ml-3">
                         {item.children.map((child) => (
-                          <Link
-                            key={child.id}
-                            href={child.path}
-                            className="block px-3 py-1.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-accent/40"
-                          >
-                            {child.label}
-                          </Link>
+                          <div key={child.id} className="space-y-1">
+                            <Link
+                              href={child.path}
+                              className="block px-3 py-1.5 rounded text-xs font-semibold text-foreground/90 hover:text-primary hover:bg-accent/40"
+                            >
+                              {child.label}
+                            </Link>
+
+                            {/* Tier 3 nested children in drawer */}
+                            {child.children && child.children.length > 0 && (
+                              <div className="pl-3 space-y-1 border-l border-border/80 ml-2">
+                                {child.children.map((tier3) => (
+                                  <Link
+                                    key={tier3.id}
+                                    href={tier3.path}
+                                    className="block px-2.5 py-1 rounded text-[11px] text-muted-foreground hover:text-primary hover:bg-accent/30"
+                                  >
+                                    {tier3.label}
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}

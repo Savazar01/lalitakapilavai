@@ -115,6 +115,18 @@ interface ECatalogEndPageConfig {
   contactDetails?: string;
 }
 
+interface ECatalogCustomPageItem {
+  id?: string;
+  pageNumber: number;
+  title: string;
+  subtitle: string;
+  pageLayout: "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE";
+  contentHtml: string;
+  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+  backgroundImage?: string;
+  backgroundColor?: string;
+}
+
 interface ECatalogDetail {
   id: string;
   title: string;
@@ -137,6 +149,7 @@ interface ECatalogDetail {
     id: string;
     title: string;
   } | null;
+  customPages?: ECatalogCustomPageItem[];
   items: CatalogPlate[];
 }
 
@@ -208,6 +221,9 @@ export default function AdminCatalogStudioPage() {
   const [artworkPickerOpen, setArtworkPickerOpen] = React.useState(false);
   const [artworkSearch, setArtworkSearch] = React.useState("");
 
+  // Custom Magazine & Editorial Pages state
+  const [customPages, setCustomPages] = React.useState<ECatalogCustomPageItem[]>([]);
+
   React.useEffect(() => {
     let ignore = false;
     async function init() {
@@ -255,6 +271,29 @@ export default function AdminCatalogStudioPage() {
           setDownloadablePdfUrl(catData.downloadablePdfUrl || "");
           setEventId(catData.eventId || "none");
           setPlates(catData.items || []);
+          setCustomPages(
+            (catData.customPages || []).map((cp: {
+              id?: string;
+              pageNumber: number;
+              title?: string;
+              subtitle?: string;
+              pageLayout?: "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE";
+              contentHtml?: string;
+              frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+              backgroundImage?: string;
+              backgroundColor?: string;
+            }) => ({
+              id: cp.id,
+              pageNumber: cp.pageNumber,
+              title: cp.title || "",
+              subtitle: cp.subtitle || "",
+              pageLayout: cp.pageLayout || "SINGLE_COLUMN",
+              contentHtml: cp.contentHtml || "",
+              frameStyle: cp.frameStyle || "gold-fillet",
+              backgroundImage: cp.backgroundImage || "",
+              backgroundColor: cp.backgroundColor || "",
+            }))
+          );
         }
 
         if (!ignore && artRes.ok) {
@@ -308,6 +347,16 @@ export default function AdminCatalogStudioPage() {
         isPublished,
         downloadablePdfUrl: downloadablePdfUrl.trim() || null,
         eventId: eventId === "none" ? null : eventId,
+        customPages: customPages.map((cp, idx) => ({
+          pageNumber: idx + 1,
+          title: cp.title.trim() || null,
+          subtitle: cp.subtitle.trim() || null,
+          pageLayout: cp.pageLayout,
+          contentHtml: cp.contentHtml || null,
+          frameStyle: cp.frameStyle || "gold-fillet",
+          backgroundImage: cp.backgroundImage || null,
+          backgroundColor: cp.backgroundColor || null,
+        })),
         items: plates.map((p, idx) => ({
           artworkId: p.artworkId,
           pageNumber: idx + 1,
@@ -334,6 +383,31 @@ export default function AdminCatalogStudioPage() {
       toast.success("Catalog updated successfully!");
       setCatalog(data);
       setPlates(data.items || []);
+      if (data.customPages) {
+        setCustomPages(
+          data.customPages.map((cp: {
+            id?: string;
+            pageNumber: number;
+            title?: string;
+            subtitle?: string;
+            pageLayout?: "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE";
+            contentHtml?: string;
+            frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+            backgroundImage?: string;
+            backgroundColor?: string;
+          }) => ({
+            id: cp.id,
+            pageNumber: cp.pageNumber,
+            title: cp.title || "",
+            subtitle: cp.subtitle || "",
+            pageLayout: cp.pageLayout || "SINGLE_COLUMN",
+            contentHtml: cp.contentHtml || "",
+            frameStyle: cp.frameStyle || "gold-fillet",
+            backgroundImage: cp.backgroundImage || "",
+            backgroundColor: cp.backgroundColor || "",
+          }))
+        );
+      }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Error saving catalog");
     } finally {
@@ -354,6 +428,51 @@ export default function AdminCatalogStudioPage() {
     // re-assign page numbers
     const updated = newPlates.map((p, i) => ({ ...p, pageNumber: i + 1 }));
     setPlates(updated);
+  };
+
+  // Custom Editorial Pages Handlers
+  const addCustomPage = () => {
+    const newPage: ECatalogCustomPageItem = {
+      pageNumber: customPages.length + 1,
+      title: "Historical Context & Iconography",
+      subtitle: "Scholarly commentary and cultural heritage",
+      pageLayout: "SINGLE_COLUMN",
+      contentHtml: "<p>Compose fine art scholarly essay, Nayaka patronage lineage, or iconographical symbolism...</p>",
+      frameStyle: "gold-fillet",
+      backgroundImage: "",
+      backgroundColor: "",
+    };
+    setCustomPages((prev) => [...prev, newPage]);
+    toast.success("Added new editorial magazine page");
+  };
+
+  const removeCustomPage = (index: number) => {
+    const updated = customPages
+      .filter((_, i) => i !== index)
+      .map((p, i) => ({ ...p, pageNumber: i + 1 }));
+    setCustomPages(updated);
+    toast.info("Removed editorial page");
+  };
+
+  const moveCustomPage = (index: number, direction: "up" | "down") => {
+    const targetIdx = direction === "up" ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= customPages.length) return;
+
+    const copy = [...customPages];
+    const temp = copy[index];
+    copy[index] = copy[targetIdx];
+    copy[targetIdx] = temp;
+
+    const updated = copy.map((p, i) => ({ ...p, pageNumber: i + 1 }));
+    setCustomPages(updated);
+  };
+
+  const updateCustomPage = (index: number, fields: Partial<ECatalogCustomPageItem>) => {
+    setCustomPages((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], ...fields };
+      return copy;
+    });
   };
 
   const removePlate = (index: number) => {
@@ -472,14 +591,17 @@ export default function AdminCatalogStudioPage() {
           <TabsTrigger value="editorial" className="text-xs flex items-center gap-1.5">
             <FileText className="w-3.5 h-3.5" /> 2. Curatorial Essay
           </TabsTrigger>
+          <TabsTrigger value="custom-pages" className="text-xs flex items-center gap-1.5">
+            <BookOpen className="w-3.5 h-3.5 text-primary" /> 3. Magazine Pages ({customPages.length})
+          </TabsTrigger>
           <TabsTrigger value="plates" className="text-xs flex items-center gap-1.5">
-            <Palette className="w-3.5 h-3.5" /> 3. Artwork Plates ({plates.length})
+            <Palette className="w-3.5 h-3.5" /> 4. Artwork Plates ({plates.length})
           </TabsTrigger>
           <TabsTrigger value="colophon" className="text-xs flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" /> 4. Colophon &amp; End Page
+            <Sparkles className="w-3.5 h-3.5" /> 5. Colophon &amp; End Page
           </TabsTrigger>
           <TabsTrigger value="pdf" className="text-xs flex items-center gap-1.5">
-            <FileDown className="w-3.5 h-3.5" /> 5. Publication &amp; Export
+            <FileDown className="w-3.5 h-3.5" /> 6. Publication &amp; Export
           </TabsTrigger>
         </TabsList>
 
@@ -950,7 +1072,204 @@ export default function AdminCatalogStudioPage() {
           </Card>
         </TabsContent>
 
-        {/* Tab 3: Artwork Plates */}
+        {/* Tab 3: Magazine & Editorial Pages */}
+        <TabsContent value="custom-pages" className="space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-primary/20 bg-primary/5">
+            <div>
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-serif font-bold text-foreground">
+                  Arbitrary Publication &amp; Magazine Pages ({customPages.length})
+                </h3>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Add multi-column feature articles, historical essays, patron biographies, and sacred iconography monographs.
+              </p>
+            </div>
+
+            <Button
+              onClick={addCustomPage}
+              size="sm"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold gap-1.5 cursor-pointer shadow-sm"
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Editorial Page
+            </Button>
+          </div>
+
+          {customPages.length === 0 ? (
+            <Card className="border-dashed p-10 text-center">
+              <BookOpen className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm font-semibold text-foreground">No Magazine Articles Added Yet</p>
+              <p className="text-xs text-muted-foreground mt-1 mb-4">
+                You can add rich magazine pages between the Curatorial Foreword and the Artwork Plates.
+              </p>
+              <Button onClick={addCustomPage} size="sm" variant="outline">
+                <Plus className="w-3.5 h-3.5 mr-1" /> Add First Editorial Page
+              </Button>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {customPages.map((page, pIdx) => (
+                <Card key={page.id || `custom-page-${pIdx}`} className="border border-border/80 bg-card overflow-hidden">
+                  <CardHeader className="bg-muted/20 border-b border-border/60 pb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-md bg-primary/10 border border-primary/30 flex items-center justify-center font-mono font-bold text-xs text-primary">
+                          {pIdx + 1}
+                        </div>
+                        <div>
+                          <CardTitle className="font-serif text-base font-bold">
+                            {page.title || `Editorial Page ${pIdx + 1}`}
+                          </CardTitle>
+                          {page.subtitle && (
+                            <p className="text-xs text-muted-foreground font-serif italic">{page.subtitle}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 self-end sm:self-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={pIdx === 0}
+                          onClick={() => moveCustomPage(pIdx, "up")}
+                          className="h-8 w-8 p-0"
+                          title="Move Page Up"
+                        >
+                          <MoveUp className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={pIdx === customPages.length - 1}
+                          onClick={() => moveCustomPage(pIdx, "down")}
+                          className="h-8 w-8 p-0"
+                          title="Move Page Down"
+                        >
+                          <MoveDown className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeCustomPage(pIdx)}
+                          className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
+                          title="Delete Page"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-4 pt-4">
+                    {/* Header Details */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="space-y-1.5 sm:col-span-1">
+                        <label className="text-xs font-semibold text-foreground">Page Title</label>
+                        <Input
+                          value={page.title}
+                          onChange={(e) => updateCustomPage(pIdx, { title: e.target.value })}
+                          placeholder="e.g. Sacred Iconography & Nayaka Influence"
+                          className="text-xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5 sm:col-span-1">
+                        <label className="text-xs font-semibold text-foreground">Subtitle / Running Tagline</label>
+                        <Input
+                          value={page.subtitle}
+                          onChange={(e) => updateCustomPage(pIdx, { subtitle: e.target.value })}
+                          placeholder="e.g. Dynastic Patronage and Ritual Lineage"
+                          className="text-xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5 sm:col-span-1">
+                        <label className="text-xs font-semibold text-foreground">Magazine Page Layout</label>
+                        <Select
+                          value={page.pageLayout}
+                          onValueChange={(val: "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE") =>
+                            updateCustomPage(pIdx, { pageLayout: val })
+                          }
+                        >
+                          <SelectTrigger className="text-xs">
+                            <SelectValue placeholder="Layout Mode" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="SINGLE_COLUMN">Single Column (Scholarly)</SelectItem>
+                            <SelectItem value="TWO_COLUMN">2-Column Fine Art Magazine</SelectItem>
+                            <SelectItem value="HERITAGE_MAGAZINE">Feature Article (Large Drop Cap)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Framing & Optional Background Customization */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-foreground">Per-Page Frame Style</label>
+                        <Select
+                          value={page.frameStyle || "gold-fillet"}
+                          onValueChange={(val: "none" | "gold-fillet" | "double-fillet" | "silk-border") =>
+                            updateCustomPage(pIdx, { frameStyle: val })
+                          }
+                        >
+                          <SelectTrigger className="text-xs">
+                            <SelectValue placeholder="Inherit Global Frame" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="gold-fillet">Classical Gold Fillet (22k Temple Border)</SelectItem>
+                            <SelectItem value="double-fillet">Royal Double Fillet (Museum Archival)</SelectItem>
+                            <SelectItem value="silk-border">Sacred Silk Border</SelectItem>
+                            <SelectItem value="none">Minimal Frame (Border-less)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-foreground">Optional Background Image</label>
+                        <MediaUploader
+                          value={page.backgroundImage || ""}
+                          onUploadComplete={(url) => updateCustomPage(pIdx, { backgroundImage: url })}
+                          onRemove={() => updateCustomPage(pIdx, { backgroundImage: "" })}
+                          mediaType="general"
+                          description="Textural backdrop for this article page (optional)."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Rich Text Editor for this page */}
+                    <div className="space-y-1.5 pt-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-foreground">Article &amp; Scholarly Text</label>
+                        <AiAssistantModal
+                          initialContext={`Article: ${page.title || "Sacred Art Monograph"}\nSubtitle: ${page.subtitle || ""}\n${page.contentHtml || ""}`}
+                          onApply={(aiText) => {
+                            const newP = `<p>${aiText.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br/>")}</p>`;
+                            updateCustomPage(pIdx, {
+                              contentHtml: page.contentHtml ? `${page.contentHtml}${newP}` : newP,
+                            });
+                          }}
+                          triggerLabel="✨ AI Article Polish"
+                        />
+                      </div>
+                      <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
+                        <TiptapEditor
+                          content={page.contentHtml}
+                          onChange={(_, html) => updateCustomPage(pIdx, { contentHtml: html })}
+                          placeholder="Compose rich article text, blockquotes, fine art historical notes, drop caps..."
+                          className="min-h-[220px]"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Tab 4: Artwork Plates */}
         <TabsContent value="plates" className="space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-primary/20 bg-primary/5">
             <div className="flex items-center gap-2.5">

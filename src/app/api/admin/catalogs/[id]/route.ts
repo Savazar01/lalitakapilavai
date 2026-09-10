@@ -31,6 +31,9 @@ export async function GET(
       where: { id },
       include: {
         event: true,
+        customPages: {
+          orderBy: { pageNumber: "asc" },
+        },
         items: {
           orderBy: { pageNumber: "asc" },
           include: {
@@ -88,6 +91,7 @@ export async function PUT(
       isPublished,
       downloadablePdfUrl,
       eventId,
+      customPages, // array of { id?, pageNumber, title, subtitle, pageLayout, contentHtml, frameStyle, backgroundImage, backgroundColor }
       items, // array of { id?, artworkId, pageNumber, curatorialNote, highlightPlate }
     } = body;
 
@@ -141,6 +145,40 @@ export async function PUT(
       },
     });
 
+    // If customPages array provided, synchronize eCatalogCustomPage entries
+    if (Array.isArray(customPages)) {
+      await prisma.$transaction(async (tx) => {
+        await tx.eCatalogCustomPage.deleteMany({
+          where: { catalogId: id },
+        });
+
+        if (customPages.length > 0) {
+          await tx.eCatalogCustomPage.createMany({
+            data: customPages.map((page: {
+              pageNumber?: number;
+              title?: string;
+              subtitle?: string;
+              pageLayout?: string;
+              contentHtml?: string;
+              frameStyle?: string;
+              backgroundImage?: string;
+              backgroundColor?: string;
+            }, idx: number) => ({
+              catalogId: id,
+              pageNumber: typeof page.pageNumber === "number" ? page.pageNumber : idx + 1,
+              title: page.title ? page.title.trim() : null,
+              subtitle: page.subtitle ? page.subtitle.trim() : null,
+              pageLayout: page.pageLayout || "SINGLE_COLUMN",
+              contentHtml: page.contentHtml || null,
+              frameStyle: page.frameStyle || "gold-fillet",
+              backgroundImage: page.backgroundImage || null,
+              backgroundColor: page.backgroundColor || null,
+            })),
+          });
+        }
+      });
+    }
+
     // If items array provided, synchronize eCatalogItem entries
     if (Array.isArray(items)) {
       // Transaction to replace or update plates
@@ -183,6 +221,9 @@ export async function PUT(
       where: { id },
       include: {
         event: true,
+        customPages: {
+          orderBy: { pageNumber: "asc" },
+        },
         items: {
           orderBy: { pageNumber: "asc" },
           include: {

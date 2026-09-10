@@ -38,11 +38,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CategoryGalleryPage({ params }: PageProps) {
   const { categorySlug } = await params;
 
-  const [currentCategory, allCategories] = await Promise.all([
+  const [currentCategory, rootCategories] = await Promise.all([
     prisma.artCategory.findUnique({
       where: { slug: categorySlug },
+      include: {
+        parent: {
+          include: {
+            children: { orderBy: { displayOrder: "asc" } },
+          },
+        },
+        children: {
+          orderBy: { displayOrder: "asc" },
+        },
+      },
     }),
     prisma.artCategory.findMany({
+      where: { parentId: null },
       orderBy: { displayOrder: "asc" },
     }),
   ]);
@@ -51,8 +62,24 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
     notFound();
   }
 
+  // Hierarchy Resolution:
+  // Is this category a parent or a sub-category?
+  const isChild = !!currentCategory.parent;
+  const rootCategory = isChild ? currentCategory.parent! : currentCategory;
+  const subCategories = isChild
+    ? currentCategory.parent!.children
+    : currentCategory.children;
+  const hasSubCategories = subCategories.length > 0;
+
+  // Artwork aggregation:
+  // If parent: fetch artworks in parent AND all child sub-categories
+  // If sub-category: fetch strictly for this sub-category
+  const categoryIdsToQuery = isChild
+    ? [currentCategory.id]
+    : [currentCategory.id, ...currentCategory.children.map((c) => c.id)];
+
   const categoryArtworks = await prisma.artwork.findMany({
-    where: { categoryId: currentCategory.id },
+    where: { categoryId: { in: categoryIdsToQuery } },
     orderBy: { createdAt: "desc" },
     include: { category: true },
   });
@@ -70,7 +97,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
     currentCategory.overlayOpacity !== null && currentCategory.overlayOpacity !== undefined
       ? currentCategory.overlayOpacity
       : 0.45;
-  const badgeLabel = currentCategory.badgeLabel || "Traditional Fine Art School";
+  const badgeLabel = currentCategory.badgeLabel || (isChild ? `${rootCategory.name} Sub-School` : "Traditional Fine Art School");
   const heroTitle = currentCategory.heroTitle || currentCategory.name;
 
   // Border style classes
@@ -86,17 +113,17 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full space-y-8">
-        {/* 1. Category Switcher Tabs at the Very Top (No 'All Masterworks' tab) */}
+        {/* 1. Primary Root Category Switcher Tabs at the Very Top */}
         <div className="flex items-center justify-center flex-wrap gap-2 pt-2">
-          {allCategories.map((cat) => {
-            const isActive = cat.slug === categorySlug;
+          {rootCategories.map((cat) => {
+            const isRootActive = cat.slug === rootCategory.slug;
             return (
               <Link
                 key={cat.id}
                 href={`/gallery/${cat.slug}`}
                 className={cn(
                   "px-4 py-2 rounded-full text-xs font-serif transition-all duration-200",
-                  isActive
+                  isRootActive
                     ? "bg-primary text-primary-foreground font-bold shadow-md ring-2 ring-primary/40"
                     : "border border-border/80 bg-card hover:bg-muted/70 text-muted-foreground hover:text-foreground font-medium shadow-2xs"
                 )}
@@ -182,6 +209,52 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
             </div>
           )}
         </div>
+
+        {/* 2.5 Secondary Sub-Category Pill Bar (When Root has Sub-categories) */}
+        {hasSubCategories && (
+          <div className="max-w-5xl mx-auto pt-1">
+            <div className="p-3 rounded-2xl bg-muted/30 border border-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono uppercase tracking-widest text-primary font-bold">
+                  {rootCategory.name} Schools:
+                </span>
+              </div>
+              <div className="flex items-center flex-wrap gap-2">
+                {/* Pill 1: All Root */}
+                <Link
+                  href={`/gallery/${rootCategory.slug}`}
+                  className={cn(
+                    "px-3.5 py-1.5 rounded-full text-xs font-serif transition-all",
+                    !isChild
+                      ? "bg-primary text-primary-foreground font-bold shadow-sm ring-2 ring-primary/40"
+                      : "bg-card/90 border border-border/70 text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                  )}
+                >
+                  All {rootCategory.name}
+                </Link>
+
+                {/* Sub-Category Pills */}
+                {subCategories.map((sub) => {
+                  const isSubActive = currentCategory.slug === sub.slug;
+                  return (
+                    <Link
+                      key={sub.id}
+                      href={`/gallery/${sub.slug}`}
+                      className={cn(
+                        "px-3.5 py-1.5 rounded-full text-xs font-serif transition-all",
+                        isSubActive
+                          ? "bg-primary text-primary-foreground font-bold shadow-sm ring-2 ring-primary/40"
+                          : "bg-card/90 border border-border/70 text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                      )}
+                    >
+                      {sub.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 3. Section Title & Plate Count */}
         <div className="flex items-center justify-between border-b border-border/60 pb-3">

@@ -15,6 +15,9 @@ export const metadata: Metadata = {
 
 export default async function GalleryPage() {
   const firstCategory = await prisma.artCategory.findFirst({
+    where: { parentId: null },
+    orderBy: { displayOrder: "asc" },
+  }) || await prisma.artCategory.findFirst({
     orderBy: { displayOrder: "asc" },
   });
 

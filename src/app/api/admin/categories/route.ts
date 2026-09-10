@@ -15,6 +15,13 @@ export async function GET(request: NextRequest) {
     const categories = await prisma.artCategory.findMany({
       orderBy: { displayOrder: "asc" },
       include: {
+        parent: {
+          select: { id: true, name: true, slug: true },
+        },
+        children: {
+          select: { id: true, name: true, slug: true, displayOrder: true },
+          orderBy: { displayOrder: "asc" },
+        },
         _count: {
           select: { artworks: true },
         },
@@ -42,6 +49,7 @@ export async function POST(request: NextRequest) {
     const {
       name,
       slug,
+      parentId,
       description,
       curatorialNote,
       coverImage,
@@ -82,6 +90,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         slug: cleanSlug,
+        parentId: parentId && parentId !== "none" ? parentId : null,
         description: description || null,
         curatorialNote: curatorialNote || description || null,
         coverImage: coverImage || null,
@@ -92,6 +101,14 @@ export async function POST(request: NextRequest) {
         overlayOpacity: overlayOpacity !== undefined ? parseFloat(String(overlayOpacity)) : 0.45,
         imagePosition: imagePosition || "center",
         borderStyle: borderStyle || "gold-fillet",
+      },
+      include: {
+        parent: {
+          select: { id: true, name: true, slug: true },
+        },
+        children: {
+          select: { id: true, name: true, slug: true, displayOrder: true },
+        },
       },
     });
 
@@ -117,6 +134,7 @@ export async function PUT(request: NextRequest) {
       id,
       name,
       slug,
+      parentId,
       description,
       curatorialNote,
       coverImage,
@@ -133,11 +151,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Category ID required" }, { status: 400 });
     }
 
+    // Prevent circular reference
+    if (parentId && parentId === id) {
+      return NextResponse.json({ error: "A category cannot be its own parent" }, { status: 400 });
+    }
+
+    const resolvedParentId = parentId && parentId !== "none" ? parentId : null;
+
     const updated = await prisma.artCategory.update({
       where: { id },
       data: {
         name,
         slug,
+        parentId: resolvedParentId,
         description: description || null,
         curatorialNote: curatorialNote || description || null,
         coverImage: coverImage || null,
@@ -148,6 +174,14 @@ export async function PUT(request: NextRequest) {
         overlayOpacity: overlayOpacity !== undefined ? parseFloat(String(overlayOpacity)) : 0.45,
         imagePosition: imagePosition || "center",
         borderStyle: borderStyle || "gold-fillet",
+      },
+      include: {
+        parent: {
+          select: { id: true, name: true, slug: true },
+        },
+        children: {
+          select: { id: true, name: true, slug: true, displayOrder: true },
+        },
       },
     });
 

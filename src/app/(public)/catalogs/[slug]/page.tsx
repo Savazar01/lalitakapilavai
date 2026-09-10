@@ -96,6 +96,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
     where: { slug },
     include: {
       event: true,
+      customPages: {
+        orderBy: { pageNumber: "asc" },
+      },
       items: {
         orderBy: { pageNumber: "asc" },
         include: {
@@ -277,6 +280,86 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             </div>
           </section>
         )}
+
+        {/* ------------------------------------------------------------------ */}
+        {/* EDITORIAL & MAGAZINE PAGES: (Arbitrary Custom Publication Pages)   */}
+        {/* ------------------------------------------------------------------ */}
+        {catalog.customPages && catalog.customPages.map((page, pIdx) => {
+          const pageFrameStyle = page.frameStyle || frameStyle;
+          const customPageFrameClass =
+            pageFrameStyle === "double-fillet"
+              ? "catalog-frame-double border-4 border-double border-primary/60"
+              : pageFrameStyle === "silk-border"
+              ? "catalog-frame-silk border-2 border-amber-600/70 shadow-[inset_0_0_0_3px_#1C1814,inset_0_0_0_4.5px_#D4AF37]"
+              : pageFrameStyle === "none"
+              ? "border-none"
+              : "catalog-frame-gold border-2 border-primary/50 shadow-[inset_0_0_0_2px_#1C1814,inset_0_0_0_3.5px_#D4AF37]";
+
+          const isTwoColumn = page.pageLayout === "TWO_COLUMN";
+          const isHeritage = page.pageLayout === "HERITAGE_MAGAZINE";
+
+          return (
+            <section
+              key={page.id}
+              className="catalog-page editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
+              style={page.backgroundColor ? { backgroundColor: page.backgroundColor } : undefined}
+            >
+              <CatalogBackgroundLayer
+                bgMode={page.backgroundImage ? "image" : bgMode}
+                pattern={pattern}
+                patternOpacity={patternOpacity}
+                bgImage={page.backgroundImage || bgImage}
+                overlayOpacity={overlayOpacity}
+              />
+              <div className={`catalog-frame relative z-10 ${customPageFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+                {/* Editorial Page Header */}
+                {(page.title || page.subtitle) && (
+                  <div className="border-b border-primary/20 pb-4 mb-4">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+                        Editorial Monograph • Page {page.pageNumber || pIdx + 1}
+                      </span>
+                      <BookOpen className="w-4 h-4 text-primary shrink-0" />
+                    </div>
+                    {page.title && (
+                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-foreground leading-tight">
+                        {page.title}
+                      </h2>
+                    )}
+                    {page.subtitle && (
+                      <p className="text-xs sm:text-sm font-serif italic text-muted-foreground mt-1">
+                        {page.subtitle}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Editorial Content Layout */}
+                <div
+                  className={`editorial-content flex-1 overflow-y-auto print:overflow-visible font-serif leading-relaxed text-foreground/90 py-2 text-justify ${
+                    isTwoColumn
+                      ? "sm:columns-2 gap-8 text-sm editorial-columns-2"
+                      : isHeritage
+                      ? "max-w-3xl mx-auto text-base [&_p:first-of-type::first-letter]:text-5xl [&_p:first-of-type::first-letter]:font-serif [&_p:first-of-type::first-letter]:text-primary [&_p:first-of-type::first-letter]:mr-2 [&_p:first-of-type::first-letter]:float-left"
+                      : "text-sm sm:text-base max-w-4xl"
+                  }`}
+                >
+                  {page.contentHtml ? (
+                    <TiptapRenderer content={page.contentHtml} />
+                  ) : (
+                    <p className="italic text-muted-foreground">No editorial content compiled for this page.</p>
+                  )}
+                </div>
+
+                {/* Editorial Page Footer Stamp */}
+                <div className="pt-3 border-t border-primary/20 flex items-center justify-between text-[11px] font-mono text-muted-foreground mt-auto">
+                  <span>{catalog.title} • Atelier Monograph</span>
+                  <span>Page {page.pageNumber || pIdx + 1}</span>
+                </div>
+              </div>
+            </section>
+          );
+        })}
 
         {/* ------------------------------------------------------------------ */}
         {/* PAGES 3 to N: ARTWORK PLATES (Strictly 1 Masterwork Per Page)      */}

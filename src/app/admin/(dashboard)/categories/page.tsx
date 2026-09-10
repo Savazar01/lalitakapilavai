@@ -50,6 +50,18 @@ interface ArtCategoryItem {
   id: string;
   name: string;
   slug: string;
+  parentId?: string | null;
+  parent?: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+  children?: {
+    id: string;
+    name: string;
+    slug: string;
+    displayOrder: number;
+  }[];
   description: string | null;
   curatorialNote?: string | null;
   coverImage: string | null;
@@ -83,6 +95,7 @@ export default function AdminCategoriesPage() {
   const [formData, setFormData] = React.useState({
     name: "",
     slug: "",
+    parentId: "none",
     description: "",
     curatorialNote: "",
     coverImage: "",
@@ -119,6 +132,7 @@ export default function AdminCategoriesPage() {
     setFormData({
       name: "",
       slug: "",
+      parentId: "none",
       description: "",
       curatorialNote: "",
       coverImage: "",
@@ -139,6 +153,7 @@ export default function AdminCategoriesPage() {
     setFormData({
       name: cat.name,
       slug: cat.slug,
+      parentId: cat.parentId || "none",
       description: cat.description || "",
       curatorialNote: cat.curatorialNote || cat.description || "",
       coverImage: cat.coverImage || "",
@@ -317,9 +332,21 @@ export default function AdminCategoriesPage() {
                       <CardTitle className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
                         <span className="truncate">{cat.name}</span>
                       </CardTitle>
-                      <code className="text-[11px] text-muted-foreground font-mono">
-                        /{cat.slug}
-                      </code>
+                      <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                        <code className="text-[11px] text-muted-foreground font-mono">
+                          /{cat.slug}
+                        </code>
+                        {cat.parent && (
+                          <Badge variant="secondary" className="text-[10px] bg-amber-500/10 text-amber-300 border-amber-500/20 font-medium">
+                            Sub of {cat.parent.name}
+                          </Badge>
+                        )}
+                        {cat.children && cat.children.length > 0 && (
+                          <Badge variant="outline" className="text-[10px] border-primary/40 text-primary font-medium">
+                            {cat.children.length} Sub-categories
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-[10px] font-mono shrink-0">
@@ -388,7 +415,7 @@ export default function AdminCategoriesPage() {
             )}
 
             {/* Core Identification */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-foreground">Category Name *</label>
                 <Input
@@ -409,6 +436,29 @@ export default function AdminCategoriesPage() {
                   placeholder="e.g. tanjore-paintings"
                   className="text-xs font-mono"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Parent Category (Hierarchy)</label>
+                <Select
+                  value={formData.parentId}
+                  onValueChange={(val) => setFormData({ ...formData, parentId: val })}
+                >
+                  <SelectTrigger className="text-xs">
+                    <SelectValue placeholder="Root Fine Art School" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None (Root Category)</SelectItem>
+                    {categories
+                      .filter((c) => !c.parentId && (!editingCategory || c.id !== editingCategory.id))
+                      .map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-[10px] text-muted-foreground">Select a parent to make this a sub-category.</span>
               </div>
             </div>
 
