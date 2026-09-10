@@ -6,7 +6,6 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Palette, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/formatters";
 
 interface Category {
@@ -31,69 +30,27 @@ interface Artwork {
   categoryId: string;
 }
 
+export interface GalleryGridProps {
+  artworks: Artwork[];
+  categories?: Category[];
+}
+
 export function GalleryGrid({
   artworks,
-  categories,
-  initialCategorySlug,
-}: {
-  artworks: Artwork[];
-  categories: Category[];
-  initialCategorySlug?: string;
-}) {
-  const initialId = React.useMemo(() => {
-    if (!initialCategorySlug) return "ALL";
-    const found = categories.find((c) => c.slug === initialCategorySlug);
-    return found ? found.id : "ALL";
-  }, [initialCategorySlug, categories]);
-
-  const [selectedCat, setSelectedCat] = React.useState(initialId);
-  const [prevSlug, setPrevSlug] = React.useState(initialCategorySlug);
-
-  if (initialCategorySlug !== prevSlug) {
-    setPrevSlug(initialCategorySlug);
-    setSelectedCat(initialId);
-  }
-
-  const filtered = artworks.filter((art) => {
-    if (selectedCat === "ALL") return true;
-    return art.categoryId === selectedCat;
-  });
-
+}: GalleryGridProps) {
   return (
-    <div className="space-y-8">
-      {/* Category Filter Tabs */}
-      <div className="flex items-center justify-center flex-wrap gap-2">
-        <Button
-          variant={selectedCat === "ALL" ? "gold" : "outline"}
-          size="sm"
-          onClick={() => setSelectedCat("ALL")}
-          className="text-xs font-serif font-semibold h-8"
-        >
-          All Masterworks ({artworks.length})
-        </Button>
-        {categories.map((cat) => (
-          <Button
-            key={cat.id}
-            variant={selectedCat === cat.id ? "gold" : "outline"}
-            size="sm"
-            onClick={() => setSelectedCat(cat.id)}
-            className="text-xs font-serif font-semibold h-8"
-          >
-            {cat.name}
-          </Button>
-        ))}
-      </div>
-
+    <div className="space-y-8 w-full">
       {/* Animated Artwork Grid */}
-      {filtered.length === 0 ? (
-        <div className="py-20 text-center text-muted-foreground">
-          <Palette className="w-10 h-10 mx-auto mb-2 opacity-40" />
-          <p className="font-serif text-sm">No artworks currently listed under this school.</p>
+      {artworks.length === 0 ? (
+        <div className="py-20 text-center text-muted-foreground border border-dashed border-border/70 rounded-2xl bg-card/20">
+          <Palette className="w-10 h-10 mx-auto mb-2 opacity-40 text-primary" />
+          <p className="font-serif text-sm font-semibold text-foreground">No artworks currently listed under this school.</p>
+          <p className="text-xs text-muted-foreground mt-1">Check back soon as the atelier archive is continually expanded.</p>
         </div>
       ) : (
         <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence>
-            {filtered.map((art) => (
+            {artworks.map((art) => (
               <motion.div
                 key={art.id}
                 layout

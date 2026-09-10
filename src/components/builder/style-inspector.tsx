@@ -101,11 +101,11 @@ const artisticBorderPresets = [
 ];
 
 const fontFamilies = [
-  { label: "Playfair Display (Classical Serif)", value: "font-serif" },
-  { label: "Cormorant Garamond (Fine Heritage)", value: "'Cormorant Garamond', serif" },
-  { label: "Cinzel (Architectural Devotional)", value: "'Cinzel', serif" },
-  { label: "Inter (Clean Sans)", value: "font-sans" },
-  { label: "Plus Jakarta Sans (Modern Editorial)", value: "'Plus Jakarta Sans', sans-serif" },
+  { label: "Playfair Display (Classical Serif)", value: "'Playfair Display', serif" },
+  { label: "Cormorant Garamond (Fine Art Serif)", value: "'Cormorant Garamond', serif" },
+  { label: "Cinzel (Royal Header)", value: "'Cinzel', serif" },
+  { label: "Inter (Clean Modern)", value: "'Inter', sans-serif" },
+  { label: "Outfit (Heritage Sans)", value: "'Outfit', sans-serif" },
 ];
 
 const availableIcons = [

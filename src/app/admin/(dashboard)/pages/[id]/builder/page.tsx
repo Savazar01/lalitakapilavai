@@ -44,6 +44,7 @@ import {
   ArrowDown,
   FileText,
   History,
+  Images,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -58,6 +59,8 @@ import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/tim
 import { TimelineInspector } from "@/components/builder/timeline-inspector";
 import { FormBlockInspector, FormFieldConfig } from "@/components/builder/form-block-inspector";
 import { DynamicFormBlock } from "@/components/public/blocks/dynamic-form-block";
+import { MediaGalleryInspector } from "@/components/builder/media-gallery-inspector";
+import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
 
 export function isLightColor(colorStr?: string | null): boolean {
   if (!colorStr) return false;
@@ -375,6 +378,32 @@ function SortableSection({
             ],
           }
         : {}),
+      ...(type === "MEDIA_GALLERY"
+        ? {
+            galleryDisplayMode: "carousel" as const,
+            galleryAutoplayTimer: 5,
+            galleryAspectRatio: "landscape" as const,
+            galleryFrameStyle: "heritage" as const,
+            galleryItems: [
+              {
+                id: "mg-1",
+                url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=1200",
+                title: "Thanjavur Gold Embossing",
+                caption: "Sacred gold relief work rendered with 22-carat leaf on seasoned teakwood.",
+                alt: "Tanjore painting detail",
+                linkType: "none" as const,
+              },
+              {
+                id: "mg-2",
+                url: "https://images.unsplash.com/photo-1582561121160-b610c3b8794c?auto=format&fit=crop&q=80&w=1200",
+                title: "Mysore Traditional Pigments",
+                caption: "Natural mineral colors and classical South Indian iconography.",
+                alt: "Mysore painting technique",
+                linkType: "none" as const,
+              },
+            ],
+          }
+        : {}),
     };
 
     currentBlocks.push(newBlock);
@@ -493,6 +522,16 @@ function SortableSection({
     recipientEmails?: string;
     emailSubjectTemplate?: string;
     fields?: FormFieldConfig[];
+  } | null>(null);
+
+  const [activeGalleryModal, setActiveGalleryModal] = React.useState<{
+    colIdx: number;
+    blockId: string;
+    displayMode?: "carousel" | "scroll" | "collage";
+    autoplayTimer?: number;
+    aspectRatio?: "landscape" | "portrait" | "square" | "natural";
+    frameStyle?: "heritage" | "minimal" | "floating" | "none";
+    items?: MediaGalleryItem[];
   } | null>(null);
 
   return (
@@ -1296,6 +1335,46 @@ function SortableSection({
                           </div>
                         </div>
                       )}
+
+                      {block.type === "MEDIA_GALLERY" && (
+                        <div className="p-3.5 rounded-xl border border-primary/40 bg-card space-y-3 shadow-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                              <Images className="w-4 h-4 text-primary" /> Media Gallery ({block.galleryDisplayMode === "collage" ? "Bento Collage" : block.galleryDisplayMode === "scroll" ? "Horizontal Scroll" : "Carousel"})
+                            </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                setActiveGalleryModal({
+                                  colIdx,
+                                  blockId: block.id,
+                                  displayMode: block.galleryDisplayMode,
+                                  autoplayTimer: block.galleryAutoplayTimer,
+                                  aspectRatio: block.galleryAspectRatio,
+                                  frameStyle: block.galleryFrameStyle,
+                                  items: block.galleryItems,
+                                })
+                              }
+                              className="text-xs h-7 border-primary/40 text-primary hover:bg-primary/10 gap-1 cursor-pointer"
+                            >
+                              <Sliders className="w-3 h-3" /> Configure Gallery ({(block.galleryItems || []).length} photos)
+                            </Button>
+                          </div>
+
+                          {/* Interactive Preview of the Gallery Block */}
+                          <div className="pt-2 border-t border-border/40 rounded bg-background/40 p-2">
+                            <MediaGalleryBlock
+                              items={block.galleryItems}
+                              displayMode={block.galleryDisplayMode}
+                              autoplayTimer={block.galleryAutoplayTimer}
+                              aspectRatio={block.galleryAspectRatio}
+                              frameStyle={block.galleryFrameStyle}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1456,8 +1535,8 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold ${
                     isSectionLight
-                      ? "border-amber-600 bg-amber-100/90 hover:bg-amber-200 text-amber-950 shadow-2xs"
-                      : "border-primary/40 hover:border-primary bg-primary/10 hover:bg-primary/20 text-primary"
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-stone-100 shadow-xs"
                   }`}
                 >
                   + 4-Col Blog Grid
@@ -1470,11 +1549,11 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
                     isSectionLight
-                      ? "border-amber-600 bg-amber-100/90 hover:bg-amber-200 text-amber-950 shadow-2xs"
-                      : "border-amber-500/40 hover:border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400"
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-stone-100 shadow-xs"
                   }`}
                 >
-                  <FileText className="w-2.5 h-2.5" /> + PDF Document
+                  <FileText className="w-2.5 h-2.5 text-amber-400" /> + PDF Document
                 </button>
                 <button
                   type="button"
@@ -1484,11 +1563,11 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
                     isSectionLight
-                      ? "border-amber-600 bg-amber-100/90 hover:bg-amber-200 text-amber-950 shadow-2xs"
-                      : "border-primary/40 hover:border-primary bg-primary/15 hover:bg-primary/25 text-primary"
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-stone-100 shadow-xs"
                   }`}
                 >
-                  <History className="w-2.5 h-2.5" /> + Artist Timeline
+                  <History className="w-2.5 h-2.5 text-amber-400" /> + Artist Timeline
                 </button>
                 <button
                   type="button"
@@ -1498,11 +1577,25 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
                     isSectionLight
-                      ? "border-amber-600 bg-amber-100/90 hover:bg-amber-200 text-amber-950 shadow-2xs"
-                      : "border-primary/40 hover:border-primary bg-primary/15 hover:bg-primary/25 text-primary"
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-stone-100 shadow-xs"
                   }`}
                 >
-                  <FileText className="w-2.5 h-2.5" /> + Contact / Lead Form
+                  <FileText className="w-2.5 h-2.5 text-amber-400" /> + Contact / Lead Form
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "MEDIA_GALLERY");
+                  }}
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
+                    isSectionLight
+                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
+                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-amber-300 shadow-xs"
+                  }`}
+                >
+                  <Images className="w-2.5 h-2.5 text-amber-400" /> + Media Gallery (Carousel/Collage)
                 </button>
               </div>
             </div>
@@ -1609,6 +1702,58 @@ function SortableSection({
                         recipientEmails: updated.recipientEmails,
                         emailSubjectTemplate: updated.emailSubjectTemplate,
                         fields: updated.fields,
+                      }
+                    : null
+                );
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Media Gallery Configuration Dialog */}
+      {activeGalleryModal && (
+        <Dialog
+          open={!!activeGalleryModal}
+          onOpenChange={(open) => {
+            if (!open) setActiveGalleryModal(null);
+          }}
+        >
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-xl text-primary flex items-center gap-2">
+                <Images className="w-5 h-5" /> Configure Media Gallery (Carousel, Scroll, Collage)
+              </DialogTitle>
+              <DialogDescription>
+                Select presentation mode, autoplay timing, aspect ratio, frame styling, and media items with links.
+              </DialogDescription>
+            </DialogHeader>
+
+            <MediaGalleryInspector
+              data={{
+                displayMode: activeGalleryModal.displayMode,
+                autoplayTimer: activeGalleryModal.autoplayTimer,
+                aspectRatio: activeGalleryModal.aspectRatio,
+                frameStyle: activeGalleryModal.frameStyle,
+                items: activeGalleryModal.items,
+              }}
+              onChange={(updated) => {
+                updateBlock(activeGalleryModal.colIdx, activeGalleryModal.blockId, {
+                  galleryDisplayMode: updated.displayMode,
+                  galleryAutoplayTimer: updated.autoplayTimer,
+                  galleryAspectRatio: updated.aspectRatio,
+                  galleryFrameStyle: updated.frameStyle,
+                  galleryItems: updated.items,
+                });
+                setActiveGalleryModal((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        displayMode: updated.displayMode,
+                        autoplayTimer: updated.autoplayTimer,
+                        aspectRatio: updated.aspectRatio,
+                        frameStyle: updated.frameStyle,
+                        items: updated.items,
                       }
                     : null
                 );

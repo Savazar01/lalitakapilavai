@@ -18,6 +18,7 @@ import { BlogGridEmbed } from "@/components/public/blog-grid-embed";
 import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
 import { DynamicFormBlock, FormFieldConfig } from "@/components/public/blocks/dynamic-form-block";
+import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
 
 interface TiptapMark {
   type: string;
@@ -82,6 +83,7 @@ function renderMarks(text: string, marks?: TiptapMark[]): React.ReactNode {
         const styleObj: React.CSSProperties = {};
         if (mark.attrs?.color) styleObj.color = mark.attrs.color as string;
         if (mark.attrs?.fontSize) styleObj.fontSize = mark.attrs.fontSize as string;
+        if (mark.attrs?.fontFamily) styleObj.fontFamily = mark.attrs.fontFamily as string;
         return (
           <span key={`ts-${idx}`} style={styleObj}>
             {acc}
@@ -356,7 +358,8 @@ export interface ColumnBlock {
     | "BLOG_GRID"
     | "PDF_VIEWER"
     | "ARTIST_TIMELINE"
-    | "FORM_BLOCK";
+    | "FORM_BLOCK"
+    | "MEDIA_GALLERY";
   content?: Record<string, unknown>;
   mediaUrl?: string;
   mediaAlt?: string;
@@ -400,6 +403,12 @@ export interface ColumnBlock {
   emailSubjectTemplate?: string;
   fields?: FormFieldConfig[];
   pageSlug?: string;
+  // Media Gallery Block Properties
+  galleryDisplayMode?: "carousel" | "scroll" | "collage";
+  galleryAutoplayTimer?: number;
+  galleryAspectRatio?: "landscape" | "portrait" | "square" | "natural";
+  galleryFrameStyle?: "heritage" | "minimal" | "floating" | "none";
+  galleryItems?: MediaGalleryItem[];
 }
 
 function renderColumnBlock(block: ColumnBlock): React.ReactNode {
@@ -525,6 +534,20 @@ function renderColumnBlock(block: ColumnBlock): React.ReactNode {
     );
   }
 
+  if (block.type === "MEDIA_GALLERY") {
+    return (
+      <div key={block.id} className="py-4 w-full">
+        <MediaGalleryBlock
+          items={block.galleryItems}
+          displayMode={block.galleryDisplayMode}
+          autoplayTimer={block.galleryAutoplayTimer}
+          aspectRatio={block.galleryAspectRatio}
+          frameStyle={block.galleryFrameStyle}
+        />
+      </div>
+    );
+  }
+
   if (block.type === "TEXT" && block.content) {
     const doc = block.content as unknown as TiptapNode;
     return (
@@ -571,6 +594,16 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
 
     if (parsedObj) {
       return <TiptapRenderer content={parsedObj} className={className} />;
+    }
+
+    // If string contains HTML tags, render safely as HTML so tags like <p> do not appear literally
+    if (/<[a-z][\s\S]*>/i.test(trimmed)) {
+      return (
+        <div
+          className={`prose prose-stone dark:prose-invert max-w-none ${className}`}
+          dangerouslySetInnerHTML={{ __html: trimmed }}
+        />
+      );
     }
 
     return (

@@ -6,7 +6,8 @@ import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { GalleryGrid } from "@/components/public/gallery-grid";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
-import { Sparkles, ArrowLeft } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ categorySlug: string }>;
@@ -37,16 +38,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CategoryGalleryPage({ params }: PageProps) {
   const { categorySlug } = await params;
 
-  const [currentCategory, allCategories, artworks] = await Promise.all([
+  const [currentCategory, allCategories] = await Promise.all([
     prisma.artCategory.findUnique({
       where: { slug: categorySlug },
     }),
     prisma.artCategory.findMany({
       orderBy: { displayOrder: "asc" },
-    }),
-    prisma.artwork.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { category: true },
     }),
   ]);
 
@@ -54,13 +51,14 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
     notFound();
   }
 
-  // Count artworks under this specific school
-  const categoryArtworksCount = artworks.filter(
-    (a) => a.categoryId === currentCategory.id
-  ).length;
+  const categoryArtworks = await prisma.artwork.findMany({
+    where: { categoryId: currentCategory.id },
+    orderBy: { createdAt: "desc" },
+    include: { category: true },
+  });
 
   // Serialize decimals for client components
-  const serializedArtworks = artworks.map((a) => ({
+  const serializedArtworks = categoryArtworks.map((a) => ({
     ...a,
     price: a.price ? a.price.toString() : null,
   }));
@@ -68,41 +66,49 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
   // Dynamic styling configurations
   const bannerHeight = currentCategory.bannerHeight || 360;
   const objectPosition = currentCategory.imagePosition || "center";
-  const overlayOpacity = currentCategory.overlayOpacity !== null && currentCategory.overlayOpacity !== undefined 
-    ? currentCategory.overlayOpacity 
-    : 0.45;
+  const overlayOpacity =
+    currentCategory.overlayOpacity !== null && currentCategory.overlayOpacity !== undefined
+      ? currentCategory.overlayOpacity
+      : 0.45;
   const badgeLabel = currentCategory.badgeLabel || "Traditional Fine Art School";
   const heroTitle = currentCategory.heroTitle || currentCategory.name;
 
   // Border style classes
-  const borderClass = currentCategory.borderStyle === "none"
-    ? "border-0 shadow-none"
-    : currentCategory.borderStyle === "subtle"
-    ? "border border-border/80 shadow-md"
-    : "border-2 border-primary/30 shadow-xl"; // "gold-fillet" default
+  const borderClass =
+    currentCategory.borderStyle === "none"
+      ? "border-0 shadow-none"
+      : currentCategory.borderStyle === "subtle"
+      ? "border border-border/80 shadow-md"
+      : "border-2 border-primary/30 shadow-xl";
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 w-full">
-        {/* Navigation Breadcrumb */}
-        <div className="mb-6 flex items-center justify-between">
-          <Link
-            href="/gallery"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Back to All Masterworks
-          </Link>
-
-          <span className="text-xs font-mono text-muted-foreground">
-            {categoryArtworksCount} {categoryArtworksCount === 1 ? "Artwork" : "Artworks"} in Archive
-          </span>
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full space-y-8">
+        {/* 1. Category Switcher Tabs at the Very Top (No 'All Masterworks' tab) */}
+        <div className="flex items-center justify-center flex-wrap gap-2 pt-2">
+          {allCategories.map((cat) => {
+            const isActive = cat.slug === categorySlug;
+            return (
+              <Link
+                key={cat.id}
+                href={`/gallery/${cat.slug}`}
+                className={cn(
+                  "px-4 py-2 rounded-full text-xs font-serif transition-all duration-200",
+                  isActive
+                    ? "bg-primary text-primary-foreground font-bold shadow-md ring-2 ring-primary/40"
+                    : "border border-border/80 bg-card hover:bg-muted/70 text-muted-foreground hover:text-foreground font-medium shadow-2xs"
+                )}
+              >
+                {cat.name}
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Category Hero Header */}
-        <div className="max-w-5xl mx-auto mb-12 space-y-6">
+        {/* 2. Category Hero Header */}
+        <div className="max-w-5xl mx-auto space-y-6">
           {currentCategory.coverImage ? (
             <div
               className={`relative w-full rounded-2xl overflow-hidden group ${borderClass}`}
@@ -143,7 +149,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
               </div>
             </div>
           ) : (
-            <div className="text-center max-w-3xl mx-auto space-y-4">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
               <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                 <Sparkles className="w-3.5 h-3.5" />
                 {badgeLabel}
@@ -160,11 +166,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                   {currentCategory.description}
                 </p>
-              ) : (
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Curated masterworks representing centuries of sacred iconography, authentic craftsmanship, and traditional gold leaf relief by Lalita Kapilavai.
-                </p>
-              )}
+              ) : null}
             </div>
           )}
 
@@ -181,12 +183,18 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
           )}
         </div>
 
-        {/* Filterable Gallery Grid initialized to this category */}
-        <GalleryGrid
-          artworks={serializedArtworks}
-          categories={allCategories}
-          initialCategorySlug={categorySlug}
-        />
+        {/* 3. Section Title & Plate Count */}
+        <div className="flex items-center justify-between border-b border-border/60 pb-3">
+          <h2 className="font-serif font-bold text-lg text-foreground">
+            {currentCategory.name} Archive Plates
+          </h2>
+          <span className="text-xs font-mono text-muted-foreground">
+            {categoryArtworks.length} {categoryArtworks.length === 1 ? "Masterwork" : "Masterworks"}
+          </span>
+        </div>
+
+        {/* 4. Filterable Gallery Grid strictly for this category */}
+        <GalleryGrid artworks={serializedArtworks} />
       </main>
 
       <Footer />

@@ -140,6 +140,7 @@ export function DynamicPageSections({
                     backgroundOverlayOpacity?: number;
                     backgroundColor?: string;
                     backgroundSize?: "cover" | "contain";
+                    fontFamily?: string;
                   };
 
                   const isColContain = colStyle.backgroundSize === "contain";
@@ -158,6 +159,7 @@ export function DynamicPageSections({
                       : (colStyle.borderStyle as React.CSSProperties["borderStyle"]) || undefined,
                     border: isZeroBorder ? "none" : undefined,
                     backgroundColor: colStyle.backgroundColor || undefined,
+                    fontFamily: colStyle.fontFamily || undefined,
                     ...(colStyle.backgroundType === "IMAGE" && colStyle.backgroundImage
                       ? {
                           backgroundImage: `url("${colStyle.backgroundImage}")`,

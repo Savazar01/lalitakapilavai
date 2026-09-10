@@ -81,6 +81,13 @@ export async function PUT(
       protectedS3Key,
     } = body;
 
+    if (categoryId !== undefined && (!categoryId || typeof categoryId !== "string" || !categoryId.trim())) {
+      return NextResponse.json(
+        { error: "Category is mandatory for all artworks." },
+        { status: 400 }
+      );
+    }
+
     const updated = await prisma.artwork.update({
       where: { id },
       data: {

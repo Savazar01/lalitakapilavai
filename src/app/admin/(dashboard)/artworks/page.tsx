@@ -324,6 +324,10 @@ export default function ArtworksAdminPage() {
   // Submit Artwork
   const handleSaveArtwork = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!categoryId || categoryId.trim() === "") {
+      toast.error("Please select an Art Category. Category is mandatory for all artworks.");
+      return;
+    }
     if (!primaryImageUrl) {
       toast.error("Please upload a primary image for the artwork.");
       return;
@@ -955,13 +959,16 @@ export default function ArtworksAdminPage() {
               {/* Category & Year */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Art Category</label>
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                    Art Category <span className="text-destructive">*</span>
+                  </label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                     required
                   >
+                    <option value="" disabled>Select a Category (Required) *</option>
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}

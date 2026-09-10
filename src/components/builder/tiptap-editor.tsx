@@ -93,7 +93,8 @@ export const TextStyleMark = Mark.create({
           const el = element as HTMLElement;
           const hasColor = el.style.color;
           const hasFontSize = el.style.fontSize;
-          if (!hasColor && !hasFontSize) return false;
+          const hasFontFamily = el.style.fontFamily;
+          if (!hasColor && !hasFontSize && !hasFontFamily) return false;
           return {};
         },
       },
@@ -103,9 +104,11 @@ export const TextStyleMark = Mark.create({
     const styles: string[] = [];
     if (HTMLAttributes.color) styles.push(`color: ${HTMLAttributes.color}`);
     if (HTMLAttributes.fontSize) styles.push(`font-size: ${HTMLAttributes.fontSize}`);
+    if (HTMLAttributes.fontFamily) styles.push(`font-family: ${HTMLAttributes.fontFamily}`);
     const filteredAttrs = { ...HTMLAttributes };
     delete filteredAttrs.color;
     delete filteredAttrs.fontSize;
+    delete filteredAttrs.fontFamily;
     if (styles.length > 0) filteredAttrs.style = styles.join("; ");
     return ["span", mergeAttributes(this.options.HTMLAttributes, filteredAttrs), 0];
   },
@@ -118,6 +121,10 @@ export const TextStyleMark = Mark.create({
       fontSize: {
         default: null,
         parseHTML: (element) => (element as HTMLElement).style.fontSize || null,
+      },
+      fontFamily: {
+        default: null,
+        parseHTML: (element) => (element as HTMLElement).style.fontFamily || null,
       },
     };
   },
@@ -144,6 +151,15 @@ const FONT_SIZES = [
   { label: "72px (Grand Display)", value: "72px" },
 ];
 
+const FONT_FAMILIES = [
+  { label: "Font: Default", value: "default" },
+  { label: "Playfair Display (Classical Serif)", value: "'Playfair Display', serif" },
+  { label: "Cormorant Garamond (Fine Art Serif)", value: "'Cormorant Garamond', serif" },
+  { label: "Cinzel (Royal Header)", value: "'Cinzel', serif" },
+  { label: "Inter (Clean Modern)", value: "'Inter', sans-serif" },
+  { label: "Outfit (Heritage Sans)", value: "'Outfit', sans-serif" },
+];
+
 export interface TiptapEditorProps {
   content?: Record<string, unknown> | string;
   onChange?: (json: Record<string, unknown>, html: string) => void;
@@ -158,24 +174,26 @@ export function TiptapEditor({
   content,
   onChange,
   className = "",
+  placeholder = "Write and polish traditional verses, curatorial notes, or philosophical commentary...",
   readOnly = false,
   isLight = false,
   onEditorReady,
 }: TiptapEditorProps) {
   const proseClasses = isLight
-    ? "prose prose-stone text-[#1C1814] [&_h1]:text-[#1C1814] [&_h2]:text-[#1C1814] [&_h3]:text-[#1C1814] [&_h4]:text-[#1C1814] [&_p]:text-[#2A2622] [&_li]:text-[#2A2622] [&_strong]:text-[#1C1814] [&_blockquote]:text-[#3A322C] [&_blockquote]:border-[#D4AF37]"
-    : "prose prose-stone dark:prose-invert text-[#F5EBE1]";
+    ? "prose prose-stone max-w-none text-stone-900 leading-relaxed [&_p]:text-stone-800"
+    : "prose prose-stone dark:prose-invert max-w-none text-foreground/90 leading-relaxed";
 
   const parsedContent = React.useMemo(() => {
-    if (!content) return "<p></p>";
-    if (typeof content === "object") return content;
+    if (!content) return undefined;
     if (typeof content === "string") {
       const trimmed = content.trim();
       if (trimmed.startsWith("{") && trimmed.includes('"type":"doc"')) {
         try {
           let jsonStr = trimmed;
-          const lastBrace = trimmed.lastIndexOf("}");
-          if (lastBrace > 0) jsonStr = trimmed.slice(0, lastBrace + 1);
+          const lastBraceIdx = trimmed.lastIndexOf("}");
+          if (lastBraceIdx > 0) {
+            jsonStr = trimmed.slice(0, lastBraceIdx + 1);
+          }
           const parsed = JSON.parse(jsonStr);
           if (parsed && typeof parsed === "object") return parsed;
         } catch {
@@ -220,6 +238,15 @@ export function TiptapEditor({
     editorProps: {
       attributes: {
         class: `${proseClasses} max-w-none focus:outline-none min-h-[80px] p-2 ${className}`,
+      },
+      transformPastedHTML(html) {
+        return html.replace(/&lt;p&gt;/g, "<p>").replace(/&lt;\/p&gt;/g, "</p>");
+      },
+      transformPastedText(text) {
+        if (text.includes("<p>") || text.includes("<div>")) {
+          return text.replace(/<[^>]*>?/gm, "");
+        }
+        return text;
       },
     },
   });
@@ -314,12 +341,12 @@ export function TiptapEditor({
   };
 
   const btnInactiveClass = isLight
-    ? "text-stone-800 hover:text-stone-950 hover:bg-stone-200/80"
-    : "text-stone-300 hover:text-foreground hover:bg-stone-800/60";
+    ? "text-stone-800 hover:text-stone-950 hover:bg-stone-200/90 font-medium"
+    : "text-stone-200 hover:text-amber-200 hover:bg-stone-800 font-medium";
 
   const btnActiveClass = isLight
-    ? "bg-amber-400 text-stone-950 font-bold shadow-xs border border-amber-500/80"
-    : "bg-amber-500/20 text-amber-300 font-bold shadow-xs border border-amber-500/50";
+    ? "bg-amber-400 text-stone-950 font-bold shadow-xs border border-amber-500"
+    : "bg-stone-900 text-amber-300 font-bold shadow-xs border border-amber-500/60";
 
   return (
     <div className="w-full relative group">
@@ -398,6 +425,33 @@ export function TiptapEditor({
               {FONT_SIZES.map((fs) => (
                 <option key={fs.value} value={fs.value}>
                   {fs.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Font Family Selector */}
+          <div className="flex items-center gap-1">
+            <select
+              value={(editor.getAttributes("textStyle").fontFamily as string) || "default"}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === "default") {
+                  editor.chain().focus().setMark("textStyle", { fontFamily: null }).run();
+                } else {
+                  editor.chain().focus().setMark("textStyle", { fontFamily: val }).run();
+                }
+              }}
+              className={`h-7 text-[11px] font-medium px-1.5 rounded border ${
+                isLight
+                  ? "bg-white border-stone-300 text-stone-800 hover:border-stone-400"
+                  : "bg-stone-900 border-amber-500/40 text-stone-100 hover:border-amber-500/70"
+              } cursor-pointer outline-none max-w-[140px]`}
+              title="Font Family Presets"
+            >
+              {FONT_FAMILIES.map((ff) => (
+                <option key={ff.value} value={ff.value}>
+                  {ff.label}
                 </option>
               ))}
             </select>
@@ -636,10 +690,10 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => setImageModalOpen(true)}
-            className={`h-7 w-7 p-0 ${btnInactiveClass}`}
+            className={`h-7 w-7 p-0 border border-stone-700/60 bg-stone-900/60 hover:bg-stone-800 ${btnInactiveClass}`}
             title="Insert Artwork / Illustration Image"
           >
-            <ImageIcon className="h-3.5 w-3.5 text-primary" />
+            <ImageIcon className="h-3.5 w-3.5 text-amber-400" />
           </Button>
 
           {/* Horizontal Rule / Divider */}
@@ -648,10 +702,10 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            className={`h-7 w-7 p-0 ${btnInactiveClass}`}
+            className={`h-7 w-7 p-0 border border-stone-700/60 bg-stone-900/60 hover:bg-stone-800 ${btnInactiveClass}`}
             title="Insert Gold Divider"
           >
-            <Minus className="h-3.5 w-3.5 text-primary" />
+            <Minus className="h-3.5 w-3.5 text-amber-400" />
           </Button>
 
           <div className="h-4 w-px bg-border mx-1" />
@@ -663,6 +717,7 @@ export function TiptapEditor({
               editor.chain().focus().insertContent(aiText).run();
             }}
             triggerLabel="AI Polish"
+            triggerClassName="bg-amber-500 text-stone-950 font-bold px-3 py-1 rounded border border-amber-400 hover:bg-amber-400 shadow-sm"
           />
         </div>
       )}
