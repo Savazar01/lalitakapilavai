@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/formatters";
 import { generateQRCodeDataUrl } from "@/lib/qr";
+import { getServerBaseUrl } from "@/lib/get-base-url";
 import {
   Sparkles,
   Music,
@@ -70,18 +71,16 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3060";
-  const targetScanUrl = `${appUrl.replace(/\/+$/, "")}/artwork/${artwork.slug}?qr=true`;
-  const qrDataUrl =
-    artwork.qrCodeUrl ||
-    (await generateQRCodeDataUrl(targetScanUrl, {
-      width: 480,
-      margin: 2,
-      color: {
-        dark: "#0F0E0D",
-        light: "#FFFFFF",
-      },
-    }));
+  const baseUrl = await getServerBaseUrl();
+  const targetScanUrl = `${baseUrl}/artwork/${artwork.slug}?qr=true`;
+  const qrDataUrl = await generateQRCodeDataUrl(targetScanUrl, {
+    width: 480,
+    margin: 2,
+    color: {
+      dark: "#0F0E0D",
+      light: "#FFFFFF",
+    },
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">

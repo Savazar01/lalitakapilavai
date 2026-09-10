@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateQRCodeDataUrl } from "@/lib/qr";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { prisma } from "@/lib/prisma";
+import { getServerBaseUrl } from "@/lib/get-base-url";
 
 export async function GET(request: NextRequest) {
   const session = await auth.api.getSession({
@@ -17,18 +17,18 @@ export async function GET(request: NextRequest) {
   const slug = searchParams.get("slug");
   const eventId = searchParams.get("eventId");
   const directUrl = searchParams.get("url");
+  const originParam = searchParams.get("origin");
 
   let targetUrl = directUrl;
   if (!targetUrl && slug) {
-    const host =
-      process.env.NEXT_PUBLIC_APP_URL ||
-      request.headers.get("origin") ||
-      "http://localhost:3060";
-    const cleanHost = host.replace(/\/+$/, "");
+    const baseUrl = originParam
+      ? originParam.replace(/\/+$/, "")
+      : await getServerBaseUrl(request);
+
     if (eventId) {
-      targetUrl = `${cleanHost}/artwork/${slug}?qr=true&eventId=${encodeURIComponent(eventId)}`;
+      targetUrl = `${baseUrl}/artwork/${slug}?qr=true&eventId=${encodeURIComponent(eventId)}`;
     } else {
-      targetUrl = `${cleanHost}/artwork/${slug}?qr=true`;
+      targetUrl = `${baseUrl}/artwork/${slug}?qr=true`;
     }
   }
 
@@ -48,16 +48,6 @@ export async function GET(request: NextRequest) {
         light: "#FFFFFF",
       },
     });
-
-    // Optionally update artwork's qrCodeUrl if slug provided without eventId
-    if (slug && !eventId) {
-      await prisma.artwork
-        .update({
-          where: { slug },
-          data: { qrCodeUrl: dataUrl },
-        })
-        .catch(() => {});
-    }
 
     return NextResponse.json({ dataUrl, targetUrl });
   } catch (error) {

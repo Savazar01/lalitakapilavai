@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
+import { getServerBaseUrl } from "@/lib/get-base-url";
 
 export const dynamic = "force-dynamic";
 
@@ -114,6 +115,8 @@ export async function POST(req: NextRequest) {
             )
             .join("");
 
+          const baseUrl = await getServerBaseUrl(req);
+
           await transporter.sendMail({
             from: `"${fromName}" <${fromEmail}>`,
             to: targetRecipients.join(", "),
@@ -151,7 +154,7 @@ export async function POST(req: NextRequest) {
               </div>
 
               <div style="border-top: 1px solid #332E27; padding-top: 16px; font-size: 11px; color: #78716C; text-align: center;">
-                <p style="margin: 0;">This inquiry has been logged in Admin CRM under <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3060'}/admin/leads" style="color: #D4AF37;">Leads &amp; Exhibition QR</a>.</p>
+                <p style="margin: 0;">This inquiry has been logged in Admin CRM under <a href="${baseUrl ? `${baseUrl}/admin/leads` : '/admin/leads'}" style="color: #D4AF37;">Leads &amp; Exhibition QR</a>.</p>
               </div>
             </div>
           `,

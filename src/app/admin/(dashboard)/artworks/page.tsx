@@ -25,6 +25,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,6 +129,7 @@ export default function ArtworksAdminPage() {
   const [qrPreviewUrl, setQrPreviewUrl] = React.useState("");
   const [qrArtworkTitle, setQrArtworkTitle] = React.useState("");
   const [qrTargetSlug, setQrTargetSlug] = React.useState("");
+  const [qrTargetUrl, setQrTargetUrl] = React.useState("");
 
   // Delete Confirmation Modal State
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -432,14 +434,17 @@ export default function ArtworksAdminPage() {
     setQrArtworkTitle(art.title);
     setQrTargetSlug(art.slug);
     setQrPreviewUrl("");
+    setQrTargetUrl("");
     setQrModalOpen(true);
     setQrLoading(true);
 
     try {
-      const res = await fetch(`/api/admin/qr?slug=${encodeURIComponent(art.slug)}`);
+      const origin = getClientBaseUrl();
+      const res = await fetch(`/api/admin/qr?slug=${encodeURIComponent(art.slug)}&origin=${encodeURIComponent(origin)}`);
       const data = await res.json();
       if (data.dataUrl) {
         setQrPreviewUrl(data.dataUrl);
+        setQrTargetUrl(data.targetUrl || `${origin}/artwork/${art.slug}?qr=true`);
       } else {
         toast.error("Failed to load QR code");
       }
@@ -1183,8 +1188,8 @@ export default function ArtworksAdminPage() {
                 <div className="text-xs text-muted-foreground">Unable to generate QR code</div>
               )}
             </div>
-            <span className="text-[11px] font-mono text-muted-foreground">
-              /artwork/{qrTargetSlug}?qr=true
+            <span className="text-[11px] font-mono text-muted-foreground text-center break-all max-w-xs px-2">
+              {qrTargetUrl || `/artwork/${qrTargetSlug}?qr=true`}
             </span>
           </div>
 

@@ -31,6 +31,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EventFormModal, EventFormData } from "@/components/admin/event-form-modal";
 import { formatEventSchedule } from "@/lib/geo-timezone";
@@ -246,7 +247,7 @@ export default function EventsAdminPage() {
     setExhibitionQrModalOpen(true);
 
     try {
-      const host = window.location.origin;
+      const host = getClientBaseUrl();
       const target = `${host}/events/${ev.slug}`;
       const res = await fetch(`/api/admin/qr?url=${encodeURIComponent(target)}`);
       const data = await res.json();
@@ -268,11 +269,11 @@ export default function EventsAdminPage() {
 
     try {
       let fetchUrl = `/api/admin/qr?`;
+      const host = getClientBaseUrl();
       if (artSlug === "") {
-        const host = window.location.origin;
         fetchUrl += `url=${encodeURIComponent(`${host}/events/${selectedExhibitionEvent.slug}`)}`;
       } else {
-        fetchUrl += `slug=${encodeURIComponent(artSlug)}&eventId=${encodeURIComponent(selectedExhibitionEvent.slug)}`;
+        fetchUrl += `slug=${encodeURIComponent(artSlug)}&eventId=${encodeURIComponent(selectedExhibitionEvent.slug)}&origin=${encodeURIComponent(host)}`;
       }
       const res = await fetch(fetchUrl);
       const data = await res.json();

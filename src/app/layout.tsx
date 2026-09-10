@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import prisma from "@/lib/prisma";
+import { getServerBaseUrl } from "@/lib/get-base-url";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,7 +23,8 @@ export async function generateMetadata(): Promise<Metadata> {
     settings?.siteDescription ||
     "Living digital archive of traditional Indian Tanjore paintings with 22k gold leaf, Mysore classical fine art, and Carnatic classical vocal recitals.";
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3060";
+  const baseUrl = await getServerBaseUrl();
+  const appUrl = baseUrl || process.env.NEXT_PUBLIC_APP_URL || "https://lalitakapilavai.com";
 
   return {
     metadataBase: new URL(appUrl),

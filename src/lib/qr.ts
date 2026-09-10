@@ -1,5 +1,6 @@
 import QRCode from "qrcode";
 import { uploadBuffer } from "@/lib/storage";
+import { getServerBaseUrl } from "@/lib/get-base-url";
 
 export interface QRCodeOptions {
   width?: number;
@@ -39,9 +40,9 @@ export async function generateAndStoreArtworkQR(
   slug: string,
   baseUrl?: string
 ): Promise<{ key: string; publicUrl: string; targetUrl: string }> {
-  const host =
-    baseUrl || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3060";
-  const targetUrl = `${host.replace(/\/+$/, "")}/artwork/${slug}?qr=true`;
+  const host = baseUrl || (await getServerBaseUrl());
+  const cleanHost = host.replace(/\/+$/, "");
+  const targetUrl = cleanHost ? `${cleanHost}/artwork/${slug}?qr=true` : `/artwork/${slug}?qr=true`;
 
   const qrBuffer = await generateQRCodeBuffer(targetUrl, {
     width: 600,
