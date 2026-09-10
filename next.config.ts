@@ -3,6 +3,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  serverExternalPackages: ["sharp", "heic-convert"],
   outputFileTracingRoot: path.join(__dirname, "./"),
   images: {
     remotePatterns: [

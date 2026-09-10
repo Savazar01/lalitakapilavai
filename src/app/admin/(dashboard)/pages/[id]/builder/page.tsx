@@ -869,7 +869,7 @@ function SortableSection({
                                 <label className="cursor-pointer">
                                   <input
                                     type="file"
-                                    accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                                    accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                                     className="hidden"
                                     onChange={(e) => {
                                       const file = e.target.files?.[0];
@@ -904,7 +904,7 @@ function SortableSection({
                               <label className="cursor-pointer">
                                 <input
                                   type="file"
-                                  accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                                  accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                                   className="hidden"
                                   onChange={(e) => {
                                     const file = e.target.files?.[0];

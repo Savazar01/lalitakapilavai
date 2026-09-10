@@ -278,7 +278,7 @@ export function StyleInspector({
                     {uploadingImage ? "Uploading..." : "Upload File"}
                     <input
                       type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                      accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                       onChange={handleFileUpload}
                       className="hidden"
                       disabled={uploadingImage}
@@ -651,7 +651,7 @@ export function StyleInspector({
                   {uploadingBgImage ? "Uploading..." : "Upload File"}
                   <input
                     type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/webp,image/tiff"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                     onChange={handleBgImageUpload}
                     className="hidden"
                     disabled={uploadingBgImage}

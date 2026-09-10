@@ -230,6 +230,7 @@ export default function ArtworksAdminPage() {
   };
 
   // Process Upload with format validation and defensive key resolution
+  const [isHeicUpload, setIsHeicUpload] = React.useState(false);
   const processUpload = async (file: File) => {
     const validMimes = [
       "image/jpeg",
@@ -238,13 +239,18 @@ export default function ArtworksAdminPage() {
       "image/webp",
       "image/gif",
       "image/tiff",
+      "image/heic",
+      "image/heif",
+      "image/heic-sequence",
     ];
-    const hasValidExt = /\.(jpe?g|png|webp|gif|tiff?)$/i.test(file.name);
+    const hasValidExt = /\.(jpe?g|png|webp|gif|tiff?|heic|heics)$/i.test(file.name);
     if (!validMimes.includes(file.type.toLowerCase()) && !hasValidExt) {
-      toast.error("Unsupported format. Please upload JPEG, PNG, WebP, GIF, or TIFF.");
+      toast.error("Unsupported format. Please upload JPEG, PNG, WebP, GIF, TIFF, or Apple HEIC/HEICS.");
       return;
     }
 
+    const isHeic = /\.(heic|heics)$/i.test(file.name) || file.type.includes("heic") || file.type.includes("heif");
+    setIsHeicUpload(isHeic);
     setUploadingImage(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -850,7 +856,7 @@ export default function ArtworksAdminPage() {
                     ref={fileInputRef}
                     type="file"
                     id="artworkImage"
-                    accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                     onChange={handleFileUpload}
                     className="hidden"
                   />
@@ -859,10 +865,14 @@ export default function ArtworksAdminPage() {
                     <div className="py-6 flex flex-col items-center justify-center gap-2 text-center">
                       <Loader2 className="w-7 h-7 animate-spin text-primary" />
                       <p className="text-xs font-medium text-foreground">
-                        Processing image via Sharp &amp; applying watermark...
+                        {isHeicUpload
+                          ? "Converting Apple HEIC to Archival Format & applying watermark..."
+                          : "Processing image via Sharp & applying watermark..."}
                       </p>
                       <p className="text-[11px] text-muted-foreground">
-                        Generating public WebP derivative and securing master asset in vault.
+                        {isHeicUpload
+                          ? "Transcoding uncompressed buffer (95% quality, 4:4:4 chroma subsampling) into master vault."
+                          : "Generating public WebP derivative and securing master asset in vault."}
                       </p>
                     </div>
                   ) : primaryImageUrl ? (
@@ -924,7 +934,7 @@ export default function ArtworksAdminPage() {
                           Click to upload or drag and drop artwork
                         </p>
                         <p className="text-[11px] text-muted-foreground mt-0.5">
-                          Supports high-resolution JPEG, PNG, WebP, GIF, or TIFF
+                          Supports high-resolution JPEG, PNG, WebP, TIFF, and Apple HEIC/HEICS
                         </p>
                       </div>
                     </div>

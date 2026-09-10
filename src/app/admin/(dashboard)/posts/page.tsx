@@ -593,7 +593,7 @@ export default function AdminPostsPage() {
                       {uploadingImage ? "Uploading..." : "Upload via Media Vault"}
                       <input
                         type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                         onChange={handleImageUpload}
                         className="hidden"
                         disabled={uploadingImage}
@@ -683,7 +683,7 @@ export default function AdminPostsPage() {
                         </span>
                         <input
                           type="file"
-                          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff"
+                          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                           onChange={handleInlineImageUpload}
                           className="hidden"
                           disabled={uploadingImage}

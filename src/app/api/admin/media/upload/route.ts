@@ -4,6 +4,7 @@ import { uploadBuffer } from "@/lib/storage";
 import prisma from "@/lib/prisma";
 import sharp from "sharp";
 import crypto from "crypto";
+import heicConvert from "heic-convert";
 import { generateWatermarkSvg } from "@/lib/watermark";
 
 
@@ -65,9 +66,42 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // 2c. Intercept Apple HEIC / HEICS Images and Transcode to High-Fidelity JPEG
+    const fileNameLower = file.name.toLowerCase();
+    const isHeic =
+      file.type === "image/heic" ||
+      file.type === "image/heif" ||
+      file.type === "image/heic-sequence" ||
+      fileNameLower.endsWith(".heic") ||
+      fileNameLower.endsWith(".heics") ||
+      fileNameLower.endsWith(".heif");
+
+    let processingBuffer: Buffer = inputBuffer;
+    let convertedFromHeic = false;
+
+    if (isHeic) {
+      try {
+        // Transcode Apple HEIC buffer into high-fidelity JPEG
+        // 95% quality preserves 22k gold leaf foil, gesso reliefs, and fine brushwork micro-textures
+        const convertedArrayBuffer = await heicConvert({
+          buffer: inputBuffer,
+          format: "JPEG",
+          quality: 0.95,
+        });
+        processingBuffer = Buffer.from(convertedArrayBuffer);
+        convertedFromHeic = true;
+      } catch (heicErr) {
+        console.error("Failed to decode Apple HEIC file:", heicErr);
+        return NextResponse.json(
+          { error: "Could not decode Apple HEIC/HEICS image. Please verify file integrity." },
+          { status: 422 }
+        );
+      }
+    }
+
     // 3. Extract Image Metadata via Sharp & Validate Format
     const allowedFormats = ["jpeg", "jpg", "png", "webp", "gif", "tiff", "tif"];
-    const metadata = await sharp(inputBuffer).metadata();
+    const metadata = await sharp(processingBuffer).metadata();
     if (!metadata.width || !metadata.height || !metadata.format) {
       return NextResponse.json(
         { error: "Failed to read image dimensions or unsupported format" },
@@ -79,7 +113,7 @@ export async function POST(request: NextRequest) {
     if (!allowedFormats.includes(detectedFormat)) {
       return NextResponse.json(
         {
-          error: `Unsupported image format (${detectedFormat}). Please upload JPEG, PNG, WebP, GIF, or TIFF.`,
+          error: `Unsupported image format (${detectedFormat}). Please upload JPEG, PNG, WebP, GIF, TIFF, or Apple HEIC/HEICS.`,
         },
         { status: 400 }
       );
@@ -87,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     const width = metadata.width;
     const height = metadata.height;
-    const origExtension = detectedFormat === "jpeg" ? "jpg" : detectedFormat;
+    const origExtension = convertedFromHeic ? "jpg" : (detectedFormat === "jpeg" ? "jpg" : detectedFormat);
     const assetId = crypto.randomUUID();
 
     // 4. Determine Media Type & Watermarking Requirement
@@ -98,7 +132,7 @@ export async function POST(request: NextRequest) {
     // Non-Artwork Media (Logos, favicons, page builder images, blog illustrations)
     // Completely skip watermark compositing and master vault archiving
     if (!isArtwork) {
-      const cleanWebpBuffer = await sharp(inputBuffer)
+      const cleanWebpBuffer = await sharp(processingBuffer)
         .webp({ quality: 88 })
         .toBuffer();
 
@@ -107,7 +141,7 @@ export async function POST(request: NextRequest) {
         cleanWebpBuffer,
         generalKey,
         "image/webp",
-        false // public
+        false // public (persists locally to public/media/public or S3)
       );
 
       return NextResponse.json({
@@ -121,19 +155,33 @@ export async function POST(request: NextRequest) {
         width,
         height,
         format: "webp",
-        originalFormat: origExtension,
+        originalFormat: convertedFromHeic ? "heic" : origExtension,
+        convertedFromHeic,
         originalSizeBytes: inputBuffer.length,
         optimizedSizeBytes: cleanWebpBuffer.length,
       });
     }
 
-    // 5. Artwork Master Asset: Save Untouched Master to Protected Vault
-    const masterKey = `masters/${assetId}.${origExtension}`;
+    // 5. Artwork Master Asset: Save to Protected Vault (Local disk public/media/vault or Cloud S3)
+    // If converted from HEIC, generate a 95% archival JPEG master with 4:4:4 chroma subsampling
+    let masterBuffer = inputBuffer;
+    let masterExtension = origExtension;
+    let masterMime = file.type || `image/${origExtension}`;
+
+    if (convertedFromHeic) {
+      masterBuffer = await sharp(processingBuffer)
+        .jpeg({ quality: 95, chromaSubsampling: "4:4:4" })
+        .toBuffer();
+      masterExtension = "jpg";
+      masterMime = "image/jpeg";
+    }
+
+    const masterKey = `masters/${assetId}.${masterExtension}`;
     const masterUpload = await uploadBuffer(
-      inputBuffer,
+      masterBuffer,
       masterKey,
-      file.type || `image/${origExtension}`,
-      true // isProtected
+      masterMime,
+      true // isProtected (writes to local vault or protected cloud storage)
     );
 
     // 6. Query Watermark Settings from DB or Default
@@ -154,8 +202,8 @@ export async function POST(request: NextRequest) {
       style: systemSettings?.watermarkStyle || "REPEAT_DIAGONAL",
     });
 
-    // 7. Generate Watermarked WebP Derivative
-    const watermarkedBuffer = await sharp(inputBuffer)
+    // 7. Generate Watermarked WebP Derivative directly from processingBuffer
+    const watermarkedBuffer = await sharp(processingBuffer)
       .composite([
         {
           input: Buffer.from(svgOverlay),
@@ -171,7 +219,7 @@ export async function POST(request: NextRequest) {
       watermarkedBuffer,
       watermarkedKey,
       "image/webp",
-      false // public
+      false // public (writes to local public/media/public or public cloud storage)
     );
 
     return NextResponse.json({
@@ -188,7 +236,8 @@ export async function POST(request: NextRequest) {
       width,
       height,
       format: "webp",
-      originalFormat: origExtension,
+      originalFormat: convertedFromHeic ? "heic" : origExtension,
+      convertedFromHeic,
       originalSizeBytes: inputBuffer.length,
       watermarkedSizeBytes: watermarkedBuffer.length,
     });

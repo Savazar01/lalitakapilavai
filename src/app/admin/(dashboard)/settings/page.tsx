@@ -540,7 +540,7 @@ export default function AdminSettingsPage() {
                           <label className="cursor-pointer">
                             <input
                               type="file"
-                              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                              accept="image/png,image/jpeg,image/webp,image/svg+xml,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                               onChange={handleLogoUpload}
                               disabled={logoUploading}
                               className="hidden"

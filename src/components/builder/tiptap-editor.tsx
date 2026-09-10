@@ -801,7 +801,7 @@ export function TiptapEditor({
               <div className="border-2 border-dashed border-border hover:border-primary/50 rounded-lg p-3 text-center transition-colors">
                 <input
                   type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  accept="image/jpeg,image/jpg,image/png,image/webp,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
                   id="tiptap-modal-image-upload"
                   className="hidden"
                   onChange={handleImageModalUpload}

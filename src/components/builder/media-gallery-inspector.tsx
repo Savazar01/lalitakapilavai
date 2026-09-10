@@ -329,7 +329,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               type="file"
               ref={fileInputRef}
               onChange={handleFileUpload}
-              accept="image/*"
+              accept="image/*,.heic,.heics"
               className="hidden"
             />
             <Button

@@ -29,12 +29,13 @@ export function MediaUploader({
   value = "",
   onUploadComplete,
   onRemove,
-  accept = "image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff",
+  accept = "image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics",
   mediaType = "general",
   className = "",
   description,
 }: MediaUploaderProps) {
   const [uploading, setUploading] = React.useState(false);
+  const [isHeicFile, setIsHeicFile] = React.useState(false);
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [mode, setMode] = React.useState<"file" | "url">("file");
   const [urlInput, setUrlInput] = React.useState(value || "");
@@ -47,6 +48,12 @@ export function MediaUploader({
   }
 
   const handleProcessFile = async (file: File) => {
+    const isHeic =
+      file.type.includes("heic") ||
+      file.type.includes("heif") ||
+      file.name.toLowerCase().endsWith(".heic") ||
+      file.name.toLowerCase().endsWith(".heics");
+    setIsHeicFile(isHeic);
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -247,9 +254,16 @@ export function MediaUploader({
               {uploading ? (
                 <div className="flex flex-col items-center gap-1.5 py-2">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  <span className="text-xs text-muted-foreground">
-                    Uploading &amp; processing asset...
+                  <span className="text-xs font-medium text-foreground">
+                    {isHeicFile
+                      ? "Converting Apple HEIC to Archival Format..."
+                      : "Uploading & processing asset..."}
                   </span>
+                  {isHeicFile && (
+                    <span className="text-[10px] text-muted-foreground">
+                      Transcoding uncompressed buffer &amp; optimizing derivatives via Sharp
+                    </span>
+                  )}
                 </div>
               ) : (
                 <>
@@ -261,7 +275,7 @@ export function MediaUploader({
                       Click to upload or drag &amp; drop
                     </p>
                     <p className="text-[10px] text-muted-foreground">
-                      {description || "WebP, JPG, PNG, GIF up to 25MB"}
+                      {description || "WebP, JPG, PNG, TIFF, and Apple HEIC/HEICS up to 50MB"}
                     </p>
                   </div>
                 </>

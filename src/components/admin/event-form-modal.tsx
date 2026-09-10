@@ -855,7 +855,7 @@ function EventFormContent({
                     {uploadingBanner ? "Uploading..." : "Upload Banner"}
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,.heic,.heics"
                       disabled={uploadingBanner}
                       onChange={handleBannerUpload}
                       className="hidden"
@@ -886,7 +886,7 @@ function EventFormContent({
                 ) : (
                   <div className="rounded-xl border border-dashed border-border/80 p-8 text-center text-xs text-muted-foreground bg-muted/10">
                     <ImageIcon className="w-8 h-8 text-primary mx-auto mb-2 opacity-50" />
-                    No hero banner uploaded. Recommended size: 1920x800px.
+                    No hero banner uploaded. Recommended size: 1920x800px. Supports JPG, PNG, WebP, HEIC/HEICS.
                   </div>
                 )}
               </div>
@@ -899,7 +899,7 @@ function EventFormContent({
                       Event Photo Gallery Studio ({galleryImages.length})
                     </span>
                     <span className="text-[11px] text-muted-foreground">
-                      Multi-mode media showcase supporting auto-carousels, smooth scroll tracks, and heritage collages.
+                      Multi-mode media showcase supporting auto-carousels, smooth scroll tracks, and heritage collages (JPG, PNG, WebP, HEIC/HEICS).
                     </span>
                   </div>
 
@@ -909,7 +909,7 @@ function EventFormContent({
                     <input
                       type="file"
                       multiple
-                      accept="image/*"
+                      accept="image/*,.heic,.heics"
                       disabled={uploadingGallery}
                       onChange={handleGalleryUpload}
                       className="hidden"
