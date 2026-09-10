@@ -155,7 +155,11 @@ export async function Navbar() {
                             {sub.label}
                           </span>
                         </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent className="min-w-[200px] p-1.5 bg-card/95 backdrop-blur-md border border-primary/30 shadow-2xl rounded-lg">
+                        <DropdownMenuSubContent
+                          sideOffset={6}
+                          alignOffset={-4}
+                          className="z-[100] min-w-[210px] p-1.5 bg-card/95 backdrop-blur-md border border-primary/40 shadow-2xl rounded-lg"
+                        >
                           <DropdownMenuItem asChild>
                             <Link
                               href={sub.path}

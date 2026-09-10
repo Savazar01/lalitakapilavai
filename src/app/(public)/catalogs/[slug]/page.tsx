@@ -23,34 +23,126 @@ interface PageProps {
 
 export const dynamic = "force-dynamic";
 
+function getFrameClass(style?: string | null) {
+  if (style === "double-fillet") {
+    return "catalog-frame-double border-4 border-double border-primary/60";
+  }
+  if (style === "silk-border") {
+    return "catalog-frame-silk border-2 border-amber-600/70 shadow-[inset_0_0_0_3px_#1C1814,inset_0_0_0_4.5px_#D4AF37]";
+  }
+  if (style === "none") {
+    return "border-none";
+  }
+  return "catalog-frame-gold border-2 border-primary/50 shadow-[inset_0_0_0_2px_#1C1814,inset_0_0_0_3.5px_#D4AF37]";
+}
+
+function getMagazineGridClass(layoutType?: string | null, fallbackLayout?: string | null) {
+  const type = layoutType || (fallbackLayout === "TWO_COLUMN" ? "2_COL" : "1_COL");
+  switch (type) {
+    case "1_COL":
+      return "grid grid-cols-1 gap-6 magazine-grid-1col";
+    case "2_COL":
+      return "grid grid-cols-1 md:grid-cols-2 gap-8 magazine-grid-2col";
+    case "ASYMMETRIC_70_30":
+      return "grid grid-cols-1 md:grid-cols-[70%_30%] gap-8 magazine-grid-asym-70-30";
+    case "ASYMMETRIC_30_70":
+      return "grid grid-cols-1 md:grid-cols-[30%_70%] gap-8 magazine-grid-asym-30-70";
+    case "3_COL":
+      return "grid grid-cols-1 md:grid-cols-3 gap-6 magazine-grid-3col";
+    case "4_COL":
+      return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 magazine-grid-4col";
+    case "6_COL":
+      return "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 magazine-grid-6col";
+    default:
+      return "grid grid-cols-1 md:grid-cols-2 gap-8 magazine-grid-2col";
+  }
+}
+
 function CatalogBackgroundLayer({
-  bgMode,
-  pattern,
+  bgType,
+  patternId,
   patternOpacity,
   bgImage,
   overlayOpacity,
+  fallbackBgMode,
+  fallbackPattern,
+  fallbackPatternOpacity,
+  fallbackBgImage,
+  fallbackOverlayOpacity,
 }: {
-  bgMode: string;
-  pattern?: ReturnType<typeof getPatternById>;
-  patternOpacity: number;
+  bgType?: string;
+  patternId?: string;
+  patternOpacity?: number;
   bgImage?: string;
-  overlayOpacity: number;
+  overlayOpacity?: number;
+  fallbackBgMode: string;
+  fallbackPattern?: ReturnType<typeof getPatternById>;
+  fallbackPatternOpacity: number;
+  fallbackBgImage?: string;
+  fallbackOverlayOpacity: number;
 }) {
-  if (bgMode === "pattern" && pattern) {
+  const mode = bgType
+    ? bgType.toUpperCase()
+    : bgImage
+    ? "IMAGE"
+    : fallbackBgMode.toUpperCase();
+
+  if (mode === "PATTERN") {
+    const pat = getPatternById(patternId) || fallbackPattern;
+    const op = typeof patternOpacity === "number" ? patternOpacity : fallbackPatternOpacity;
+    if (pat) {
+      return (
+        <div
+          aria-hidden="true"
+          className="catalog-bg-layer absolute inset-0 pointer-events-none z-0 overflow-hidden"
+          style={{
+            backgroundImage: `url("${pat.svgDataUri}")`,
+            backgroundRepeat: "repeat",
+            opacity: op,
+          }}
+        />
+      );
+    }
+  }
+
+  if (mode === "IMAGE") {
+    const img = bgImage || fallbackBgImage;
+    const op = typeof overlayOpacity === "number" ? overlayOpacity : fallbackOverlayOpacity;
+    if (img) {
+      return (
+        <div
+          aria-hidden="true"
+          className="catalog-bg-layer absolute inset-0 pointer-events-none z-0 overflow-hidden"
+        >
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center"
+            style={{ backgroundImage: `url("${img}")` }}
+          />
+          <div
+            className="absolute inset-0 bg-black"
+            style={{ opacity: op }}
+          />
+        </div>
+      );
+    }
+  }
+
+  // Fallback to global catalog background
+  if (fallbackBgMode.toUpperCase() === "PATTERN" && fallbackPattern) {
     return (
       <div
         aria-hidden="true"
         className="catalog-bg-layer absolute inset-0 pointer-events-none z-0 overflow-hidden"
         style={{
-          backgroundImage: `url("${pattern.svgDataUri}")`,
+          backgroundImage: `url("${fallbackPattern.svgDataUri}")`,
           backgroundRepeat: "repeat",
-          opacity: patternOpacity,
+          opacity: fallbackPatternOpacity,
         }}
       />
     );
   }
 
-  if (bgMode === "image" && bgImage) {
+  if (fallbackBgMode.toUpperCase() === "IMAGE" && fallbackBgImage) {
     return (
       <div
         aria-hidden="true"
@@ -58,11 +150,11 @@ function CatalogBackgroundLayer({
       >
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center"
-          style={{ backgroundImage: `url("${bgImage}")` }}
+          style={{ backgroundImage: `url("${fallbackBgImage}")` }}
         />
         <div
           className="absolute inset-0 bg-black"
-          style={{ opacity: overlayOpacity }}
+          style={{ opacity: fallbackOverlayOpacity }}
         />
       </div>
     );
@@ -116,19 +208,12 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
 
   const themeConfig = (catalog.themeConfig as Record<string, unknown> | null) || {};
   const coverConfig = (catalog.coverConfig as Record<string, unknown> | null) || {};
+  const essayConfig = (catalog.essayConfig as Record<string, unknown> | null) || {};
   const endPageConfig = (catalog.endPageConfig as Record<string, unknown> | null) || {};
 
   const orientation = catalog.orientation === "landscape" ? "landscape" : "portrait";
   const frameStyle = (themeConfig.frameStyle as string) || "gold-fillet";
-
-  const frameClass =
-    frameStyle === "double-fillet"
-      ? "catalog-frame-double border-4 border-double border-primary/60"
-      : frameStyle === "silk-border"
-      ? "catalog-frame-silk border-2 border-amber-600/70 shadow-[inset_0_0_0_3px_#1C1814,inset_0_0_0_4.5px_#D4AF37]"
-      : frameStyle === "none"
-      ? "border-none"
-      : "catalog-frame-gold border-2 border-primary/50 shadow-[inset_0_0_0_2px_#1C1814,inset_0_0_0_3.5px_#D4AF37]";
+  const frameClass = getFrameClass(frameStyle);
 
   const bgColor = (themeConfig.backgroundColor as string) || "#1C1814";
   const textColor = (themeConfig.textColor as string) || "#FAF7F2";
@@ -141,6 +226,34 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const overlayOpacity =
     typeof themeConfig.overlayOpacity === "number" ? themeConfig.overlayOpacity : 0.4;
   const pattern = getPatternById(bgPatternId);
+
+  // Cover Page configuration
+  const coverFrameClass = getFrameClass((coverConfig.frameStyle as string) || frameStyle);
+  const coverBgColor = (coverConfig.backgroundColor as string) || undefined;
+  const coverBgType = (coverConfig.backgroundType as string) || (coverConfig.backgroundImage ? "IMAGE" : undefined);
+  const coverBgPattern = coverConfig.backgroundPattern as string | undefined;
+  const coverPatternOpacity = typeof coverConfig.patternOpacity === "number" ? coverConfig.patternOpacity : undefined;
+  const coverBgImage = (coverConfig.backgroundImage as string) || undefined;
+  const coverOverlayOpacity = typeof coverConfig.overlayOpacity === "number" ? coverConfig.overlayOpacity : undefined;
+
+  // Curatorial Essay configuration
+  const essayFrameClass = getFrameClass((essayConfig.frameStyle as string) || frameStyle);
+  const essayBgColor = (essayConfig.backgroundColor as string) || undefined;
+  const essayBgType = (essayConfig.backgroundType as string) || (essayConfig.backgroundImage ? "IMAGE" : undefined);
+  const essayBgPattern = essayConfig.backgroundPattern as string | undefined;
+  const essayPatternOpacity = typeof essayConfig.patternOpacity === "number" ? essayConfig.patternOpacity : undefined;
+  const essayBgImage = (essayConfig.backgroundImage as string) || undefined;
+  const essayOverlayOpacity = typeof essayConfig.overlayOpacity === "number" ? essayConfig.overlayOpacity : undefined;
+  const essayTitle = (essayConfig.title as string) || "Curatorial Statement & Scholarly Monograph";
+
+  // End Page configuration
+  const endFrameClass = getFrameClass((endPageConfig.frameStyle as string) || frameStyle);
+  const endBgColor = (endPageConfig.backgroundColor as string) || undefined;
+  const endBgType = (endPageConfig.backgroundType as string) || (endPageConfig.backgroundImage ? "IMAGE" : undefined);
+  const endBgPattern = endPageConfig.backgroundPattern as string | undefined;
+  const endPatternOpacity = typeof endPageConfig.patternOpacity === "number" ? endPageConfig.patternOpacity : undefined;
+  const endBgImage = (endPageConfig.backgroundImage as string) || undefined;
+  const endOverlayOpacity = typeof endPageConfig.overlayOpacity === "number" ? endPageConfig.overlayOpacity : undefined;
 
   return (
     <div
@@ -188,15 +301,23 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {/* PAGE 1: BOOK COVER (Strict Single Page on Print)                   */}
         {/* ------------------------------------------------------------------ */}
-        <section className="catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none">
+        <section
+          className="catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none"
+          style={coverBgColor ? { backgroundColor: coverBgColor } : undefined}
+        >
           <CatalogBackgroundLayer
-            bgMode={bgMode}
-            pattern={pattern}
-            patternOpacity={patternOpacity}
-            bgImage={bgImage}
-            overlayOpacity={overlayOpacity}
+            bgType={coverBgType}
+            patternId={coverBgPattern}
+            patternOpacity={coverPatternOpacity}
+            bgImage={coverBgImage}
+            overlayOpacity={coverOverlayOpacity}
+            fallbackBgMode={bgMode}
+            fallbackPattern={pattern}
+            fallbackPatternOpacity={patternOpacity}
+            fallbackBgImage={bgImage}
+            fallbackOverlayOpacity={overlayOpacity}
           />
-          <div className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+          <div className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
             {/* Header / Subtitle */}
             <div className="space-y-4 pt-2">
               <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full">
@@ -253,18 +374,26 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* PAGE 2: CURATORIAL ESSAY (If Present, Strict Single Page on Print) */}
         {/* ------------------------------------------------------------------ */}
         {catalog.curatorialEssay && (
-          <section className="catalog-page essay-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none">
+          <section
+            className="catalog-page essay-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
+            style={essayBgColor ? { backgroundColor: essayBgColor } : undefined}
+          >
             <CatalogBackgroundLayer
-              bgMode={bgMode}
-              pattern={pattern}
-              patternOpacity={patternOpacity}
-              bgImage={bgImage}
-              overlayOpacity={overlayOpacity}
+              bgType={essayBgType}
+              patternId={essayBgPattern}
+              patternOpacity={essayPatternOpacity}
+              bgImage={essayBgImage}
+              overlayOpacity={essayOverlayOpacity}
+              fallbackBgMode={bgMode}
+              fallbackPattern={pattern}
+              fallbackPatternOpacity={patternOpacity}
+              fallbackBgImage={bgImage}
+              fallbackOverlayOpacity={overlayOpacity}
             />
-            <div className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+            <div className={`catalog-frame relative z-10 ${essayFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
               <div className="border-b border-primary/20 pb-3 flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
-                  Curatorial Statement &amp; Scholarly Monograph
+                  {essayTitle}
                 </span>
                 <BookOpen className="w-4 h-4 text-primary" />
               </div>
@@ -282,36 +411,34 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         )}
 
         {/* ------------------------------------------------------------------ */}
-        {/* EDITORIAL & MAGAZINE PAGES: (Arbitrary Custom Publication Pages)   */}
+        {/* EDITORIAL & MAGAZINE PAGES: (Multi-Segment Layouts & Per-Page BG)  */}
         {/* ------------------------------------------------------------------ */}
         {catalog.customPages && catalog.customPages.map((page, pIdx) => {
-          const pageFrameStyle = page.frameStyle || frameStyle;
-          const customPageFrameClass =
-            pageFrameStyle === "double-fillet"
-              ? "catalog-frame-double border-4 border-double border-primary/60"
-              : pageFrameStyle === "silk-border"
-              ? "catalog-frame-silk border-2 border-amber-600/70 shadow-[inset_0_0_0_3px_#1C1814,inset_0_0_0_4.5px_#D4AF37]"
-              : pageFrameStyle === "none"
-              ? "border-none"
-              : "catalog-frame-gold border-2 border-primary/50 shadow-[inset_0_0_0_2px_#1C1814,inset_0_0_0_3.5px_#D4AF37]";
-
-          const isTwoColumn = page.pageLayout === "TWO_COLUMN";
-          const isHeritage = page.pageLayout === "HERITAGE_MAGAZINE";
+          const pageFrameClass = getFrameClass(page.frameStyle || frameStyle);
+          const gridClass = getMagazineGridClass(page.layoutType, page.pageLayout);
+          const segments = Array.isArray(page.segments)
+            ? (page.segments as unknown as { id: string; colSpan: number; contentHtml: string }[])
+            : [];
 
           return (
             <section
               key={page.id}
-              className="catalog-page editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
+              className="catalog-page catalog-magazine-page editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
               style={page.backgroundColor ? { backgroundColor: page.backgroundColor } : undefined}
             >
               <CatalogBackgroundLayer
-                bgMode={page.backgroundImage ? "image" : bgMode}
-                pattern={pattern}
-                patternOpacity={patternOpacity}
-                bgImage={page.backgroundImage || bgImage}
-                overlayOpacity={overlayOpacity}
+                bgType={page.backgroundType || undefined}
+                patternId={page.backgroundPattern || undefined}
+                patternOpacity={page.patternOpacity ?? undefined}
+                bgImage={page.backgroundImage || undefined}
+                overlayOpacity={page.overlayOpacity ?? undefined}
+                fallbackBgMode={bgMode}
+                fallbackPattern={pattern}
+                fallbackPatternOpacity={patternOpacity}
+                fallbackBgImage={bgImage}
+                fallbackOverlayOpacity={overlayOpacity}
               />
-              <div className={`catalog-frame relative z-10 ${customPageFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+              <div className={`catalog-frame relative z-10 ${pageFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
                 {/* Editorial Page Header */}
                 {(page.title || page.subtitle) && (
                   <div className="border-b border-primary/20 pb-4 mb-4">
@@ -334,18 +461,21 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   </div>
                 )}
 
-                {/* Editorial Content Layout */}
-                <div
-                  className={`editorial-content flex-1 overflow-y-auto print:overflow-visible font-serif leading-relaxed text-foreground/90 py-2 text-justify ${
-                    isTwoColumn
-                      ? "sm:columns-2 gap-8 text-sm editorial-columns-2"
-                      : isHeritage
-                      ? "max-w-3xl mx-auto text-base [&_p:first-of-type::first-letter]:text-5xl [&_p:first-of-type::first-letter]:font-serif [&_p:first-of-type::first-letter]:text-primary [&_p:first-of-type::first-letter]:mr-2 [&_p:first-of-type::first-letter]:float-left"
-                      : "text-sm sm:text-base max-w-4xl"
-                  }`}
-                >
-                  {page.contentHtml ? (
-                    <TiptapRenderer content={page.contentHtml} />
+                {/* Editorial Multi-Segment Content Layout */}
+                <div className={`magazine-layout-container flex-1 overflow-y-auto print:overflow-visible font-serif leading-relaxed text-foreground/90 py-2 ${gridClass}`}>
+                  {segments.length > 0 ? (
+                    segments.map((seg, sIdx) => (
+                      <div
+                        key={seg.id || sIdx}
+                        className="magazine-col prose prose-sm dark:prose-invert font-serif leading-relaxed text-foreground/90 overflow-y-auto print:overflow-visible text-justify"
+                      >
+                        <TiptapRenderer content={seg.contentHtml} />
+                      </div>
+                    ))
+                  ) : page.contentHtml ? (
+                    <div className="magazine-col prose prose-sm sm:prose-base dark:prose-invert font-serif leading-relaxed text-foreground/90 overflow-y-auto print:overflow-visible text-justify">
+                      <TiptapRenderer content={page.contentHtml} />
+                    </div>
                   ) : (
                     <p className="italic text-muted-foreground">No editorial content compiled for this page.</p>
                   )}
@@ -379,11 +509,11 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               className="catalog-page plate-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none"
             >
               <CatalogBackgroundLayer
-                bgMode={bgMode}
-                pattern={pattern}
-                patternOpacity={patternOpacity}
-                bgImage={bgImage}
-                overlayOpacity={overlayOpacity}
+                fallbackBgMode={bgMode}
+                fallbackPattern={pattern}
+                fallbackPatternOpacity={patternOpacity}
+                fallbackBgImage={bgImage}
+                fallbackOverlayOpacity={overlayOpacity}
               />
               <div
                 className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
@@ -576,15 +706,23 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* FINAL PAGE: COLOPHON & ATELIER HERITAGE (When Enabled)             */}
         {/* ------------------------------------------------------------------ */}
         {endPageConfig.isEnabled !== false && (
-          <section className="catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none">
+          <section
+            className="catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
+            style={endBgColor ? { backgroundColor: endBgColor } : undefined}
+          >
             <CatalogBackgroundLayer
-              bgMode={bgMode}
-              pattern={pattern}
-              patternOpacity={patternOpacity}
-              bgImage={bgImage}
-              overlayOpacity={overlayOpacity}
+              bgType={endBgType}
+              patternId={endBgPattern}
+              patternOpacity={endPatternOpacity}
+              bgImage={endBgImage}
+              overlayOpacity={endOverlayOpacity}
+              fallbackBgMode={bgMode}
+              fallbackPattern={pattern}
+              fallbackPatternOpacity={patternOpacity}
+              fallbackBgImage={bgImage}
+              fallbackOverlayOpacity={overlayOpacity}
             />
-            <div className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
+            <div className={`catalog-frame relative z-10 ${endFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
               <div className="space-y-3 pt-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
                   Colophon &amp; Publication Details

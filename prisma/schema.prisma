@@ -580,20 +580,29 @@ model ECatalog {
 }
 
 model ECatalogCustomPage {
-  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  catalogId       String    @db.Uuid
-  catalog         ECatalog  @relation(fields: [catalogId], references: [id], onDelete: Cascade)
-  pageNumber      Int       @default(1)
-  title           String?   // e.g. "Sacred Iconography & Nayaka Influence"
-  subtitle        String?   // e.g. "Scholarly commentary and dynastic patronage"
-  pageLayout      String    @default("SINGLE_COLUMN") // "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE"
-  contentHtml     String?   @db.Text
-  sections        Json?     // Optional structured blocks
-  backgroundImage String?
-  backgroundColor String?
-  frameStyle      String?   @default("gold-fillet")
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  catalogId         String    @db.Uuid
+  catalog           ECatalog  @relation(fields: [catalogId], references: [id], onDelete: Cascade)
+  pageNumber        Int       @default(1)
+  title             String?   // e.g. "Sacred Iconography & Nayaka Influence"
+  subtitle          String?   // e.g. "Scholarly commentary and dynastic patronage"
+  layoutType        String    @default("2_COL") // "1_COL" | "2_COL" | "3_COL" | "4_COL" | "6_COL" | "ASYMMETRIC_70_30" | "ASYMMETRIC_30_70"
+  pageLayout        String?   @default("2_COL") // backward compatible alias
+  contentHtml       String?   @db.Text
+  sections          Json?     // Optional structured blocks
+  segments          Json?     // Array of segment objects: [{ id, title, contentHtml, image, caption, widthRatio }]
+
+  // Background Styling Suite
+  backgroundType    String    @default("COLOR") // "COLOR" | "PATTERN" | "IMAGE"
+  backgroundColor   String?   @default("#FAF7F2")
+  backgroundPattern String?
+  patternOpacity    Float?    @default(0.15)
+  backgroundImage   String?
+  overlayOpacity    Float?    @default(0.2)
+  frameStyle        String?   @default("gold-fillet")
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@map("e_catalog_custom_pages")
 }

@@ -50,6 +50,75 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { BACKGROUND_PATTERNS } from "@/lib/background-patterns";
+import {
+  CatalogBackgroundControl,
+  type CatalogBackgroundConfig,
+} from "@/components/admin/catalog-background-control";
+
+export type MagazineLayoutType =
+  | "1_COL"
+  | "2_COL"
+  | "ASYMMETRIC_70_30"
+  | "ASYMMETRIC_30_70"
+  | "3_COL"
+  | "4_COL"
+  | "6_COL";
+
+export interface CustomPageSegment {
+  id: string;
+  title?: string;
+  contentHtml: string;
+  image?: string;
+  caption?: string;
+  widthRatio?: string;
+}
+
+export function getColumnCount(layout: MagazineLayoutType): number {
+  switch (layout) {
+    case "1_COL":
+      return 1;
+    case "2_COL":
+    case "ASYMMETRIC_70_30":
+    case "ASYMMETRIC_30_70":
+      return 2;
+    case "3_COL":
+      return 3;
+    case "4_COL":
+      return 4;
+    case "6_COL":
+      return 6;
+    default:
+      return 2;
+  }
+}
+
+export function initSegmentsForLayout(
+  layout: MagazineLayoutType,
+  existingSegments?: CustomPageSegment[],
+  fallbackHtml?: string
+): CustomPageSegment[] {
+  const count = getColumnCount(layout);
+  const segments: CustomPageSegment[] = [];
+
+  for (let i = 0; i < count; i++) {
+    if (existingSegments && existingSegments[i]) {
+      segments.push(existingSegments[i]);
+    } else if (i === 0 && fallbackHtml) {
+      segments.push({
+        id: `seg-${i}-${Date.now()}`,
+        title: `Column ${i + 1}`,
+        contentHtml: fallbackHtml,
+      });
+    } else {
+      segments.push({
+        id: `seg-${i}-${Date.now() + i}`,
+        title: `Column ${i + 1}`,
+        contentHtml: "",
+      });
+    }
+  }
+  return segments;
+}
 
 interface ArtworkOption {
   id: string;
@@ -89,42 +158,32 @@ interface ECatalogThemeConfig {
   accentColor?: string;
 }
 
-interface ECatalogCoverConfig {
-  backgroundColor?: string;
-  backgroundImage?: string;
-  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+interface ECatalogCoverConfig extends CatalogBackgroundConfig {
   showDate?: boolean;
   showCurator?: boolean;
 }
 
-interface ECatalogEssayConfig {
+interface ECatalogEssayConfig extends CatalogBackgroundConfig {
   title?: string;
   contentHtml?: string;
-  backgroundImage?: string;
-  backgroundColor?: string;
-  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
 }
 
-interface ECatalogEndPageConfig {
+interface ECatalogEndPageConfig extends CatalogBackgroundConfig {
   isEnabled?: boolean;
   title?: string;
   contentHtml?: string;
-  backgroundImage?: string;
-  backgroundColor?: string;
-  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
   contactDetails?: string;
 }
 
-interface ECatalogCustomPageItem {
+interface ECatalogCustomPageItem extends CatalogBackgroundConfig {
   id?: string;
   pageNumber: number;
   title: string;
   subtitle: string;
-  pageLayout: "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE";
-  contentHtml: string;
-  frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
-  backgroundImage?: string;
-  backgroundColor?: string;
+  layoutType: MagazineLayoutType;
+  pageLayout?: string;
+  contentHtml?: string;
+  segments: CustomPageSegment[];
 }
 
 interface ECatalogDetail {
@@ -277,22 +336,38 @@ export default function AdminCatalogStudioPage() {
               pageNumber: number;
               title?: string;
               subtitle?: string;
-              pageLayout?: "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE";
+              layoutType?: string;
+              pageLayout?: string;
               contentHtml?: string;
-              frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
-              backgroundImage?: string;
+              segments?: CustomPageSegment[];
+              backgroundType?: "COLOR" | "PATTERN" | "IMAGE";
               backgroundColor?: string;
-            }) => ({
-              id: cp.id,
-              pageNumber: cp.pageNumber,
-              title: cp.title || "",
-              subtitle: cp.subtitle || "",
-              pageLayout: cp.pageLayout || "SINGLE_COLUMN",
-              contentHtml: cp.contentHtml || "",
-              frameStyle: cp.frameStyle || "gold-fillet",
-              backgroundImage: cp.backgroundImage || "",
-              backgroundColor: cp.backgroundColor || "",
-            }))
+              backgroundPattern?: string;
+              patternOpacity?: number;
+              backgroundImage?: string;
+              overlayOpacity?: number;
+              frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+            }) => {
+              const layout = (cp.layoutType || cp.pageLayout || "2_COL") as MagazineLayoutType;
+              const segments = initSegmentsForLayout(layout, cp.segments, cp.contentHtml);
+              return {
+                id: cp.id,
+                pageNumber: cp.pageNumber,
+                title: cp.title || "",
+                subtitle: cp.subtitle || "",
+                layoutType: layout,
+                pageLayout: layout,
+                contentHtml: cp.contentHtml || "",
+                segments,
+                backgroundType: cp.backgroundType || "COLOR",
+                backgroundColor: cp.backgroundColor || "#FAF7F2",
+                backgroundPattern: cp.backgroundPattern || "mandala-filigree",
+                patternOpacity: typeof cp.patternOpacity === "number" ? cp.patternOpacity : 0.15,
+                backgroundImage: cp.backgroundImage || "",
+                overlayOpacity: typeof cp.overlayOpacity === "number" ? cp.overlayOpacity : 0.2,
+                frameStyle: cp.frameStyle || "gold-fillet",
+              };
+            })
           );
         }
 
@@ -351,11 +426,17 @@ export default function AdminCatalogStudioPage() {
           pageNumber: idx + 1,
           title: cp.title.trim() || null,
           subtitle: cp.subtitle.trim() || null,
-          pageLayout: cp.pageLayout,
+          layoutType: cp.layoutType || "2_COL",
+          pageLayout: cp.layoutType || "2_COL",
           contentHtml: cp.contentHtml || null,
-          frameStyle: cp.frameStyle || "gold-fillet",
+          segments: cp.segments || [],
+          backgroundType: cp.backgroundType || "COLOR",
+          backgroundColor: cp.backgroundColor || "#FAF7F2",
+          backgroundPattern: cp.backgroundPattern || null,
+          patternOpacity: cp.patternOpacity ?? 0.15,
           backgroundImage: cp.backgroundImage || null,
-          backgroundColor: cp.backgroundColor || null,
+          overlayOpacity: cp.overlayOpacity ?? 0.2,
+          frameStyle: cp.frameStyle || "gold-fillet",
         })),
         items: plates.map((p, idx) => ({
           artworkId: p.artworkId,
@@ -390,22 +471,38 @@ export default function AdminCatalogStudioPage() {
             pageNumber: number;
             title?: string;
             subtitle?: string;
-            pageLayout?: "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE";
+            layoutType?: string;
+            pageLayout?: string;
             contentHtml?: string;
-            frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
-            backgroundImage?: string;
+            segments?: CustomPageSegment[];
+            backgroundType?: "COLOR" | "PATTERN" | "IMAGE";
             backgroundColor?: string;
-          }) => ({
-            id: cp.id,
-            pageNumber: cp.pageNumber,
-            title: cp.title || "",
-            subtitle: cp.subtitle || "",
-            pageLayout: cp.pageLayout || "SINGLE_COLUMN",
-            contentHtml: cp.contentHtml || "",
-            frameStyle: cp.frameStyle || "gold-fillet",
-            backgroundImage: cp.backgroundImage || "",
-            backgroundColor: cp.backgroundColor || "",
-          }))
+            backgroundPattern?: string;
+            patternOpacity?: number;
+            backgroundImage?: string;
+            overlayOpacity?: number;
+            frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+          }) => {
+            const layout = (cp.layoutType || cp.pageLayout || "2_COL") as MagazineLayoutType;
+            const segments = initSegmentsForLayout(layout, cp.segments, cp.contentHtml);
+            return {
+              id: cp.id,
+              pageNumber: cp.pageNumber,
+              title: cp.title || "",
+              subtitle: cp.subtitle || "",
+              layoutType: layout,
+              pageLayout: layout,
+              contentHtml: cp.contentHtml || "",
+              segments,
+              backgroundType: cp.backgroundType || "COLOR",
+              backgroundColor: cp.backgroundColor || "#FAF7F2",
+              backgroundPattern: cp.backgroundPattern || "mandala-filigree",
+              patternOpacity: typeof cp.patternOpacity === "number" ? cp.patternOpacity : 0.15,
+              backgroundImage: cp.backgroundImage || "",
+              overlayOpacity: typeof cp.overlayOpacity === "number" ? cp.overlayOpacity : 0.2,
+              frameStyle: cp.frameStyle || "gold-fillet",
+            };
+          })
         );
       }
     } catch (err: unknown) {
@@ -432,15 +529,33 @@ export default function AdminCatalogStudioPage() {
 
   // Custom Editorial Pages Handlers
   const addCustomPage = () => {
+    const layoutType: MagazineLayoutType = "2_COL";
     const newPage: ECatalogCustomPageItem = {
       pageNumber: customPages.length + 1,
       title: "Historical Context & Iconography",
       subtitle: "Scholarly commentary and cultural heritage",
-      pageLayout: "SINGLE_COLUMN",
-      contentHtml: "<p>Compose fine art scholarly essay, Nayaka patronage lineage, or iconographical symbolism...</p>",
-      frameStyle: "gold-fillet",
+      layoutType,
+      pageLayout: layoutType,
+      contentHtml: "",
+      segments: [
+        {
+          id: `seg-1-${Date.now()}`,
+          title: "Column 1 (Primary Thesis)",
+          contentHtml: "<p>Compose fine art scholarly essay, Nayaka patronage lineage, or iconographical symbolism...</p>",
+        },
+        {
+          id: `seg-2-${Date.now() + 1}`,
+          title: "Column 2 (Patronage & Context)",
+          contentHtml: "<p>Detail historical court documentation, pigment chemistry, or comparative temple iconography...</p>",
+        },
+      ],
+      backgroundType: "COLOR",
+      backgroundColor: "#FAF7F2",
+      backgroundPattern: "mandala-filigree",
+      patternOpacity: 0.15,
       backgroundImage: "",
-      backgroundColor: "",
+      overlayOpacity: 0.2,
+      frameStyle: "gold-fillet",
     };
     setCustomPages((prev) => [...prev, newPage]);
     toast.success("Added new editorial magazine page");
@@ -467,10 +582,37 @@ export default function AdminCatalogStudioPage() {
     setCustomPages(updated);
   };
 
-  const updateCustomPage = (index: number, fields: Partial<ECatalogCustomPageItem>) => {
+  const updateCustomPage = (index: number, updates: Partial<ECatalogCustomPageItem>) => {
     setCustomPages((prev) => {
       const copy = [...prev];
-      copy[index] = { ...copy[index], ...fields };
+      copy[index] = { ...copy[index], ...updates };
+      return copy;
+    });
+  };
+
+  const updateCustomPageSegment = (pageIdx: number, segIdx: number, html: string) => {
+    setCustomPages((prev) => {
+      const copy = [...prev];
+      const target = { ...copy[pageIdx] };
+      const segments = [...(target.segments || [])];
+      if (segments[segIdx]) {
+        segments[segIdx] = { ...segments[segIdx], contentHtml: html };
+      }
+      target.segments = segments;
+      target.contentHtml = segments.map((s) => s.contentHtml).filter(Boolean).join("");
+      copy[pageIdx] = target;
+      return copy;
+    });
+  };
+
+  const changeCustomPageLayout = (pageIdx: number, newLayout: MagazineLayoutType) => {
+    setCustomPages((prev) => {
+      const copy = [...prev];
+      const target = { ...copy[pageIdx] };
+      target.layoutType = newLayout;
+      target.pageLayout = newLayout;
+      target.segments = initSegmentsForLayout(newLayout, target.segments, target.contentHtml);
+      copy[pageIdx] = target;
       return copy;
     });
   };
@@ -1068,6 +1210,23 @@ export default function AdminCatalogStudioPage() {
                   />
                 </div>
               </div>
+
+              <div className="pt-2">
+                <CatalogBackgroundControl
+                  config={{
+                    backgroundType: essayConfig.backgroundType || "COLOR",
+                    backgroundColor: essayConfig.backgroundColor || "#FAF7F2",
+                    backgroundPattern: essayConfig.backgroundPattern || "mandala-filigree",
+                    patternOpacity: essayConfig.patternOpacity ?? 0.15,
+                    backgroundImage: essayConfig.backgroundImage || "",
+                    overlayOpacity: essayConfig.overlayOpacity ?? 0.2,
+                    frameStyle: essayConfig.frameStyle || "gold-fillet",
+                  }}
+                  onChange={(upd) => setEssayConfig((prev) => ({ ...prev, ...upd }))}
+                  title="Curatorial Essay Background & Framing"
+                  description="Customize canvas backdrop, sacred pattern, and framing specifically for this foreword."
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -1187,79 +1346,120 @@ export default function AdminCatalogStudioPage() {
                       <div className="space-y-1.5 sm:col-span-1">
                         <label className="text-xs font-semibold text-foreground">Magazine Page Layout</label>
                         <Select
-                          value={page.pageLayout}
-                          onValueChange={(val: "SINGLE_COLUMN" | "TWO_COLUMN" | "HERITAGE_MAGAZINE") =>
-                            updateCustomPage(pIdx, { pageLayout: val })
-                          }
+                          value={page.layoutType || "2_COL"}
+                          onValueChange={(val: MagazineLayoutType) => changeCustomPageLayout(pIdx, val)}
                         >
                           <SelectTrigger className="text-xs">
                             <SelectValue placeholder="Layout Mode" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="SINGLE_COLUMN">Single Column (Scholarly)</SelectItem>
-                            <SelectItem value="TWO_COLUMN">2-Column Fine Art Magazine</SelectItem>
-                            <SelectItem value="HERITAGE_MAGAZINE">Feature Article (Large Drop Cap)</SelectItem>
+                            <SelectItem value="1_COL">1-Column Full Feature (Scholarly)</SelectItem>
+                            <SelectItem value="2_COL">2-Column Balanced (50:50)</SelectItem>
+                            <SelectItem value="ASYMMETRIC_70_30">2-Column Asymmetric (70:30)</SelectItem>
+                            <SelectItem value="ASYMMETRIC_30_70">2-Column Asymmetric (30:70)</SelectItem>
+                            <SelectItem value="3_COL">3-Column Magazine Spread (33:33:33)</SelectItem>
+                            <SelectItem value="4_COL">4-Column Grid (Archival &amp; Footnotes)</SelectItem>
+                            <SelectItem value="6_COL">6-Column Gallery Matrix</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
-                    {/* Framing & Optional Background Customization */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground">Per-Page Frame Style</label>
-                        <Select
-                          value={page.frameStyle || "gold-fillet"}
-                          onValueChange={(val: "none" | "gold-fillet" | "double-fillet" | "silk-border") =>
-                            updateCustomPage(pIdx, { frameStyle: val })
-                          }
-                        >
-                          <SelectTrigger className="text-xs">
-                            <SelectValue placeholder="Inherit Global Frame" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="gold-fillet">Classical Gold Fillet (22k Temple Border)</SelectItem>
-                            <SelectItem value="double-fillet">Royal Double Fillet (Museum Archival)</SelectItem>
-                            <SelectItem value="silk-border">Sacred Silk Border</SelectItem>
-                            <SelectItem value="none">Minimal Frame (Border-less)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground">Optional Background Image</label>
-                        <MediaUploader
-                          value={page.backgroundImage || ""}
-                          onUploadComplete={(url) => updateCustomPage(pIdx, { backgroundImage: url })}
-                          onRemove={() => updateCustomPage(pIdx, { backgroundImage: "" })}
-                          mediaType="general"
-                          description="Textural backdrop for this article page (optional)."
-                        />
-                      </div>
+                    {/* Universal Background & Framing Suite for this page */}
+                    <div className="pt-1">
+                      <CatalogBackgroundControl
+                        config={page}
+                        onChange={(upd) => updateCustomPage(pIdx, upd)}
+                        title="Page Background &amp; Framing Suite"
+                        description="Select canvas backdrop, sacred heritage pattern, or custom image for this discrete magazine page."
+                      />
                     </div>
 
-                    {/* Rich Text Editor for this page */}
-                    <div className="space-y-1.5 pt-2">
+                    {/* Multi-Segment Independent Column Studio */}
+                    <div className="space-y-3 pt-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-xs font-semibold text-foreground">Article &amp; Scholarly Text</label>
-                        <AiAssistantModal
-                          initialContext={`Article: ${page.title || "Sacred Art Monograph"}\nSubtitle: ${page.subtitle || ""}\n${page.contentHtml || ""}`}
-                          onApply={(aiText) => {
-                            const newP = `<p>${aiText.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br/>")}</p>`;
-                            updateCustomPage(pIdx, {
-                              contentHtml: page.contentHtml ? `${page.contentHtml}${newP}` : newP,
-                            });
-                          }}
-                          triggerLabel="✨ AI Article Polish"
-                        />
+                        <div className="space-y-0.5">
+                          <label className="text-xs font-serif font-bold text-foreground">
+                            Multi-Segment Column Studio ({page.segments?.length || 1} Columns)
+                          </label>
+                          <p className="text-[11px] text-muted-foreground">
+                            Each column functions independently with its own typography, headings, images, and AI polish.
+                          </p>
+                        </div>
+                        <Badge variant="outline" className="text-[10px] font-mono text-primary border-primary/30">
+                          {page.layoutType || "2_COL"} Spacing
+                        </Badge>
                       </div>
-                      <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
-                        <TiptapEditor
-                          content={page.contentHtml}
-                          onChange={(_, html) => updateCustomPage(pIdx, { contentHtml: html })}
-                          placeholder="Compose rich article text, blockquotes, fine art historical notes, drop caps..."
-                          className="min-h-[220px]"
-                        />
+
+                      <div
+                        className={`grid gap-4 ${
+                          page.layoutType === "1_COL"
+                            ? "grid-cols-1"
+                            : page.layoutType === "2_COL"
+                            ? "grid-cols-1 md:grid-cols-2"
+                            : page.layoutType === "ASYMMETRIC_70_30"
+                            ? "grid-cols-1 md:grid-cols-12"
+                            : page.layoutType === "ASYMMETRIC_30_70"
+                            ? "grid-cols-1 md:grid-cols-12"
+                            : page.layoutType === "3_COL"
+                            ? "grid-cols-1 md:grid-cols-3"
+                            : page.layoutType === "4_COL"
+                            ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
+                            : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
+                        }`}
+                      >
+                        {page.segments?.map((seg, sIdx) => {
+                          const colSpan =
+                            page.layoutType === "ASYMMETRIC_70_30"
+                              ? sIdx === 0
+                                ? "md:col-span-8"
+                                : "md:col-span-4"
+                              : page.layoutType === "ASYMMETRIC_30_70"
+                              ? sIdx === 0
+                                ? "md:col-span-4"
+                                : "md:col-span-8"
+                              : "";
+
+                          return (
+                            <div
+                              key={seg.id || `seg-${sIdx}`}
+                              className={`space-y-2 p-3 rounded-xl border border-border/80 bg-card/90 flex flex-col justify-between shadow-xs ${colSpan}`}
+                            >
+                              <div className="flex items-center justify-between gap-2 pb-2 border-b border-border/50">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-5 h-5 rounded-full bg-primary/10 text-primary border border-primary/30 flex items-center justify-center text-[10px] font-mono font-bold">
+                                    {sIdx + 1}
+                                  </span>
+                                  <span className="text-xs font-serif font-bold text-foreground">
+                                    {seg.title || `Column ${sIdx + 1}`}
+                                  </span>
+                                </div>
+
+                                <AiAssistantModal
+                                  initialContext={`Article: ${page.title || "Sacred Art Monograph"}\nColumn ${sIdx + 1}:\n${seg.contentHtml || ""}`}
+                                  onApply={(aiText) => {
+                                    const newP = `<p>${aiText.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br/>")}</p>`;
+                                    updateCustomPageSegment(
+                                      pIdx,
+                                      sIdx,
+                                      seg.contentHtml ? `${seg.contentHtml}${newP}` : newP
+                                    );
+                                  }}
+                                  triggerLabel="✨ AI Polish"
+                                />
+                              </div>
+
+                              <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm flex-1">
+                                <TiptapEditor
+                                  content={seg.contentHtml}
+                                  onChange={(_, html) => updateCustomPageSegment(pIdx, sIdx, html)}
+                                  placeholder={`Compose text, drop caps, or insert photos for Column ${sIdx + 1}...`}
+                                  className="min-h-[200px]"
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </CardContent>
@@ -1575,6 +1775,23 @@ export default function AdminCatalogStudioPage() {
                       className="min-h-[220px]"
                     />
                   </div>
+                </div>
+
+                <div className="pt-2">
+                  <CatalogBackgroundControl
+                    config={{
+                      backgroundType: endPageConfig.backgroundType || "COLOR",
+                      backgroundColor: endPageConfig.backgroundColor || "#FAF7F2",
+                      backgroundPattern: endPageConfig.backgroundPattern || "mandala-filigree",
+                      patternOpacity: endPageConfig.patternOpacity ?? 0.15,
+                      backgroundImage: endPageConfig.backgroundImage || "",
+                      overlayOpacity: endPageConfig.overlayOpacity ?? 0.2,
+                      frameStyle: endPageConfig.frameStyle || "gold-fillet",
+                    }}
+                    onChange={(upd) => setEndPageConfig((prev) => ({ ...prev, ...upd }))}
+                    title="Colophon & End Page Background & Framing"
+                    description="Customize canvas backdrop, sacred pattern, and framing specifically for this closing page."
+                  />
                 </div>
 
                 <div className="space-y-1.5 pt-2">

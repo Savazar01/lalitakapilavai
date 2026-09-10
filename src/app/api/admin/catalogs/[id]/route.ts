@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
@@ -158,22 +159,47 @@ export async function PUT(
               pageNumber?: number;
               title?: string;
               subtitle?: string;
+              layoutType?: string;
               pageLayout?: string;
               contentHtml?: string;
-              frameStyle?: string;
-              backgroundImage?: string;
+              sections?: unknown;
+              segments?: unknown;
+              backgroundType?: string;
               backgroundColor?: string;
-            }, idx: number) => ({
-              catalogId: id,
-              pageNumber: typeof page.pageNumber === "number" ? page.pageNumber : idx + 1,
-              title: page.title ? page.title.trim() : null,
-              subtitle: page.subtitle ? page.subtitle.trim() : null,
-              pageLayout: page.pageLayout || "SINGLE_COLUMN",
-              contentHtml: page.contentHtml || null,
-              frameStyle: page.frameStyle || "gold-fillet",
-              backgroundImage: page.backgroundImage || null,
-              backgroundColor: page.backgroundColor || null,
-            })),
+              backgroundPattern?: string;
+              patternOpacity?: number;
+              backgroundImage?: string;
+              overlayOpacity?: number;
+              frameStyle?: string;
+            }, idx: number) => {
+              const layoutType = page.layoutType || page.pageLayout || "2_COL";
+              let contentHtml = page.contentHtml || null;
+              if (!contentHtml && Array.isArray(page.segments) && page.segments.length > 0) {
+                contentHtml = page.segments
+                  .map((s: { contentHtml?: string }) => s.contentHtml || "")
+                  .filter(Boolean)
+                  .join("");
+              }
+
+              return {
+                catalogId: id,
+                pageNumber: typeof page.pageNumber === "number" ? page.pageNumber : idx + 1,
+                title: page.title ? page.title.trim() : null,
+                subtitle: page.subtitle ? page.subtitle.trim() : null,
+                layoutType,
+                pageLayout: layoutType,
+                contentHtml,
+                sections: page.sections !== undefined ? (page.sections as unknown as Prisma.InputJsonValue) : undefined,
+                segments: page.segments !== undefined ? (page.segments as unknown as Prisma.InputJsonValue) : undefined,
+                backgroundType: page.backgroundType || "COLOR",
+                backgroundColor: page.backgroundColor || "#FAF7F2",
+                backgroundPattern: page.backgroundPattern || null,
+                patternOpacity: typeof page.patternOpacity === "number" ? page.patternOpacity : 0.15,
+                backgroundImage: page.backgroundImage || null,
+                overlayOpacity: typeof page.overlayOpacity === "number" ? page.overlayOpacity : 0.2,
+                frameStyle: page.frameStyle || "gold-fillet",
+              };
+            }),
           });
         }
       });

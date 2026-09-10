@@ -286,7 +286,8 @@ body {
     margin: 0 auto !important;
   }
 
-  /* Multi-Page Magazine Editorial Page Print Rules */
+  /* Multi-Segment Magazine Editorial Page Print Rules */
+  .catalog-magazine-page,
   .editorial-page {
     page-break-after: always !important;
     break-after: page !important;
@@ -295,6 +296,56 @@ body {
     height: 100vh !important;
     max-height: 100vh !important;
     overflow: hidden !important;
+    padding: 10mm !important;
+    box-sizing: border-box !important;
+  }
+
+  .magazine-grid-1col {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 6mm !important;
+  }
+
+  .magazine-grid-2col {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8mm !important;
+  }
+
+  .magazine-grid-3col {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 6mm !important;
+  }
+
+  .magazine-grid-4col {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 4mm !important;
+  }
+
+  .magazine-grid-6col {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 3mm !important;
+  }
+
+  .magazine-grid-asym-70-30 {
+    display: grid !important;
+    grid-template-columns: 7fr 3fr !important;
+    gap: 8mm !important;
+  }
+
+  .magazine-grid-asym-30-70 {
+    display: grid !important;
+    grid-template-columns: 3fr 7fr !important;
+    gap: 8mm !important;
+  }
+
+  .magazine-col {
+    overflow: hidden !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
   }
 
   .editorial-columns-2 {
