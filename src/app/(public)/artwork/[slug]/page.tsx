@@ -199,7 +199,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               <h3 className="font-serif font-bold text-sm text-foreground uppercase tracking-wider">
                 Iconographic Commentary &amp; Symbolism
               </h3>
-              <div className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              <div className="text-xs sm:text-sm text-foreground/90 leading-relaxed">
                 <TiptapRenderer content={artwork.description} />
               </div>
             </div>

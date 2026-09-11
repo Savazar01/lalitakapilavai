@@ -68,6 +68,23 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
   Compass,
 };
 
+/**
+ * Strips hardcoded pure white/black and parchment/charcoal inline styles
+ * so that typography dynamically inherits CSS theme variables (text-foreground / dark:prose-invert).
+ */
+export function sanitizeAdaptiveThemeHtml(html: string): string {
+  if (!html) return "";
+  return html
+    .replace(
+      /style="([^"]*?)color:\s*(#ffffff|#fff|#000000|#000|#1c1814|#faf7f2|#fbf8f1|#0f0e0d|rgb\(\s*255,\s*255,\s*255\s*\)|rgb\(\s*0,\s*0,\s*0\s*\)|rgba\(\s*255,\s*255,\s*255,\s*[0-9.]+\s*\)|rgba\(\s*0,\s*0,\s*0,\s*[0-9.]+\s*\));?([^"]*?)"/gi,
+      (match, p1, color, p2) => {
+        const remaining = `${p1} ${p2}`.trim().replace(/;\s*;/g, ";");
+        return remaining && remaining !== ";" ? `style="${remaining}"` : "";
+      }
+    )
+    .replace(/\sstyle=""/gi, "");
+}
+
 function renderMarks(text: string, marks?: TiptapMark[]): React.ReactNode {
   if (!marks || marks.length === 0) return text;
 
@@ -81,9 +98,30 @@ function renderMarks(text: string, marks?: TiptapMark[]): React.ReactNode {
         return <u key={`u-${idx}`}>{acc}</u>;
       case "textStyle": {
         const styleObj: React.CSSProperties = {};
-        if (mark.attrs?.color) styleObj.color = mark.attrs.color as string;
+        if (mark.attrs?.color) {
+          const c = String(mark.attrs.color).trim().toLowerCase();
+          const isMonochrome =
+            c === "#ffffff" ||
+            c === "#fff" ||
+            c === "#000000" ||
+            c === "#000" ||
+            c === "#1c1814" ||
+            c === "#faf7f2" ||
+            c === "#fbf8f1" ||
+            c === "#0f0e0d" ||
+            c === "rgb(255, 255, 255)" ||
+            c === "rgb(0, 0, 0)" ||
+            c.startsWith("rgba(255, 255, 255") ||
+            c.startsWith("rgba(0, 0, 0");
+          if (!isMonochrome) {
+            styleObj.color = mark.attrs.color as string;
+          }
+        }
         if (mark.attrs?.fontSize) styleObj.fontSize = mark.attrs.fontSize as string;
         if (mark.attrs?.fontFamily) styleObj.fontFamily = mark.attrs.fontFamily as string;
+        if (Object.keys(styleObj).length === 0) {
+          return acc;
+        }
         return (
           <span key={`ts-${idx}`} style={styleObj}>
             {acc}
@@ -598,16 +636,17 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
 
     // If string contains HTML tags, render safely as HTML so tags like <p> do not appear literally
     if (/<[a-z][\s\S]*>/i.test(trimmed)) {
+      const sanitized = sanitizeAdaptiveThemeHtml(trimmed);
       return (
         <div
-          className={`prose prose-stone dark:prose-invert max-w-none ${className}`}
-          dangerouslySetInnerHTML={{ __html: trimmed }}
+          className={`prose prose-stone dark:prose-invert max-w-none text-foreground leading-relaxed ${className}`}
+          dangerouslySetInnerHTML={{ __html: sanitized }}
         />
       );
     }
 
     return (
-      <div className={`prose prose-stone dark:prose-invert max-w-none ${className}`}>
+      <div className={`prose prose-stone dark:prose-invert max-w-none text-foreground leading-relaxed ${className}`}>
         <p className="whitespace-pre-line leading-relaxed">{content}</p>
       </div>
     );
@@ -629,7 +668,7 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
   const doc = content as unknown as TiptapNode;
 
   return (
-    <div className={`prose-container ${className}`}>
+    <div className={`prose prose-stone dark:prose-invert max-w-none text-foreground leading-relaxed ${className}`}>
       {mediaConfig && renderMediaBlock(mediaConfig)}
       {doc.type === "doc" && renderNode(doc, "root")}
     </div>

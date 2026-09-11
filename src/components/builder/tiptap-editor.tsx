@@ -102,14 +102,33 @@ export const TextStyleMark = Mark.create({
   },
   renderHTML({ HTMLAttributes }) {
     const styles: string[] = [];
-    if (HTMLAttributes.color) styles.push(`color: ${HTMLAttributes.color}`);
+    if (HTMLAttributes.color) {
+      const c = String(HTMLAttributes.color).trim().toLowerCase();
+      // Exclude hardcoded monochrome white/black so the text inherits theme foreground
+      if (
+        c !== "#ffffff" &&
+        c !== "#fff" &&
+        c !== "#000000" &&
+        c !== "#000" &&
+        c !== "rgb(255, 255, 255)" &&
+        c !== "rgb(0, 0, 0)" &&
+        c !== "rgba(255, 255, 255, 1)" &&
+        c !== "rgba(0, 0, 0, 1)"
+      ) {
+        styles.push(`color: ${HTMLAttributes.color}`);
+      }
+    }
     if (HTMLAttributes.fontSize) styles.push(`font-size: ${HTMLAttributes.fontSize}`);
     if (HTMLAttributes.fontFamily) styles.push(`font-family: ${HTMLAttributes.fontFamily}`);
     const filteredAttrs = { ...HTMLAttributes };
     delete filteredAttrs.color;
     delete filteredAttrs.fontSize;
     delete filteredAttrs.fontFamily;
-    if (styles.length > 0) filteredAttrs.style = styles.join("; ");
+    if (styles.length > 0) {
+      filteredAttrs.style = styles.join("; ");
+      return ["span", mergeAttributes(this.options.HTMLAttributes, filteredAttrs), 0];
+    }
+    // If no styles apply, avoid creating a redundant styled wrapper
     return ["span", mergeAttributes(this.options.HTMLAttributes, filteredAttrs), 0];
   },
   addAttributes() {
@@ -133,10 +152,11 @@ export const TextStyleMark = Mark.create({
 const COLOR_PRESETS = [
   { label: "Temple Gold", color: "#D4AF37" },
   { label: "Madder Terracotta", color: "#A3281E" },
-  { label: "Deep Charcoal", color: "#1C1814" },
-  { label: "Parchment Ivory", color: "#FAF7F2" },
-  { label: "Pure White", color: "#FFFFFF" },
+  { label: "Deep Ochre", color: "#C25E34" },
+  { label: "Royal Lapis", color: "#2E5B88" },
+  { label: "Forest Malachite", color: "#2D6A4F" },
 ];
+
 
 const FONT_SIZES = [
   { label: "Size: Auto", value: "default" },
@@ -181,7 +201,8 @@ export function TiptapEditor({
 }: TiptapEditorProps) {
   const proseClasses = isLight
     ? "prose prose-stone max-w-none text-stone-900 leading-relaxed [&_p]:text-stone-800"
-    : "prose prose-stone dark:prose-invert max-w-none text-foreground/90 leading-relaxed";
+    : "prose prose-stone dark:prose-invert max-w-none text-foreground leading-relaxed [&_p]:text-foreground/90";
+
 
   const parsedContent = React.useMemo(() => {
     if (!content) return undefined;
@@ -460,6 +481,21 @@ export function TiptapEditor({
           {/* Color Palette Selector */}
           <div className="flex items-center gap-1 pl-0.5">
             <div className="flex items-center gap-1 border border-border/80 rounded p-0.5 bg-background/50">
+              {/* Default / Auto Theme-Adaptive Swatch */}
+              <button
+                type="button"
+                onClick={() =>
+                  editor.chain().focus().setMark("textStyle", { color: null }).run()
+                }
+                className="w-4 h-4 rounded-full border border-border hover:scale-125 transition-transform cursor-pointer overflow-hidden relative shadow-2xs group/auto"
+                title="Default / Auto (Theme-Adaptive Text Color)"
+              >
+                <span className="absolute inset-0 bg-gradient-to-tr from-stone-900 via-stone-500 to-amber-100" />
+                <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold text-white opacity-0 group-hover/auto:opacity-100 drop-shadow-xs">
+                  A
+                </span>
+              </button>
+              <div className="h-3 w-px bg-border/60 mx-0.5" />
               {COLOR_PRESETS.map((preset) => (
                 <button
                   key={preset.color}

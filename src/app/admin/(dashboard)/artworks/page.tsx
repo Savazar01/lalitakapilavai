@@ -26,8 +26,11 @@ import {
   Eye,
   EyeOff,
   Home,
+  UploadCloud,
+  FileSpreadsheet,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ArtworkBulkImportModal } from "@/components/admin/artwork-bulk-import-modal";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
@@ -158,6 +161,38 @@ export default function ArtworksAdminPage() {
   const [newCatName, setNewCatName] = React.useState("");
   const [newCatSlug, setNewCatSlug] = React.useState("");
   const [creatingCat, setCreatingCat] = React.useState(false);
+
+  // Excel Bulk Export & Import State
+  const [exportingExcel, setExportingExcel] = React.useState(false);
+  const [bulkImportOpen, setBulkImportOpen] = React.useState(false);
+
+  const handleExportExcel = async () => {
+    try {
+      setExportingExcel(true);
+      toast.info("Generating archival Excel catalog with embedded thumbnails...");
+      const res = await fetch("/api/admin/artworks/export");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to generate Excel catalog");
+      }
+      const count = res.headers.get("X-Export-Total-Count") || artworks.length;
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `lalita-artworks-catalog-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success(`Successfully exported ${count} artworks with embedded thumbnails!`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Export failed";
+      toast.error(msg);
+    } finally {
+      setExportingExcel(false);
+    }
+  };
 
   const reloadData = React.useCallback(() => {
     Promise.all([
@@ -572,6 +607,33 @@ export default function ArtworksAdminPage() {
         >
           <FolderTree className="w-3.5 h-3.5" />
           Categories ({categories.length})
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportExcel}
+          disabled={exportingExcel}
+          className="text-xs gap-1.5"
+          title="Export entire artwork collection as high-fidelity Excel workbook with embedded thumbnails"
+        >
+          {exportingExcel ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Download className="w-3.5 h-3.5 text-primary" />
+          )}
+          {exportingExcel ? "Exporting..." : "Export Excel"}
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setBulkImportOpen(true)}
+          className="text-xs gap-1.5"
+          title="Upload Excel spreadsheet to bulk create or update masterworks"
+        >
+          <UploadCloud className="w-3.5 h-3.5 text-primary" />
+          Bulk Import Excel
         </Button>
 
         <Button
@@ -1417,6 +1479,13 @@ export default function ArtworksAdminPage() {
         </DialogContent>
       </Dialog>
 
+
+      {/* Bulk Excel Import & Mass Update Modal */}
+      <ArtworkBulkImportModal
+        open={bulkImportOpen}
+        onOpenChange={setBulkImportOpen}
+        onSuccess={reloadData}
+      />
 
       {/* Delete Confirmation Modal */}
       <ConfirmDialog
