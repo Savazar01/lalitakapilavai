@@ -89,6 +89,8 @@ export interface EventFormData {
   contactName?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;
+  statusOverride?: "AUTO" | "FORCE_UPCOMING" | "FORCE_PAST" | string;
+  isArchived?: boolean;
   artworkIds?: string[];
 }
 
@@ -177,6 +179,12 @@ function EventFormContent({
   const [currency, setCurrency] = React.useState(initialEvent?.currency || "INR");
   const [isRegistrationOpen, setIsRegistrationOpen] = React.useState(
     initialEvent?.isRegistrationOpen !== false
+  );
+  const [statusOverride, setStatusOverride] = React.useState<string>(
+    initialEvent?.statusOverride || "AUTO"
+  );
+  const [isArchived, setIsArchived] = React.useState<boolean>(
+    initialEvent?.isArchived === true
   );
   const [isPublished, setIsPublished] = React.useState(initialEvent?.isPublished !== false);
   const [contactName, setContactName] = React.useState(
@@ -430,6 +438,8 @@ function EventFormContent({
       currency: currency || "INR",
       isRegistrationOpen,
       isPublished,
+      statusOverride,
+      isArchived,
       contactName: contactName || null,
       contactEmail: contactEmail || null,
       contactPhone: contactPhone || null,
@@ -558,6 +568,45 @@ function EventFormContent({
                       onChange={(e) => setRegistrationFee(e.target.value)}
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Lifecycle & Manual Archive Override */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-lg border border-primary/25 bg-primary/5">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">
+                    Event Lifecycle Status
+                  </label>
+                  <select
+                    value={statusOverride}
+                    onChange={(e) => setStatusOverride(e.target.value)}
+                    className="w-full bg-card border border-border text-foreground text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-primary focus:outline-none"
+                  >
+                    <option value="AUTO">Automatic (Calculated from End/Start Date)</option>
+                    <option value="FORCE_UPCOMING">Force as Upcoming Event</option>
+                    <option value="FORCE_PAST">Designate as Past Event / Retrospective</option>
+                  </select>
+                  <p className="text-[10px] text-muted-foreground">
+                    Overrides auto-date calculation to force placement in Upcoming or Past sections.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 flex flex-col justify-center">
+                  <label className="text-xs font-semibold text-foreground mb-1">
+                    Catalog Archival Flag
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={isArchived}
+                      onChange={(e) => setIsArchived(e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Archive from public event listings</span>
+                  </label>
+                  <p className="text-[10px] text-muted-foreground">
+                    Hide from public calendars while preserving historical data.
+                  </p>
                 </div>
               </div>
 

@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 
 
 interface PageItem {
@@ -154,23 +155,15 @@ export default function PagesAdminPage() {
   return (
     <div className="space-y-6">
       {/* Header with Title and Create Dialog */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            Visual Page Builder
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
-            Custom Page Layouts
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Build dynamic 12-column pages with inline Tiptap editing and responsive preview emulators.
-          </p>
-        </div>
-
+      <EditablePageHeader
+        sectionKey="pages"
+        defaultTitle="Custom Page Layouts"
+        defaultSubtitle="Build dynamic 12-column pages with inline Tiptap editing and responsive preview emulators."
+        badgeLabel="Visual Page Builder"
+      >
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="gold" className="gap-2 shrink-0">
+            <Button variant="gold" className="gap-2 shrink-0 text-xs">
               <Plus className="w-4 h-4" />
               Create New Page
             </Button>
@@ -247,7 +240,7 @@ export default function PagesAdminPage() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+      </EditablePageHeader>
 
       {/* Pages Grid / List */}
       {loading ? (

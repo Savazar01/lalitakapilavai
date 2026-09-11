@@ -18,6 +18,8 @@ import {
   Loader2,
   QrCode,
   Download,
+  History,
+  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +36,7 @@ import { toast } from "sonner";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EventFormModal, EventFormData } from "@/components/admin/event-form-modal";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 import { formatEventSchedule } from "@/lib/geo-timezone";
 import { formatCurrency } from "@/lib/formatters";
 
@@ -84,6 +87,8 @@ interface EventItem {
   currency?: string;
   isRegistrationOpen: boolean;
   isPublished?: boolean;
+  statusOverride?: string | null;
+  isArchived?: boolean;
   contactName?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;
@@ -94,6 +99,7 @@ export default function EventsAdminPage() {
   const [events, setEvents] = React.useState<EventItem[]>([]);
   const [artworksCatalog, setArtworksCatalog] = React.useState<ArtworkSummary[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [activeSegment, setActiveSegment] = React.useState<"upcoming" | "past" | "all">("upcoming");
 
   // Form Modal State
   const [formModalOpen, setFormModalOpen] = React.useState(false);
@@ -180,6 +186,8 @@ export default function EventsAdminPage() {
           currency: fullEvent.currency || "INR",
           isRegistrationOpen: fullEvent.isRegistrationOpen,
           isPublished: fullEvent.isPublished !== false,
+          statusOverride: fullEvent.statusOverride || "AUTO",
+          isArchived: fullEvent.isArchived === true,
           contactName: fullEvent.contactName || "",
           contactEmail: fullEvent.contactEmail || "",
           contactPhone: fullEvent.contactPhone || "",
@@ -288,23 +296,89 @@ export default function EventsAdminPage() {
     }
   };
 
+  // Date Segmentation Logic
+  const now = new Date();
+  const isPast = (ev: EventItem) => {
+    if (ev.statusOverride === "FORCE_PAST") return true;
+    if (ev.statusOverride === "FORCE_UPCOMING") return false;
+    const compareDate = ev.endDate ? new Date(ev.endDate) : new Date(ev.startDate);
+    return compareDate < now;
+  };
+
+  const upcomingEvents = React.useMemo(
+    () => events.filter((ev) => !isPast(ev)).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()),
+    [events]
+  );
+
+  const pastEvents = React.useMemo(
+    () => events.filter((ev) => isPast(ev)).sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()),
+    [events]
+  );
+
+  const displayedEvents = React.useMemo(() => {
+    if (activeSegment === "upcoming") return upcomingEvents;
+    if (activeSegment === "past") return pastEvents;
+    return events;
+  }, [activeSegment, upcomingEvents, pastEvents, events]);
+
   return (
     <div className="space-y-6">
-      {/* Header Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
-            Exhibitions, Recitals &amp; Workshops
-          </h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            Curate international schedules, venue coordinates, timezones, and masterwork exhibition linkages.
-          </p>
-        </div>
-
-        <Button onClick={handleOpenCreate} variant="gold" className="gap-2">
+      {/* Reusable In-Place Editable Header */}
+      <EditablePageHeader
+        sectionKey="events"
+        defaultTitle="Exhibitions, Recitals & Workshops"
+        defaultSubtitle="Curate international schedules, venue coordinates, timezones, and masterwork exhibition linkages."
+        badgeLabel="Cultural Calendar & Recitals"
+      >
+        <Button onClick={handleOpenCreate} variant="gold" className="gap-2 text-xs">
           <Plus className="w-4 h-4" />
           Schedule Event
         </Button>
+      </EditablePageHeader>
+
+      {/* Segmented Filter Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
+        <div className="inline-flex rounded-lg border border-border bg-card p-1 text-xs">
+          <button
+            type="button"
+            onClick={() => setActiveSegment("upcoming")}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              activeSegment === "upcoming"
+                ? "bg-primary/20 text-primary font-semibold shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            Upcoming Exhibitions ({upcomingEvents.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSegment("past")}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              activeSegment === "past"
+                ? "bg-primary/20 text-primary font-semibold shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <History className="w-3.5 h-3.5" />
+            Past Retrospectives ({pastEvents.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSegment("all")}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              activeSegment === "all"
+                ? "bg-primary/20 text-primary font-semibold shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All Schedules ({events.length})
+          </button>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground font-mono">
+          Showing {displayedEvents.length} of {events.length} curated events
+        </p>
       </div>
 
       {/* Events Grid / Listing */}
@@ -312,12 +386,20 @@ export default function EventsAdminPage() {
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
-      ) : events.length === 0 ? (
+      ) : displayedEvents.length === 0 ? (
         <Card className="p-12 text-center border-dashed">
           <Calendar className="w-12 h-12 mx-auto text-primary mb-3 opacity-60" />
-          <CardTitle className="text-base font-serif">No Events Scheduled</CardTitle>
+          <CardTitle className="text-base font-serif">
+            {activeSegment === "upcoming"
+              ? "No Upcoming Events Scheduled"
+              : activeSegment === "past"
+              ? "No Past Retrospectives Found"
+              : "No Events Scheduled"}
+          </CardTitle>
           <CardDescription className="text-xs mt-1">
-            Create your first Tanjore exhibition, classical concert, or workshop masterclass.
+            {activeSegment === "upcoming"
+              ? "All existing events have concluded or are set as past. Schedule a new exhibition."
+              : "Create your first Tanjore exhibition, classical concert, or workshop masterclass."}
           </CardDescription>
           <Button onClick={handleOpenCreate} variant="gold" size="sm" className="mt-4 gap-1">
             <Plus className="w-3.5 h-3.5" />
@@ -326,12 +408,16 @@ export default function EventsAdminPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((ev) => {
+          {displayedEvents.map((ev) => {
             const banner = ev.bannerImage || ev.posterUrl;
+            const eventIsPast = isPast(ev);
+
             return (
               <Card
                 key={ev.id}
-                className="hover:border-primary/50 transition-all flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-lg"
+                className={`hover:border-primary/50 transition-all flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-lg ${
+                  eventIsPast ? "bg-card/70 border-border/70" : "bg-card border-border"
+                }`}
               >
                 {/* Optional Hero Banner Preview */}
                 {banner && (
@@ -340,8 +426,29 @@ export default function EventsAdminPage() {
                       src={banner}
                       alt={ev.title}
                       fill
-                      className="object-cover transition-transform duration-500 hover:scale-105"
+                      className={`object-cover transition-transform duration-500 hover:scale-105 ${
+                        eventIsPast ? "grayscale hover:grayscale-0 opacity-85 hover:opacity-100" : ""
+                      }`}
                     />
+                    <div className="absolute top-2 left-2 flex gap-1">
+                      {ev.statusOverride === "FORCE_PAST" ? (
+                        <Badge variant="outline" className="text-[10px] uppercase font-mono bg-background/80 backdrop-blur-sm border-amber-500/40 text-amber-300">
+                          Forced Past
+                        </Badge>
+                      ) : ev.statusOverride === "FORCE_UPCOMING" ? (
+                        <Badge variant="gold" className="text-[10px] uppercase font-mono shadow-md">
+                          Forced Upcoming
+                        </Badge>
+                      ) : eventIsPast ? (
+                        <Badge variant="outline" className="text-[10px] uppercase font-mono bg-background/80 backdrop-blur-sm">
+                          Concluded
+                        </Badge>
+                      ) : (
+                        <Badge variant="gold" className="text-[10px] uppercase font-mono shadow-md">
+                          Upcoming
+                        </Badge>
+                      )}
+                    </div>
                     <div className="absolute top-2 right-2 flex gap-1">
                       <Badge variant="gold" className="text-[10px] uppercase font-mono shadow-md">
                         {ev.eventType}
@@ -353,9 +460,16 @@ export default function EventsAdminPage() {
                 <CardHeader className="pb-2">
                   {!banner && (
                     <div className="flex items-start justify-between gap-2 mb-1">
-                      <Badge variant="gold" className="text-[10px] uppercase">
-                        {ev.eventType}
-                      </Badge>
+                      <div className="flex items-center gap-1.5">
+                        <Badge variant="gold" className="text-[10px] uppercase">
+                          {ev.eventType}
+                        </Badge>
+                        {eventIsPast && (
+                          <Badge variant="outline" className="text-[10px] uppercase font-mono">
+                            Concluded
+                          </Badge>
+                        )}
+                      </div>
                       <Badge
                         variant={ev.isRegistrationOpen ? "outline" : "secondary"}
                         className="text-[10px]"

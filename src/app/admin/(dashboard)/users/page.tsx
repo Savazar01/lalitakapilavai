@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 import {
   Table,
   TableHeader,
@@ -289,30 +290,23 @@ export default function UserManagementPage() {
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header Desk */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/80 pb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Shield className="w-5 h-5 text-primary" />
-            <h1 className="text-2xl font-serif font-bold tracking-tight text-foreground">
-              User &amp; Administrator Suite
-            </h1>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Manage administrative personnel, role authorizations (RBAC), and session security.
-          </p>
-        </div>
-
+      <EditablePageHeader
+        sectionKey="users"
+        defaultTitle="User & Administrator Suite"
+        defaultSubtitle="Manage administrative personnel, role authorizations (RBAC), and session security."
+        badgeLabel="Access Control"
+      >
         <Button
           onClick={() => {
             setCreateError(null);
             setCreateModalOpen(true);
           }}
           variant="gold"
-          className="gap-2 shrink-0 shadow-sm"
+          className="gap-2 shrink-0 shadow-sm text-xs"
         >
           <UserPlus className="w-4 h-4" /> Add Administrator
         </Button>
-      </div>
+      </EditablePageHeader>
 
       {/* Stats Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

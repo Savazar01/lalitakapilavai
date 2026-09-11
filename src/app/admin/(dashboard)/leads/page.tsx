@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 
 import {
   Select,
@@ -191,32 +192,21 @@ export default function AdminLeadsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <Users className="w-4 h-4 text-primary" />
-            </div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">
-              Leads & Exhibition QR CRM
-            </h1>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Visitor captures from physical gallery QR cards, artwork acquisition inquiries, and event RSVPs.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={handleExportCsv}
-            variant="outline"
-            className="text-xs border-border/80 cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5 mr-1.5 text-primary" />
-            Export CSV
-          </Button>
-        </div>
-      </div>
+      <EditablePageHeader
+        sectionKey="leads"
+        defaultTitle="Inbound Leads & QR CRM"
+        defaultSubtitle="Visitor captures from physical gallery QR cards, artwork acquisition inquiries, and event RSVPs."
+        badgeLabel="Inbound Inquiries & QR Scans"
+      >
+        <Button
+          onClick={handleExportCsv}
+          variant="outline"
+          className="text-xs border-border/80 cursor-pointer"
+        >
+          <Download className="w-3.5 h-3.5 mr-1.5 text-primary" />
+          Export CSV
+        </Button>
+      </EditablePageHeader>
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">

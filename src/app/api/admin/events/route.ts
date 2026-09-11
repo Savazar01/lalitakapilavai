@@ -75,6 +75,8 @@ export async function POST(request: NextRequest) {
       contactEmail,
       contactPhone,
       artworkIds,
+      statusOverride,
+      isArchived,
     } = body;
 
     if (!title || !slug || !eventType || !startDate) {
@@ -135,6 +137,8 @@ export async function POST(request: NextRequest) {
           contactName: contactName || null,
           contactEmail: contactEmail || null,
           contactPhone: contactPhone || null,
+          statusOverride: statusOverride || "AUTO",
+          isArchived: isArchived !== undefined ? !!isArchived : false,
         },
       });
 

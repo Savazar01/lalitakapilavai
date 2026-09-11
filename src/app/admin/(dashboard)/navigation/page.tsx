@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 
 
 interface MenuItemNode {
@@ -255,29 +256,21 @@ export default function NavigationManagerPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            Navigation Matrix Console
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
-            Hierarchical Menu Engine
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Configure primary, secondary, and nested 2-tier dropdown navigation across all header and drawer positions.
-          </p>
-        </div>
-
+      <EditablePageHeader
+        sectionKey="navigation"
+        defaultTitle="Hierarchical Menu Engine"
+        defaultSubtitle="Configure primary, secondary, and nested 2-tier dropdown navigation across all header and drawer positions."
+        badgeLabel="Navigation Matrix Console"
+      >
         <Button
           variant="gold"
           onClick={() => openAddDialog(null)}
-          className="gap-2 shrink-0"
+          className="gap-2 shrink-0 text-xs"
         >
           <Plus className="w-4 h-4" />
           Add Root Nav Item
         </Button>
-      </div>
+      </EditablePageHeader>
 
       {/* Position Selector Tabs */}
       <div className="flex flex-wrap gap-2 p-1.5 rounded-lg border border-border bg-card/60 backdrop-blur-md">

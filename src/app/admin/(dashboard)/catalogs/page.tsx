@@ -31,6 +31,7 @@ import {
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { MediaUploader } from "@/components/admin/media-uploader";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 
 interface ECatalogListItem {
   id: string;
@@ -197,21 +198,12 @@ export default function AdminCatalogsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <Library className="w-4 h-4 text-primary" />
-            </div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">
-              Digital e-Catalogs &amp; Booklets
-            </h1>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Curate publication-grade exhibition booklets, curatorial forewords, and fine art plates with printable PDFs.
-          </p>
-        </div>
-
+      <EditablePageHeader
+        sectionKey="catalogs"
+        defaultTitle="Digital e-Catalogs & Booklets"
+        defaultSubtitle="Curate publication-grade exhibition booklets, curatorial forewords, and fine art plates with printable PDFs."
+        badgeLabel="Digital Publications"
+      >
         <Button
           onClick={() => {
             setNewTitle("");
@@ -221,12 +213,13 @@ export default function AdminCatalogsPage() {
             setError(null);
             setCreateModalOpen(true);
           }}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
+          variant="gold"
+          className="shadow-sm cursor-pointer gap-2 text-xs"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4" />
           Create e-Catalog
         </Button>
-      </div>
+      </EditablePageHeader>
 
       {/* Filter / Search Bar */}
       <div className="flex items-center gap-3">

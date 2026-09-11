@@ -27,6 +27,7 @@ import {
 import { toast } from "sonner";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -497,42 +498,32 @@ export default function ArtworksAdminPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            Vault &amp; Catalog Management
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
-            Artwork Catalog
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Curate Tanjore gold relief masterpieces, Mysore classical schools, dimensions, and exhibition QR scans.
-          </p>
-        </div>
+      <EditablePageHeader
+        sectionKey="artworks"
+        defaultTitle="Artwork Catalog"
+        defaultSubtitle="Curate Tanjore gold relief masterpieces, Mysore classical schools, dimensions, and exhibition QR scans."
+        badgeLabel="Vault & Catalog Management"
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCategoryModalOpen(true)}
+          className="text-xs gap-1.5"
+        >
+          <FolderTree className="w-3.5 h-3.5" />
+          Categories ({categories.length})
+        </Button>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCategoryModalOpen(true)}
-            className="text-xs gap-1.5"
-          >
-            <FolderTree className="w-3.5 h-3.5" />
-            Categories ({categories.length})
-          </Button>
-
-          <Button
-            variant="gold"
-            size="sm"
-            onClick={handleOpenCreate}
-            className="text-xs gap-1.5"
-          >
-            <Plus className="w-4 h-4" />
-            Add Artwork
-          </Button>
-        </div>
-      </div>
+        <Button
+          variant="gold"
+          size="sm"
+          onClick={handleOpenCreate}
+          className="text-xs gap-1.5"
+        >
+          <Plus className="w-4 h-4" />
+          Add Artwork
+        </Button>
+      </EditablePageHeader>
 
       {/* Control Bar: Filters & Search */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-2 rounded-lg border border-border bg-card/60 backdrop-blur-md">

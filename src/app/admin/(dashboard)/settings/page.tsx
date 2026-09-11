@@ -20,6 +20,7 @@ import {
   FileText,
   Plus,
   Wand2,
+  Sliders,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SUPPORTED_CURRENCIES } from "@/lib/formatters";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
+import { AdminPortalConfig, DEFAULT_ADMIN_CONFIG } from "@/lib/admin-config";
+import { ADMIN_NAV_ITEMS } from "@/components/admin/sidebar";
 
 interface LegalLinkItem {
   label: string;
@@ -99,6 +103,10 @@ export default function AdminSettingsPage() {
   const [testingAi, setTestingAi] = React.useState(false);
   const [aiTestPrompt, setAiTestPrompt] = React.useState("Describe the sacred use of 22k gold leaf in Thanjavur art.");
   const [aiTestResult, setAiTestResult] = React.useState<string | null>(null);
+
+  // Admin Portal White-Labeling State
+  const [adminConfig, setAdminConfig] = React.useState<AdminPortalConfig>(DEFAULT_ADMIN_CONFIG);
+  const [savingBranding, setSavingBranding] = React.useState(false);
 
   // Core Settings Form
   const [form, setForm] = React.useState({
@@ -218,6 +226,9 @@ export default function AdminSettingsPage() {
           if (data.aiConfig) {
             setAiConfig((prev) => ({ ...prev, ...data.aiConfig }));
           }
+          if (data.adminConfig) {
+            setAdminConfig((prev) => ({ ...prev, ...data.adminConfig }));
+          }
         }
         setLoading(false);
       })
@@ -225,7 +236,37 @@ export default function AdminSettingsPage() {
         console.error("Failed to load settings:", err);
         setLoading(false);
       });
+
+    fetch("/api/admin/settings/copy")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) setAdminConfig(data);
+      })
+      .catch(() => {});
   }, []);
+
+  const handleSaveBranding = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSavingBranding(true);
+    try {
+      const res = await fetch("/api/admin/settings/copy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(adminConfig),
+      });
+      if (res.ok) {
+        toast.success("Admin portal white-labeling saved successfully!");
+        window.dispatchEvent(new Event("adminConfigUpdated"));
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to save portal configuration");
+      }
+    } catch {
+      toast.error("Error saving portal configuration");
+    } finally {
+      setSavingBranding(false);
+    }
+  };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -415,34 +456,25 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <Settings className="w-4 h-4 text-primary" />
-            </div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">
-              Platform & Storage Settings
-            </h1>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Global system metadata, watermark vault, R2/S3 storage, dynamic footer, Gmail SMTP, and multi-provider AI engine.
-          </p>
-        </div>
-
+      <EditablePageHeader
+        sectionKey="settings"
+        defaultTitle="Platform & Storage Settings"
+        defaultSubtitle="Global system metadata, watermark vault, R2/S3 storage, dynamic footer, Gmail SMTP, and multi-provider AI engine."
+        badgeLabel="Platform Infrastructure"
+      >
         <Button
           onClick={handleSave}
           disabled={saving || loading}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer text-xs"
         >
           {saving ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
           ) : (
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="w-3.5 h-3.5 mr-1.5" />
           )}
           Save All Settings
         </Button>
-      </div>
+      </EditablePageHeader>
 
       {successMsg && (
         <div className="p-3 text-xs rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-2">
@@ -465,9 +497,12 @@ export default function AdminSettingsPage() {
       ) : (
         <form onSubmit={handleSave}>
           <Tabs defaultValue="general" className="w-full space-y-6">
-            <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 w-full h-auto p-1 bg-muted/60">
+            <TabsList className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 w-full h-auto p-1 bg-muted/60">
               <TabsTrigger value="general" className="text-xs py-2">
                 <Settings className="w-3.5 h-3.5 mr-1" /> General
+              </TabsTrigger>
+              <TabsTrigger value="branding" className="text-xs py-2">
+                <Sliders className="w-3.5 h-3.5 mr-1" /> White-Labeling
               </TabsTrigger>
               <TabsTrigger value="watermark" className="text-xs py-2">
                 <Shield className="w-3.5 h-3.5 mr-1" /> Watermark
@@ -666,6 +701,132 @@ export default function AdminSettingsPage() {
                         className="text-xs font-mono"
                       />
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab: Admin Portal White-Labeling */}
+            <TabsContent value="branding">
+              <Card className="border border-border/80 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="font-serif text-lg flex items-center gap-2">
+                    <Sliders className="w-5 h-5 text-primary" />
+                    Admin Portal White-Labeling &amp; Navigation
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Customize the top dashboard brand titles and rename every sidebar navigation menu item to suit institutional or client requirements.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 text-xs">
+                  {/* Top Bar and Brand Headers */}
+                  <div className="p-4 rounded-lg border border-primary/30 bg-primary/5 space-y-4">
+                    <h4 className="font-semibold text-foreground text-sm">Dashboard &amp; Sidebar Branding</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Top Dashboard Title</Label>
+                        <Input
+                          value={adminConfig.dashboardTitle}
+                          onChange={(e) =>
+                            setAdminConfig({ ...adminConfig, dashboardTitle: e.target.value })
+                          }
+                          placeholder="Archive & Platform Dashboard"
+                          className="text-xs font-serif"
+                        />
+                        <p className="text-[10px] text-muted-foreground">Appears on the top sticky navigation bar</p>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Sidebar Brand Title</Label>
+                        <Input
+                          value={adminConfig.sidebarBrandTitle}
+                          onChange={(e) =>
+                            setAdminConfig({ ...adminConfig, sidebarBrandTitle: e.target.value })
+                          }
+                          placeholder="Lalita Kapilavai"
+                          className="text-xs font-serif"
+                        />
+                        <p className="text-[10px] text-muted-foreground">Primary artist/institution name</p>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Sidebar Subtitle</Label>
+                        <Input
+                          value={adminConfig.sidebarBrandSubtitle}
+                          onChange={(e) =>
+                            setAdminConfig({ ...adminConfig, sidebarBrandSubtitle: e.target.value })
+                          }
+                          placeholder="Control Center"
+                          className="text-xs font-mono"
+                        />
+                        <p className="text-[10px] text-muted-foreground">Appears under brand name in sidebar</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sidebar Navigation Items */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-foreground text-sm">Sidebar Navigation Menu Labels</h4>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setAdminConfig({
+                            ...adminConfig,
+                            sidebarLabels: { ...DEFAULT_ADMIN_CONFIG.sidebarLabels },
+                          })
+                        }
+                        className="text-[11px] h-7"
+                      >
+                        Reset Menu Defaults
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Rename sidebar menu items without altering internal route bindings.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+                      {ADMIN_NAV_ITEMS.map((item) => (
+                        <div key={item.id} className="p-3 rounded-lg border border-border bg-card/60 space-y-1.5">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-mono text-muted-foreground font-semibold">/{item.id}</span>
+                            <span className="text-[10px] text-muted-foreground">Default: {item.defaultLabel}</span>
+                          </div>
+                          <Input
+                            value={adminConfig.sidebarLabels?.[item.id] ?? item.defaultLabel}
+                            onChange={(e) =>
+                              setAdminConfig({
+                                ...adminConfig,
+                                sidebarLabels: {
+                                  ...adminConfig.sidebarLabels,
+                                  [item.id]: e.target.value,
+                                },
+                              })
+                            }
+                            className="text-xs"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-border flex justify-end">
+                    <Button
+                      type="button"
+                      variant="gold"
+                      onClick={() => handleSaveBranding()}
+                      disabled={savingBranding}
+                      className="gap-2 text-xs"
+                    >
+                      {savingBranding ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
+                      Save White-Label Configuration
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
 import { DashboardLayoutManager, DashboardWidgetData } from "@/components/admin/dashboard-layout-manager";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -133,25 +134,17 @@ export default async function AdminDashboardPage() {
       {/* Welcome Banner */}
       <div className="rounded-xl border border-primary/30 bg-gradient-to-br from-card via-card to-primary/5 p-6 sm:p-8 relative overflow-hidden shadow-sm">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
-              <Sparkles className="w-3.5 h-3.5" />
-              Administrative Overview
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
-              Welcome to Lalita Kapilavai Archive
-            </h1>
-            <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-              Manage your sacred artwork catalog with 22k gold specifications,
-              dynamic watermarked assets, exhibitions, physical QR scan leads, and
-              Carnatic music synesthetic models.
-            </p>
-          </div>
+        <EditablePageHeader
+          sectionKey="overview"
+          defaultTitle="Welcome to Lalita Kapilavai Archive"
+          defaultSubtitle="Manage your sacred artwork catalog with 22k gold specifications, dynamic watermarked assets, exhibitions, physical QR scan leads, and Carnatic music synesthetic models."
+          badgeLabel="Administrative Overview"
+          className="border-b-0 pb-0"
+        >
           <Badge variant="gold" className="shrink-0 text-xs px-3 py-1">
             PostgreSQL 17 :5633 • Web :3060
           </Badge>
-        </div>
+        </EditablePageHeader>
       </div>
 
       {/* Dynamic Customizable Layout Manager */}

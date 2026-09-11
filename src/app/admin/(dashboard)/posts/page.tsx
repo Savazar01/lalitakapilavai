@@ -47,6 +47,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 
 
 interface BlogPostItem {
@@ -352,29 +353,21 @@ export default function AdminPostsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-primary" />
-            </div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">
-              Blog & AEO Editorial Desk
-            </h1>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Publish heritage essays, technique guides, and AEO structured data optimized for Perplexity, ChatGPT & Google.
-          </p>
-        </div>
-
+      <EditablePageHeader
+        sectionKey="posts"
+        defaultTitle="Blog & AEO Editorial Desk"
+        defaultSubtitle="Publish heritage essays, technique guides, and AEO structured data optimized for Perplexity, ChatGPT & Google."
+        badgeLabel="Content Engine"
+      >
         <Button
           onClick={handleOpenCreate}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
+          variant="gold"
+          className="shadow-sm cursor-pointer gap-2 text-xs"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4" />
           Write Article
         </Button>
-      </div>
+      </EditablePageHeader>
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">

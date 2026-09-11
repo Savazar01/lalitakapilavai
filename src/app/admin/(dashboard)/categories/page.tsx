@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { EditablePageHeader } from "@/components/admin/editable-page-header";
 
 
 interface ArtCategoryItem {
@@ -251,29 +252,21 @@ export default function AdminCategoriesPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <FolderTree className="w-4 h-4 text-primary" />
-            </div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">
-              Art Categories
-            </h1>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Manage classical Indian fine art painting schools, display hierarchy, and visual metadata.
-          </p>
-        </div>
-
+      <EditablePageHeader
+        sectionKey="categories"
+        defaultTitle="Traditional Art Disciplines"
+        defaultSubtitle="Manage classical Indian fine art painting schools, display hierarchy, and visual metadata."
+        badgeLabel="Artistic Lineages"
+      >
         <Button
           onClick={handleOpenCreate}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
+          variant="gold"
+          className="shadow-sm cursor-pointer gap-2 text-xs"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4" />
           Add Category
         </Button>
-      </div>
+      </EditablePageHeader>
 
       {/* Filter / Search Bar */}
       <div className="flex items-center gap-3">

@@ -93,6 +93,8 @@ export async function PUT(
       contactEmail,
       contactPhone,
       artworkIds,
+      statusOverride,
+      isArchived,
     } = body;
 
     const updated = await prisma.$transaction(async (tx) => {
@@ -130,6 +132,8 @@ export async function PUT(
           contactName: contactName !== undefined ? contactName : undefined,
           contactEmail: contactEmail !== undefined ? contactEmail : undefined,
           contactPhone: contactPhone !== undefined ? contactPhone : undefined,
+          statusOverride: statusOverride !== undefined ? statusOverride : undefined,
+          isArchived: isArchived !== undefined ? !!isArchived : undefined,
         },
       });
 
