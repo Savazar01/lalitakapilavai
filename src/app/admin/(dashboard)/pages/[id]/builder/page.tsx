@@ -45,6 +45,7 @@ import {
   FileText,
   History,
   Images,
+  Grid,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -61,6 +62,11 @@ import { FormBlockInspector, FormFieldConfig } from "@/components/builder/form-b
 import { DynamicFormBlock } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryInspector } from "@/components/builder/media-gallery-inspector";
 import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
+import {
+  PageMatrixStudio,
+  type PageMatrixConfig,
+  reconcilePageMatrixCells,
+} from "@/components/builder/page-matrix-studio";
 
 export function isLightColor(colorStr?: string | null): boolean {
   if (!colorStr) return false;
@@ -102,6 +108,8 @@ interface SectionData {
   id: string;
   title: string;
   gridSpan: number;
+  layoutType?: "PRESET" | "MATRIX" | string;
+  matrixConfig?: PageMatrixConfig | null;
   backgroundColor?: string | null;
   backgroundType?: "COLOR" | "PATTERN" | "IMAGE" | null;
   backgroundPattern?: string | null;
@@ -171,6 +179,7 @@ function SortableSection({
   onUpdateSubSectionContent,
   onSelectSubSection,
   selectedSubSectionIndex,
+  onUpdateMatrixConfig,
 }: {
   section: SectionData;
   index: number;
@@ -184,6 +193,7 @@ function SortableSection({
   onUpdateSubSectionContent: (subIdx: number, content: Record<string, unknown>) => void;
   onSelectSubSection: (subIdx: number) => void;
   selectedSubSectionIndex: number | null;
+  onUpdateMatrixConfig?: (updated: Partial<PageMatrixConfig>) => void;
 }) {
   const {
     attributes,
@@ -675,8 +685,33 @@ function SortableSection({
         </div>
       </div>
 
-      {/* 12-Column Responsive Grid Row with relative z-10 */}
-      <div className="grid grid-cols-12 gap-4 px-4 sm:px-6 relative z-10">
+      {/* Matrix Canvas or 12-Column Responsive Grid Row */}
+      {section.layoutType === "MATRIX" ? (
+        <div className="px-4 sm:px-6 relative z-10">
+          <PageMatrixStudio
+            config={
+              section.matrixConfig || {
+                matrixRows: 2,
+                matrixCols: 2,
+                rowHeights: "1fr 1fr",
+                colWidths: "1fr 1fr",
+                hasHeader: false,
+                headerHtml: "",
+                hasFooter: false,
+                footerHtml: "",
+                verticalSpineMode: "NONE",
+                verticalSpineHtml: "",
+                verticalSpineWidth: "25%",
+                segments: reconcilePageMatrixCells(2, 2, []),
+              }
+            }
+            onChange={(updated) => onUpdateMatrixConfig?.(updated)}
+            sectionTitle={section.title}
+          />
+        </div>
+      ) : (
+        /* 12-Column Responsive Grid Row with relative z-10 */
+        <div className="grid grid-cols-12 gap-4 px-4 sm:px-6 relative z-10">
         {section.subSections.map((col, colIdx) => {
           const colSpanClass =
             col.gridSpan === 12
@@ -1602,6 +1637,7 @@ function SortableSection({
           );
         })}
       </div>
+      )}
 
       {/* Timeline Configuration Dialog */}
       {activeTimelineModal && (
@@ -1883,6 +1919,78 @@ export default function VisualPageBuilder() {
     setPresetDialogOpen(false);
   };
 
+  // Add Advanced Matrix Grid Section
+  const handleAddMatrixSection = () => {
+    if (!page) return;
+    const initialSegments = reconcilePageMatrixCells(2, 2, []);
+    const newSection: SectionData = {
+      id: crypto.randomUUID(),
+      title: `Matrix Grid Section ${page.sections.length + 1}`,
+      gridSpan: 12,
+      layoutType: "MATRIX",
+      backgroundColor: "#FAF7F2",
+      paddingTop: 48,
+      paddingBottom: 48,
+      matrixConfig: {
+        matrixRows: 2,
+        matrixCols: 2,
+        rowHeights: "1fr 1fr",
+        colWidths: "1fr 1fr",
+        hasHeader: false,
+        headerHtml: "",
+        hasFooter: false,
+        footerHtml: "",
+        verticalSpineMode: "NONE",
+        verticalSpineHtml: "",
+        verticalSpineWidth: "25%",
+        segments: initialSegments,
+      },
+      subSections: [],
+    };
+
+    setPage({
+      ...page,
+      sections: [...page.sections, newSection],
+    });
+
+    setSelectedSectionId(newSection.id);
+    setSelectedSubIndex(null);
+    setPresetDialogOpen(false);
+    toast.success("Added InDesign-Grade Matrix Grid Section");
+  };
+
+  // Update Matrix Config for Section
+  const handleUpdateMatrixConfig = (
+    sectionId: string,
+    updated: Partial<PageMatrixConfig>
+  ) => {
+    if (!page) return;
+    setPage({
+      ...page,
+      sections: page.sections.map((s) => {
+        if (s.id !== sectionId) return s;
+        const currentConfig = s.matrixConfig || {
+          matrixRows: 2,
+          matrixCols: 2,
+          rowHeights: "1fr 1fr",
+          colWidths: "1fr 1fr",
+          hasHeader: false,
+          headerHtml: "",
+          hasFooter: false,
+          footerHtml: "",
+          verticalSpineMode: "NONE",
+          verticalSpineHtml: "",
+          verticalSpineWidth: "25%",
+          segments: [],
+        };
+        return {
+          ...s,
+          matrixConfig: { ...currentConfig, ...updated },
+        };
+      }),
+    });
+  };
+
   // Move Section Up or Down
   const handleMoveSection = (index: number, direction: "up" | "down") => {
     if (!page) return;
@@ -2130,6 +2238,9 @@ export default function VisualPageBuilder() {
                     onUpdateSubSectionContent={(subIdx, content) =>
                       handleUpdateSubContent(section.id, subIdx, content)
                     }
+                    onUpdateMatrixConfig={(updated) =>
+                      handleUpdateMatrixConfig(section.id, updated)
+                    }
                   />
                 ))}
               </SortableContext>
@@ -2141,10 +2252,10 @@ export default function VisualPageBuilder() {
                 type="button"
                 variant="outline"
                 onClick={() => setPresetDialogOpen(true)}
-                className="border-dashed border-2 border-primary/50 hover:border-primary px-8 py-6 h-auto text-sm font-serif font-bold text-primary gap-2 bg-card/60 backdrop-blur-md"
+                className="border-dashed border-2 border-primary/50 hover:border-primary px-8 py-6 h-auto text-sm font-serif font-bold text-primary gap-2 bg-card/60 backdrop-blur-md cursor-pointer"
               >
                 <Plus className="w-5 h-5" />
-                Add Responsive 12-Column Section
+                Add Responsive Section (Presets & Matrix Engine)
               </Button>
             </div>
           </div>
@@ -2290,22 +2401,58 @@ export default function VisualPageBuilder() {
         })()}
       </div>
 
-      {/* Column Preset Modal */}
+      {/* Section Creation Modal: InDesign Matrix Engine + 12-Column Presets */}
       <Dialog open={presetDialogOpen} onOpenChange={setPresetDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Select 12-Column Section Preset</DialogTitle>
+            <DialogTitle className="font-serif text-lg">Add Responsive Section</DialogTitle>
             <DialogDescription>
-              Choose a grid column partition. Columns can be customized with Tiptap text blocks, artwork imagery, or devotional notes.
+              Launch an advanced InDesign-grade Matrix Grid canvas or pick from classical 12-column presets.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-4">
+          {/* Featured InDesign Matrix Engine Card */}
+          <div
+            onClick={handleAddMatrixSection}
+            className="p-4 rounded-xl border-2 border-primary/70 bg-gradient-to-br from-primary/15 via-card to-amber-500/10 hover:border-primary cursor-pointer transition-all shadow-md group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-1"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                <Grid className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-serif font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors">
+                    ⚡ Advanced Matrix Grid Engine
+                  </h4>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/20 text-primary font-bold uppercase">
+                    InDesign Grade
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Multi-row (1–6) × multi-column (1–6) responsive matrix grid with custom track proportions, spanned featured zones, vertical sidebar spine, and running headers.
+                </p>
+              </div>
+            </div>
+            <Button size="sm" className="shrink-0 text-xs gap-1.5 shadow-xs cursor-pointer">
+              <Plus className="w-3.5 h-3.5" /> Launch Matrix
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2 pt-2">
+            <div className="h-px bg-border flex-1" />
+            <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+              Or Select Preserved 12-Column Preset
+            </span>
+            <div className="h-px bg-border flex-1" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-1">
             {columnPresets.map((preset) => (
               <div
                 key={preset.name}
                 onClick={() => handleAddSection(preset.columns)}
-                className="p-4 rounded-lg border border-border hover:border-primary/70 bg-card hover:bg-accent/40 cursor-pointer transition-all flex flex-col justify-between"
+                className="p-3.5 rounded-lg border border-border hover:border-primary/70 bg-card hover:bg-accent/40 cursor-pointer transition-all flex flex-col justify-between"
               >
                 <div>
                   <h4 className="font-serif font-bold text-sm text-foreground mb-1">

@@ -411,7 +411,7 @@ export interface ColumnBlock {
   galleryItems?: MediaGalleryItem[];
 }
 
-function renderColumnBlock(block: ColumnBlock): React.ReactNode {
+export function renderColumnBlock(block: ColumnBlock): React.ReactNode {
   if (block.type === "IMAGE") {
     return (
       <div key={block.id}>

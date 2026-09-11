@@ -213,6 +213,8 @@ model PageSection {
   backgroundImage          String?
   backgroundOverlayOpacity  Float?        @default(0.5)
   customCssClass           String?
+  layoutType               String?       @default("PRESET") // "PRESET" | "MATRIX"
+  matrixConfig             Json?         // Stores MatrixSectionConfig
   createdAt                DateTime      @default(now())
   updatedAt                DateTime      @updatedAt
 

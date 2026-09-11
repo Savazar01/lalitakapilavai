@@ -246,20 +246,267 @@ const DEFAULT_TEMPLATES = [
   },
 ];
 
-export async function GET() {
+const DEFAULT_PAGE_SECTION_TEMPLATES = [
+  {
+    title: "Hero Showcase with Left Bio Spine",
+    description: "2x2 asymmetric matrix featuring a full-height vertical side spine, spanned hero cell, and two supporting columns.",
+    targetPageType: "PAGE_SECTION",
+    matrixRows: 2,
+    matrixCols: 2,
+    rowHeights: "auto auto",
+    colWidths: "1fr 1fr",
+    hasHeader: true,
+    headerHtml: "<p><strong>SACRED EXHIBITION</strong> • TRADITIONAL EMBELLISHMENT</p>",
+    hasFooter: false,
+    footerHtml: null,
+    verticalSpineMode: "LEFT",
+    verticalSpineWidth: "25%",
+    verticalSpineHtml: "<div style='text-align:center;'><p style='font-family:serif;font-size:14px;letter-spacing:0.15em;text-transform:uppercase;'><strong>ATELIER BIO</strong><br/><span style='font-size:11px;color:#D4AF37;'>LALITA KAPILAVAI</span></p><p style='font-size:12px;margin-top:8px;'>Exponent of Thanjavur 22k gold leaf iconography and classical South Indian devotional music.</p></div>",
+    frameStyle: "gold-fillet",
+    backgroundType: "COLOR",
+    backgroundColor: "#FAF7F2",
+    backgroundPattern: "lotus-jaali",
+    patternOpacity: 0.15,
+    segments: [
+      {
+        id: "web-hero",
+        row: 1,
+        col: 1,
+        rowSpan: 1,
+        colSpan: 2,
+        title: "Hero Masterwork Plate",
+        contentHtml: "<h2>Divine Manifestations in Swarna Gesso</h2><p>Experience the museum-grade fidelity of 22-karat gold foil relief, embellished with authentic Jaipur gemstones and natural limestone paste.</p>",
+      },
+      {
+        id: "web-sub-1",
+        row: 2,
+        col: 1,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Iconographical Lineage",
+        contentHtml: "<h4>Gesso Embossing &amp; Foil Adhesion</h4><p>Layers of limestone powder mixed with Arabic gum create sculptured dimensional relief before hand-burnishing with 22k gold leaf.</p>",
+      },
+      {
+        id: "web-sub-2",
+        row: 2,
+        col: 2,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Carnatic Synthesis",
+        contentHtml: "<h4>Raga Ragamalika &amp; Mood</h4><p>Visual devotional iconography designed in resonance with foundational Carnatic classical ragas.</p>",
+      },
+    ],
+  },
+  {
+    title: "Editorial 3x2 Art Matrix",
+    description: "3 Rows × 2 Columns publication spread with top spanning banner, twin body columns, and archival footnotes.",
+    targetPageType: "PAGE_SECTION",
+    matrixRows: 3,
+    matrixCols: 2,
+    rowHeights: "auto auto auto",
+    colWidths: "1fr 1fr",
+    hasHeader: true,
+    headerHtml: "<p><strong>ATELIER ESSAYS</strong> • SACRED ART &amp; HISTORICAL SCHOLARSHIP</p>",
+    hasFooter: true,
+    footerHtml: "<p>© Atelier of Lalita Kapilavai • Sacred Art Archive</p>",
+    verticalSpineMode: "NONE",
+    verticalSpineWidth: "25%",
+    verticalSpineHtml: null,
+    frameStyle: "double-fillet",
+    backgroundType: "COLOR",
+    backgroundColor: "#FBF8F1",
+    backgroundPattern: "mandala-filigree",
+    patternOpacity: 0.1,
+    segments: [
+      {
+        id: "web-ed-lead",
+        row: 1,
+        col: 1,
+        rowSpan: 1,
+        colSpan: 2,
+        title: "Lead Editorial Feature",
+        contentHtml: "<h1>The Living Legacy of Thanjavur Painting</h1><p>Tracing four centuries of divine ornamentation from the royal courts of the Nayakas and Marathas to contemporary fine art sanctums.</p>",
+      },
+      {
+        id: "web-ed-col1",
+        row: 2,
+        col: 1,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "The Sacred Canvas",
+        contentHtml: "<h4>Unbleached Teak &amp; Mukha-Varnam</h4><p>Pure teak wood frames supporting organic canvas, prepared with unboiled limestone and paste for archival permanence.</p>",
+      },
+      {
+        id: "web-ed-col2",
+        row: 2,
+        col: 2,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Gold Burnishing",
+        contentHtml: "<h4>The 22k Gold Foil Leafing</h4><p>Precision manual leafing burnished with agate stone to achieve the warm, eternal glow of royal Tanjore masterworks.</p>",
+      },
+      {
+        id: "web-ed-sub1",
+        row: 3,
+        col: 1,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Mineral Pigments",
+        contentHtml: "<p>Traditional plant dyes, lapis lazuli, and mineral cinnabar providing luminous divine color fields.</p>",
+      },
+      {
+        id: "web-ed-sub2",
+        row: 3,
+        col: 2,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Patronage &amp; Honors",
+        contentHtml: "<p>Commissioned by international cultural archives, royal foundations, and esteemed classical art collectors.</p>",
+      },
+    ],
+  },
+  {
+    title: "Asymmetric 70:30 Curatorial Story",
+    description: "Wide masterwork focal column with detailed supporting curatorial sidebar.",
+    targetPageType: "PAGE_SECTION",
+    matrixRows: 2,
+    matrixCols: 2,
+    rowHeights: "auto auto",
+    colWidths: "7fr 3fr",
+    hasHeader: true,
+    headerHtml: "<p><strong>CURATORIAL MONOGRAPH</strong> • ASYMMETRIC STUDY</p>",
+    hasFooter: false,
+    footerHtml: null,
+    verticalSpineMode: "NONE",
+    verticalSpineWidth: "25%",
+    verticalSpineHtml: null,
+    frameStyle: "gold-fillet",
+    backgroundType: "COLOR",
+    backgroundColor: "#FAF7F2",
+    backgroundPattern: "mandala-filigree",
+    patternOpacity: 0.12,
+    segments: [
+      {
+        id: "web-asym-main",
+        row: 1,
+        col: 1,
+        rowSpan: 2,
+        colSpan: 1,
+        title: "Dominant Artwork Feature",
+        contentHtml: "<h2>Swarna Venkateswara: Sacred Majesty</h2><p>An expansive study of traditional Tanjore iconographical proportions, Mukha-varnam gaze symmetry, and jewel-encrusted temple arches.</p>",
+      },
+      {
+        id: "web-asym-side1",
+        row: 1,
+        col: 2,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Iconography Details",
+        contentHtml: "<h4>Archival Provenance</h4><p>Documenting the historic iconography and sacred dhyana slokas governing each adornment.</p>",
+      },
+      {
+        id: "web-asym-side2",
+        row: 2,
+        col: 2,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Atelier Note",
+        contentHtml: "<h4>Handcrafted in Chennai</h4><p>Created exclusively by Master Artist Lalita Kapilavai over 480 hours of meticulous relief work.</p>",
+      },
+    ],
+  },
+  {
+    title: "Devotional Tri-Panel with Header",
+    description: "Tri-column devotional showcase with full-width top invocation header.",
+    targetPageType: "PAGE_SECTION",
+    matrixRows: 2,
+    matrixCols: 3,
+    rowHeights: "auto auto",
+    colWidths: "1fr 1fr 1fr",
+    hasHeader: true,
+    headerHtml: "<p><strong>SACRED TRIPTYCH</strong> • DEVOTIONAL PANTHEON</p>",
+    hasFooter: true,
+    footerHtml: "<p>Traditional South Indian Sacred Iconography • Lalita Kapilavai Atelier</p>",
+    verticalSpineMode: "NONE",
+    verticalSpineWidth: "25%",
+    verticalSpineHtml: null,
+    frameStyle: "silk-border",
+    backgroundType: "COLOR",
+    backgroundColor: "#FBF8F1",
+    backgroundPattern: "lotus-jaali",
+    patternOpacity: 0.1,
+    segments: [
+      {
+        id: "web-tri-invoc",
+        row: 1,
+        col: 1,
+        rowSpan: 1,
+        colSpan: 3,
+        title: "Triptych Invocation",
+        contentHtml: "<h2>Trimurti Devotional Manifestations</h2><p>A panoramic three-part exploration of sacred divine archetypes rendered in authentic Tanjore gesso relief.</p>",
+      },
+      {
+        id: "web-tri-1",
+        row: 2,
+        col: 1,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Panel I: Srishti (Creation)",
+        contentHtml: "<h4>Lord Brahma &amp; Saraswati</h4><p>Knowledge, resonance of the Veena, and cosmic sacred geometry.</p>",
+      },
+      {
+        id: "web-tri-2",
+        row: 2,
+        col: 2,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Panel II: Sthiti (Preservation)",
+        contentHtml: "<h4>Lord Vishnu &amp; Mahalakshmi</h4><p>Grace, sustenance, and abundant auspiciousness adorned with gold foil.</p>",
+      },
+      {
+        id: "web-tri-3",
+        row: 2,
+        col: 3,
+        rowSpan: 1,
+        colSpan: 1,
+        title: "Panel III: Laya (Transformation)",
+        contentHtml: "<h4>Lord Shiva &amp; Parvati</h4><p>Cosmic dance of Nataraja and the eternal silence of Kailasha.</p>",
+      },
+    ],
+  },
+];
+
+export async function GET(req: NextRequest) {
   try {
     const session = await checkAdminAuth();
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const targetPageType = searchParams.get("targetPageType");
+
+    let whereClause: Prisma.ECatalogTemplateWhereInput = {};
+    const isPageSectionQuery = targetPageType === "PAGE_SECTION";
+
+    if (isPageSectionQuery) {
+      whereClause = { targetPageType: "PAGE_SECTION" };
+    } else if (targetPageType) {
+      whereClause = { targetPageType };
+    } else {
+      // Legacy e-catalog query without param: strictly exclude PAGE_SECTION to prevent contamination
+      whereClause = { targetPageType: { not: "PAGE_SECTION" } };
+    }
+
     let templates = await prisma.eCatalogTemplate.findMany({
+      where: whereClause,
       orderBy: { createdAt: "desc" },
     });
 
-    // If no templates exist in the database, seed standard presets
+    // If no templates exist for this scoped category, seed standard defaults
     if (templates.length === 0) {
-      for (const preset of DEFAULT_TEMPLATES) {
+      const presetsToSeed = isPageSectionQuery ? DEFAULT_PAGE_SECTION_TEMPLATES : DEFAULT_TEMPLATES;
+      for (const preset of presetsToSeed) {
         await prisma.eCatalogTemplate.create({
           data: {
             title: preset.title,
@@ -287,6 +534,7 @@ export async function GET() {
       }
 
       templates = await prisma.eCatalogTemplate.findMany({
+        where: whereClause,
         orderBy: { createdAt: "desc" },
       });
     }

@@ -115,6 +115,8 @@ export async function PUT(
               title: sec.title || `Section ${sIdx + 1}`,
               orderIndex: sIdx + 1,
               gridSpan: sec.gridSpan || 12,
+              layoutType: sec.layoutType || "PRESET",
+              matrixConfig: sec.matrixConfig ? sec.matrixConfig : undefined,
               backgroundColor: sec.backgroundColor || null,
               backgroundType: sec.backgroundType || "COLOR",
               backgroundPattern: sec.backgroundPattern || null,
