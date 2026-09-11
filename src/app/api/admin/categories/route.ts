@@ -13,14 +13,16 @@ export async function GET(request: NextRequest) {
     }
 
     const categories = await prisma.artCategory.findMany({
-      orderBy: { displayOrder: "asc" },
+      where: { isDeleted: false },
+      orderBy: [{ sortOrder: "asc" }, { displayOrder: "asc" }],
       include: {
         parent: {
           select: { id: true, name: true, slug: true },
         },
         children: {
-          select: { id: true, name: true, slug: true, displayOrder: true },
-          orderBy: { displayOrder: "asc" },
+          where: { isDeleted: false },
+          select: { id: true, name: true, slug: true, displayOrder: true, sortOrder: true, isActive: true, showOnHomepage: true },
+          orderBy: [{ sortOrder: "asc" }, { displayOrder: "asc" }],
         },
         _count: {
           select: { artworks: true },
@@ -54,6 +56,9 @@ export async function POST(request: NextRequest) {
       curatorialNote,
       coverImage,
       displayOrder,
+      sortOrder,
+      isActive,
+      showOnHomepage,
       badgeLabel,
       heroTitle,
       bannerHeight,
@@ -95,6 +100,9 @@ export async function POST(request: NextRequest) {
         curatorialNote: curatorialNote || description || null,
         coverImage: coverImage || null,
         displayOrder: displayOrder ?? 0,
+        sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : (displayOrder ?? 0),
+        isActive: isActive !== undefined ? !!isActive : true,
+        showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : false,
         badgeLabel: badgeLabel || "Traditional Fine Art School",
         heroTitle: heroTitle || null,
         bannerHeight: bannerHeight ? parseInt(String(bannerHeight), 10) : 360,
@@ -139,6 +147,9 @@ export async function PUT(request: NextRequest) {
       curatorialNote,
       coverImage,
       displayOrder,
+      sortOrder,
+      isActive,
+      showOnHomepage,
       badgeLabel,
       heroTitle,
       bannerHeight,
@@ -164,16 +175,19 @@ export async function PUT(request: NextRequest) {
         name,
         slug,
         parentId: resolvedParentId,
-        description: description || null,
-        curatorialNote: curatorialNote || description || null,
-        coverImage: coverImage || null,
-        displayOrder: displayOrder ?? 0,
-        badgeLabel: badgeLabel || "Traditional Fine Art School",
-        heroTitle: heroTitle || null,
-        bannerHeight: bannerHeight ? parseInt(String(bannerHeight), 10) : 360,
-        overlayOpacity: overlayOpacity !== undefined ? parseFloat(String(overlayOpacity)) : 0.45,
-        imagePosition: imagePosition || "center",
-        borderStyle: borderStyle || "gold-fillet",
+        description: description !== undefined ? (description || null) : undefined,
+        curatorialNote: curatorialNote !== undefined ? (curatorialNote || null) : undefined,
+        coverImage: coverImage !== undefined ? (coverImage || null) : undefined,
+        displayOrder: displayOrder !== undefined ? displayOrder : undefined,
+        sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : undefined,
+        isActive: isActive !== undefined ? !!isActive : undefined,
+        showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : undefined,
+        badgeLabel: badgeLabel !== undefined ? badgeLabel : undefined,
+        heroTitle: heroTitle !== undefined ? (heroTitle || null) : undefined,
+        bannerHeight: bannerHeight ? parseInt(String(bannerHeight), 10) : undefined,
+        overlayOpacity: overlayOpacity !== undefined ? parseFloat(String(overlayOpacity)) : undefined,
+        imagePosition: imagePosition || undefined,
+        borderStyle: borderStyle || undefined,
       },
       include: {
         parent: {
@@ -209,20 +223,38 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Category ID required" }, { status: 400 });
     }
 
-    // Check if category has artworks
+    const existing = await prisma.artCategory.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Category not found" }, { status: 404 });
+    }
+
+    // Check if category has active artworks
     const artworkCount = await prisma.artwork.count({
-      where: { categoryId: id },
+      where: { categoryId: id, isDeleted: false },
     });
 
     if (artworkCount > 0) {
       return NextResponse.json(
-        { error: `Cannot delete category: ${artworkCount} artworks are assigned to it.` },
+        { error: `Cannot delete category: ${artworkCount} active artworks are assigned to it.` },
         { status: 409 }
       );
     }
 
-    await prisma.artCategory.delete({ where: { id } });
-    return NextResponse.json({ success: true });
+    // Soft delete with slug collision guard
+    const deletedSlug = `${existing.slug}-deleted-${Date.now()}`;
+    await prisma.artCategory.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+        isActive: false,
+        slug: deletedSlug,
+      },
+    });
+
+    return NextResponse.json({ success: true, message: "Category soft-deleted successfully" });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error deleting category";
     return NextResponse.json({ error: message }, { status: 500 });

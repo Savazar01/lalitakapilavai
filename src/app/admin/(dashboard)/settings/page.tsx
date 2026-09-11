@@ -812,6 +812,115 @@ export default function AdminSettingsPage() {
                     </div>
                   </div>
 
+                  {/* Section Headings, Eyebrows & Subtitles */}
+                  <div className="space-y-3 pt-4 border-t border-border">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-foreground text-sm">Admin View Headers, Eyebrow Badges &amp; Descriptions</h4>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setAdminConfig({
+                            ...adminConfig,
+                            pageHeadings: { ...DEFAULT_ADMIN_CONFIG.pageHeadings },
+                          })
+                        }
+                        className="text-[11px] h-7"
+                      >
+                        Reset Headings Defaults
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Customize the eyebrow badges, main titles, and curatorial descriptions across all 11 administrative dashboard pages.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                      {ADMIN_NAV_ITEMS.map((item) => {
+                        const heading = adminConfig.pageHeadings?.[item.id] || DEFAULT_ADMIN_CONFIG.pageHeadings[item.id] || {
+                          badge: "",
+                          title: item.defaultLabel,
+                          subtitle: "",
+                        };
+                        return (
+                          <div key={`heading-${item.id}`} className="p-3.5 rounded-lg border border-border bg-card/60 space-y-2.5">
+                            <div className="flex items-center justify-between text-xs pb-1 border-b border-border/50">
+                              <span className="font-semibold text-primary flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5" />
+                                {item.defaultLabel} Section
+                              </span>
+                              <span className="font-mono text-[10px] text-muted-foreground">/{item.id}</span>
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label className="text-[10px] font-mono uppercase text-muted-foreground">Eyebrow Badge / Tag</Label>
+                              <Input
+                                value={heading.badge || ""}
+                                onChange={(e) =>
+                                  setAdminConfig({
+                                    ...adminConfig,
+                                    pageHeadings: {
+                                      ...adminConfig.pageHeadings,
+                                      [item.id]: {
+                                        ...heading,
+                                        badge: e.target.value,
+                                      },
+                                    },
+                                  })
+                                }
+                                placeholder="Eyebrow Tag..."
+                                className="text-xs h-8"
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label className="text-[10px] font-mono uppercase text-muted-foreground">Main Heading Title</Label>
+                              <Input
+                                value={heading.title || ""}
+                                onChange={(e) =>
+                                  setAdminConfig({
+                                    ...adminConfig,
+                                    pageHeadings: {
+                                      ...adminConfig.pageHeadings,
+                                      [item.id]: {
+                                        ...heading,
+                                        title: e.target.value,
+                                      },
+                                    },
+                                  })
+                                }
+                                placeholder="Page Title..."
+                                className="text-xs font-semibold h-8"
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label className="text-[10px] font-mono uppercase text-muted-foreground">Subtitle / Curatorial Description</Label>
+                              <Textarea
+                                value={heading.subtitle || ""}
+                                onChange={(e) =>
+                                  setAdminConfig({
+                                    ...adminConfig,
+                                    pageHeadings: {
+                                      ...adminConfig.pageHeadings,
+                                      [item.id]: {
+                                        ...heading,
+                                        subtitle: e.target.value,
+                                      },
+                                    },
+                                  })
+                                }
+                                placeholder="Subtitle or instructions..."
+                                rows={2}
+                                className="text-xs resize-none"
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="pt-3 border-t border-border flex justify-end">
                     <Button
                       type="button"

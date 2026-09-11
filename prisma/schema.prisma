@@ -182,11 +182,21 @@ model Page {
   metaDescription String?       @db.Text
   isPublished     Boolean       @default(false)
   publishedAt     DateTime?
+  isActive        Boolean       @default(true)
+  isDeleted       Boolean       @default(false)
+  showOnHomepage  Boolean       @default(false)
+  sortOrder       Int           @default(0)
+  eyebrowTag      String?
+  heroTitle       String?
+  heroSubtitle    String?       @db.Text
+  config          Json?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
   sections        PageSection[]
 
+  @@index([sortOrder])
+  @@index([isActive, isDeleted])
   @@map("pages")
 }
 
@@ -259,11 +269,18 @@ model ArtCategory {
   parent         ArtCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children       ArtCategory[] @relation("CategoryHierarchy")
 
+  isActive       Boolean   @default(true)
+  isDeleted      Boolean   @default(false)
+  showOnHomepage Boolean   @default(false)
+  sortOrder      Int       @default(0)
+
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   artworks       Artwork[]
 
+  @@index([sortOrder])
+  @@index([isActive, isDeleted])
   @@map("art_categories")
 }
 
@@ -282,6 +299,10 @@ model Artwork {
   currency           String               @default("INR")
   isAvailable        Boolean              @default(true)
   isFeatured         Boolean              @default(false)
+  isActive           Boolean              @default(true)
+  isDeleted          Boolean              @default(false)
+  showOnHomepage     Boolean              @default(false)
+  sortOrder          Int                  @default(0)
   primaryImageUrl    String
   watermarkedWebpUrl String
   protectedS3Key     String?              // Protected original master S3 key
@@ -299,6 +320,8 @@ model Artwork {
   ragaLinks          ArtworkRagaLink[]
   eCatalogItems      ECatalogItem[]
 
+  @@index([sortOrder])
+  @@index([isActive, isDeleted])
   @@map("artworks")
 }
 
@@ -421,6 +444,10 @@ model Event {
   contactPhone       String?
   statusOverride     String?             @default("AUTO") // "AUTO" | "FORCE_UPCOMING" | "FORCE_PAST"
   isArchived         Boolean             @default(false)
+  isActive           Boolean             @default(true)
+  isDeleted          Boolean             @default(false)
+  showOnHomepage     Boolean             @default(false)
+  sortOrder          Int                 @default(0)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
@@ -429,6 +456,8 @@ model Event {
   leads              Lead[]
   eCatalogs          ECatalog[]
 
+  @@index([sortOrder])
+  @@index([isActive, isDeleted])
   @@map("events")
 }
 
@@ -575,10 +604,16 @@ model ECatalog {
   items              ECatalogItem[]
 
   isPublished        Boolean        @default(false)
+  isActive           Boolean        @default(true)
+  isDeleted          Boolean        @default(false)
+  showOnHomepage     Boolean        @default(false)
+  sortOrder          Int            @default(0)
   downloadEnabled    Boolean        @default(true)
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 
+  @@index([sortOrder])
+  @@index([isActive, isDeleted])
   @@map("e_catalogs")
 }
 

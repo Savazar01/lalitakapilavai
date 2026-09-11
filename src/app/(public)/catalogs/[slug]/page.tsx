@@ -203,7 +203,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
     },
   });
 
-  if (!catalog || (!catalog.isPublished && process.env.NODE_ENV === "production")) {
+  if (!catalog || !catalog.isActive || catalog.isDeleted || (!catalog.isPublished && process.env.NODE_ENV === "production")) {
     notFound();
   }
 

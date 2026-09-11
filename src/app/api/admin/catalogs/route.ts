@@ -26,8 +26,11 @@ export async function GET(req: NextRequest) {
     const publishedOnly = searchParams.get("published") === "true";
 
     const catalogs = await prisma.eCatalog.findMany({
-      where: publishedOnly ? { isPublished: true } : undefined,
-      orderBy: { createdAt: "desc" },
+      where: {
+        isDeleted: false,
+        ...(publishedOnly ? { isPublished: true } : {}),
+      },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
       include: {
         event: {
           select: { id: true, title: true, venue: true, city: true, startDate: true },
@@ -67,6 +70,9 @@ export async function POST(req: NextRequest) {
       isPublished,
       downloadablePdfUrl,
       eventId,
+      isActive,
+      showOnHomepage,
+      sortOrder,
     } = body;
 
     if (!title || !slug) {
@@ -82,8 +88,8 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    const existing = await prisma.eCatalog.findUnique({
-      where: { slug: cleanSlug },
+    const existing = await prisma.eCatalog.findFirst({
+      where: { slug: cleanSlug, isDeleted: false },
     });
 
     if (existing) {
@@ -105,6 +111,9 @@ export async function POST(req: NextRequest) {
         isPublished: Boolean(isPublished),
         downloadablePdfUrl: downloadablePdfUrl || null,
         eventId: eventId || null,
+        isActive: isActive !== undefined ? !!isActive : true,
+        showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : false,
+        sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : 0,
       },
     });
 

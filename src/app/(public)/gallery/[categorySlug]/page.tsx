@@ -53,12 +53,12 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
       },
     }),
     prisma.artCategory.findMany({
-      where: { parentId: null },
-      orderBy: { displayOrder: "asc" },
+      where: { parentId: null, isActive: true, isDeleted: false },
+      orderBy: [{ sortOrder: "asc" }, { displayOrder: "asc" }],
     }),
   ]);
 
-  if (!currentCategory) {
+  if (!currentCategory || !currentCategory.isActive || currentCategory.isDeleted) {
     notFound();
   }
 
@@ -79,8 +79,12 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
     : [currentCategory.id, ...currentCategory.children.map((c) => c.id)];
 
   const categoryArtworks = await prisma.artwork.findMany({
-    where: { categoryId: { in: categoryIdsToQuery } },
-    orderBy: { createdAt: "desc" },
+    where: {
+      categoryId: { in: categoryIdsToQuery },
+      isActive: true,
+      isDeleted: false,
+    },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     include: { category: true },
   });
 

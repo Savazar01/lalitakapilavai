@@ -14,12 +14,15 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const firstCategory = await prisma.artCategory.findFirst({
-    where: { parentId: null },
-    orderBy: { displayOrder: "asc" },
-  }) || await prisma.artCategory.findFirst({
-    orderBy: { displayOrder: "asc" },
-  });
+  const firstCategory =
+    (await prisma.artCategory.findFirst({
+      where: { isActive: true, isDeleted: false, parentId: null },
+      orderBy: [{ sortOrder: "asc" }, { displayOrder: "asc" }],
+    })) ||
+    (await prisma.artCategory.findFirst({
+      where: { isActive: true, isDeleted: false },
+      orderBy: [{ sortOrder: "asc" }, { displayOrder: "asc" }],
+    }));
 
   if (firstCategory) {
     redirect(`/gallery/${firstCategory.slug}`);

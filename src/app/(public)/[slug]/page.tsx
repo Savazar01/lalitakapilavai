@@ -52,8 +52,8 @@ export default async function DynamicPublicPage({ params }: PageProps) {
   const { slug } = await params;
   const page = await getPageBySlug(slug);
 
-  // If page does not exist or unpublished, trigger 404
-  if (!page || !page.isPublished) {
+  // If page does not exist, unpublished, inactive, or soft-deleted, trigger 404
+  if (!page || !page.isPublished || !page.isActive || page.isDeleted) {
     notFound();
   }
 

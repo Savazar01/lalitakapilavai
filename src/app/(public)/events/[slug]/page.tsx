@@ -76,7 +76,7 @@ export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const event = await getEventBySlug(slug);
 
-  if (!event) {
+  if (!event || !event.isPublished || !event.isActive || event.isDeleted) {
     notFound();
   }
 

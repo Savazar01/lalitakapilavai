@@ -45,6 +45,7 @@ export function EditablePageHeader({
   const [isEditing, setIsEditing] = React.useState(false);
   const [editTitle, setEditTitle] = React.useState(title);
   const [editSubtitle, setEditSubtitle] = React.useState(subtitle);
+  const [editBadge, setEditBadge] = React.useState(badge || "");
   const [saving, setSaving] = React.useState(false);
 
   // Fetch persisted config on mount
@@ -56,7 +57,7 @@ export function EditablePageHeader({
           const h = data.pageHeadings[sectionKey];
           if (h.title) setTitle(h.title);
           if (h.subtitle) setSubtitle(h.subtitle);
-          if (h.badge) setBadge(h.badge);
+          if (h.badge !== undefined) setBadge(h.badge);
         }
       })
       .catch(() => {});
@@ -65,12 +66,14 @@ export function EditablePageHeader({
   const handleStartEdit = () => {
     setEditTitle(title);
     setEditSubtitle(subtitle);
+    setEditBadge(badge || "");
     setIsEditing(true);
   };
 
   const handleCancel = () => {
     setEditTitle(title);
     setEditSubtitle(subtitle);
+    setEditBadge(badge || "");
     setIsEditing(false);
   };
 
@@ -83,10 +86,12 @@ export function EditablePageHeader({
     setSaving(true);
     const prevTitle = title;
     const prevSubtitle = subtitle;
+    const prevBadge = badge;
 
     // Optimistic update
-    setTitle(editTitle);
-    setSubtitle(editSubtitle);
+    setTitle(editTitle.trim());
+    setSubtitle(editSubtitle.trim());
+    setBadge(editBadge.trim());
     setIsEditing(false);
 
     try {
@@ -96,9 +101,9 @@ export function EditablePageHeader({
         body: JSON.stringify({
           sectionKey,
           heading: {
+            badge: editBadge.trim(),
             title: editTitle.trim(),
             subtitle: editSubtitle.trim(),
-            badge,
           },
         }),
       });
@@ -107,10 +112,12 @@ export function EditablePageHeader({
         throw new Error("Failed to save changes");
       }
 
-      toast.success("Page heading updated successfully");
+      window.dispatchEvent(new CustomEvent("adminConfigUpdated"));
+      toast.success("Page heading and badge updated successfully");
     } catch {
       setTitle(prevTitle);
       setSubtitle(prevSubtitle);
+      setBadge(prevBadge);
       toast.error("Failed to update heading");
     } finally {
       setSaving(false);
@@ -119,19 +126,31 @@ export function EditablePageHeader({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-5 ${className}`}
+      className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-border/40 pb-5 ${className}`}
     >
-      <div className="flex-1 min-w-0">
-        {/* Optional Badge */}
+      <div className="flex-1 min-w-0 flex flex-col items-start gap-1 text-left w-full">
+        {/* 1. TOP: Eyebrow Tag / Badge */}
         {badge && (
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest mb-1.5">
-            {badgeIcon || <Sparkles className="w-3.5 h-3.5" />}
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest mb-0.5">
+            {badgeIcon || <Sparkles className="w-3.5 h-3.5 shrink-0" />}
             <span>{badge}</span>
           </div>
         )}
 
         {isEditing ? (
-          <div className="space-y-3 p-3 rounded-lg border border-primary/40 bg-card/90 shadow-sm max-w-2xl">
+          <div className="w-full space-y-3 p-3.5 rounded-lg border border-primary/40 bg-card/95 shadow-sm max-w-2xl mt-1 text-left">
+            <div className="space-y-1">
+              <label className="text-[11px] font-mono text-primary uppercase tracking-wider font-semibold">
+                Eyebrow Badge / Tag
+              </label>
+              <Input
+                value={editBadge}
+                onChange={(e) => setEditBadge(e.target.value)}
+                placeholder="e.g. Navigation Architecture"
+                className="text-xs h-9 border-primary/30 focus-visible:ring-primary"
+              />
+            </div>
+
             <div className="space-y-1">
               <label className="text-[11px] font-mono text-primary uppercase tracking-wider font-semibold">
                 Page Title
@@ -188,7 +207,8 @@ export function EditablePageHeader({
             </div>
           </div>
         ) : (
-          <div className="group relative inline-block max-w-full">
+          <div className="group relative flex flex-col items-start w-full text-left">
+            {/* 2. MIDDLE: Main Section Title */}
             <div className="flex items-center gap-2.5">
               <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground tracking-tight">
                 {title}
@@ -200,7 +220,7 @@ export function EditablePageHeader({
                   type="button"
                   onClick={handleStartEdit}
                   className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
-                  title="Edit page heading and subtitle"
+                  title="Edit eyebrow badge, title, and description"
                   aria-label="Edit page heading"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
@@ -208,6 +228,7 @@ export function EditablePageHeader({
               )}
             </div>
 
+            {/* 3. BOTTOM: Subtitle / Description */}
             <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-3xl leading-relaxed">
               {subtitle}
             </p>

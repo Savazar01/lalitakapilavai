@@ -19,7 +19,11 @@ export const metadata: Metadata = {
 export default async function CategoriesPage() {
   const [categories, pageData] = await Promise.all([
     prisma.artCategory.findMany({
-      orderBy: { displayOrder: "asc" },
+      where: {
+        isActive: true,
+        isDeleted: false,
+      },
+      orderBy: [{ sortOrder: "asc" }, { displayOrder: "asc" }],
       include: {
         _count: {
           select: { artworks: true },
@@ -43,8 +47,9 @@ export default async function CategoriesPage() {
       .catch(() => null),
   ]);
 
-  const headerTitle = pageData?.title || "Traditional Art Disciplines";
+  const headerTitle = pageData?.heroTitle || pageData?.title || "Traditional Art Disciplines";
   const headerSubtitle =
+    pageData?.heroSubtitle ||
     pageData?.metaDescription ||
     "Explore classical South Indian artistic disciplines spanning Thanjavur 22k gold foil embossments, Mysore traditional paintings, temple murals, and Carnatic music traditions.";
 
@@ -61,7 +66,7 @@ export default async function CategoriesPage() {
         <div className="text-center max-w-2xl mx-auto pt-12 sm:pt-16 pb-6 px-4 space-y-3">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            Heritage Lineage &amp; Schools
+            {pageData?.eyebrowTag || "Heritage Lineage & Schools"}
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground">
             {headerTitle}

@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const q = searchParams.get("q");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = {};
+    const where: any = { isDeleted: false };
 
     if (categoryId && categoryId !== "ALL") {
       where.categoryId = categoryId;
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     const artworks = await prisma.artwork.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
       include: {
         category: true,
         _count: {
@@ -88,6 +88,9 @@ export async function POST(request: NextRequest) {
       price,
       isAvailable,
       isFeatured,
+      isActive,
+      showOnHomepage,
+      sortOrder,
       primaryImageUrl,
       watermarkedWebpUrl,
       protectedS3Key,
@@ -106,8 +109,8 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9-_]/g, "-")
       .replace(/-+/g, "-");
 
-    const existing = await prisma.artwork.findUnique({
-      where: { slug: cleanSlug },
+    const existing = await prisma.artwork.findFirst({
+      where: { slug: cleanSlug, isDeleted: false },
     });
 
     if (existing) {
@@ -138,6 +141,9 @@ export async function POST(request: NextRequest) {
         currency: body.currency || "INR",
         isAvailable: isAvailable !== undefined ? !!isAvailable : true,
         isFeatured: !!isFeatured,
+        isActive: isActive !== undefined ? !!isActive : true,
+        showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : false,
+        sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : 0,
         primaryImageUrl,
         watermarkedWebpUrl: watermarkedWebpUrl || primaryImageUrl,
         protectedS3Key: protectedS3Key || null,

@@ -206,13 +206,30 @@ async function main() {
   ];
 
   for (const cat of categories) {
-    await prisma.artCategory.upsert({
+    const existing = await prisma.artCategory.findUnique({
       where: { slug: cat.slug },
-      update: {},
-      create: cat,
     });
+
+    if (existing) {
+      if (existing.isDeleted) {
+        console.log(`🛡️ Preserved soft-deleted state for category: ${cat.slug} (never resurrecting)`);
+      } else {
+        console.log(`🛡️ Preserved user modifications for category: ${cat.slug}`);
+      }
+      continue;
+    }
+
+    await prisma.artCategory.create({
+      data: {
+        ...cat,
+        sortOrder: cat.displayOrder,
+        isActive: true,
+        isDeleted: false,
+        showOnHomepage: false,
+      },
+    });
+    console.log(`✅ Provisioned default category: ${cat.slug}`);
   }
-  console.log(`✅ Provisioned ${categories.length} Art Categories`);
 
   // 4. Provision Default Navigation Menu Items (Hierarchical)
   const menuCount = await prisma.menuItem.count();
@@ -629,6 +646,26 @@ async function main() {
       metaTitle: "Exhibitions, Concerts & Workshops — Lalita Kapilavai",
       metaDescription:
         "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.",
+      eyebrowTag: "Cultural Calendar & Recitals",
+      heroTitle: "Exhibitions & Events",
+      heroSubtitle:
+        "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.",
+      config: {
+        upcomingBadge: "Live Schedules",
+        upcomingTitle: "Upcoming Exhibitions & Events",
+        upcomingSubtitle:
+          "Forthcoming gallery exhibitions, classical vocal concerts, and traditional iconography masterclasses.",
+        upcomingEmptyTitle: "No Upcoming Public Events",
+        upcomingEmptySubtitle:
+          "New exhibition dates, gallery recitals, and masterclasses are published periodically. Please explore our past retrospectives below.",
+        pastBadge: "Archive & Retrospectives",
+        pastTitle: "Past Exhibitions & Retrospectives",
+        pastSubtitle:
+          "Archived exhibitions, previous concert recitals, and documented artistic milestones.",
+        pastEmptyTitle: "No Past Retrospectives Recorded",
+        pastEmptySubtitle:
+          "Historical exhibitions and previous concert recitals will appear here once archived.",
+      },
       isPublished: true,
       sectionTitle: "Cultural Calendar Hero",
       content: {
@@ -723,7 +760,19 @@ async function main() {
     },
   ];
 
-  for (const sp of systemPages) {
+  for (const sp of systemPages as Array<{
+    title: string;
+    slug: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    eyebrowTag?: string;
+    heroTitle?: string;
+    heroSubtitle?: string;
+    config?: Record<string, unknown>;
+    isPublished: boolean;
+    sectionTitle?: string;
+    content: Record<string, unknown>;
+  }>) {
     const existingPage = await prisma.page.findUnique({
       where: { slug: sp.slug },
       include: { sections: true },
@@ -736,6 +785,14 @@ async function main() {
           slug: sp.slug,
           metaDescription: sp.metaDescription,
           isPublished: sp.isPublished,
+          isActive: true,
+          isDeleted: false,
+          showOnHomepage: false,
+          sortOrder: 0,
+          eyebrowTag: sp.eyebrowTag || null,
+          heroTitle: sp.heroTitle || null,
+          heroSubtitle: sp.heroSubtitle || null,
+          config: sp.config ? (sp.config as unknown as object) : undefined,
           sections: {
             create: [
               {
@@ -748,7 +805,7 @@ async function main() {
                       title: "Header Content",
                       orderIndex: 1,
                       gridSpan: 12,
-                      content: sp.content,
+                      content: sp.content as unknown as object,
                     },
                   ],
                 },
@@ -758,30 +815,49 @@ async function main() {
         },
       });
       console.log(`✅ Provisioned editable system page with full sections: /${sp.slug}`);
-    } else if (existingPage.sections.length === 0) {
-      // Backfill default section if page has 0 sections
-      await prisma.pageSection.create({
-        data: {
-          pageId: existingPage.id,
-          title: sp.sectionTitle || "Hero Banner",
-          orderIndex: 1,
-          gridSpan: 12,
-          subSections: {
-            create: [
-              {
-                title: "Header Content",
-                orderIndex: 1,
-                gridSpan: 12,
-                content: sp.content,
-              },
-            ],
-          },
-        },
-      });
-      console.log(`✅ Backfilled default hero section for: /${sp.slug}`);
+    } else if (existingPage.isDeleted) {
+      console.log(`🛡️ Preserved soft-deleted state for: /${sp.slug} (never resurrecting)`);
+      continue;
     } else {
-      // PRESERVE: Admin has customized this page; do not modify!
-      console.log(`🛡️ Preserved existing admin modifications for: /${sp.slug} (${existingPage.sections.length} sections)`);
+      // PRESERVE: Admin has customized this page; do not modify existing content!
+      // Only backfill missing fields if null
+      const pageUpdates: Record<string, unknown> = {};
+      if (!existingPage.eyebrowTag && sp.eyebrowTag) pageUpdates.eyebrowTag = sp.eyebrowTag;
+      if (!existingPage.heroTitle && sp.heroTitle) pageUpdates.heroTitle = sp.heroTitle;
+      if (!existingPage.heroSubtitle && sp.heroSubtitle) pageUpdates.heroSubtitle = sp.heroSubtitle;
+      if (!existingPage.config && sp.config) pageUpdates.config = sp.config as unknown as object;
+
+      if (Object.keys(pageUpdates).length > 0) {
+        await prisma.page.update({
+          where: { id: existingPage.id },
+          data: pageUpdates,
+        });
+        console.log(`🔧 Backfilled missing metadata config for: /${sp.slug}`);
+      }
+
+      if (existingPage.sections.length === 0) {
+        await prisma.pageSection.create({
+          data: {
+            pageId: existingPage.id,
+            title: sp.sectionTitle || "Hero Banner",
+            orderIndex: 1,
+            gridSpan: 12,
+            subSections: {
+              create: [
+                {
+                  title: "Header Content",
+                  orderIndex: 1,
+                  gridSpan: 12,
+                  content: sp.content as unknown as object,
+                },
+              ],
+            },
+          },
+        });
+        console.log(`✅ Backfilled default hero section for: /${sp.slug}`);
+      } else {
+        console.log(`🛡️ Preserved existing admin modifications for: /${sp.slug} (${existingPage.sections.length} sections)`);
+      }
     }
   }
 

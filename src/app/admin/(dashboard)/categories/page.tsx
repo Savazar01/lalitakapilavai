@@ -13,6 +13,9 @@ import {
   Palette,
   ArrowUpDown,
   Search,
+  Eye,
+  EyeOff,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,6 +76,9 @@ interface ArtCategoryItem {
   overlayOpacity?: number | null;
   imagePosition?: string | null;
   borderStyle?: string | null;
+  isActive: boolean;
+  showOnHomepage: boolean;
+  sortOrder: number;
   _count?: {
     artworks: number;
   };
@@ -101,6 +107,9 @@ export default function AdminCategoriesPage() {
     curatorialNote: "",
     coverImage: "",
     displayOrder: 0,
+    sortOrder: 0,
+    isActive: true,
+    showOnHomepage: false,
     badgeLabel: "Traditional Fine Art School",
     heroTitle: "",
     bannerHeight: 360,
@@ -138,6 +147,9 @@ export default function AdminCategoriesPage() {
       curatorialNote: "",
       coverImage: "",
       displayOrder: categories.length + 1,
+      sortOrder: categories.length + 1,
+      isActive: true,
+      showOnHomepage: false,
       badgeLabel: "Traditional Fine Art School",
       heroTitle: "",
       bannerHeight: 360,
@@ -159,6 +171,9 @@ export default function AdminCategoriesPage() {
       curatorialNote: cat.curatorialNote || cat.description || "",
       coverImage: cat.coverImage || "",
       displayOrder: cat.displayOrder,
+      sortOrder: cat.sortOrder !== undefined ? cat.sortOrder : cat.displayOrder,
+      isActive: cat.isActive !== undefined ? cat.isActive : true,
+      showOnHomepage: cat.showOnHomepage !== undefined ? cat.showOnHomepage : false,
       badgeLabel: cat.badgeLabel || "Traditional Fine Art School",
       heroTitle: cat.heroTitle || "",
       bannerHeight: cat.bannerHeight || 360,
@@ -168,6 +183,48 @@ export default function AdminCategoriesPage() {
     });
     setError(null);
     setModalOpen(true);
+  };
+
+  const handleToggleActive = async (cat: ArtCategoryItem) => {
+    const nextVal = !cat.isActive;
+    setCategories((prev) => prev.map((c) => (c.id === cat.id ? { ...c, isActive: nextVal } : c)));
+    try {
+      const res = await fetch("/api/admin/categories", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: cat.id, isActive: nextVal }),
+      });
+      if (!res.ok) {
+        setCategories((prev) => prev.map((c) => (c.id === cat.id ? { ...c, isActive: cat.isActive } : c)));
+        toast.error("Failed to toggle category active status");
+      } else {
+        toast.success(`"${cat.name}" is now ${nextVal ? "Active" : "Inactive"}`);
+      }
+    } catch {
+      setCategories((prev) => prev.map((c) => (c.id === cat.id ? { ...c, isActive: cat.isActive } : c)));
+      toast.error("Error toggling category active status");
+    }
+  };
+
+  const handleToggleHomepage = async (cat: ArtCategoryItem) => {
+    const nextVal = !cat.showOnHomepage;
+    setCategories((prev) => prev.map((c) => (c.id === cat.id ? { ...c, showOnHomepage: nextVal } : c)));
+    try {
+      const res = await fetch("/api/admin/categories", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: cat.id, showOnHomepage: nextVal }),
+      });
+      if (!res.ok) {
+        setCategories((prev) => prev.map((c) => (c.id === cat.id ? { ...c, showOnHomepage: cat.showOnHomepage } : c)));
+        toast.error("Failed to toggle category homepage status");
+      } else {
+        toast.success(`"${cat.name}" homepage status updated`);
+      }
+    } catch {
+      setCategories((prev) => prev.map((c) => (c.id === cat.id ? { ...c, showOnHomepage: cat.showOnHomepage } : c)));
+      toast.error("Error toggling category homepage status");
+    }
   };
 
   const handleAutoSlug = (nameVal: string) => {
@@ -349,6 +406,37 @@ export default function AdminCategoriesPage() {
                 <CardDescription className="text-xs text-muted-foreground line-clamp-2 mt-2">
                   {cat.description || "No specific curatorial description provided."}
                 </CardDescription>
+
+                {/* Visibility & Homepage Toggles */}
+                <div className="flex items-center gap-1.5 pt-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(cat)}
+                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                      cat.isActive
+                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20 dark:text-emerald-400"
+                        : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                    }`}
+                    title="Click to toggle Active status"
+                  >
+                    {cat.isActive ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                    {cat.isActive ? "Active" : "Inactive"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleHomepage(cat)}
+                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                      cat.showOnHomepage
+                        ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
+                        : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
+                    }`}
+                    title="Click to toggle Homepage visibility"
+                  >
+                    <Home className="w-3 h-3" />
+                    {cat.showOnHomepage ? "On Home" : "Not on Home"}
+                  </button>
+                </div>
               </CardHeader>
 
               <CardContent className="pt-0">
@@ -580,6 +668,28 @@ export default function AdminCategoriesPage() {
                     className="text-xs font-mono"
                   />
                 </div>
+              </div>
+
+              <div className="flex items-center gap-6 pt-3 border-t border-border/50">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                  />
+                  <span className="text-xs font-medium text-foreground">Active (Visible in public gallery)</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.showOnHomepage}
+                    onChange={(e) => setFormData({ ...formData, showOnHomepage: e.target.checked })}
+                    className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                  />
+                  <span className="text-xs font-medium text-foreground">Feature on Homepage</span>
+                </label>
               </div>
             </div>
 

@@ -16,6 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
       where: {
         OR: [{ slug: "home" }, { slug: "index" }],
         isPublished: true,
+        isActive: true,
+        isDeleted: false,
       },
     });
 
@@ -48,6 +50,8 @@ export default async function HomePage() {
       where: {
         OR: [{ slug: "home" }, { slug: "index" }],
         isPublished: true,
+        isActive: true,
+        isDeleted: false,
       },
       include: {
         sections: {

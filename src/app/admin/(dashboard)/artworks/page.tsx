@@ -23,6 +23,9 @@ import {
   RefreshCw,
   X,
   CheckCircle2,
+  Eye,
+  EyeOff,
+  Home,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
@@ -80,6 +83,9 @@ interface Artwork {
   currency?: string;
   isAvailable: boolean;
   isFeatured: boolean;
+  isActive: boolean;
+  showOnHomepage: boolean;
+  sortOrder: number;
   primaryImageUrl: string;
   watermarkedWebpUrl: string;
   category: Category;
@@ -117,6 +123,9 @@ export default function ArtworksAdminPage() {
   const [currency, setCurrency] = React.useState("INR");
   const [isAvailable, setIsAvailable] = React.useState(true);
   const [isFeatured, setIsFeatured] = React.useState(false);
+  const [isActive, setIsActive] = React.useState(true);
+  const [showOnHomepage, setShowOnHomepage] = React.useState(false);
+  const [sortOrder, setSortOrder] = React.useState(0);
 
   // Image Upload State
   const [uploadingImage, setUploadingImage] = React.useState(false);
@@ -205,6 +214,9 @@ export default function ArtworksAdminPage() {
     setCurrency("INR");
     setIsAvailable(true);
     setIsFeatured(false);
+    setIsActive(true);
+    setShowOnHomepage(false);
+    setSortOrder(artworks.length + 1);
     setPrimaryImageUrl("");
     setWatermarkedWebpUrl("");
     setProtectedS3Key("");
@@ -227,6 +239,9 @@ export default function ArtworksAdminPage() {
     setCurrency(art.currency || "INR");
     setIsAvailable(art.isAvailable);
     setIsFeatured(art.isFeatured);
+    setIsActive(art.isActive !== undefined ? art.isActive : true);
+    setShowOnHomepage(art.showOnHomepage !== undefined ? art.showOnHomepage : false);
+    setSortOrder(art.sortOrder !== undefined ? art.sortOrder : 0);
     setPrimaryImageUrl(art.primaryImageUrl);
     setWatermarkedWebpUrl(art.watermarkedWebpUrl);
     setDialogOpen(true);
@@ -357,6 +372,9 @@ export default function ArtworksAdminPage() {
       currency,
       isAvailable,
       isFeatured,
+      isActive,
+      showOnHomepage,
+      sortOrder: parseInt(String(sortOrder), 10) || 0,
       primaryImageUrl,
       watermarkedWebpUrl: watermarkedWebpUrl || primaryImageUrl,
       protectedS3Key,
@@ -427,6 +445,48 @@ export default function ArtworksAdminPage() {
       toast.error("Error deleting artwork");
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleToggleActive = async (artwork: Artwork) => {
+    const nextVal = !artwork.isActive;
+    setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, isActive: nextVal } : a)));
+    try {
+      const res = await fetch(`/api/admin/artworks/${artwork.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: nextVal }),
+      });
+      if (!res.ok) {
+        setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, isActive: artwork.isActive } : a)));
+        toast.error("Failed to toggle artwork visibility");
+      } else {
+        toast.success(`"${artwork.title}" is now ${nextVal ? "Active" : "Inactive"}`);
+      }
+    } catch {
+      setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, isActive: artwork.isActive } : a)));
+      toast.error("Error toggling artwork visibility");
+    }
+  };
+
+  const handleToggleHomepage = async (artwork: Artwork) => {
+    const nextVal = !artwork.showOnHomepage;
+    setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, showOnHomepage: nextVal } : a)));
+    try {
+      const res = await fetch(`/api/admin/artworks/${artwork.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ showOnHomepage: nextVal }),
+      });
+      if (!res.ok) {
+        setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, showOnHomepage: artwork.showOnHomepage } : a)));
+        toast.error("Failed to toggle homepage display");
+      } else {
+        toast.success(`"${artwork.title}" homepage display updated`);
+      }
+    } catch {
+      setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, showOnHomepage: artwork.showOnHomepage } : a)));
+      toast.error("Error toggling homepage display");
     }
   };
 
@@ -674,6 +734,37 @@ export default function ArtworksAdminPage() {
                   {art.medium} • {art.dimensions}
                 </p>
 
+                {/* Visibility & Homepage Toggles */}
+                <div className="flex items-center gap-1.5 pt-1 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(art)}
+                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                      art.isActive
+                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20 dark:text-emerald-400"
+                        : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                    }`}
+                    title="Click to toggle Active status"
+                  >
+                    {art.isActive ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                    {art.isActive ? "Active" : "Inactive"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleHomepage(art)}
+                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                      art.showOnHomepage
+                        ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
+                        : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
+                    }`}
+                    title="Click to toggle Feature on Homepage"
+                  >
+                    <Home className="w-3 h-3" />
+                    {art.showOnHomepage ? "On Home" : "Not on Home"}
+                  </button>
+                </div>
+
                 <div className="pt-2 border-t border-border/50 flex items-center justify-between">
                   <Link
                     href={`/artwork/${art.slug}`}
@@ -762,9 +853,37 @@ export default function ArtworksAdminPage() {
                     <div className="font-mono text-[11px]">{art.dimensions}</div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={art.isAvailable ? "gold" : "outline"} className="text-[10px]">
-                      {art.isAvailable ? "Available" : "Acquired"}
-                    </Badge>
+                    <div className="flex flex-col gap-1 items-start">
+                      <Badge variant={art.isAvailable ? "gold" : "outline"} className="text-[10px]">
+                        {art.isAvailable ? "Available" : "Acquired"}
+                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(art)}
+                          className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border transition-all cursor-pointer ${
+                            art.isActive
+                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:text-emerald-400"
+                              : "bg-muted text-muted-foreground border-border"
+                          }`}
+                          title="Toggle Active"
+                        >
+                          {art.isActive ? "Active" : "Inactive"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleHomepage(art)}
+                          className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border transition-all cursor-pointer ${
+                            art.showOnHomepage
+                              ? "bg-amber-500/10 text-amber-600 border-amber-500/30 dark:text-amber-400"
+                              : "bg-muted text-muted-foreground border-border opacity-60"
+                          }`}
+                          title="Toggle Feature on Home"
+                        >
+                          {art.showOnHomepage ? "Home" : "Off"}
+                        </button>
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell className="font-mono text-xs font-bold text-primary">
                     {art.price ? formatCurrency(art.price, art.currency || "INR") : "Inquire"}
@@ -1096,6 +1215,48 @@ export default function ArtworksAdminPage() {
                   <label htmlFor="isFeatured" className="text-xs font-medium text-foreground">
                     Feature on Home
                   </label>
+                </div>
+              </div>
+
+              {/* Visibility & Curation Settings */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-lg border border-border bg-muted/20">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isActiveArtwork"
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                  />
+                  <label htmlFor="isActiveArtwork" className="text-xs font-medium text-foreground">
+                    Active (Publicly Visible)
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="showOnHomepageArtwork"
+                    checked={showOnHomepage}
+                    onChange={(e) => setShowOnHomepage(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                  />
+                  <label htmlFor="showOnHomepageArtwork" className="text-xs font-medium text-foreground">
+                    Homepage Gallery
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label htmlFor="sortOrderArtwork" className="text-xs font-medium text-foreground whitespace-nowrap">
+                    Sort Order:
+                  </label>
+                  <Input
+                    id="sortOrderArtwork"
+                    type="number"
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(parseInt(e.target.value, 10) || 0)}
+                    className="h-8 text-xs font-mono w-24"
+                  />
                 </div>
               </div>
 

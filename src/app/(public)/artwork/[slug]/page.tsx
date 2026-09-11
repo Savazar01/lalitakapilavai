@@ -67,7 +67,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const artwork = await getArtworkBySlug(slug);
 
-  if (!artwork) {
+  if (!artwork || !artwork.isActive || artwork.isDeleted) {
     notFound();
   }
 

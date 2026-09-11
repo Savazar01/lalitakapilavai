@@ -95,6 +95,9 @@ export async function PUT(
       artworkIds,
       statusOverride,
       isArchived,
+      isActive,
+      showOnHomepage,
+      sortOrder,
     } = body;
 
     const updated = await prisma.$transaction(async (tx) => {
@@ -129,6 +132,9 @@ export async function PUT(
           currency: body.currency !== undefined ? body.currency : undefined,
           isRegistrationOpen: isRegistrationOpen !== undefined ? !!isRegistrationOpen : undefined,
           isPublished: isPublished !== undefined ? !!isPublished : undefined,
+          isActive: isActive !== undefined ? !!isActive : undefined,
+          showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : undefined,
+          sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : undefined,
           contactName: contactName !== undefined ? contactName : undefined,
           contactEmail: contactEmail !== undefined ? contactEmail : undefined,
           contactPhone: contactPhone !== undefined ? contactPhone : undefined,
@@ -175,7 +181,20 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.event.delete({ where: { id } });
+    const existing = await prisma.event.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    const deletedSlug = `${existing.slug}-deleted-${Date.now()}`;
+    await prisma.event.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+        isActive: false,
+        slug: deletedSlug,
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

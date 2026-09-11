@@ -13,7 +13,8 @@ export async function GET(request: NextRequest) {
     }
 
     const pages = await prisma.page.findMany({
-      orderBy: { updatedAt: "desc" },
+      where: { isDeleted: false },
+      orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }],
       include: {
         _count: {
           select: { sections: true },
@@ -39,7 +40,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, slug, metaDescription } = body;
+    const {
+      title,
+      slug,
+      metaDescription,
+      eyebrowTag,
+      heroTitle,
+      heroSubtitle,
+      config,
+      isActive,
+      showOnHomepage,
+      sortOrder,
+    } = body;
 
     if (!title || !slug) {
       return NextResponse.json(
@@ -54,8 +66,8 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9-_]/g, "-")
       .replace(/-+/g, "-");
 
-    const existing = await prisma.page.findUnique({
-      where: { slug: cleanSlug },
+    const existing = await prisma.page.findFirst({
+      where: { slug: cleanSlug, isDeleted: false },
     });
 
     if (existing) {
@@ -71,6 +83,13 @@ export async function POST(request: NextRequest) {
         title,
         slug: cleanSlug,
         metaDescription,
+        eyebrowTag: eyebrowTag || null,
+        heroTitle: heroTitle || null,
+        heroSubtitle: heroSubtitle || null,
+        config: config || undefined,
+        isActive: isActive !== undefined ? !!isActive : true,
+        showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : false,
+        sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : 0,
         sections: {
           create: [
             {

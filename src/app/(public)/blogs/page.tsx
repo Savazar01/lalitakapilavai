@@ -71,13 +71,13 @@ export default async function BlogsPage() {
         <div className="text-center max-w-2xl mx-auto pt-12 sm:pt-16 pb-6 px-4 space-y-3">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            Curatorial Chronicle &amp; Insights
+            {pageData?.eyebrowTag || "Curatorial Chronicle & Insights"}
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground">
-            {headerTitle}
+            {pageData?.heroTitle || headerTitle}
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {headerSubtitle}
+            {pageData?.heroSubtitle || headerSubtitle}
           </p>
         </div>
       )}

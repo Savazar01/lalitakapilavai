@@ -15,6 +15,9 @@ import {
   Calendar,
   Loader2,
   ExternalLink,
+  Eye,
+  EyeOff,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +44,9 @@ interface ECatalogListItem {
   coverImageUrl: string | null;
   themeColor: string;
   isPublished: boolean;
+  isActive: boolean;
+  showOnHomepage: boolean;
+  sortOrder: number;
   downloadablePdfUrl: string | null;
   createdAt: string;
   event?: {
@@ -74,6 +80,8 @@ export default function AdminCatalogsPage() {
   const [newSlug, setNewSlug] = React.useState("");
   const [newSubtitle, setNewSubtitle] = React.useState("");
   const [newCoverImage, setNewCoverImage] = React.useState("");
+  const [newIsActive, setNewIsActive] = React.useState(true);
+  const [newShowOnHomepage, setNewShowOnHomepage] = React.useState(false);
 
   React.useEffect(() => {
     let ignore = false;
@@ -106,18 +114,18 @@ export default function AdminCatalogsPage() {
         setCatalogs(data);
       }
     } catch (err) {
-      console.error("Failed to load catalogs:", err);
+      console.error("Failed to refresh catalogs:", err);
     }
   }, []);
 
-  const handleAutoSlug = (titleVal: string) => {
-    setNewTitle(titleVal);
-    const slugVal = titleVal
+  const handleAutoSlug = (val: string) => {
+    setNewTitle(val);
+    const generated = val
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
-    setNewSlug(slugVal);
+    setNewSlug(generated);
   };
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
@@ -140,6 +148,8 @@ export default function AdminCatalogsPage() {
           subtitle: newSubtitle.trim() || null,
           coverImageUrl: newCoverImage || null,
           isPublished: false,
+          isActive: newIsActive,
+          showOnHomepage: newShowOnHomepage,
         }),
       });
 
@@ -185,6 +195,48 @@ export default function AdminCatalogsPage() {
       toast.error(err instanceof Error ? err.message : "Error deleting catalog");
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleToggleActive = async (cat: ECatalogListItem) => {
+    const nextVal = !cat.isActive;
+    setCatalogs((prev) => prev.map((c) => (c.id === cat.id ? { ...c, isActive: nextVal } : c)));
+    try {
+      const res = await fetch(`/api/admin/catalogs/${cat.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: nextVal }),
+      });
+      if (!res.ok) {
+        setCatalogs((prev) => prev.map((c) => (c.id === cat.id ? { ...c, isActive: cat.isActive } : c)));
+        toast.error("Failed to toggle catalog visibility");
+      } else {
+        toast.success(`"${cat.title}" is now ${nextVal ? "Active" : "Inactive"}`);
+      }
+    } catch {
+      setCatalogs((prev) => prev.map((c) => (c.id === cat.id ? { ...c, isActive: cat.isActive } : c)));
+      toast.error("Error toggling catalog visibility");
+    }
+  };
+
+  const handleToggleHomepage = async (cat: ECatalogListItem) => {
+    const nextVal = !cat.showOnHomepage;
+    setCatalogs((prev) => prev.map((c) => (c.id === cat.id ? { ...c, showOnHomepage: nextVal } : c)));
+    try {
+      const res = await fetch(`/api/admin/catalogs/${cat.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ showOnHomepage: nextVal }),
+      });
+      if (!res.ok) {
+        setCatalogs((prev) => prev.map((c) => (c.id === cat.id ? { ...c, showOnHomepage: cat.showOnHomepage } : c)));
+        toast.error("Failed to toggle catalog homepage status");
+      } else {
+        toast.success(`"${cat.title}" homepage status updated`);
+      }
+    } catch {
+      setCatalogs((prev) => prev.map((c) => (c.id === cat.id ? { ...c, showOnHomepage: cat.showOnHomepage } : c)));
+      toast.error("Error toggling catalog homepage status");
     }
   };
 
@@ -303,6 +355,37 @@ export default function AdminCatalogsPage() {
                       <p className="text-[10px] font-mono text-muted-foreground/80 truncate">
                         /{cat.slug}
                       </p>
+
+                      {/* Visibility & Homepage Toggles */}
+                      <div className="flex items-center gap-1.5 pt-1.5 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(cat)}
+                          className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                            cat.isActive
+                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20 dark:text-emerald-400"
+                              : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                          }`}
+                          title="Click to toggle Active status"
+                        >
+                          {cat.isActive ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                          {cat.isActive ? "Active" : "Inactive"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleToggleHomepage(cat)}
+                          className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                            cat.showOnHomepage
+                              ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
+                              : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
+                          }`}
+                          title="Click to toggle Feature on Homepage"
+                        >
+                          <Home className="w-3 h-3" />
+                          {cat.showOnHomepage ? "On Home" : "Not on Home"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -410,6 +493,28 @@ export default function AdminCatalogsPage() {
                 mediaType="general"
                 description="High-resolution image for the gold-embossed catalog front cover."
               />
+            </div>
+
+            <div className="flex items-center gap-6 pt-3 border-t border-border/50">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={newIsActive}
+                  onChange={(e) => setNewIsActive(e.target.checked)}
+                  className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                />
+                <span className="text-xs font-medium text-foreground">Active (Visible to public)</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={newShowOnHomepage}
+                  onChange={(e) => setNewShowOnHomepage(e.target.checked)}
+                  className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                />
+                <span className="text-xs font-medium text-foreground">Feature on Homepage</span>
+              </label>
             </div>
 
             <DialogFooter className="pt-2">

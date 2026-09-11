@@ -90,3 +90,30 @@ All code generation and architectural modifications must adhere to the specializ
 - [`.skills/shadcn.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/shadcn.md): Design tokens and component elevation rules for Indian Classical fine art.
 - [`.skills/cloudflare-security.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/cloudflare-security.md): Cloudflare WAF hardening, rate limits, CSP headers, and R2 media policies.
 - [`.skills/playwright.md`](file:///c:/Users/AVASA/Downloads/OpenC/lalitakapilavai/.skills/playwright.md): E2E multi-browser test harness specifications.
+
+---
+
+## 6. Content Integrity, Dynamic CMS & Non-Destructive Operations Standards
+All agent workflows and feature implementations must strictly adhere to these content and persistence protocols:
+
+1. **Non-Destructive Idempotent Seeding (`prisma/seed.ts`)**:
+   - Seeding scripts must check for existing records before writing (`prisma.<entity>.findUnique`).
+   - If an entity already exists, its existing user-curated content must never be overwritten.
+   - If `existing.isDeleted === true`, the seeder must skip resurrection to honor intentional administrative soft-deletions.
+2. **Soft-Delete & Slug Collision Safeguards**:
+   - Major content entities (`Page`, `ArtCategory`, `Artwork`, `Event`, `ECatalog`) use soft deletion (`isDeleted: true`, `isActive: false`).
+   - To prevent database unique constraint collisions on `slug` while immediately freeing the canonical slug for re-creation, soft-delete operations must mutate the slug:
+     ```ts
+     const deletedSlug = `${existing.slug}-deleted-${Date.now()}`;
+     await prisma.entity.update({
+       where: { id },
+       data: { isDeleted: true, isActive: false, slug: deletedSlug },
+     });
+     ```
+3. **Zero Hardcoded Frontend Verbiage**:
+   - Public pages (including `/events`, `/gallery`, `/blogs`, `/categories`, and `/`) must fetch their titles, eyebrow badges, descriptions, and section labels dynamically from the database (`Page` model and its `config Json?` column).
+   - Fallback defaults must be structured so that brand-new environments render gracefully even prior to database population.
+4. **Universal Visibility & Ordering Governance**:
+   - Major entities must support `isActive` (public visibility toggle), `showOnHomepage` (homepage featured status), and `sortOrder` (manual display hierarchy).
+   - Public queries must enforce `{ isActive: true, isDeleted: false }` filters and order by `sortOrder: "asc"`.
+

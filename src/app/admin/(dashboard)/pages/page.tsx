@@ -13,6 +13,11 @@ import {
   Trash2,
   Loader2,
   Sparkles,
+  Settings,
+  Eye,
+  EyeOff,
+  Home,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,11 +43,30 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
 
 
+interface PageConfig {
+  upcomingBadge?: string;
+  upcomingTitle?: string;
+  upcomingSubtitle?: string;
+  upcomingEmptyTitle?: string;
+  upcomingEmptySubtitle?: string;
+  pastBadge?: string;
+  pastTitle?: string;
+  pastSubtitle?: string;
+  [key: string]: unknown;
+}
+
 interface PageItem {
   id: string;
   title: string;
   slug: string;
   metaDescription: string | null;
+  eyebrowTag?: string | null;
+  heroTitle?: string | null;
+  heroSubtitle?: string | null;
+  config?: PageConfig | null;
+  isActive: boolean;
+  showOnHomepage: boolean;
+  sortOrder: number;
   isPublished: boolean;
   updatedAt: string;
   _count?: { sections: number };
@@ -54,6 +78,31 @@ export default function PagesAdminPage() {
   const [loading, setLoading] = React.useState(true);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [creating, setCreating] = React.useState(false);
+
+  // Settings & Copy Modal State
+  const [settingsModalOpen, setSettingsModalOpen] = React.useState(false);
+  const [editingPage, setEditingPage] = React.useState<PageItem | null>(null);
+  const [savingSettings, setSavingSettings] = React.useState(false);
+  const [settingsForm, setSettingsForm] = React.useState({
+    title: "",
+    eyebrowTag: "",
+    heroTitle: "",
+    heroSubtitle: "",
+    metaDescription: "",
+    sortOrder: 0,
+    isActive: true,
+    showOnHomepage: false,
+    config: {
+      upcomingBadge: "",
+      upcomingTitle: "",
+      upcomingSubtitle: "",
+      upcomingEmptyTitle: "",
+      upcomingEmptySubtitle: "",
+      pastBadge: "",
+      pastTitle: "",
+      pastSubtitle: "",
+    } as PageConfig,
+  });
 
   // Delete Confirmation State
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -151,6 +200,108 @@ export default function PagesAdminPage() {
     }
   };
 
+  const handleOpenSettings = (page: PageItem) => {
+    setEditingPage(page);
+    setSettingsForm({
+      title: page.title,
+      eyebrowTag: page.eyebrowTag || "",
+      heroTitle: page.heroTitle || "",
+      heroSubtitle: page.heroSubtitle || "",
+      metaDescription: page.metaDescription || "",
+      sortOrder: page.sortOrder || 0,
+      isActive: page.isActive !== undefined ? page.isActive : true,
+      showOnHomepage: page.showOnHomepage !== undefined ? page.showOnHomepage : false,
+      config: {
+        upcomingBadge: page.config?.upcomingBadge || "Exhibition Schedule",
+        upcomingTitle: page.config?.upcomingTitle || "Upcoming Exhibitions & Events",
+        upcomingSubtitle:
+          page.config?.upcomingSubtitle ||
+          "Discover forthcoming sacred Tanjore exhibitions, classical gallery showcases, and Carnatic music recitals.",
+        upcomingEmptyTitle: page.config?.upcomingEmptyTitle || "No Upcoming Exhibitions Scheduled",
+        upcomingEmptySubtitle:
+          page.config?.upcomingEmptySubtitle ||
+          "New sacred art exhibitions and recital programs will be announced soon. Explore our past retrospectives below.",
+        pastBadge: page.config?.pastBadge || "Archival Showcase",
+        pastTitle: page.config?.pastTitle || "Past Exhibitions & Retrospectives",
+        pastSubtitle:
+          page.config?.pastSubtitle ||
+          "A curated retrospective of past masterwork exhibitions, private gallery viewings, and heritage recitals.",
+        ...(page.config || {}),
+      },
+    });
+    setSettingsModalOpen(true);
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPage) return;
+    setSavingSettings(true);
+    try {
+      const res = await fetch(`/api/admin/pages/${editingPage.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settingsForm),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setPages((prev) => prev.map((p) => (p.id === editingPage.id ? { ...p, ...updated } : p)));
+        toast.success(`Updated settings for "${editingPage.title}"`);
+        setSettingsModalOpen(false);
+        setEditingPage(null);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to update page settings");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Error saving page settings");
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const handleToggleActive = async (page: PageItem) => {
+    const nextVal = !page.isActive;
+    setPages((prev) => prev.map((p) => (p.id === page.id ? { ...p, isActive: nextVal } : p)));
+    try {
+      const res = await fetch(`/api/admin/pages/${page.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: nextVal }),
+      });
+      if (!res.ok) {
+        setPages((prev) => prev.map((p) => (p.id === page.id ? { ...p, isActive: page.isActive } : p)));
+        toast.error("Failed to toggle active status");
+      } else {
+        toast.success(`Page "${page.title}" is now ${nextVal ? "Active" : "Inactive"}`);
+      }
+    } catch {
+      setPages((prev) => prev.map((p) => (p.id === page.id ? { ...p, isActive: page.isActive } : p)));
+      toast.error("Error toggling active status");
+    }
+  };
+
+  const handleToggleHomepage = async (page: PageItem) => {
+    const nextVal = !page.showOnHomepage;
+    setPages((prev) => prev.map((p) => (p.id === page.id ? { ...p, showOnHomepage: nextVal } : p)));
+    try {
+      const res = await fetch(`/api/admin/pages/${page.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ showOnHomepage: nextVal }),
+      });
+      if (!res.ok) {
+        setPages((prev) => prev.map((p) => (p.id === page.id ? { ...p, showOnHomepage: page.showOnHomepage } : p)));
+        toast.error("Failed to toggle homepage display");
+      } else {
+        toast.success(`Page "${page.title}" homepage display ${nextVal ? "enabled" : "disabled"}`);
+      }
+    } catch {
+      setPages((prev) => prev.map((p) => (p.id === page.id ? { ...p, showOnHomepage: page.showOnHomepage } : p)));
+      toast.error("Error toggling homepage display");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -270,9 +421,16 @@ export default function PagesAdminPage() {
               <Card key={p.id} className="hover:border-primary/50 transition-all flex flex-col justify-between">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-base font-serif font-bold text-foreground">
-                      {p.title}
-                    </CardTitle>
+                    <div className="min-w-0">
+                      {p.eyebrowTag && (
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80 block mb-0.5 truncate">
+                          {p.eyebrowTag}
+                        </span>
+                      )}
+                      <CardTitle className="text-base font-serif font-bold text-foreground">
+                        {p.title}
+                      </CardTitle>
+                    </div>
                     <div className="flex items-center gap-1 shrink-0">
                       {isCorePage && (
                         <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-600 dark:text-amber-400">
@@ -284,14 +442,46 @@ export default function PagesAdminPage() {
                       </Badge>
                     </div>
                   </div>
-                  <CardDescription className="text-xs font-mono text-primary">
-                    /{p.slug}
+                  <CardDescription className="text-xs font-mono text-primary flex items-center justify-between mt-1">
+                    <span>/{p.slug}</span>
+                    <span className="text-[10px] text-muted-foreground font-sans">Order: {p.sortOrder || 0}</span>
                   </CardDescription>
+
+                  {/* Visibility & Display Toggles */}
+                  <div className="flex items-center gap-1.5 pt-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleActive(p)}
+                      className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                        p.isActive
+                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20 dark:text-emerald-400"
+                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                      }`}
+                      title="Click to toggle Active status"
+                    >
+                      {p.isActive ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                      {p.isActive ? "Active" : "Inactive"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleToggleHomepage(p)}
+                      className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                        p.showOnHomepage
+                          ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
+                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
+                      }`}
+                      title="Click to toggle Homepage visibility"
+                    >
+                      <Home className="w-3 h-3" />
+                      {p.showOnHomepage ? "On Home" : "Not on Home"}
+                    </button>
+                  </div>
                 </CardHeader>
 
                 <CardContent className="pb-4">
                   <p className="text-xs text-muted-foreground line-clamp-2">
-                    {p.metaDescription || "No meta description provided."}
+                    {p.heroSubtitle || p.metaDescription || "No hero description or meta summary provided."}
                   </p>
                   <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50 text-[11px] text-muted-foreground">
                     <span>{p._count?.sections || 0} Sections</span>
@@ -300,7 +490,7 @@ export default function PagesAdminPage() {
                   </div>
                 </CardContent>
 
-                <div className="p-3 bg-secondary/30 border-t border-border/60 flex items-center justify-between gap-2">
+                <div className="p-3 bg-secondary/30 border-t border-border/60 flex items-center justify-between gap-2 flex-wrap">
                   <Link
                     href={`/${p.slug === "home" ? "" : p.slug}`}
                     target="_blank"
@@ -310,7 +500,18 @@ export default function PagesAdminPage() {
                     View Live
                   </Link>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenSettings(p)}
+                      className="h-8 text-xs gap-1 cursor-pointer hover:border-primary/50"
+                      title="Edit Page Copy & Settings"
+                    >
+                      <Settings className="w-3.5 h-3.5" />
+                      Settings & Copy
+                    </Button>
+
                     {!isCorePage && (
                       <Button
                         variant="ghost"
@@ -326,7 +527,7 @@ export default function PagesAdminPage() {
                     <Link href={`/admin/pages/${p.id}/builder`}>
                       <Button variant="default" size="sm" className="h-8 text-xs gap-1.5 font-semibold">
                         <Pencil className="w-3.5 h-3.5" />
-                        Visual Builder
+                        Builder
                       </Button>
                     </Link>
                   </div>
@@ -336,6 +537,275 @@ export default function PagesAdminPage() {
           })}
         </div>
       )}
+
+      {/* Page Settings & Dynamic Copy Modal */}
+      <Dialog open={settingsModalOpen} onOpenChange={setSettingsModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          {editingPage && (
+            <form onSubmit={handleSaveSettings} className="space-y-5">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-serif">
+                  Page Settings & Verbiage: /{editingPage.slug}
+                </DialogTitle>
+                <DialogDescription className="text-xs">
+                  Configure page-level hero verbiage, eyebrow badges, sorting, and sub-section copy.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 text-left text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="font-semibold uppercase tracking-wider text-foreground">
+                      Page Title
+                    </label>
+                    <Input
+                      value={settingsForm.title}
+                      onChange={(e) => setSettingsForm((f) => ({ ...f, title: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="font-semibold uppercase tracking-wider text-foreground">
+                      Eyebrow Tag / Badge
+                    </label>
+                    <Input
+                      placeholder="e.g. SACRED EXHIBITIONS"
+                      value={settingsForm.eyebrowTag}
+                      onChange={(e) => setSettingsForm((f) => ({ ...f, eyebrowTag: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-semibold uppercase tracking-wider text-foreground">
+                    Hero Main Heading
+                  </label>
+                  <Input
+                    placeholder="e.g. Sacred Exhibitions & Classical Recitals"
+                    value={settingsForm.heroTitle}
+                    onChange={(e) => setSettingsForm((f) => ({ ...f, heroTitle: e.target.value }))}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-semibold uppercase tracking-wider text-foreground">
+                    Hero Subtitle / Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    placeholder="Hero description paragraph displayed directly below the main heading..."
+                    value={settingsForm.heroSubtitle}
+                    onChange={(e) => setSettingsForm((f) => ({ ...f, heroSubtitle: e.target.value }))}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="font-semibold uppercase tracking-wider text-foreground">
+                      Sort Order (Lower appears first)
+                    </label>
+                    <Input
+                      type="number"
+                      value={settingsForm.sortOrder}
+                      onChange={(e) =>
+                        setSettingsForm((f) => ({ ...f, sortOrder: parseInt(e.target.value, 10) || 0 }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="font-semibold uppercase tracking-wider text-foreground">
+                      Meta Description (SEO)
+                    </label>
+                    <Input
+                      placeholder="Search engine summary..."
+                      value={settingsForm.metaDescription}
+                      onChange={(e) => setSettingsForm((f) => ({ ...f, metaDescription: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6 pt-2 border-t border-border/50">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settingsForm.isActive}
+                      onChange={(e) => setSettingsForm((f) => ({ ...f, isActive: e.target.checked }))}
+                      className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span className="font-medium text-foreground">Active (Visible to public)</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settingsForm.showOnHomepage}
+                      onChange={(e) => setSettingsForm((f) => ({ ...f, showOnHomepage: e.target.checked }))}
+                      className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span className="font-medium text-foreground">Feature on Homepage</span>
+                  </label>
+                </div>
+
+                {/* Event-Specific Section Copy Controls */}
+                {editingPage.slug === "events" && (
+                  <div className="mt-4 p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-4">
+                    <h4 className="font-serif font-bold text-sm text-foreground flex items-center gap-1.5">
+                      <SlidersHorizontal className="w-4 h-4 text-primary" />
+                      Live Schedules & Event Sections Verbiage
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground">
+                      Customize section headers, eyebrow tags, and empty states rendered on the public /events page.
+                    </p>
+
+                    <div className="space-y-3 pt-1">
+                      <div className="font-semibold text-[11px] text-primary uppercase tracking-wider border-b border-primary/20 pb-1">
+                        Upcoming Exhibitions Section
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] text-muted-foreground">Upcoming Eyebrow Badge</label>
+                          <Input
+                            value={settingsForm.config.upcomingBadge || ""}
+                            onChange={(e) =>
+                              setSettingsForm((f) => ({
+                                ...f,
+                                config: { ...f.config, upcomingBadge: e.target.value },
+                              }))
+                            }
+                            placeholder="Exhibition Schedule"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] text-muted-foreground">Upcoming Heading Title</label>
+                          <Input
+                            value={settingsForm.config.upcomingTitle || ""}
+                            onChange={(e) =>
+                              setSettingsForm((f) => ({
+                                ...f,
+                                config: { ...f.config, upcomingTitle: e.target.value },
+                              }))
+                            }
+                            placeholder="Upcoming Exhibitions & Events"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[11px] text-muted-foreground">Upcoming Subtitle</label>
+                        <Input
+                          value={settingsForm.config.upcomingSubtitle || ""}
+                          onChange={(e) =>
+                            setSettingsForm((f) => ({
+                              ...f,
+                              config: { ...f.config, upcomingSubtitle: e.target.value },
+                            }))
+                          }
+                          placeholder="Discover forthcoming sacred Tanjore exhibitions..."
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <div>
+                          <label className="text-[11px] text-muted-foreground">Empty State Title</label>
+                          <Input
+                            value={settingsForm.config.upcomingEmptyTitle || ""}
+                            onChange={(e) =>
+                              setSettingsForm((f) => ({
+                                ...f,
+                                config: { ...f.config, upcomingEmptyTitle: e.target.value },
+                              }))
+                            }
+                            placeholder="No Upcoming Exhibitions Scheduled"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] text-muted-foreground">Empty State Subtitle</label>
+                          <Input
+                            value={settingsForm.config.upcomingEmptySubtitle || ""}
+                            onChange={(e) =>
+                              setSettingsForm((f) => ({
+                                ...f,
+                                config: { ...f.config, upcomingEmptySubtitle: e.target.value },
+                              }))
+                            }
+                            placeholder="New exhibitions will be announced soon..."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="font-semibold text-[11px] text-primary uppercase tracking-wider border-b border-primary/20 pb-1 pt-3">
+                        Past Exhibitions Section
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] text-muted-foreground">Past Eyebrow Badge</label>
+                          <Input
+                            value={settingsForm.config.pastBadge || ""}
+                            onChange={(e) =>
+                              setSettingsForm((f) => ({
+                                ...f,
+                                config: { ...f.config, pastBadge: e.target.value },
+                              }))
+                            }
+                            placeholder="Archival Showcase"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] text-muted-foreground">Past Heading Title</label>
+                          <Input
+                            value={settingsForm.config.pastTitle || ""}
+                            onChange={(e) =>
+                              setSettingsForm((f) => ({
+                                ...f,
+                                config: { ...f.config, pastTitle: e.target.value },
+                              }))
+                            }
+                            placeholder="Past Exhibitions & Retrospectives"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[11px] text-muted-foreground">Past Subtitle</label>
+                        <Input
+                          value={settingsForm.config.pastSubtitle || ""}
+                          onChange={(e) =>
+                            setSettingsForm((f) => ({
+                              ...f,
+                              config: { ...f.config, pastSubtitle: e.target.value },
+                            }))
+                          }
+                          placeholder="A curated retrospective of past masterwork exhibitions..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter className="pt-3 border-t border-border/60">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setSettingsModalOpen(false)}
+                  disabled={savingSettings}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" variant="gold" disabled={savingSettings}>
+                  {savingSettings ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Settings & Copy"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Modal */}
       <ConfirmDialog

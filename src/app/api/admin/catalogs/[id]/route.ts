@@ -92,6 +92,9 @@ export async function PUT(
       isPublished,
       downloadablePdfUrl,
       eventId,
+      isActive,
+      showOnHomepage,
+      sortOrder,
       customPages, // array of { id?, pageNumber, title, subtitle, pageLayout, contentHtml, frameStyle, backgroundImage, backgroundColor }
       items, // array of { id?, artworkId, pageNumber, curatorialNote, highlightPlate }
     } = body;
@@ -113,7 +116,7 @@ export async function PUT(
         .replace(/^-+|-+$/g, "");
 
       const slugConflict = await prisma.eCatalog.findFirst({
-        where: { slug: cleanSlug, NOT: { id } },
+        where: { slug: cleanSlug, NOT: { id }, isDeleted: false },
       });
       if (slugConflict) {
         return NextResponse.json(
@@ -141,6 +144,9 @@ export async function PUT(
         essayConfig: essayConfig !== undefined ? essayConfig : existing.essayConfig,
         endPageConfig: endPageConfig !== undefined ? endPageConfig : existing.endPageConfig,
         isPublished: isPublished !== undefined ? Boolean(isPublished) : existing.isPublished,
+        isActive: isActive !== undefined ? Boolean(isActive) : existing.isActive,
+        showOnHomepage: showOnHomepage !== undefined ? Boolean(showOnHomepage) : existing.showOnHomepage,
+        sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : existing.sortOrder,
         downloadablePdfUrl: downloadablePdfUrl !== undefined ? downloadablePdfUrl : existing.downloadablePdfUrl,
         eventId: eventId !== undefined ? (eventId || null) : existing.eventId,
       },
@@ -313,8 +319,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Catalog not found" }, { status: 404 });
     }
 
-    await prisma.eCatalog.delete({
+    const deletedSlug = `${existing.slug}-deleted-${Date.now()}`;
+    await prisma.eCatalog.update({
       where: { id },
+      data: {
+        isDeleted: true,
+        isActive: false,
+        slug: deletedSlug,
+      },
     });
 
     return NextResponse.json({ success: true, message: "Catalog deleted successfully" });

@@ -58,7 +58,20 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { title, slug, metaDescription, isPublished, sections } = body;
+    const {
+      title,
+      slug,
+      metaDescription,
+      isPublished,
+      eyebrowTag,
+      heroTitle,
+      heroSubtitle,
+      config,
+      isActive,
+      showOnHomepage,
+      sortOrder,
+      sections,
+    } = body;
 
     // Use Prisma transaction to update page and re-sync sections
     const updatedPage = await prisma.$transaction(async (tx) => {
@@ -71,6 +84,13 @@ export async function PUT(
           metaDescription,
           isPublished,
           publishedAt: isPublished ? new Date() : null,
+          eyebrowTag: eyebrowTag !== undefined ? eyebrowTag : undefined,
+          heroTitle: heroTitle !== undefined ? heroTitle : undefined,
+          heroSubtitle: heroSubtitle !== undefined ? heroSubtitle : undefined,
+          config: config !== undefined ? config : undefined,
+          isActive: isActive !== undefined ? !!isActive : undefined,
+          showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : undefined,
+          sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : undefined,
         },
       });
 
@@ -178,7 +198,27 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.page.delete({ where: { id } });
+    const existing = await prisma.page.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    }
+
+    const deletedSlug = `${existing.slug}-deleted-${Date.now()}`;
+    await prisma.page.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+        isActive: false,
+        slug: deletedSlug,
+      },
+    });
+
+    try {
+      revalidatePath("/admin/pages");
+      revalidatePath(`/${existing.slug}`);
+    } catch {
+      // ignore
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

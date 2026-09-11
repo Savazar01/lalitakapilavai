@@ -76,6 +76,9 @@ export async function PUT(
       price,
       isAvailable,
       isFeatured,
+      isActive,
+      showOnHomepage,
+      sortOrder,
       primaryImageUrl,
       watermarkedWebpUrl,
       protectedS3Key,
@@ -104,6 +107,9 @@ export async function PUT(
         currency: body.currency !== undefined ? body.currency : undefined,
         isAvailable: isAvailable !== undefined ? !!isAvailable : undefined,
         isFeatured: isFeatured !== undefined ? !!isFeatured : undefined,
+        isActive: isActive !== undefined ? !!isActive : undefined,
+        showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : undefined,
+        sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : undefined,
         primaryImageUrl,
         watermarkedWebpUrl,
         protectedS3Key,
@@ -134,7 +140,20 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.artwork.delete({ where: { id } });
+    const existing = await prisma.artwork.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Artwork not found" }, { status: 404 });
+    }
+
+    const deletedSlug = `${existing.slug}-deleted-${Date.now()}`;
+    await prisma.artwork.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+        isActive: false,
+        slug: deletedSlug,
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

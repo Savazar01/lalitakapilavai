@@ -20,6 +20,9 @@ import {
   Download,
   History,
   CheckCircle2,
+  Eye,
+  EyeOff,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -89,6 +92,9 @@ interface EventItem {
   isPublished?: boolean;
   statusOverride?: string | null;
   isArchived?: boolean;
+  isActive?: boolean;
+  showOnHomepage?: boolean;
+  sortOrder?: number;
   contactName?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;
@@ -244,6 +250,52 @@ export default function EventsAdminPage() {
       console.error(e);
     } finally {
       setLoadingAttendees(false);
+    }
+  };
+
+  const handleToggleActive = async (ev: EventItem) => {
+    const updated = !ev.isActive;
+    setEvents((prev) =>
+      prev.map((item) => (item.id === ev.id ? { ...item, isActive: updated } : item))
+    );
+    try {
+      const res = await fetch(`/api/admin/events/${ev.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: updated }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update active state");
+      }
+      toast.success(updated ? "Event activated" : "Event deactivated");
+    } catch {
+      setEvents((prev) =>
+        prev.map((item) => (item.id === ev.id ? { ...item, isActive: ev.isActive } : item))
+      );
+      toast.error("Failed to update active status");
+    }
+  };
+
+  const handleToggleHomepage = async (ev: EventItem) => {
+    const updated = !ev.showOnHomepage;
+    setEvents((prev) =>
+      prev.map((item) => (item.id === ev.id ? { ...item, showOnHomepage: updated } : item))
+    );
+    try {
+      const res = await fetch(`/api/admin/events/${ev.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ showOnHomepage: updated }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update homepage state");
+      }
+      toast.success(updated ? "Featured on homepage" : "Removed from homepage");
+    } catch {
+      setEvents((prev) =>
+        prev.map((item) => (item.id === ev.id ? { ...item, showOnHomepage: ev.showOnHomepage } : item))
+      );
+      toast.error("Failed to update homepage status");
     }
   };
 
@@ -486,6 +538,37 @@ export default function EventsAdminPage() {
                   <CardDescription className="text-xs font-mono text-primary truncate">
                     /{ev.slug}
                   </CardDescription>
+
+                  {/* Active and Homepage Toggles */}
+                  <div className="flex items-center gap-1.5 pt-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleActive(ev)}
+                      className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                        ev.isActive
+                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20 dark:text-emerald-400"
+                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                      }`}
+                      title="Click to toggle Active status"
+                    >
+                      {ev.isActive ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                      {ev.isActive ? "Active" : "Inactive"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleToggleHomepage(ev)}
+                      className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                        ev.showOnHomepage
+                          ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
+                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
+                      }`}
+                      title="Click to toggle Feature on Homepage"
+                    >
+                      <Home className="w-3 h-3" />
+                      {ev.showOnHomepage ? "On Home" : "Not on Home"}
+                    </button>
+                  </div>
                 </CardHeader>
 
                 <CardContent className="space-y-2.5 pb-4 text-xs text-muted-foreground flex-1">

@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
     }
 
     const events = await prisma.event.findMany({
-      orderBy: { startDate: "asc" },
+      where: { isDeleted: false },
+      orderBy: [{ sortOrder: "asc" }, { startDate: "asc" }],
       include: {
         _count: {
           select: {
@@ -77,6 +78,9 @@ export async function POST(request: NextRequest) {
       artworkIds,
       statusOverride,
       isArchived,
+      isActive,
+      showOnHomepage,
+      sortOrder,
     } = body;
 
     if (!title || !slug || !eventType || !startDate) {
@@ -92,8 +96,8 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9-_]/g, "-")
       .replace(/-+/g, "-");
 
-    const existing = await prisma.event.findUnique({
-      where: { slug: cleanSlug },
+    const existing = await prisma.event.findFirst({
+      where: { slug: cleanSlug, isDeleted: false },
     });
 
     if (existing) {
@@ -134,6 +138,9 @@ export async function POST(request: NextRequest) {
           currency: body.currency || "INR",
           isRegistrationOpen: isRegistrationOpen !== undefined ? !!isRegistrationOpen : true,
           isPublished: isPublished !== undefined ? !!isPublished : true,
+          isActive: isActive !== undefined ? !!isActive : true,
+          showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : false,
+          sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : 0,
           contactName: contactName || null,
           contactEmail: contactEmail || null,
           contactPhone: contactPhone || null,

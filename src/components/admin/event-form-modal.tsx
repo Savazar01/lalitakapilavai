@@ -91,6 +91,9 @@ export interface EventFormData {
   contactPhone?: string | null;
   statusOverride?: "AUTO" | "FORCE_UPCOMING" | "FORCE_PAST" | string;
   isArchived?: boolean;
+  isActive?: boolean;
+  showOnHomepage?: boolean;
+  sortOrder?: number;
   artworkIds?: string[];
 }
 
@@ -187,6 +190,9 @@ function EventFormContent({
     initialEvent?.isArchived === true
   );
   const [isPublished, setIsPublished] = React.useState(initialEvent?.isPublished !== false);
+  const [isActive, setIsActive] = React.useState(initialEvent?.isActive !== false);
+  const [showOnHomepage, setShowOnHomepage] = React.useState(initialEvent?.showOnHomepage === true);
+  const [sortOrder, setSortOrder] = React.useState<number>(initialEvent?.sortOrder || 0);
   const [contactName, setContactName] = React.useState(
     initialEvent?.contactName || "Smt. Lalita Kapilavai"
   );
@@ -438,6 +444,9 @@ function EventFormContent({
       currency: currency || "INR",
       isRegistrationOpen,
       isPublished,
+      isActive,
+      showOnHomepage,
+      sortOrder: parseInt(String(sortOrder), 10) || 0,
       statusOverride,
       isArchived,
       contactName: contactName || null,
@@ -635,7 +644,27 @@ function EventFormContent({
                 </div>
               </div>
 
-              <div className="flex items-center gap-6 pt-2">
+              <div className="flex items-center gap-6 pt-2 flex-wrap border-t border-border/50">
+                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                  />
+                  Active (Publicly Visible)
+                </label>
+
+                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showOnHomepage}
+                    onChange={(e) => setShowOnHomepage(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                  />
+                  Feature on Homepage
+                </label>
+
                 <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
                   <input
                     type="checkbox"
@@ -653,8 +682,21 @@ function EventFormContent({
                     onChange={(e) => setIsPublished(e.target.checked)}
                     className="rounded border-border text-primary focus:ring-primary h-4 w-4"
                   />
-                  Published on Website
+                  Published
                 </label>
+
+                <div className="flex items-center gap-2 ml-auto">
+                  <label htmlFor="eventSortOrder" className="text-xs font-medium text-foreground whitespace-nowrap">
+                    Sort Order:
+                  </label>
+                  <Input
+                    id="eventSortOrder"
+                    type="number"
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(parseInt(e.target.value, 10) || 0)}
+                    className="h-7 text-xs font-mono w-20"
+                  />
+                </div>
               </div>
             </TabsContent>
 

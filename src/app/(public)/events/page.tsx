@@ -21,7 +21,12 @@ export const metadata: Metadata = {
 export default async function EventsPage() {
   const [events, pageData] = await Promise.all([
     prisma.event.findMany({
-      where: { isPublished: true, isArchived: false },
+      where: {
+        isPublished: true,
+        isArchived: false,
+        isActive: true,
+        isDeleted: false,
+      },
       orderBy: { startDate: "asc" },
       include: {
         _count: { select: { artworks: true, registrations: true } },
@@ -44,6 +49,35 @@ export default async function EventsPage() {
       .catch(() => null),
   ]);
 
+  const pageConfig = (pageData?.config && typeof pageData.config === "object" ? pageData.config : {}) as Record<string, string>;
+
+  const heroEyebrow = pageData?.eyebrowTag || pageConfig?.heroEyebrow || "Cultural Calendar & Recitals";
+  const heroTitle = pageData?.heroTitle || pageData?.title || "Exhibitions & Events";
+  const heroSubtitle =
+    pageData?.heroSubtitle ||
+    pageData?.metaDescription ||
+    "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.";
+
+  const upcomingBadge = pageConfig?.upcomingBadge || "Live Schedules";
+  const upcomingTitle = pageConfig?.upcomingTitle || "Upcoming Exhibitions & Events";
+  const upcomingSubtitle =
+    pageConfig?.upcomingSubtitle ||
+    "Forthcoming gallery exhibitions, classical vocal concerts, and traditional iconography masterclasses.";
+  const upcomingEmptyTitle = pageConfig?.upcomingEmptyTitle || "No Upcoming Public Events";
+  const upcomingEmptySubtitle =
+    pageConfig?.upcomingEmptySubtitle ||
+    "New exhibition dates, gallery recitals, and masterclasses are published periodically. Please explore our past retrospectives below.";
+
+  const pastBadge = pageConfig?.pastBadge || "Archival Retrospectives";
+  const pastTitle = pageConfig?.pastTitle || "Past Exhibitions & Retrospectives";
+  const pastSubtitle =
+    pageConfig?.pastSubtitle ||
+    "Historical archive of celebrated Tanjore masterwork showcases, museum exhibitions, and concert tours.";
+  const pastEmptyTitle = pageConfig?.pastEmptyTitle || "No Past Retrospectives Recorded";
+  const pastEmptySubtitle =
+    pageConfig?.pastEmptySubtitle ||
+    "Historical exhibitions and previous concert recitals will appear here once archived.";
+
   const now = new Date();
 
   const isPast = (ev: {
@@ -65,11 +99,6 @@ export default async function EventsPage() {
     .filter((ev) => isPast(ev))
     .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
-  const headerTitle = pageData?.title || "Exhibitions & Events";
-  const headerSubtitle =
-    pageData?.metaDescription ||
-    "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.";
-
   const hasCustomSections = pageData?.sections && pageData.sections.length > 0;
 
   return (
@@ -83,13 +112,13 @@ export default async function EventsPage() {
         <div className="text-center max-w-2xl mx-auto pt-12 sm:pt-16 pb-6 px-4 space-y-3">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
             <Sparkles className="w-3.5 h-3.5" />
-            Cultural Calendar &amp; Recitals
+            {heroEyebrow}
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground">
-            {headerTitle}
+            {heroTitle}
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {headerSubtitle}
+            {heroSubtitle}
           </p>
         </div>
       )}
@@ -101,13 +130,13 @@ export default async function EventsPage() {
             <div>
               <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary uppercase tracking-wider mb-1">
                 <Calendar className="w-3.5 h-3.5" />
-                Live Schedules
+                {upcomingBadge}
               </div>
               <h2 className="text-xl sm:text-2xl font-serif font-bold text-foreground">
-                Upcoming Exhibitions &amp; Events
+                {upcomingTitle}
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Forthcoming gallery exhibitions, classical vocal concerts, and traditional iconography masterclasses.
+                {upcomingSubtitle}
               </p>
             </div>
             <Badge variant="gold" className="text-xs font-mono self-start sm:self-center">
@@ -118,9 +147,9 @@ export default async function EventsPage() {
           {upcomingEvents.length === 0 ? (
             <Card className="p-10 text-center border-dashed max-w-md mx-auto bg-card/40">
               <Calendar className="w-10 h-10 mx-auto text-primary mb-2 opacity-50" />
-              <CardTitle className="text-base font-serif">No Upcoming Public Events</CardTitle>
+              <CardTitle className="text-base font-serif">{upcomingEmptyTitle}</CardTitle>
               <CardDescription className="text-xs mt-1">
-                New exhibition dates, gallery recitals, and masterclasses are published periodically. Please explore our past retrospectives below.
+                {upcomingEmptySubtitle}
               </CardDescription>
             </Card>
           ) : (
@@ -213,13 +242,13 @@ export default async function EventsPage() {
               <div>
                 <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                   <History className="w-3.5 h-3.5 text-primary" />
-                  Archival Retrospectives
+                  {pastBadge}
                 </div>
                 <h2 className="text-xl sm:text-2xl font-serif font-bold text-foreground">
-                  Past Exhibitions &amp; Retrospectives
+                  {pastTitle}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Historical archive of celebrated Tanjore masterwork showcases, museum exhibitions, and concert tours.
+                  {pastSubtitle}
                 </p>
               </div>
               <Badge variant="outline" className="text-xs font-mono self-start sm:self-center border-border/80">
