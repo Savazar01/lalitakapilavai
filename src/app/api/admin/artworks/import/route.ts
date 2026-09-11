@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import ExcelJS from "exceljs";
@@ -292,7 +292,7 @@ export async function POST(request: NextRequest) {
               medium: mediumVal,
               yearCreated: yearCreatedVal,
               hasGoldFoil,
-              goldPurity: hasGoldFoil ? "22 Carat Jaipur Gold Leaf" : null,
+              goldPurity: null,
               price: priceVal,
               currency: currencyVal,
               isAvailable: isAvailableVal,

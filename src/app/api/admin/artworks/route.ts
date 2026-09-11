@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
         medium: medium || "22k Gold Foil, Teakwood, Semi-Precious Gemstones",
         yearCreated: parseInt(yearCreated, 10) || new Date().getFullYear(),
         hasGoldFoil: !!hasGoldFoil,
-        goldPurity: goldPurity || (hasGoldFoil ? "22 Carat Jaipur Gold Leaf" : null),
+        goldPurity: hasGoldFoil && goldPurity?.trim() ? goldPurity.trim() : null,
         price: price ? parseFloat(price) : null,
         currency: body.currency || "INR",
         isAvailable: isAvailable !== undefined ? !!isAvailable : true,

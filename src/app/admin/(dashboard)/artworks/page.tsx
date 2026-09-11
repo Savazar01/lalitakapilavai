@@ -120,8 +120,8 @@ export default function ArtworksAdminPage() {
   const [dimensions, setDimensions] = React.useState("24 x 36 inches");
   const [medium, setMedium] = React.useState("22k Gold Foil, Teakwood, Semi-Precious Gemstones");
   const [yearCreated, setYearCreated] = React.useState(new Date().getFullYear().toString());
-  const [hasGoldFoil, setHasGoldFoil] = React.useState(true);
-  const [goldPurity, setGoldPurity] = React.useState("22 Carat Jaipur Gold Leaf");
+  const [hasGoldFoil, setHasGoldFoil] = React.useState(false);
+  const [goldPurity, setGoldPurity] = React.useState("");
   const [price, setPrice] = React.useState("");
   const [currency, setCurrency] = React.useState("INR");
   const [isAvailable, setIsAvailable] = React.useState(true);
@@ -243,8 +243,8 @@ export default function ArtworksAdminPage() {
     setDimensions("24 x 36 inches");
     setMedium("22k Gold Foil, Teakwood, Semi-Precious Gemstones");
     setYearCreated(new Date().getFullYear().toString());
-    setHasGoldFoil(true);
-    setGoldPurity("22 Carat Jaipur Gold Leaf");
+    setHasGoldFoil(false);
+    setGoldPurity("");
     setPrice("");
     setCurrency("INR");
     setIsAvailable(true);
@@ -402,7 +402,7 @@ export default function ArtworksAdminPage() {
       medium,
       yearCreated: parseInt(yearCreated, 10),
       hasGoldFoil,
-      goldPurity: hasGoldFoil ? goldPurity : null,
+      goldPurity: hasGoldFoil && goldPurity?.trim() ? goldPurity.trim() : null,
       price: price ? parseFloat(price) : null,
       currency,
       isAvailable,
@@ -1205,7 +1205,13 @@ export default function ArtworksAdminPage() {
                     type="checkbox"
                     id="hasGoldFoil"
                     checked={hasGoldFoil}
-                    onChange={(e) => setHasGoldFoil(e.target.checked)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setHasGoldFoil(checked);
+                      if (!checked) {
+                        setGoldPurity("");
+                      }
+                    }}
                     className="rounded border-border text-primary focus:ring-primary h-4 w-4"
                   />
                   <label htmlFor="hasGoldFoil" className="text-xs font-semibold text-foreground">
