@@ -238,6 +238,16 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const coverPatternOpacity = typeof coverConfig.patternOpacity === "number" ? coverConfig.patternOpacity : undefined;
   const coverBgImage = (coverConfig.backgroundImage as string) || undefined;
   const coverOverlayOpacity = typeof coverConfig.overlayOpacity === "number" ? coverConfig.overlayOpacity : undefined;
+  const coverDesignMode = (coverConfig.coverDesignMode as string) || (coverConfig.useMatrixLayout ? "MATRIX" : coverConfig.contentHtml ? "WYSIWYG" : "IMAGE_PLATE");
+  const coverContentHtml = coverConfig.contentHtml as string | undefined;
+
+  const coverScope = resolveContainerThemeScope({
+    backgroundType: coverBgType,
+    backgroundColor: coverBgColor || bgColor,
+    backgroundImage: coverBgImage || (bgMode === "image" ? bgImage : undefined),
+    overlayOpacity: coverOverlayOpacity ?? overlayOpacity,
+    backgroundPattern: coverBgPattern || bgPatternId,
+  });
 
   // Curatorial Essay configuration
   const essayFrameClass = getFrameClass((essayConfig.frameStyle as string) || frameStyle);
@@ -304,7 +314,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {/* PAGE 1: BOOK COVER (Strict Single Page on Print)                   */}
         {/* ------------------------------------------------------------------ */}
-        {coverConfig.useMatrixLayout && coverConfig.matrixConfig ? (
+        {coverDesignMode === "MATRIX" && coverConfig.matrixConfig ? (
           (() => {
             const mc = coverConfig.matrixConfig as Record<string, unknown>;
             const matrixSegments = Array.isArray(mc.segments)
@@ -347,10 +357,65 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               />
             );
           })()
+        ) : coverDesignMode === "WYSIWYG" && coverContentHtml ? (
+          <section
+            className={cn(
+              "catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none",
+              coverScope.wrapperClass
+            )}
+            style={{
+              ...coverScope.wrapperStyle,
+              ...(coverBgColor ? { backgroundColor: coverBgColor } : {}),
+            }}
+          >
+            <CatalogBackgroundLayer
+              bgType={coverBgType}
+              patternId={coverBgPattern}
+              patternOpacity={coverPatternOpacity}
+              bgImage={coverBgImage}
+              overlayOpacity={coverOverlayOpacity}
+              fallbackBgMode={bgMode}
+              fallbackPattern={pattern}
+              fallbackPatternOpacity={patternOpacity}
+              fallbackBgImage={bgImage}
+              fallbackOverlayOpacity={overlayOpacity}
+            />
+            <div
+              className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+            >
+              {/* Bespoke WYSIWYG Front Cover Content with container contrast scoping */}
+              <div className="w-full flex-1 flex flex-col justify-center my-auto">
+                <TiptapRenderer
+                  content={coverContentHtml}
+                  contrast={coverScope.contrastMode}
+                  className="w-full max-w-4xl mx-auto"
+                />
+              </div>
+
+              {/* Footer Notice */}
+              <div className="pt-4 border-t border-primary/20 space-y-1">
+                {catalog.event && (
+                  <div className="inline-flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                    <Calendar className="w-3 h-3 text-primary" />
+                    <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
+                  </div>
+                )}
+                <p className="text-[11px] font-mono text-muted-foreground/70">
+                  Published by the Atelier of Lalita Kapilavai • Sacred Art &amp; Heritage
+                </p>
+              </div>
+            </div>
+          </section>
         ) : (
           <section
-            className="catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none"
-            style={coverBgColor ? { backgroundColor: coverBgColor } : undefined}
+            className={cn(
+              "catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none",
+              coverScope.wrapperClass
+            )}
+            style={{
+              ...coverScope.wrapperStyle,
+              ...(coverBgColor ? { backgroundColor: coverBgColor } : {}),
+            }}
           >
             <CatalogBackgroundLayer
               bgType={coverBgType}

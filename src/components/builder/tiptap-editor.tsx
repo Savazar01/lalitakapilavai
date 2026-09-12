@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -327,6 +328,12 @@ export function TiptapEditor({
   }, [editor, parsedContent]);
 
   const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
   const [linkModalOpen, setLinkModalOpen] = React.useState(false);
   const [linkUrl, setLinkUrl] = React.useState("");
   const [imageModalOpen, setImageModalOpen] = React.useState(false);
@@ -429,12 +436,13 @@ export function TiptapEditor({
   const btnInactiveClass = "text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800 font-medium";
   const btnActiveClass = "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 font-bold shadow-xs";
 
-  return (
+  const editorContent = (
     <div
       className={cn(
-        "w-full relative group transition-all",
-        isFullscreen &&
-          "fixed inset-0 z-50 bg-background/98 backdrop-blur-md p-4 sm:p-8 flex flex-col h-screen w-screen overflow-hidden shadow-2xl"
+        "w-full relative group transition-all flex flex-col bg-card text-card-foreground",
+        isFullscreen
+          ? "fixed inset-0 z-[9999] h-screen w-screen bg-background/98 backdrop-blur-md p-6 sm:p-10 overflow-hidden shadow-2xl"
+          : "rounded-xl border border-border"
       )}
     >
       {/* Floating / Sticky Inline Action Toolbar (visible when editable) */}
@@ -906,28 +914,34 @@ export function TiptapEditor({
           {/* Fullscreen Expansion Studio Toggle */}
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className={cn(btnBaseClass, btnInactiveClass, "ml-auto")}
-            title={isFullscreen ? "Exit Fullscreen Studio (Esc)" : "Expand to Fullscreen Studio"}
+            className="h-8 px-2.5 text-xs font-semibold gap-1.5 border-border bg-card hover:bg-accent ml-auto cursor-pointer"
+            title={isFullscreen ? "Restore Window (Esc)" : "Expand to Full View"}
           >
             {isFullscreen ? (
-              <Minimize2 className="h-4 w-4 text-primary" />
+              <>
+                <Minimize2 className="h-4 w-4 text-primary" />
+                <span>Restore</span>
+              </>
             ) : (
-              <Maximize2 className="h-4 w-4" />
+              <>
+                <Maximize2 className="h-4 w-4" />
+                <span>Expand</span>
+              </>
             )}
           </Button>
         </div>
       )}
 
       {/* Live Content Surface */}
-      <div className={cn("relative", isFullscreen && "flex-1 overflow-y-auto pr-2")}>
+      <div className={cn("relative overflow-y-auto", isFullscreen ? "flex-1 p-4 max-w-5xl mx-auto w-full" : "min-h-[80px] p-2")}>
         <EditorContent
           editor={editor}
           className={cn(
             getContrastTypographyClasses(effectiveContrast),
-            isFullscreen ? "min-h-[400px]" : "min-h-[80px]",
+            isFullscreen ? "min-h-[500px]" : "min-h-[80px]",
             "outline-none"
           )}
         />
@@ -1423,6 +1437,12 @@ export function TiptapEditor({
       </Dialog>
     </div>
   );
+
+  if (isFullscreen && mounted && typeof document !== "undefined") {
+    return createPortal(editorContent, document.body);
+  }
+
+  return editorContent;
 }
 
 // Universal Standardized WYSIWYG Suite Alias

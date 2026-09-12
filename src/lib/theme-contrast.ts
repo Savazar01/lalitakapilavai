@@ -190,6 +190,7 @@ export function resolveContainerThemeScope(config: BackgroundStyleConfig): Conta
       legacyMode: "dark-bg",
       wrapperStyle: {
         colorScheme: "dark",
+        color: "#FFFFFF",
         ["--current-heading" as string]: "var(--token-text-light, #FFFFFF)",
         ["--current-body" as string]: "var(--token-text-light, #F8FAFC)",
         ["--current-muted" as string]: "var(--token-text-muted-light, #94A3B8)",
@@ -213,6 +214,7 @@ export function resolveContainerThemeScope(config: BackgroundStyleConfig): Conta
         legacyMode: "light-bg",
         wrapperStyle: {
           colorScheme: "light",
+          color: "#0F172A",
           ["--current-heading" as string]: "var(--token-text-dark, #0F172A)",
           ["--current-body" as string]: "var(--token-text-dark, #1E293B)",
           ["--current-muted" as string]: "var(--token-text-muted-dark, #475569)",
@@ -228,6 +230,7 @@ export function resolveContainerThemeScope(config: BackgroundStyleConfig): Conta
         legacyMode: "dark-bg",
         wrapperStyle: {
           colorScheme: "dark",
+          color: "#FFFFFF",
           ["--current-heading" as string]: "var(--token-text-light, #FFFFFF)",
           ["--current-body" as string]: "var(--token-text-light, #F8FAFC)",
           ["--current-muted" as string]: "var(--token-text-muted-light, #94A3B8)",
@@ -251,6 +254,7 @@ export function resolveContainerThemeScope(config: BackgroundStyleConfig): Conta
           legacyMode: "light-bg",
           wrapperStyle: {
             colorScheme: "light",
+            color: "#0F172A",
             ["--current-heading" as string]: "var(--token-text-dark, #0F172A)",
             ["--current-body" as string]: "var(--token-text-dark, #1E293B)",
             ["--current-muted" as string]: "var(--token-text-muted-dark, #475569)",

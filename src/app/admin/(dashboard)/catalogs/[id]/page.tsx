@@ -168,6 +168,8 @@ interface ECatalogThemeConfig {
 interface ECatalogCoverConfig extends CatalogBackgroundConfig {
   showDate?: boolean;
   showCurator?: boolean;
+  coverDesignMode?: "IMAGE_PLATE" | "WYSIWYG" | "MATRIX";
+  contentHtml?: string;
   useMatrixLayout?: boolean;
   matrixConfig?: CatalogMatrixConfig;
 }
@@ -1309,47 +1311,114 @@ export default function AdminCatalogStudioPage() {
                 )}
               </div>
 
-                {/* Advanced Matrix Cover Layout Engine */}
-                <div className="pt-4 border-t border-border/60 space-y-3">
-                  <div className="flex items-center justify-between">
+                {/* Cover Presentation & Layout Engine (Image Plate vs. WYSIWYG vs. Matrix) */}
+                <div className="pt-4 border-t border-border/60 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <h4 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-primary" /> Advanced Matrix Cover Layout Engine (Optional)
+                        <Sparkles className="w-3.5 h-3.5 text-primary" /> Front Cover Presentation Engine
                       </h4>
                       <p className="text-[11px] text-muted-foreground">
-                        Enable an InDesign-grade multi-cell visual matrix layout for the front cover instead of standard single-image banner.
+                        Choose between a classical single-image monograph plate, a bespoke rich-text WYSIWYG cover, or an InDesign-grade multi-cell visual matrix.
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-foreground">Matrix Cover:</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(coverConfig.useMatrixLayout)}
-                          onChange={(e) =>
-                            setCoverConfig((prev) => ({
-                              ...prev,
-                              useMatrixLayout: e.target.checked,
-                              matrixConfig: prev.matrixConfig || {
-                                matrixRows: 2,
-                                matrixCols: 2,
-                                rowHeights: "1fr 1fr",
-                                colWidths: "1fr 1fr",
-                                hasHeader: false,
-                                hasFooter: false,
-                                verticalSpineMode: "NONE",
-                                segments: reconcileMatrixCells(2, 2, []),
-                              },
-                            }))
-                          }
-                          className="sr-only peer"
-                        />
-                        <div className="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-                      </label>
+                    <div className="flex items-center gap-1 p-0.5 rounded-lg border border-border bg-muted/30">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverDesignMode: "IMAGE_PLATE",
+                            useMatrixLayout: false,
+                          }))
+                        }
+                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                          (coverConfig.coverDesignMode === "IMAGE_PLATE" || (!coverConfig.coverDesignMode && !coverConfig.useMatrixLayout))
+                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Single Image Plate
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverDesignMode: "WYSIWYG",
+                            useMatrixLayout: false,
+                          }))
+                        }
+                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                          coverConfig.coverDesignMode === "WYSIWYG"
+                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Bespoke WYSIWYG
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverDesignMode: "MATRIX",
+                            useMatrixLayout: true,
+                            matrixConfig: prev.matrixConfig || {
+                              matrixRows: 2,
+                              matrixCols: 2,
+                              rowHeights: "1fr 1fr",
+                              colWidths: "1fr 1fr",
+                              hasHeader: false,
+                              hasFooter: false,
+                              verticalSpineMode: "NONE",
+                              segments: reconcileMatrixCells(2, 2, []),
+                            },
+                          }))
+                        }
+                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                          coverConfig.coverDesignMode === "MATRIX" || (coverConfig.useMatrixLayout && coverConfig.coverDesignMode !== "WYSIWYG")
+                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Matrix Studio
+                      </button>
                     </div>
                   </div>
 
-                  {coverConfig.useMatrixLayout && (
+                  {/* Mode 2: Bespoke WYSIWYG Cover Editor */}
+                  {coverConfig.coverDesignMode === "WYSIWYG" && (
+                    <div className="pt-2 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-primary" /> Bespoke Front Cover Typography &amp; Layout
+                        </label>
+                        <span className="text-[11px] text-muted-foreground">
+                          Universal Full-Viewport Portal WYSIWYG Suite
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        Compose custom front-cover titles, sub-headings, awards, royal patron credits, publisher stamps, and decorative dividers using the complete rich-text suite.
+                      </p>
+                      <div className="border border-border/80 rounded-xl overflow-hidden shadow-xs">
+                        <TiptapEditor
+                          content={coverConfig.contentHtml || ""}
+                          onChange={(_, html) =>
+                            setCoverConfig((prev) => ({
+                              ...prev,
+                              contentHtml: html,
+                            }))
+                          }
+                          contrast={themeConfig.backgroundMode === "IMAGE" ? "dark-bg" : undefined}
+                          className="min-h-[380px]"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mode 3: Advanced Matrix Studio */}
+                  {(coverConfig.coverDesignMode === "MATRIX" || (coverConfig.useMatrixLayout && coverConfig.coverDesignMode !== "WYSIWYG")) && (
                     <div className="pt-2">
                       <CatalogMatrixStudio
                         pageTitle={title || "Catalog Front Cover"}
@@ -1386,6 +1455,8 @@ export default function AdminCatalogStudioPage() {
                             }
                             return {
                               ...prev,
+                              useMatrixLayout: true,
+                              coverDesignMode: "MATRIX",
                               matrixConfig: {
                                 ...currentMatrix,
                                 ...upd,
