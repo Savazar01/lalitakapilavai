@@ -19,6 +19,8 @@ import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
 import { DynamicFormBlock, FormFieldConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
+import { cn } from "@/lib/utils";
+import { type ContrastMode, getContrastTypographyClasses } from "@/lib/theme-contrast";
 
 interface TiptapMark {
   type: string;
@@ -49,9 +51,10 @@ interface MediaBlockConfig {
   borderWidth?: number;
 }
 
-interface TiptapRendererProps {
+export interface TiptapRendererProps {
   content: Record<string, unknown> | string | null | undefined;
   className?: string;
+  contrast?: ContrastMode;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -69,11 +72,39 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
 };
 
 /**
- * Strips hardcoded pure white/black and parchment/charcoal inline styles
- * so that typography dynamically inherits CSS theme variables (text-foreground / dark:prose-invert).
+ * Strips conflicting hardcoded monochrome inline styles based on container contrast
+ * so typography dynamically inherits container or theme foreground.
  */
-export function sanitizeAdaptiveThemeHtml(html: string): string {
+export function sanitizeAdaptiveThemeHtml(html: string, contrast: ContrastMode = "auto"): string {
   if (!html) return "";
+
+  if (contrast === "light-bg") {
+    // In light background containers: strip white/light inline colors so text stays dark charcoal
+    return html
+      .replace(
+        /style="([^"]*?)color:\s*(#ffffff|#fff|#faf7f2|#fbf8f1|#f5f5f0|#f3ebdd|white|rgb\(\s*255,\s*255,\s*255\s*\)|rgba\(\s*255,\s*255,\s*255,\s*[0-9.]+\s*\));?([^"]*?)"/gi,
+        (match, p1, color, p2) => {
+          const remaining = `${p1} ${p2}`.trim().replace(/;\s*;/g, ";");
+          return remaining && remaining !== ";" ? `style="${remaining}"` : "";
+        }
+      )
+      .replace(/\sstyle=""/gi, "");
+  }
+
+  if (contrast === "dark-bg") {
+    // In dark background containers: strip black/dark inline colors so text stays radiant ivory/white
+    return html
+      .replace(
+        /style="([^"]*?)color:\s*(#000000|#000|#1c1814|#0f0e0d|#0d0e12|#1e1b18|#1a1a1a|#2a2622|black|rgb\(\s*0,\s*0,\s*0\s*\)|rgba\(\s*0,\s*0,\s*0,\s*[0-9.]+\s*\));?([^"]*?)"/gi,
+        (match, p1, color, p2) => {
+          const remaining = `${p1} ${p2}`.trim().replace(/;\s*;/g, ";");
+          return remaining && remaining !== ";" ? `style="${remaining}"` : "";
+        }
+      )
+      .replace(/\sstyle=""/gi, "");
+  }
+
+  // "auto": Strip both monochrome white and black styles to defer to global CSS theme variables
   return html
     .replace(
       /style="([^"]*?)color:\s*(#ffffff|#fff|#000000|#000|#1c1814|#faf7f2|#fbf8f1|#0f0e0d|rgb\(\s*255,\s*255,\s*255\s*\)|rgb\(\s*0,\s*0,\s*0\s*\)|rgba\(\s*255,\s*255,\s*255,\s*[0-9.]+\s*\)|rgba\(\s*0,\s*0,\s*0,\s*[0-9.]+\s*\));?([^"]*?)"/gi,
@@ -85,7 +116,7 @@ export function sanitizeAdaptiveThemeHtml(html: string): string {
     .replace(/\sstyle=""/gi, "");
 }
 
-function renderMarks(text: string, marks?: TiptapMark[]): React.ReactNode {
+function renderMarks(text: string, marks?: TiptapMark[], contrast: ContrastMode = "auto"): React.ReactNode {
   if (!marks || marks.length === 0) return text;
 
   return marks.reduce<React.ReactNode>((acc, mark, idx) => {
@@ -100,20 +131,36 @@ function renderMarks(text: string, marks?: TiptapMark[]): React.ReactNode {
         const styleObj: React.CSSProperties = {};
         if (mark.attrs?.color) {
           const c = String(mark.attrs.color).trim().toLowerCase();
-          const isMonochrome =
+          const isWhiteOrLight =
             c === "#ffffff" ||
             c === "#fff" ||
+            c === "#faf7f2" ||
+            c === "#fbf8f1" ||
+            c === "#f5f5f0" ||
+            c === "#f3ebdd" ||
+            c === "white" ||
+            c === "rgb(255, 255, 255)" ||
+            c.startsWith("rgba(255, 255, 255");
+          const isBlackOrDark =
             c === "#000000" ||
             c === "#000" ||
             c === "#1c1814" ||
-            c === "#faf7f2" ||
-            c === "#fbf8f1" ||
             c === "#0f0e0d" ||
-            c === "rgb(255, 255, 255)" ||
+            c === "#0d0e12" ||
+            c === "#1e1b18" ||
+            c === "#1a1a1a" ||
+            c === "#2a2622" ||
+            c === "black" ||
             c === "rgb(0, 0, 0)" ||
-            c.startsWith("rgba(255, 255, 255") ||
             c.startsWith("rgba(0, 0, 0");
-          if (!isMonochrome) {
+
+          if (contrast === "light-bg" && isWhiteOrLight) {
+            // Strip conflicting white/light inline color on light background
+          } else if (contrast === "dark-bg" && isBlackOrDark) {
+            // Strip conflicting black/dark inline color on dark background
+          } else if (contrast === "auto" && (isWhiteOrLight || isBlackOrDark)) {
+            // Strip monochrome colors in auto mode so theme controls color
+          } else {
             styleObj.color = mark.attrs.color as string;
           }
         }
@@ -149,8 +196,8 @@ function renderMarks(text: string, marks?: TiptapMark[]): React.ReactNode {
   }, text);
 }
 
-function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
-  const children = node.content?.map((child, i) => renderNode(child, `${String(key)}-c${i}`));
+function renderNode(node: TiptapNode, key: React.Key, contrast: ContrastMode = "auto"): React.ReactNode {
+  const children = node.content?.map((child, i) => renderNode(child, `${String(key)}-c${i}`, contrast));
 
   const textAlign = node.attrs?.textAlign as string | undefined;
   const alignClass =
@@ -170,12 +217,12 @@ function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
       const level = (node.attrs?.level as number) || 2;
       const sizeClasses =
         level === 1
-          ? "text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-foreground mb-4"
+          ? "text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-4"
           : level === 2
-          ? "text-2xl sm:text-3xl font-serif font-bold text-foreground mb-3"
+          ? "text-2xl sm:text-3xl font-serif font-bold mb-3"
           : level === 3
-          ? "text-xl sm:text-2xl font-serif font-semibold text-foreground mb-2"
-          : "text-lg sm:text-xl font-serif font-semibold text-foreground mb-2";
+          ? "text-xl sm:text-2xl font-serif font-semibold mb-2"
+          : "text-lg sm:text-xl font-serif font-semibold mb-2";
 
       if (level === 1) {
         return <h1 key={key} className={`${sizeClasses} ${alignClass}`}>{children}</h1>;
@@ -191,21 +238,21 @@ function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
 
     case "paragraph":
       return (
-        <p key={key} className={`text-base leading-relaxed text-foreground/85 mb-4 ${alignClass}`}>
+        <p key={key} className={`text-base leading-relaxed mb-4 opacity-90 ${alignClass}`}>
           {children && children.length > 0 ? children : "\u00A0"}
         </p>
       );
 
     case "bulletList":
       return (
-        <ul key={key} className="list-disc list-inside mb-4 space-y-1 text-foreground/85">
+        <ul key={key} className="list-disc list-inside mb-4 space-y-1 opacity-90">
           {children}
         </ul>
       );
 
     case "orderedList":
       return (
-        <ol key={key} className="list-decimal list-inside mb-4 space-y-1 text-foreground/85">
+        <ol key={key} className="list-decimal list-inside mb-4 space-y-1 opacity-90">
           {children}
         </ol>
       );
@@ -217,7 +264,7 @@ function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
       return (
         <blockquote
           key={key}
-          className="border-l-4 border-primary pl-4 italic text-foreground/80 my-4 font-serif"
+          className="border-l-4 border-primary pl-4 italic opacity-85 my-4 font-serif"
         >
           {children}
         </blockquote>
@@ -226,7 +273,7 @@ function renderNode(node: TiptapNode, key: React.Key): React.ReactNode {
     case "text":
       return (
         <React.Fragment key={key}>
-          {renderMarks(node.text || "", node.marks)}
+          {renderMarks(node.text || "", node.marks, contrast)}
         </React.Fragment>
       );
 
@@ -449,7 +496,7 @@ export interface ColumnBlock {
   galleryItems?: MediaGalleryItem[];
 }
 
-export function renderColumnBlock(block: ColumnBlock): React.ReactNode {
+export function renderColumnBlock(block: ColumnBlock, contrast: ContrastMode = "auto"): React.ReactNode {
   if (block.type === "IMAGE") {
     return (
       <div key={block.id}>
@@ -588,9 +635,10 @@ export function renderColumnBlock(block: ColumnBlock): React.ReactNode {
 
   if (block.type === "TEXT" && block.content) {
     const doc = block.content as unknown as TiptapNode;
+    const typographyClasses = getContrastTypographyClasses(contrast);
     return (
-      <div key={block.id} className="prose prose-stone dark:prose-invert max-w-none">
-        {doc.type === "doc" ? renderNode(doc, block.id) : null}
+      <div key={block.id} className={cn(typographyClasses, "max-w-none")}>
+        {doc.type === "doc" ? renderNode(doc, block.id, contrast) : null}
       </div>
     );
   }
@@ -598,8 +646,9 @@ export function renderColumnBlock(block: ColumnBlock): React.ReactNode {
   return null;
 }
 
-export function TiptapRenderer({ content, className = "" }: TiptapRendererProps) {
+export function TiptapRenderer({ content, className = "", contrast = "auto" }: TiptapRendererProps) {
   if (!content) return null;
+  const contrastClasses = getContrastTypographyClasses(contrast);
 
   if (typeof content === "string") {
     let parsedObj: Record<string, unknown> | null = null;
@@ -631,22 +680,22 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
     }
 
     if (parsedObj) {
-      return <TiptapRenderer content={parsedObj} className={className} />;
+      return <TiptapRenderer content={parsedObj} className={className} contrast={contrast} />;
     }
 
     // If string contains HTML tags, render safely as HTML so tags like <p> do not appear literally
     if (/<[a-z][\s\S]*>/i.test(trimmed)) {
-      const sanitized = sanitizeAdaptiveThemeHtml(trimmed);
+      const sanitized = sanitizeAdaptiveThemeHtml(trimmed, contrast);
       return (
         <div
-          className={`prose prose-stone dark:prose-invert max-w-none text-foreground leading-relaxed ${className}`}
+          className={cn(contrastClasses, "max-w-none leading-relaxed", className)}
           dangerouslySetInnerHTML={{ __html: sanitized }}
         />
       );
     }
 
     return (
-      <div className={`prose prose-stone dark:prose-invert max-w-none text-foreground leading-relaxed ${className}`}>
+      <div className={cn(contrastClasses, "max-w-none leading-relaxed", className)}>
         <p className="whitespace-pre-line leading-relaxed">{content}</p>
       </div>
     );
@@ -657,8 +706,8 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
   // Check if content has nested multi-row blocks
   if (Array.isArray(rawObj.blocks) && rawObj.blocks.length > 0) {
     return (
-      <div className={`space-y-4 ${className}`}>
-        {rawObj.blocks.map((block: ColumnBlock) => renderColumnBlock(block))}
+      <div className={cn(contrastClasses, "space-y-4", className)}>
+        {rawObj.blocks.map((block: ColumnBlock) => renderColumnBlock(block, contrast))}
       </div>
     );
   }
@@ -668,9 +717,9 @@ export function TiptapRenderer({ content, className = "" }: TiptapRendererProps)
   const doc = content as unknown as TiptapNode;
 
   return (
-    <div className={`prose prose-stone dark:prose-invert max-w-none text-foreground leading-relaxed ${className}`}>
+    <div className={cn(contrastClasses, "max-w-none leading-relaxed", className)}>
       {mediaConfig && renderMediaBlock(mediaConfig)}
-      {doc.type === "doc" && renderNode(doc, "root")}
+      {doc.type === "doc" && renderNode(doc, "root", contrast)}
     </div>
   );
 }

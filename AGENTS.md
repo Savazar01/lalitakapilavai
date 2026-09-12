@@ -117,3 +117,23 @@ All agent workflows and feature implementations must strictly adhere to these co
    - Major entities must support `isActive` (public visibility toggle), `showOnHomepage` (homepage featured status), and `sortOrder` (manual display hierarchy).
    - Public queries must enforce `{ isActive: true, isDeleted: false }` filters and order by `sortOrder: "asc"`.
 
+---
+
+## 7. Theme-Adaptive Typography & Container Contrast Invariant
+To prevent unreadable/invisible text when users toggle Dark, Light, or System themes across custom colored sections, matrix cells, hero overlays, and rich text blocks:
+
+1. **Luminance-Aware Container Contrast Resolution (`src/lib/theme-contrast.ts`)**:
+   - Containers with explicit background colors or media overlays MUST NOT blindly follow the global `.dark` / `.light` theme class.
+   - Backgrounds are classified via ITU-R BT.709 perceived luminance (`0.2126*r + 0.7152*g + 0.0722*b`):
+     - **Light Background** (`luminance > 140` e.g. `#FAF7F2`, `#FFFFFF`, Warm Parchment, Raw Silk): Typography scope locked to `light-bg` (`text-stone-900 prose-stone dark:text-stone-900 dark:prose-stone [color-scheme:light]`).
+     - **Dark Background** (`luminance <= 140` e.g. `#1C1814`, `#0F0E0D`, Charcoal, Obsidian, Deep Teak): Typography scope locked to `dark-bg` (`text-stone-100 prose-invert dark:text-stone-100 dark:prose-invert [color-scheme:dark]`).
+     - **Default / Transparent**: Inherits global theme typography (`text-foreground`).
+2. **Hero Image Overlay Scrim Standard**:
+   - All full-bleed hero image overlays must enforce a high-opacity dark scrim (`bg-stone-950/60` or `bg-black/50`).
+   - Hero text containers must always resolve to `dark-bg`, guaranteeing crisp white/ivory typography across both light and dark modes.
+3. **Tiptap Rich-Text AST & Inline Style Sanitization**:
+   - In `TiptapRenderer` (`src/components/public/tiptap-renderer.tsx`), AST node elements (`h1-h4`, `p`, `ul`, `ol`, `blockquote`) must inherit `currentColor` from container typography rather than hardcoding `text-foreground`.
+   - Conflicting monochrome inline color attributes (`color: #000000` on dark backgrounds or `color: #ffffff` on light backgrounds) are sanitized dynamically based on the resolved container contrast mode.
+   - In `TiptapEditor` (`src/components/builder/tiptap-editor.tsx`), the editor content and toolbar reflect the container's contrast mode in real-time, preventing black-on-dark or white-on-light composition in admin studios.
+
+

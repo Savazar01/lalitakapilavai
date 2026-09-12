@@ -67,27 +67,13 @@ import {
   type PageMatrixConfig,
   reconcilePageMatrixCells,
 } from "@/components/builder/page-matrix-studio";
+import {
+  resolveContainerContrast,
+  getContrastTypographyClasses,
+  isLightColor as themeIsLightColor,
+} from "@/lib/theme-contrast";
 
-export function isLightColor(colorStr?: string | null): boolean {
-  if (!colorStr) return false;
-  const hex = colorStr.trim().replace("#", "");
-  if (hex.length === 3) {
-    const r = parseInt(hex[0] + hex[0], 16);
-    const g = parseInt(hex[1] + hex[1], 16);
-    const b = parseInt(hex[2] + hex[2], 16);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance > 0.55;
-  }
-  if (hex.length === 6) {
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance > 0.55;
-  }
-  const lightPresets = ["#FAF7F2", "#FFFFFF", "#F3EBDD", "#E8DFD1", "#FBF8F1", "white"];
-  return lightPresets.some((p) => colorStr.toLowerCase().includes(p.toLowerCase()));
-}
+export const isLightColor = themeIsLightColor;
 import {
   Dialog,
   DialogContent,
@@ -230,7 +216,15 @@ function SortableSection({
       : {}),
   };
 
-  const isSectionLight = isLightColor(section.backgroundColor);
+  const sectionContrast = resolveContainerContrast({
+    backgroundType: section.backgroundType || undefined,
+    backgroundColor: section.backgroundColor,
+    backgroundImage: section.backgroundImage,
+    overlayOpacity: section.backgroundOverlayOpacity,
+    backgroundPattern: section.backgroundPattern,
+  });
+  const isSectionLight = sectionContrast === "light-bg";
+  const sectionTypographyClasses = getContrastTypographyClasses(sectionContrast);
 
   const addBlockToCol = (colIdx: number, type: ColumnBlock["type"]) => {
     const col = section.subSections[colIdx];
@@ -707,6 +701,8 @@ function SortableSection({
             }
             onChange={(updated) => onUpdateMatrixConfig?.(updated)}
             sectionTitle={section.title}
+            contrast={sectionContrast}
+            backgroundColor={section.backgroundColor}
           />
         </div>
       ) : (
@@ -868,6 +864,7 @@ function SortableSection({
                       {/* Block Contents */}
                       {block.type === "TEXT" && (
                         <TiptapEditor
+                          contrast={sectionContrast}
                           isLight={isSectionLight}
                           content={block.content}
                           onChange={(json) => updateBlock(colIdx, block.id, { content: json })}
@@ -1462,6 +1459,7 @@ function SortableSection({
 
                   {/* Inline Tiptap Rich-Text Editor */}
                   <TiptapEditor
+                    contrast={sectionContrast}
                     isLight={isSectionLight}
                     content={col.content}
                     onChange={(json) => onUpdateSubSectionContent(colIdx, json)}

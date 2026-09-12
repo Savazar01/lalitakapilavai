@@ -43,6 +43,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TiptapEditor } from "@/components/builder/tiptap-editor";
 import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
+import { type ContrastMode, resolveContainerContrast } from "@/lib/theme-contrast";
 
 export interface MatrixCellSegment {
   id: string;
@@ -102,6 +103,8 @@ interface CatalogMatrixStudioProps {
   onChange: (updated: Partial<CatalogMatrixConfig>) => void;
   pageTitle?: string;
   pageType?: "COVER" | "MAGAZINE" | "END_PAGE";
+  contrast?: ContrastMode;
+  backgroundColor?: string | null;
 }
 
 /**
@@ -159,7 +162,14 @@ export function CatalogMatrixStudio({
   onChange,
   pageTitle = "Page",
   pageType = "MAGAZINE",
+  contrast,
+  backgroundColor,
 }: CatalogMatrixStudioProps) {
+  const baseContrast: ContrastMode =
+    contrast ||
+    resolveContainerContrast({
+      backgroundColor: backgroundColor,
+    });
   const {
     matrixRows = 2,
     matrixCols = 2,
@@ -853,6 +863,11 @@ export function CatalogMatrixStudio({
                   </label>
                   <div className="rounded-lg border border-input bg-card p-1 shadow-xs max-h-[260px] overflow-y-auto">
                     <TiptapEditor
+                      contrast={
+                        selectedCell.bgConfig?.backgroundColor
+                          ? resolveContainerContrast({ backgroundColor: selectedCell.bgConfig.backgroundColor })
+                          : baseContrast
+                      }
                       content={selectedCell.contentHtml}
                       onChange={(_, html) =>
                         updateCell(selectedCell.row, selectedCell.col, { contentHtml: html })
@@ -909,6 +924,11 @@ export function CatalogMatrixStudio({
 
                   <div className="rounded-md border border-input bg-card/60 p-1 flex-1">
                     <TiptapEditor
+                      contrast={
+                        cell.bgConfig?.backgroundColor
+                          ? resolveContainerContrast({ backgroundColor: cell.bgConfig.backgroundColor })
+                          : baseContrast
+                      }
                       content={cell.contentHtml}
                       onChange={(_, html) => updateCell(cell.row, cell.col, { contentHtml: html })}
                       placeholder={`Compose copy for Cell (${cell.row}, ${cell.col})...`}
@@ -936,6 +956,7 @@ export function CatalogMatrixStudio({
               </div>
               <div className="rounded-md border border-input bg-card/60 p-1">
                 <TiptapEditor
+                  contrast={baseContrast}
                   content={headerHtml || ""}
                   onChange={(_, html) => onChange({ headerHtml: html })}
                   placeholder="e.g. Curatorial Statement • Chapter 1 • Sacred Lineage"
@@ -956,6 +977,7 @@ export function CatalogMatrixStudio({
               </div>
               <div className="rounded-md border border-input bg-card/60 p-1">
                 <TiptapEditor
+                  contrast={baseContrast}
                   content={verticalSpineHtml || ""}
                   onChange={(_, html) => onChange({ verticalSpineHtml: html })}
                   placeholder="Vertical metadata, archival provenance notes, or atelier imprint..."
@@ -976,6 +998,7 @@ export function CatalogMatrixStudio({
               </div>
               <div className="rounded-md border border-input bg-card/60 p-1">
                 <TiptapEditor
+                  contrast={baseContrast}
                   content={footerHtml || ""}
                   onChange={(_, html) => onChange({ footerHtml: html })}
                   placeholder="e.g. Published by the Atelier of Lalita Kapilavai • All rights reserved."

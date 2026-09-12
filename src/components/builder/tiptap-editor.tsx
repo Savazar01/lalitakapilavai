@@ -41,6 +41,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
+import { cn } from "@/lib/utils";
+import { type ContrastMode, getContrastTypographyClasses } from "@/lib/theme-contrast";
 
 export const CustomImageNode = Node.create({
   name: "image",
@@ -187,6 +189,7 @@ export interface TiptapEditorProps {
   placeholder?: string;
   readOnly?: boolean;
   isLight?: boolean;
+  contrast?: ContrastMode;
   onEditorReady?: (editor: import("@tiptap/react").Editor) => void;
 }
 
@@ -197,12 +200,19 @@ export function TiptapEditor({
   placeholder = "Write and polish traditional verses, curatorial notes, or philosophical commentary...",
   readOnly = false,
   isLight = false,
+  contrast,
   onEditorReady,
 }: TiptapEditorProps) {
-  const proseClasses = isLight
-    ? "prose prose-stone max-w-none text-stone-900 leading-relaxed [&_p]:text-stone-800"
-    : "prose prose-stone dark:prose-invert max-w-none text-foreground leading-relaxed [&_p]:text-foreground/90";
+  const effectiveContrast: ContrastMode = contrast
+    ? contrast
+    : isLight
+    ? "light-bg"
+    : "auto";
 
+  const proseClasses = cn(
+    getContrastTypographyClasses(effectiveContrast),
+    "max-w-none focus:outline-none min-h-[80px] p-2 leading-relaxed"
+  );
 
   const parsedContent = React.useMemo(() => {
     if (!content) return undefined;
@@ -258,7 +268,7 @@ export function TiptapEditor({
     },
     editorProps: {
       attributes: {
-        class: `${proseClasses} max-w-none focus:outline-none min-h-[80px] p-2 ${className}`,
+        class: cn(proseClasses, className),
       },
       transformPastedHTML(html) {
         return html.replace(/&lt;p&gt;/g, "<p>").replace(/&lt;\/p&gt;/g, "</p>");
@@ -271,6 +281,18 @@ export function TiptapEditor({
       },
     },
   });
+
+  React.useEffect(() => {
+    if (editor) {
+      editor.setOptions({
+        editorProps: {
+          attributes: {
+            class: cn(proseClasses, className),
+          },
+        },
+      });
+    }
+  }, [editor, proseClasses, className]);
 
   React.useEffect(() => {
     if (editor && onEditorReady) {
@@ -361,11 +383,13 @@ export function TiptapEditor({
     setImageModalOpen(false);
   };
 
-  const btnInactiveClass = isLight
+  const isLightEffective = effectiveContrast === "light-bg";
+
+  const btnInactiveClass = isLightEffective
     ? "text-stone-800 hover:text-stone-950 hover:bg-stone-200/90 font-medium"
     : "text-stone-200 hover:text-amber-200 hover:bg-stone-800 font-medium";
 
-  const btnActiveClass = isLight
+  const btnActiveClass = isLightEffective
     ? "bg-amber-400 text-stone-950 font-bold shadow-xs border border-amber-500"
     : "bg-stone-900 text-amber-300 font-bold shadow-xs border border-amber-500/60";
 
@@ -375,7 +399,7 @@ export function TiptapEditor({
       {!readOnly && (
         <div
           className={`flex flex-wrap items-center gap-1 p-1 mb-2 rounded-lg border transition-opacity z-20 ${
-            isLight
+            isLightEffective
               ? "border-stone-300 bg-white/95 text-stone-900 shadow-sm"
               : "border-border bg-card/95 backdrop-blur-md shadow-sm"
           }`}
@@ -759,7 +783,10 @@ export function TiptapEditor({
       )}
 
       {/* Live Content Surface */}
-      <EditorContent editor={editor} />
+      <EditorContent
+        editor={editor}
+        className={cn(getContrastTypographyClasses(effectiveContrast), "min-h-[80px] outline-none")}
+      />
 
       {/* Styled Link Modal Dialog */}
       <Dialog open={linkModalOpen} onOpenChange={setLinkModalOpen}>

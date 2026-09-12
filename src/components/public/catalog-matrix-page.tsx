@@ -1,6 +1,8 @@
 import * as React from "react";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
 import { BookOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
 
 export interface MatrixCellSegmentData {
   id: string;
@@ -57,6 +59,12 @@ export function CatalogMatrixPage({
   catalogTitle,
   fallbackContentHtml,
 }: CatalogMatrixPageProps) {
+  const contrast = resolveContainerContrast({
+    backgroundColor,
+    backgroundMode: backgroundColor ? "color" : "none",
+  });
+  const typographyClasses = getContrastTypographyClasses(contrast);
+
   // Determine covered cells from rowSpan / colSpan
   const coveredCells = React.useMemo(() => {
     const covered = new Set<string>();
@@ -82,7 +90,10 @@ export function CatalogMatrixPage({
 
   return (
     <section
-      className="catalog-page catalog-matrix-page-wrapper editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none"
+      className={cn(
+        "catalog-page catalog-matrix-page-wrapper editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none",
+        typographyClasses
+      )}
       style={backgroundColor ? { backgroundColor } : undefined}
     >
       {backgroundLayer}
@@ -92,8 +103,8 @@ export function CatalogMatrixPage({
       >
         {/* Running Header */}
         {hasHeader && headerHtml ? (
-          <header className="catalog-running-header border-b border-primary/20 pb-3 mb-4 text-xs font-serif font-bold text-foreground">
-            <TiptapRenderer content={headerHtml} />
+          <header className="catalog-running-header border-b border-primary/20 pb-3 mb-4 text-xs font-serif font-bold">
+            <TiptapRenderer content={headerHtml} contrast={contrast} />
           </header>
         ) : (pageTitle || pageSubtitle) ? (
           <header className="catalog-running-header border-b border-primary/20 pb-4 mb-4">
@@ -104,7 +115,7 @@ export function CatalogMatrixPage({
               <BookOpen className="w-4 h-4 text-primary shrink-0" />
             </div>
             {pageTitle && (
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-foreground leading-tight">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold leading-tight">
                 {pageTitle}
               </h2>
             )}
@@ -134,7 +145,7 @@ export function CatalogMatrixPage({
               }}
             >
               {verticalSpineHtml ? (
-                <TiptapRenderer content={verticalSpineHtml} />
+                <TiptapRenderer content={verticalSpineHtml} contrast={contrast} />
               ) : (
                 <div className="text-xs font-mono uppercase tracking-widest text-primary/70">
                   Archival Spine
@@ -166,21 +177,27 @@ export function CatalogMatrixPage({
                       gridRow: `span ${rSpan}`,
                       gridColumn: `span ${cSpan}`,
                     }}
-                    className="catalog-matrix-cell overflow-y-auto print:overflow-visible prose prose-sm dark:prose-invert font-serif leading-relaxed text-foreground/90 text-justify flex flex-col"
+                    className={cn(
+                      "catalog-matrix-cell overflow-y-auto print:overflow-visible font-serif leading-relaxed text-justify flex flex-col",
+                      typographyClasses
+                    )}
                   >
                     {cell.title && (
-                      <h4 className="font-serif text-base font-bold text-foreground mb-1 not-prose">
+                      <h4 className="font-serif text-base font-bold mb-1 not-prose">
                         {cell.title}
                       </h4>
                     )}
-                    <TiptapRenderer content={cell.contentHtml} />
+                    <TiptapRenderer content={cell.contentHtml} contrast={contrast} />
                   </div>
                 );
               })}
             </div>
           ) : fallbackContentHtml ? (
-            <div className="catalog-matrix-cell flex-1 overflow-y-auto print:overflow-visible prose prose-sm sm:prose-base dark:prose-invert font-serif leading-relaxed text-foreground/90 text-justify">
-              <TiptapRenderer content={fallbackContentHtml} />
+            <div className={cn(
+              "catalog-matrix-cell flex-1 overflow-y-auto print:overflow-visible font-serif leading-relaxed text-justify",
+              typographyClasses
+            )}>
+              <TiptapRenderer content={fallbackContentHtml} contrast={contrast} />
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center italic text-muted-foreground text-xs">
@@ -192,7 +209,7 @@ export function CatalogMatrixPage({
         {/* Running Footer */}
         {hasFooter && footerHtml ? (
           <footer className="catalog-running-footer border-t border-primary/20 pt-3 mt-auto text-center text-xs font-mono text-muted-foreground">
-            <TiptapRenderer content={footerHtml} />
+            <TiptapRenderer content={footerHtml} contrast={contrast} />
           </footer>
         ) : (
           <footer className="catalog-running-footer pt-3 border-t border-primary/20 flex items-center justify-between text-[11px] font-mono text-muted-foreground mt-auto">

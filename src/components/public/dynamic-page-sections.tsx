@@ -3,6 +3,8 @@ import { AnimatedSection } from "@/components/public/animated-section";
 import { TiptapRenderer, renderColumnBlock } from "@/components/public/tiptap-renderer";
 import { getPatternById } from "@/lib/background-patterns";
 import type { PageMatrixConfig } from "@/components/builder/page-matrix-studio";
+import { cn } from "@/lib/utils";
+import { resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
 
 export interface DynamicSubSectionItem {
   id?: string;
@@ -52,6 +54,15 @@ export function DynamicPageSections({
             ? Number(section.backgroundOverlayOpacity)
             : 0.5;
 
+        const sectionContrast = resolveContainerContrast({
+          backgroundType: section.backgroundType || undefined,
+          backgroundColor: section.backgroundColor,
+          backgroundImage: section.backgroundImage,
+          overlayOpacity: section.backgroundOverlayOpacity,
+          backgroundPattern: section.backgroundPattern,
+        });
+        const sectionTypographyClasses = getContrastTypographyClasses(sectionContrast);
+
         const isContain =
           section.customCssClass?.includes("bg-contain") ||
           (section as unknown as { backgroundSize?: string }).backgroundSize === "contain";
@@ -83,13 +94,13 @@ export function DynamicPageSections({
         return (
           <AnimatedSection
             key={section.id}
-            className={`w-full relative overflow-hidden ${section.customCssClass || ""}`}
+            className={cn("w-full relative overflow-hidden", sectionTypographyClasses, section.customCssClass)}
             style={sectionStyle}
           >
             {/* Background Image Dark Overlay */}
             {isImageBg && (
               <div
-                className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 z-0"
+                className="absolute inset-0 bg-stone-950/60 pointer-events-none transition-opacity duration-300 z-0"
                 style={{ opacity: overlayOpacity }}
               />
             )}
@@ -130,7 +141,7 @@ export function DynamicPageSections({
                       {/* Section Running Header */}
                       {matrix.hasHeader && matrix.headerHtml && (
                         <header className="running-header-public w-full pb-3 border-b border-primary/20 text-center">
-                          <TiptapRenderer content={matrix.headerHtml} />
+                          <TiptapRenderer content={matrix.headerHtml} contrast={sectionContrast} />
                         </header>
                       )}
 
@@ -150,7 +161,7 @@ export function DynamicPageSections({
                             }}
                           >
                             <div className="lg:w-64 max-w-full">
-                              <TiptapRenderer content={matrix.verticalSpineHtml} />
+                              <TiptapRenderer content={matrix.verticalSpineHtml} contrast={sectionContrast} />
                             </div>
                           </div>
                         )}
@@ -167,10 +178,20 @@ export function DynamicPageSections({
                             const cellKey = `${cell.row}-${cell.col}`;
                             if (coveredCells.has(cellKey)) return null;
 
+                            const cellContrast = cell.bgConfig?.backgroundColor
+                              ? resolveContainerContrast({
+                                  backgroundColor: cell.bgConfig.backgroundColor,
+                                })
+                              : sectionContrast;
+                            const cellTypographyClasses = getContrastTypographyClasses(cellContrast);
+
                             return (
                               <div
                                 key={cell.id || cellKey}
-                                className="matrix-cell w-full relative p-5 rounded-2xl border border-border/60 bg-card/60 backdrop-blur-xs shadow-xs transition-all"
+                                className={cn(
+                                  "matrix-cell w-full relative p-5 rounded-2xl border border-border/60 bg-card/60 backdrop-blur-xs shadow-xs transition-all",
+                                  cellTypographyClasses
+                                )}
                                 style={{
                                   gridRow: `span ${cell.rowSpan || 1}`,
                                   gridColumn: `span ${cell.colSpan || 1}`,
@@ -178,17 +199,17 @@ export function DynamicPageSections({
                                 }}
                               >
                                 {cell.title && (
-                                  <h4 className="font-serif font-bold text-lg sm:text-xl text-foreground mb-3 pb-1 border-b border-border/30">
+                                  <h4 className="font-serif font-bold text-lg sm:text-xl mb-3 pb-1 border-b border-border/30">
                                     {cell.title}
                                   </h4>
                                 )}
 
                                 {Array.isArray(cell.blocks) && cell.blocks.length > 0 ? (
                                   <div className="space-y-4">
-                                    {cell.blocks.map((block) => renderColumnBlock(block))}
+                                    {cell.blocks.map((block) => renderColumnBlock(block, cellContrast))}
                                   </div>
                                 ) : cell.contentHtml ? (
-                                  <TiptapRenderer content={cell.contentHtml} />
+                                  <TiptapRenderer content={cell.contentHtml} contrast={cellContrast} />
                                 ) : null}
                               </div>
                             );
@@ -199,7 +220,7 @@ export function DynamicPageSections({
                       {/* Section Running Footer */}
                       {matrix.hasFooter && matrix.footerHtml && (
                         <footer className="running-footer-public w-full pt-3 border-t border-primary/20 text-center">
-                          <TiptapRenderer content={matrix.footerHtml} />
+                          <TiptapRenderer content={matrix.footerHtml} contrast={sectionContrast} />
                         </footer>
                       )}
                     </div>
@@ -244,6 +265,17 @@ export function DynamicPageSections({
                       backgroundSize?: "cover" | "contain";
                       fontFamily?: string;
                     };
+
+                    const colContrast = (colStyle.backgroundColor || colStyle.backgroundImage)
+                      ? resolveContainerContrast({
+                          backgroundType: colStyle.backgroundType,
+                          backgroundColor: colStyle.backgroundColor,
+                          backgroundImage: colStyle.backgroundImage,
+                          overlayOpacity: colStyle.backgroundOverlayOpacity,
+                          backgroundPattern: colStyle.backgroundPattern,
+                        })
+                      : sectionContrast;
+                    const colTypographyClasses = getContrastTypographyClasses(colContrast);
 
                     const isColContain = colStyle.backgroundSize === "contain";
                     const isZeroBorder =
@@ -295,9 +327,14 @@ export function DynamicPageSections({
                     return (
                       <div
                         key={col.id || `col-${colIdx}`}
-                        className={`${colSpanClass} w-full relative ${radiusClass} ${glowClass} ${
+                        className={cn(
+                          colSpanClass,
+                          "w-full relative",
+                          radiusClass,
+                          glowClass,
+                          colTypographyClasses,
                           hasCustomStyling ? "p-4" : ""
-                        }`}
+                        )}
                         style={borderStyleObj}
                       >
                         {colStyle.ornamentalFrame && (
@@ -308,7 +345,7 @@ export function DynamicPageSections({
                             <div className="absolute bottom-1 right-1 w-3.5 h-3.5 border-b-2 border-r-2 border-[#D4AF37] pointer-events-none z-10" />
                           </>
                         )}
-                        <TiptapRenderer content={col.content as Record<string, unknown>} />
+                        <TiptapRenderer content={col.content as Record<string, unknown>} contrast={colContrast} />
                       </div>
                     );
                   })}

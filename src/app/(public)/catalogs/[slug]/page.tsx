@@ -17,6 +17,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
+import { cn } from "@/lib/utils";
+import { resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -514,11 +516,19 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           const segments = Array.isArray(page.segments)
             ? (page.segments as unknown as { id: string; colSpan: number; contentHtml: string }[])
             : [];
+          const pageContrast = resolveContainerContrast({
+            backgroundColor: page.backgroundColor,
+            backgroundMode: page.backgroundColor ? "color" : "none",
+          });
+          const pageTypographyClasses = getContrastTypographyClasses(pageContrast);
 
           return (
             <section
               key={page.id}
-              className="catalog-page catalog-magazine-page editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
+              className={cn(
+                "catalog-page catalog-magazine-page editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none",
+                pageTypographyClasses
+              )}
               style={page.backgroundColor ? { backgroundColor: page.backgroundColor } : undefined}
             >
               {bgLayerNode}
@@ -533,7 +543,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       <BookOpen className="w-4 h-4 text-primary shrink-0" />
                     </div>
                     {page.title && (
-                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-foreground leading-tight">
+                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold leading-tight">
                         {page.title}
                       </h2>
                     )}
@@ -546,19 +556,19 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 )}
 
                 {/* Editorial Multi-Segment Content Layout */}
-                <div className={`magazine-layout-container flex-1 overflow-y-auto print:overflow-visible font-serif leading-relaxed text-foreground/90 py-2 ${gridClass}`}>
+                <div className={`magazine-layout-container flex-1 overflow-y-auto print:overflow-visible font-serif leading-relaxed py-2 ${gridClass}`}>
                   {segments.length > 0 ? (
                     segments.map((seg, sIdx) => (
                       <div
                         key={seg.id || sIdx}
-                        className="magazine-col prose prose-sm dark:prose-invert font-serif leading-relaxed text-foreground/90 overflow-y-auto print:overflow-visible text-justify"
+                        className={cn("magazine-col font-serif leading-relaxed overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}
                       >
-                        <TiptapRenderer content={seg.contentHtml} />
+                        <TiptapRenderer content={seg.contentHtml} contrast={pageContrast} />
                       </div>
                     ))
                   ) : page.contentHtml ? (
-                    <div className="magazine-col prose prose-sm sm:prose-base dark:prose-invert font-serif leading-relaxed text-foreground/90 overflow-y-auto print:overflow-visible text-justify">
-                      <TiptapRenderer content={page.contentHtml} />
+                    <div className={cn("magazine-col font-serif leading-relaxed overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}>
+                      <TiptapRenderer content={page.contentHtml} contrast={pageContrast} />
                     </div>
                   ) : (
                     <p className="italic text-muted-foreground">No editorial content compiled for this page.</p>
@@ -834,42 +844,54 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 />
               );
             })()
-          ) : (
-            <section
-              className="catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
-              style={endBgColor ? { backgroundColor: endBgColor } : undefined}
-            >
-              <CatalogBackgroundLayer
-                bgType={endBgType}
-                patternId={endBgPattern}
-                patternOpacity={endPatternOpacity}
-                bgImage={endBgImage}
-                overlayOpacity={endOverlayOpacity}
-                fallbackBgMode={bgMode}
-                fallbackPattern={pattern}
-                fallbackPatternOpacity={patternOpacity}
-                fallbackBgImage={bgImage}
-                fallbackOverlayOpacity={overlayOpacity}
-              />
-              <div className={`catalog-frame relative z-10 ${endFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
-                <div className="space-y-3 pt-4">
-                  <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
-                    Colophon &amp; Publication Details
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl font-serif font-bold">
-                    {(endPageConfig.title as string) || "Colophon & Atelier Heritage"}
-                  </h2>
-                </div>
+          ) : (() => {
+            const endContrast = resolveContainerContrast({
+              backgroundColor: endBgColor,
+              backgroundImage: endBgImage,
+              backgroundType: endBgType,
+              overlayOpacity: endOverlayOpacity,
+            });
+            const endTypographyClasses = getContrastTypographyClasses(endContrast);
 
-                <div className="prose prose-sm dark:prose-invert font-serif leading-relaxed text-foreground/85 max-w-xl mx-auto flex-1 flex flex-col justify-center">
-                  {endPageConfig.contentHtml ? (
-                    <TiptapRenderer content={endPageConfig.contentHtml as string} />
-                  ) : (
-                    <p>
-                      Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic 22k gold foil Thanjavur art and classical Carnatic musicianship.
-                    </p>
-                  )}
-                </div>
+            return (
+              <section
+                className={cn(
+                  "catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none",
+                  endTypographyClasses
+                )}
+                style={endBgColor ? { backgroundColor: endBgColor } : undefined}
+              >
+                <CatalogBackgroundLayer
+                  bgType={endBgType}
+                  patternId={endBgPattern}
+                  patternOpacity={endPatternOpacity}
+                  bgImage={endBgImage}
+                  overlayOpacity={endOverlayOpacity}
+                  fallbackBgMode={bgMode}
+                  fallbackPattern={pattern}
+                  fallbackPatternOpacity={patternOpacity}
+                  fallbackBgImage={bgImage}
+                  fallbackOverlayOpacity={overlayOpacity}
+                />
+                <div className={`catalog-frame relative z-10 ${endFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
+                  <div className="space-y-3 pt-4">
+                    <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+                      Colophon &amp; Publication Details
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-serif font-bold">
+                      {(endPageConfig.title as string) || "Colophon & Atelier Heritage"}
+                    </h2>
+                  </div>
+
+                  <div className={cn("font-serif leading-relaxed max-w-xl mx-auto flex-1 flex flex-col justify-center", endTypographyClasses)}>
+                    {endPageConfig.contentHtml ? (
+                      <TiptapRenderer content={endPageConfig.contentHtml as string} contrast={endContrast} />
+                    ) : (
+                      <p>
+                        Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic 22k gold foil Thanjavur art and classical Carnatic musicianship.
+                      </p>
+                    )}
+                  </div>
 
                 <div className="pt-6 border-t border-primary/20 space-y-2 text-xs text-muted-foreground font-mono">
                   <p>
@@ -882,7 +904,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 </div>
               </div>
             </section>
-          )
+            );
+          })()
         )}
       </main>
 

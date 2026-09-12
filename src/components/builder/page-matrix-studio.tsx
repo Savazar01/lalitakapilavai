@@ -58,6 +58,7 @@ import { FormBlockInspector, type FormFieldConfig } from "@/components/builder/f
 import { MediaGalleryInspector } from "@/components/builder/media-gallery-inspector";
 import { MediaGalleryBlock, type MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
 import { toast } from "sonner";
+import { type ContrastMode, resolveContainerContrast } from "@/lib/theme-contrast";
 
 export interface PageMatrixCellSegment {
   id: string;
@@ -112,6 +113,8 @@ interface PageMatrixStudioProps {
   config: PageMatrixConfig;
   onChange: (updated: Partial<PageMatrixConfig>) => void;
   sectionTitle?: string;
+  contrast?: ContrastMode;
+  backgroundColor?: string | null;
 }
 
 export function reconcilePageMatrixCells(
@@ -217,7 +220,10 @@ export function PageMatrixStudio({
   config,
   onChange,
   sectionTitle: _sectionTitle = "Matrix Grid Section",
+  contrast,
+  backgroundColor,
 }: PageMatrixStudioProps) {
+  const baseContrast: ContrastMode = contrast || resolveContainerContrast({ backgroundColor });
   const {
     matrixRows = 2,
     matrixCols = 2,
@@ -1287,6 +1293,11 @@ export function PageMatrixStudio({
                       {/* TEXT Block */}
                       {block.type === "TEXT" && (
                         <TiptapEditor
+                          contrast={
+                            selectedCell.bgConfig?.backgroundColor
+                              ? resolveContainerContrast({ backgroundColor: selectedCell.bgConfig.backgroundColor })
+                              : baseContrast
+                          }
                           content={block.content}
                           onChange={(json) =>
                             updateBlockInCell(selectedCell.row, selectedCell.col, block.id, { content: json })
@@ -1630,6 +1641,11 @@ export function PageMatrixStudio({
                         </div>
                         {block.type === "TEXT" && (
                           <TiptapEditor
+                            contrast={
+                              cell.bgConfig?.backgroundColor
+                                ? resolveContainerContrast({ backgroundColor: cell.bgConfig.backgroundColor })
+                                : baseContrast
+                            }
                             content={block.content}
                             onChange={(json) => updateBlockInCell(cell.row, cell.col, block.id, { content: json })}
                           />
@@ -1669,12 +1685,18 @@ export function PageMatrixStudio({
                     </Button>
                     <Button
                       type="button"
+                      className="h-6 text-[10px] px-2 gap-1"
+                    >
+                      <ImageIcon className="w-2.5 h-2.5" /> Image
+                    </Button>
+                    <Button
+                      type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => addBlockToCell(cell.row, cell.col, "BUTTON")}
-                      className="h-6 text-[10px] px-2"
+                      onClick={() => addBlockToCell(cell.row, cell.col, "VIDEO")}
+                      className="h-6 text-[10px] px-2 gap-1"
                     >
-                      + Button
+                      <Video className="w-2.5 h-2.5" /> Video
                     </Button>
                   </div>
                 </div>
@@ -1683,8 +1705,8 @@ export function PageMatrixStudio({
           </div>
         </TabsContent>
 
-        {/* TAB 3: HEADER, FOOTER & SPINE ZONES */}
-        <TabsContent value="zones" className="space-y-4 pt-3">
+        {/* Tab 3: Header & Footers Inspector */}
+        <TabsContent value="headers-footers" className="space-y-4 pt-1">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Running Header */}
             <div className="p-4 rounded-xl border border-border/70 bg-card/50 space-y-2">
@@ -1700,6 +1722,7 @@ export function PageMatrixStudio({
                 />
               </div>
               <TiptapEditor
+                contrast={baseContrast}
                 content={headerHtml ? { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: headerHtml.replace(/<[^>]+>/g, "") }] }] } : undefined}
                 onChange={(json) => {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1718,6 +1741,7 @@ export function PageMatrixStudio({
                 <span className="text-[10px] font-mono text-muted-foreground">{verticalSpineMode}</span>
               </div>
               <TiptapEditor
+                contrast={baseContrast}
                 content={verticalSpineHtml ? { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: verticalSpineHtml.replace(/<[^>]+>/g, "") }] }] } : undefined}
                 onChange={(json) => {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1741,6 +1765,7 @@ export function PageMatrixStudio({
                 />
               </div>
               <TiptapEditor
+                contrast={baseContrast}
                 content={footerHtml ? { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: footerHtml.replace(/<[^>]+>/g, "") }] }] } : undefined}
                 onChange={(json) => {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
