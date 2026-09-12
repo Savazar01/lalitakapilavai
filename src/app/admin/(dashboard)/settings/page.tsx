@@ -23,7 +23,23 @@ import {
   Sliders,
   Palette,
   RotateCcw,
+  Type,
+  Sun,
+  Moon,
+  Globe,
 } from "lucide-react";
+import {
+  DetailedThemeConfig,
+  DEFAULT_DETAILED_THEME_CONFIG,
+  HEADING_FONT_OPTIONS,
+  BODY_FONT_OPTIONS,
+  BORDER_WIDTH_OPTIONS,
+  BORDER_RADIUS_OPTIONS,
+  FONT_SIZE_OPTIONS,
+  LINE_HEIGHT_OPTIONS,
+  sanitizeDetailedThemeConfig,
+  ThemeModeTokens,
+} from "@/lib/theme-config";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,45 +127,24 @@ export default function AdminSettingsPage() {
   const [savingBranding, setSavingBranding] = React.useState(false);
 
   // Theme & Design Studio State
-  type ThemeTokenSet = {
-    "--background": string;
-    "--foreground": string;
-    "--card": string;
-    "--border": string;
-    "--muted-foreground": string;
-    "--primary": string;
-    "--primary-foreground": string;
-  };
-  const DEFAULT_LIGHT_TOKENS: ThemeTokenSet = {
-    "--background": "#F4F5F7",
-    "--foreground": "#0F172A",
-    "--card": "#FFFFFF",
-    "--border": "#CBD5E1",
-    "--muted-foreground": "#1E293B",
-    "--primary": "#8C6512",
-    "--primary-foreground": "#FFFFFF",
-  };
-  const DEFAULT_DARK_TOKENS: ThemeTokenSet = {
-    "--background": "#0B0F17",
-    "--foreground": "#F8FAFC",
-    "--card": "#151B26",
-    "--border": "#1E293B",
-    "--muted-foreground": "#94A3B8",
-    "--primary": "#F3C64F",
-    "--primary-foreground": "#0D0E12",
-  };
-  const TOKEN_LABELS: Record<keyof ThemeTokenSet, string> = {
-    "--background": "Canvas Background",
-    "--foreground": "Primary Text",
-    "--card": "Card Surface",
-    "--border": "Border",
-    "--muted-foreground": "Secondary Text",
-    "--primary": "Primary Accent",
-    "--primary-foreground": "Accent Text (on Primary)",
-  };
-  const [themeLight, setThemeLight] = React.useState<ThemeTokenSet>({ ...DEFAULT_LIGHT_TOKENS });
-  const [themeDark, setThemeDark] = React.useState<ThemeTokenSet>({ ...DEFAULT_DARK_TOKENS });
+  const [themeConfig, setThemeConfig] = React.useState<DetailedThemeConfig>(DEFAULT_DETAILED_THEME_CONFIG);
+  const [activeThemeSubTab, setActiveThemeSubTab] = React.useState<"common" | "light" | "dark">("common");
   const [savingTheme, setSavingTheme] = React.useState(false);
+
+  const PALETTE_TOKEN_DEFINITIONS: { key: keyof ThemeModeTokens; label: string; description: string }[] = [
+    { key: "canvasBg", label: "Canvas Background", description: "Base page canvas color (--background)" },
+    { key: "cardBg", label: "Card & Surface", description: "Elevated surfaces, panels & dialogs (--card)" },
+    { key: "borderColor", label: "Border Color", description: "Structural container lines (--border)" },
+    { key: "headingColor", label: "Headings Color", description: "Title & display typography (--headings)" },
+    { key: "bodyColor", label: "Body Text Color", description: "Primary readable content (--foreground)" },
+    { key: "mutedColor", label: "Secondary / Muted Text", description: "Subtitles, metadata & captions (--muted-foreground)" },
+    { key: "btnPrimaryBg", label: "Primary Button Background", description: "Main call-to-action fill (--primary)" },
+    { key: "btnPrimaryText", label: "Primary Button Text", description: "Contrast text on primary button (--primary-foreground)" },
+    { key: "btnSecondaryBg", label: "Secondary Button Background", description: "Subtle secondary action fill (--secondary)" },
+    { key: "btnSecondaryText", label: "Secondary Button Text", description: "Text on secondary button (--secondary-foreground)" },
+    { key: "activePillBg", label: "Active Pill / Badge Background", description: "Selected filter pills & active tabs" },
+    { key: "activePillText", label: "Active Pill / Badge Text", description: "Text on selected filter pills & tabs" },
+  ];
 
   // Core Settings Form
   const [form, setForm] = React.useState({
@@ -273,9 +268,7 @@ export default function AdminSettingsPage() {
             setAdminConfig((prev) => ({ ...prev, ...data.adminConfig }));
           }
           if (data.themeConfig) {
-            const tc = data.themeConfig as { light?: Record<string, string>; dark?: Record<string, string> };
-            if (tc.light) setThemeLight((prev) => ({ ...prev, ...tc.light }));
-            if (tc.dark) setThemeDark((prev) => ({ ...prev, ...tc.dark }));
+            setThemeConfig(sanitizeDetailedThemeConfig(data.themeConfig));
           }
         }
         setLoading(false);
@@ -322,10 +315,10 @@ export default function AdminSettingsPage() {
       const res = await fetch("/api/admin/settings/theme", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ themeConfig: { light: themeLight, dark: themeDark } }),
+        body: JSON.stringify({ themeConfig }),
       });
       if (res.ok) {
-        toast.success("Theme tokens saved! Refresh any public page to see changes.");
+        toast.success("Theme configuration saved globally across public app and admin portal!");
       } else {
         const err = await res.json().catch(() => ({}));
         toast.error(err.error || "Failed to save theme configuration");
@@ -346,9 +339,8 @@ export default function AdminSettingsPage() {
         body: JSON.stringify({ themeConfig: null }),
       });
       if (res.ok) {
-        setThemeLight({ ...DEFAULT_LIGHT_TOKENS });
-        setThemeDark({ ...DEFAULT_DARK_TOKENS });
-        toast.success("Theme reset to globals.css defaults.");
+        setThemeConfig({ ...DEFAULT_DETAILED_THEME_CONFIG });
+        toast.success("Theme reset to system defaults.");
       } else {
         const err = await res.json().catch(() => ({}));
         toast.error(err.error || "Failed to reset theme");
@@ -1736,10 +1728,10 @@ export default function AdminSettingsPage() {
                     <div>
                       <CardTitle className="flex items-center gap-2 text-base">
                         <Palette className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-                        Theme &amp; Design Studio
+                        Unified Theme &amp; Design System Atelier
                       </CardTitle>
                       <CardDescription className="mt-1 text-xs">
-                        Override public CSS design tokens for Light and Dark modes. Changes persist in the database and apply globally on the next page load. Admin portal tokens remain locked to neutral Slate and are not affected.
+                        Configure global typography, structural border thickness, and color palettes applied universally across both the public visitor application and the Admin Portal.
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
@@ -1756,7 +1748,7 @@ export default function AdminSettingsPage() {
                         ) : (
                           <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
                         )}
-                        Reset to Defaults
+                        Reset to System Defaults
                       </Button>
                       <Button
                         type="button"
@@ -1770,185 +1762,565 @@ export default function AdminSettingsPage() {
                         ) : (
                           <Save className="w-3.5 h-3.5 mr-1.5" />
                         )}
-                        Save Theme
+                        Save Theme Configuration
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Light Mode Tokens */}
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2">
-                        ☀️ Light Mode Tokens
-                      </h3>
-                      {(Object.keys(TOKEN_LABELS) as (keyof typeof TOKEN_LABELS)[]).map((key) => (
-                        <div key={`light-${key}`} className="flex items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <label
-                              htmlFor={`light-${key}`}
-                              className="text-xs font-semibold text-slate-800 dark:text-slate-200 block"
-                            >
-                              {TOKEN_LABELS[key]}
-                            </label>
-                            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">{key}</span>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <input
-                              id={`light-${key}`}
-                              type="color"
-                              value={themeLight[key]}
-                              onChange={(e) =>
-                                setThemeLight((prev) => ({ ...prev, [key]: e.target.value }))
-                              }
-                              className="h-8 w-8 rounded border border-slate-300 dark:border-slate-700 cursor-pointer p-0.5 bg-white"
-                              title={`${TOKEN_LABELS[key]} color picker`}
-                            />
-                            <input
-                              type="text"
-                              value={themeLight[key]}
-                              onChange={(e) =>
-                                setThemeLight((prev) => ({ ...prev, [key]: e.target.value }))
-                              }
-                              className="w-24 text-xs font-mono border-[1.5px] border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                              placeholder="#FFFFFF"
-                              maxLength={25}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Dark Mode Tokens */}
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2">
-                        🌙 Dark Mode Tokens
-                      </h3>
-                      {(Object.keys(TOKEN_LABELS) as (keyof typeof TOKEN_LABELS)[]).map((key) => (
-                        <div key={`dark-${key}`} className="flex items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <label
-                              htmlFor={`dark-${key}`}
-                              className="text-xs font-semibold text-slate-800 dark:text-slate-200 block"
-                            >
-                              {TOKEN_LABELS[key]}
-                            </label>
-                            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">{key}</span>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <input
-                              id={`dark-${key}`}
-                              type="color"
-                              value={themeDark[key]}
-                              onChange={(e) =>
-                                setThemeDark((prev) => ({ ...prev, [key]: e.target.value }))
-                              }
-                              className="h-8 w-8 rounded border border-slate-300 dark:border-slate-700 cursor-pointer p-0.5 bg-white"
-                              title={`${TOKEN_LABELS[key]} dark color picker`}
-                            />
-                            <input
-                              type="text"
-                              value={themeDark[key]}
-                              onChange={(e) =>
-                                setThemeDark((prev) => ({ ...prev, [key]: e.target.value }))
-                              }
-                              className="w-24 text-xs font-mono border-[1.5px] border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                              placeholder="#0B0F17"
-                              maxLength={25}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  {/* Sub-Tab Navigation */}
+                  <div className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl w-fit mb-6">
+                    <button
+                      type="button"
+                      onClick={() => setActiveThemeSubTab("common")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeThemeSubTab === "common"
+                          ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs"
+                          : "text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
+                      }`}
+                    >
+                      <Globe className="w-3.5 h-3.5" /> Common &amp; Typography
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveThemeSubTab("light")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeThemeSubTab === "light"
+                          ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs"
+                          : "text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
+                      }`}
+                    >
+                      <Sun className="w-3.5 h-3.5" /> Light Mode Palette
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveThemeSubTab("dark")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeThemeSubTab === "dark"
+                          ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs"
+                          : "text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
+                      }`}
+                    >
+                      <Moon className="w-3.5 h-3.5" /> Dark Mode Palette
+                    </button>
                   </div>
 
-                  {/* Live Preview Panel */}
-                  <div className="mt-8 space-y-4">
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2">
-                      🔍 Live Preview (reflects current editor values)
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Light Preview */}
+                  {/* Sub-Tab 1: Common & Typography */}
+                  {activeThemeSubTab === "common" && (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Heading Font Family */}
+                        <div className="space-y-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                          <Label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                            <Type className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
+                            Primary Headings Font Family
+                          </Label>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Applies to h1-h6 display titles, hero banners, and catalog covers.
+                          </p>
+                          <select
+                            value={themeConfig.common.fontHeading}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({
+                                ...prev,
+                                common: { ...prev.common, fontHeading: e.target.value },
+                              }))
+                            }
+                            className="w-full h-9 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-slate-100 cursor-pointer outline-none"
+                          >
+                            {HEADING_FONT_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Body Font Family */}
+                        <div className="space-y-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                          <Label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                            <Type className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
+                            Primary Body Font Family
+                          </Label>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Applies to paragraphs, card descriptions, data tables, and forms.
+                          </p>
+                          <select
+                            value={themeConfig.common.fontBody}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({
+                                ...prev,
+                                common: { ...prev.common, fontBody: e.target.value },
+                              }))
+                            }
+                            className="w-full h-9 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-slate-100 cursor-pointer outline-none"
+                          >
+                            {BODY_FONT_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Global Border Thickness */}
+                        <div className="space-y-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                          <Label className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            Global Border Thickness
+                          </Label>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Governs container lines, cards, inputs, dialogs, and table borders.
+                          </p>
+                          <select
+                            value={themeConfig.common.borderWidth}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({
+                                ...prev,
+                                common: { ...prev.common, borderWidth: e.target.value },
+                              }))
+                            }
+                            className="w-full h-9 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-slate-100 cursor-pointer outline-none"
+                          >
+                            {BORDER_WIDTH_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Global Border Radius */}
+                        <div className="space-y-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                          <Label className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            Global Corner Radius (--radius)
+                          </Label>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Architectural curvature for cards, buttons, modals, and input fields.
+                          </p>
+                          <select
+                            value={themeConfig.common.borderRadius}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({
+                                ...prev,
+                                common: { ...prev.common, borderRadius: e.target.value },
+                              }))
+                            }
+                            className="w-full h-9 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-slate-100 cursor-pointer outline-none"
+                          >
+                            {BORDER_RADIUS_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Base Font Size */}
+                        <div className="space-y-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                          <Label className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            Base Font Size
+                          </Label>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Universal body typography baseline scaling for readability.
+                          </p>
+                          <select
+                            value={themeConfig.common.baseFontSize}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({
+                                ...prev,
+                                common: { ...prev.common, baseFontSize: e.target.value },
+                              }))
+                            }
+                            className="w-full h-9 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-slate-100 cursor-pointer outline-none"
+                          >
+                            {FONT_SIZE_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Line Height */}
+                        <div className="space-y-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                          <Label className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            Base Line Height
+                          </Label>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Vertical line spacing ratio for curatorial essays and commentary.
+                          </p>
+                          <select
+                            value={themeConfig.common.lineHeight}
+                            onChange={(e) =>
+                              setThemeConfig((prev) => ({
+                                ...prev,
+                                common: { ...prev.common, lineHeight: e.target.value },
+                              }))
+                            }
+                            className="w-full h-9 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-slate-100 cursor-pointer outline-none"
+                          >
+                            {LINE_HEIGHT_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sub-Tab 2: Light Mode Palette */}
+                  {activeThemeSubTab === "light" && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {PALETTE_TOKEN_DEFINITIONS.map((def) => (
+                          <div
+                            key={`light-${def.key}`}
+                            className="flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <label
+                                htmlFor={`light-${def.key}`}
+                                className="text-xs font-bold text-slate-900 dark:text-slate-100 block"
+                              >
+                                {def.label}
+                              </label>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
+                                {def.description}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <input
+                                id={`light-${def.key}`}
+                                type="color"
+                                value={themeConfig.light[def.key]}
+                                onChange={(e) =>
+                                  setThemeConfig((prev) => ({
+                                    ...prev,
+                                    light: { ...prev.light, [def.key]: e.target.value },
+                                  }))
+                                }
+                                className="h-8 w-8 rounded border border-slate-300 dark:border-slate-700 cursor-pointer p-0.5 bg-white"
+                                title={`${def.label} picker`}
+                              />
+                              <input
+                                type="text"
+                                value={themeConfig.light[def.key]}
+                                onChange={(e) =>
+                                  setThemeConfig((prev) => ({
+                                    ...prev,
+                                    light: { ...prev.light, [def.key]: e.target.value },
+                                  }))
+                                }
+                                className="w-24 text-xs font-mono border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                                placeholder="#FFFFFF"
+                                maxLength={25}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sub-Tab 3: Dark Mode Palette */}
+                  {activeThemeSubTab === "dark" && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {PALETTE_TOKEN_DEFINITIONS.map((def) => (
+                          <div
+                            key={`dark-${def.key}`}
+                            className="flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <label
+                                htmlFor={`dark-${def.key}`}
+                                className="text-xs font-bold text-slate-900 dark:text-slate-100 block"
+                              >
+                                {def.label}
+                              </label>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
+                                {def.description}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <input
+                                id={`dark-${def.key}`}
+                                type="color"
+                                value={themeConfig.dark[def.key]}
+                                onChange={(e) =>
+                                  setThemeConfig((prev) => ({
+                                    ...prev,
+                                    dark: { ...prev.dark, [def.key]: e.target.value },
+                                  }))
+                                }
+                                className="h-8 w-8 rounded border border-slate-300 dark:border-slate-700 cursor-pointer p-0.5 bg-white"
+                                title={`${def.label} dark picker`}
+                              />
+                              <input
+                                type="text"
+                                value={themeConfig.dark[def.key]}
+                                onChange={(e) =>
+                                  setThemeConfig((prev) => ({
+                                    ...prev,
+                                    dark: { ...prev.dark, [def.key]: e.target.value },
+                                  }))
+                                }
+                                className="w-24 text-xs font-mono border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                                placeholder="#0B0F17"
+                                maxLength={25}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Interactive Live Preview Sandbox */}
+                  <div className="mt-8 space-y-4 pt-6 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        🔍 Interactive Live Preview Sandbox
+                      </h3>
+                      <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                        Font: {themeConfig.common.fontHeading} / {themeConfig.common.fontBody} | Border: {themeConfig.common.borderWidth} | Radius: {themeConfig.common.borderRadius}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Light Mode Preview Card */}
                       <div
-                        className="rounded-xl border-[1.5px] p-4 space-y-3"
+                        className="p-5 space-y-4 border transition-all"
                         style={{
-                          backgroundColor: themeLight["--background"],
-                          borderColor: themeLight["--border"],
+                          backgroundColor: themeConfig.light.canvasBg,
+                          borderColor: themeConfig.light.borderColor,
+                          borderWidth: themeConfig.common.borderWidth,
+                          borderRadius: themeConfig.common.borderRadius,
                         }}
                       >
                         <div
-                          className="text-xs font-bold uppercase tracking-widest mb-1"
-                          style={{ color: themeLight["--primary"] }}
+                          className="text-xs font-bold uppercase tracking-widest"
+                          style={{
+                            color: themeConfig.light.btnPrimaryBg,
+                            fontFamily: `'${themeConfig.common.fontBody}', sans-serif`,
+                          }}
                         >
                           ☀️ Light Mode Preview
                         </div>
                         <div
-                          className="rounded-lg border p-3 space-y-2"
+                          className="p-4 space-y-3 border transition-all"
                           style={{
-                            backgroundColor: themeLight["--card"],
-                            borderColor: themeLight["--border"],
+                            backgroundColor: themeConfig.light.cardBg,
+                            borderColor: themeConfig.light.borderColor,
+                            borderWidth: themeConfig.common.borderWidth,
+                            borderRadius: themeConfig.common.borderRadius,
                           }}
                         >
-                          <p className="text-sm font-bold" style={{ color: themeLight["--foreground"] }}>
-                            Lalita Kapilavai — Sacred Art Archive
-                          </p>
-                          <p className="text-xs" style={{ color: themeLight["--muted-foreground"] }}>
-                            Tanjore painting, 22k gold foil, classical devotional iconography.
-                          </p>
-                          <button
-                            className="text-xs font-semibold px-3 py-1.5 rounded-md mt-1"
+                          <h4
+                            className="text-base font-bold"
                             style={{
-                              backgroundColor: themeLight["--primary"],
-                              color: themeLight["--primary-foreground"],
+                              color: themeConfig.light.headingColor,
+                              fontFamily: `'${themeConfig.common.fontHeading}', Georgia, serif`,
                             }}
                           >
-                            Commission Artwork →
-                          </button>
+                            Lalita Kapilavai — Sacred Art Archive
+                          </h4>
+                          <p
+                            style={{
+                              color: themeConfig.light.bodyColor,
+                              fontFamily: `'${themeConfig.common.fontBody}', sans-serif`,
+                              fontSize: themeConfig.common.baseFontSize,
+                              lineHeight: themeConfig.common.lineHeight,
+                            }}
+                          >
+                            Tanjore traditional iconography with authentic 22k gold foil relief, paired with timeless South Indian Carnatic vocal traditions.
+                          </p>
+                          <p
+                            className="text-xs"
+                            style={{
+                              color: themeConfig.light.mutedColor,
+                              fontFamily: `'${themeConfig.common.fontBody}', sans-serif`,
+                            }}
+                          >
+                            Catalog ref: #LK-2026-TANJORE • 48 Artworks Curated
+                          </p>
+
+                          {/* Pills */}
+                          <div className="flex items-center gap-2 pt-1 flex-wrap">
+                            <span
+                              className="text-xs px-2.5 py-1 font-bold shadow-xs border transition-all"
+                              style={{
+                                backgroundColor: themeConfig.light.activePillBg,
+                                color: themeConfig.light.activePillText,
+                                borderColor: themeConfig.light.activePillBg,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              Selected Period
+                            </span>
+                            <span
+                              className="text-xs px-2.5 py-1 font-medium border transition-all"
+                              style={{
+                                backgroundColor: themeConfig.light.cardBg,
+                                color: themeConfig.light.bodyColor,
+                                borderColor: themeConfig.light.borderColor,
+                                borderWidth: themeConfig.common.borderWidth,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              Classical Temple Murals
+                            </span>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 pt-2">
+                            <button
+                              type="button"
+                              className="text-xs font-semibold px-3 py-1.5 shadow-sm transition-all"
+                              style={{
+                                backgroundColor: themeConfig.light.btnPrimaryBg,
+                                color: themeConfig.light.btnPrimaryText,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              Commission Artwork →
+                            </button>
+                            <button
+                              type="button"
+                              className="text-xs font-semibold px-3 py-1.5 border transition-all"
+                              style={{
+                                backgroundColor: themeConfig.light.btnSecondaryBg,
+                                color: themeConfig.light.btnSecondaryText,
+                                borderColor: themeConfig.light.borderColor,
+                                borderWidth: themeConfig.common.borderWidth,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              View Catalog
+                            </button>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Dark Preview */}
+                      {/* Dark Mode Preview Card */}
                       <div
-                        className="rounded-xl border-[1.5px] p-4 space-y-3"
+                        className="p-5 space-y-4 border transition-all"
                         style={{
-                          backgroundColor: themeDark["--background"],
-                          borderColor: themeDark["--border"],
+                          backgroundColor: themeConfig.dark.canvasBg,
+                          borderColor: themeConfig.dark.borderColor,
+                          borderWidth: themeConfig.common.borderWidth,
+                          borderRadius: themeConfig.common.borderRadius,
                         }}
                       >
                         <div
-                          className="text-xs font-bold uppercase tracking-widest mb-1"
-                          style={{ color: themeDark["--primary"] }}
+                          className="text-xs font-bold uppercase tracking-widest"
+                          style={{
+                            color: themeConfig.dark.btnPrimaryBg,
+                            fontFamily: `'${themeConfig.common.fontBody}', sans-serif`,
+                          }}
                         >
                           🌙 Dark Mode Preview
                         </div>
                         <div
-                          className="rounded-lg border p-3 space-y-2"
+                          className="p-4 space-y-3 border transition-all"
                           style={{
-                            backgroundColor: themeDark["--card"],
-                            borderColor: themeDark["--border"],
+                            backgroundColor: themeConfig.dark.cardBg,
+                            borderColor: themeConfig.dark.borderColor,
+                            borderWidth: themeConfig.common.borderWidth,
+                            borderRadius: themeConfig.common.borderRadius,
                           }}
                         >
-                          <p className="text-sm font-bold" style={{ color: themeDark["--foreground"] }}>
-                            Lalita Kapilavai — Sacred Art Archive
-                          </p>
-                          <p className="text-xs" style={{ color: themeDark["--muted-foreground"] }}>
-                            Tanjore painting, 22k gold foil, classical devotional iconography.
-                          </p>
-                          <button
-                            className="text-xs font-semibold px-3 py-1.5 rounded-md mt-1"
+                          <h4
+                            className="text-base font-bold"
                             style={{
-                              backgroundColor: themeDark["--primary"],
-                              color: themeDark["--primary-foreground"],
+                              color: themeConfig.dark.headingColor,
+                              fontFamily: `'${themeConfig.common.fontHeading}', Georgia, serif`,
                             }}
                           >
-                            Commission Artwork →
-                          </button>
+                            Lalita Kapilavai — Sacred Art Archive
+                          </h4>
+                          <p
+                            style={{
+                              color: themeConfig.dark.bodyColor,
+                              fontFamily: `'${themeConfig.common.fontBody}', sans-serif`,
+                              fontSize: themeConfig.common.baseFontSize,
+                              lineHeight: themeConfig.common.lineHeight,
+                            }}
+                          >
+                            Tanjore traditional iconography with authentic 22k gold foil relief, paired with timeless South Indian Carnatic vocal traditions.
+                          </p>
+                          <p
+                            className="text-xs"
+                            style={{
+                              color: themeConfig.dark.mutedColor,
+                              fontFamily: `'${themeConfig.common.fontBody}', sans-serif`,
+                            }}
+                          >
+                            Catalog ref: #LK-2026-TANJORE • 48 Artworks Curated
+                          </p>
+
+                          {/* Pills */}
+                          <div className="flex items-center gap-2 pt-1 flex-wrap">
+                            <span
+                              className="text-xs px-2.5 py-1 font-bold shadow-xs border transition-all"
+                              style={{
+                                backgroundColor: themeConfig.dark.activePillBg,
+                                color: themeConfig.dark.activePillText,
+                                borderColor: themeConfig.dark.activePillBg,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              Selected Period
+                            </span>
+                            <span
+                              className="text-xs px-2.5 py-1 font-medium border transition-all"
+                              style={{
+                                backgroundColor: themeConfig.dark.cardBg,
+                                color: themeConfig.dark.bodyColor,
+                                borderColor: themeConfig.dark.borderColor,
+                                borderWidth: themeConfig.common.borderWidth,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              Classical Temple Murals
+                            </span>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 pt-2">
+                            <button
+                              type="button"
+                              className="text-xs font-semibold px-3 py-1.5 shadow-sm transition-all"
+                              style={{
+                                backgroundColor: themeConfig.dark.btnPrimaryBg,
+                                color: themeConfig.dark.btnPrimaryText,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              Commission Artwork →
+                            </button>
+                            <button
+                              type="button"
+                              className="text-xs font-semibold px-3 py-1.5 border transition-all"
+                              style={{
+                                backgroundColor: themeConfig.dark.btnSecondaryBg,
+                                color: themeConfig.dark.btnSecondaryText,
+                                borderColor: themeConfig.dark.borderColor,
+                                borderWidth: themeConfig.common.borderWidth,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              View Catalog
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-slate-500 dark:text-slate-500 italic mt-2">
-                      Note: Admin portal tokens (.admin-scope) remain permanently locked to neutral Slate per design system governance. Only the public exhibition palette is controlled here.
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                      All tokens saved here dynamically propagate to both public exhibition pages and all admin management screens.
                     </p>
                   </div>
                 </CardContent>

@@ -11,10 +11,13 @@ import {
   Bold,
   Italic,
   Underline as UnderlineIcon,
+  Strikethrough,
+  Code,
   Heading1,
   Heading2,
   Heading3,
   Heading4,
+  Pilcrow,
   List,
   ListOrdered,
   Quote,
@@ -383,26 +386,16 @@ export function TiptapEditor({
     setImageModalOpen(false);
   };
 
-  const isLightEffective = effectiveContrast === "light-bg";
-
-  const btnInactiveClass = isLightEffective
-    ? "text-slate-700 hover:text-slate-950 hover:bg-slate-100 font-medium"
-    : "text-slate-300 hover:text-white hover:bg-slate-800 font-medium";
-
-  const btnActiveClass = isLightEffective
-    ? "bg-slate-900 text-white font-semibold shadow-xs border border-slate-900"
-    : "bg-slate-100 text-slate-900 font-semibold shadow-xs border border-slate-200";
+  const btnBaseClass = "h-8 w-8 p-0 inline-flex items-center justify-center rounded transition-all";
+  const btnInactiveClass = "text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800 font-medium";
+  const btnActiveClass = "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 font-bold shadow-xs";
 
   return (
     <div className="w-full relative group">
       {/* Floating / Sticky Inline Action Toolbar (visible when editable) */}
       {!readOnly && (
         <div
-          className={`flex flex-wrap items-center gap-1 p-1 mb-2 rounded-lg border transition-opacity z-20 ${
-            isLightEffective
-              ? "border-stone-300 bg-white/95 text-stone-900 shadow-sm"
-              : "border-border bg-card/95 backdrop-blur-md shadow-sm"
-          }`}
+          className="flex flex-wrap items-center gap-1 p-1 mb-2 rounded-lg border border-slate-300 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm transition-opacity z-20"
         >
           {/* Text Style formatting */}
           <Button
@@ -410,7 +403,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive("bold") ? btnActiveClass : btnInactiveClass
             }`}
             title="Bold"
@@ -423,7 +416,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive("italic") ? btnActiveClass : btnInactiveClass
             }`}
             title="Italic"
@@ -436,7 +429,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive("underline") ? btnActiveClass : btnInactiveClass
             }`}
             title="Underline"
@@ -444,7 +437,33 @@ export function TiptapEditor({
             <UnderlineIcon className="h-3.5 w-3.5" />
           </Button>
 
-          <div className="h-4 w-px bg-border mx-1" />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            className={`${btnBaseClass} ${
+              editor.isActive("strike") ? btnActiveClass : btnInactiveClass
+            }`}
+            title="Strikethrough"
+          >
+            <Strikethrough className="h-3.5 w-3.5" />
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().toggleCode().run()}
+            className={`${btnBaseClass} ${
+              editor.isActive("code") ? btnActiveClass : btnInactiveClass
+            }`}
+            title="Inline Code"
+          >
+            <Code className="h-3.5 w-3.5" />
+          </Button>
+
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
 
           {/* Typography Sizing (12px to 72px) */}
           <div className="flex items-center gap-1">
@@ -458,11 +477,7 @@ export function TiptapEditor({
                   editor.chain().focus().setMark("textStyle", { fontSize: val }).run();
                 }
               }}
-              className={`h-7 text-[11px] font-medium px-1.5 rounded border ${
-                isLight
-                  ? "bg-white border-stone-300 text-stone-800 hover:border-stone-400"
-                  : "bg-background border-border text-foreground hover:border-primary/50"
-              } cursor-pointer outline-none`}
+              className="h-7 text-[11px] font-medium px-1.5 rounded border border-slate-400 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 hover:border-slate-500 cursor-pointer outline-none"
               title="Font Size Presets"
             >
               {FONT_SIZES.map((fs) => (
@@ -485,11 +500,7 @@ export function TiptapEditor({
                   editor.chain().focus().setMark("textStyle", { fontFamily: val }).run();
                 }
               }}
-              className={`h-7 text-[11px] font-medium px-1.5 rounded border ${
-                isLight
-                  ? "bg-white border-stone-300 text-stone-800 hover:border-stone-400"
-                  : "bg-stone-900 border-border text-stone-100 hover:border-slate-500"
-              } cursor-pointer outline-none max-w-[140px]`}
+              className="h-7 text-[11px] font-medium px-1.5 rounded border border-slate-400 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 hover:border-slate-500 cursor-pointer outline-none max-w-[140px]"
               title="Font Family Presets"
             >
               {FONT_FAMILIES.map((ff) => (
@@ -502,14 +513,14 @@ export function TiptapEditor({
 
           {/* Color Palette Selector */}
           <div className="flex items-center gap-1 pl-0.5">
-            <div className="flex items-center gap-1 border border-border/80 rounded p-0.5 bg-background/50">
+            <div className="flex items-center gap-1 border border-slate-300 dark:border-slate-700 rounded p-0.5 bg-slate-50 dark:bg-slate-900/70">
               {/* Default / Auto Theme-Adaptive Swatch */}
               <button
                 type="button"
                 onClick={() =>
                   editor.chain().focus().setMark("textStyle", { color: null }).run()
                 }
-                className="w-4 h-4 rounded-full border border-border hover:scale-125 transition-transform cursor-pointer overflow-hidden relative shadow-2xs group/auto"
+                className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600 hover:scale-125 transition-transform cursor-pointer overflow-hidden relative shadow-2xs group/auto"
                 title="Default / Auto (Theme-Adaptive Text Color)"
               >
                 <span className="absolute inset-0 bg-gradient-to-tr from-stone-900 via-stone-500 to-stone-200" />
@@ -517,7 +528,7 @@ export function TiptapEditor({
                   A
                 </span>
               </button>
-              <div className="h-3 w-px bg-border/60 mx-0.5" />
+              <div className="h-3 w-px bg-slate-300 dark:bg-slate-700 mx-0.5" />
               {COLOR_PRESETS.map((preset) => (
                 <button
                   key={preset.color}
@@ -530,7 +541,7 @@ export function TiptapEditor({
                   title={`${preset.label} (${preset.color})`}
                 />
               ))}
-              <div className="h-3.5 w-px bg-border mx-0.5" />
+              <div className="h-3.5 w-px bg-slate-300 dark:bg-slate-700 mx-0.5" />
               {/* Custom Color Input */}
               <label
                 className="w-4 h-4 rounded-full border border-border flex items-center justify-center cursor-pointer hover:border-primary transition-colors overflow-hidden relative"
@@ -559,15 +570,28 @@ export function TiptapEditor({
             </div>
           </div>
 
-          <div className="h-4 w-px bg-border mx-1" />
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
 
-          {/* Headings */}
+          {/* Paragraph & Headings */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().setParagraph().run()}
+            className={`${btnBaseClass} ${
+              editor.isActive("paragraph") && !editor.isActive("heading") ? btnActiveClass : btnInactiveClass
+            }`}
+            title="Normal Text / Paragraph"
+          >
+            <Pilcrow className="h-3.5 w-3.5" />
+          </Button>
+
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={`h-7 px-1.5 text-xs font-serif ${
+            className={`${btnBaseClass} font-serif ${
               editor.isActive("heading", { level: 1 }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Heading 1"
@@ -580,7 +604,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={`h-7 px-1.5 text-xs font-serif ${
+            className={`${btnBaseClass} font-serif ${
               editor.isActive("heading", { level: 2 }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Heading 2"
@@ -593,7 +617,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={`h-7 px-1.5 text-xs font-serif ${
+            className={`${btnBaseClass} font-serif ${
               editor.isActive("heading", { level: 3 }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Heading 3"
@@ -606,7 +630,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-            className={`h-7 px-1.5 text-xs font-serif ${
+            className={`${btnBaseClass} font-serif ${
               editor.isActive("heading", { level: 4 }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Heading 4"
@@ -614,7 +638,7 @@ export function TiptapEditor({
             <Heading4 className="h-3.5 w-3.5" />
           </Button>
 
-          <div className="h-4 w-px bg-border mx-1" />
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
 
           {/* Lists & Quotes */}
           <Button
@@ -622,7 +646,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive("bulletList") ? btnActiveClass : btnInactiveClass
             }`}
             title="Bullet List"
@@ -635,7 +659,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive("orderedList") ? btnActiveClass : btnInactiveClass
             }`}
             title="Numbered List"
@@ -648,7 +672,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive("blockquote") ? btnActiveClass : btnInactiveClass
             }`}
             title="Blockquote"
@@ -656,7 +680,7 @@ export function TiptapEditor({
             <Quote className="h-3.5 w-3.5" />
           </Button>
 
-          <div className="h-4 w-px bg-border mx-1" />
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
 
           {/* Text Alignment */}
           <Button
@@ -664,7 +688,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive({ textAlign: "left" }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Align Left"
@@ -677,7 +701,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive({ textAlign: "center" }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Align Center"
@@ -690,7 +714,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive({ textAlign: "right" }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Align Right"
@@ -703,7 +727,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive({ textAlign: "justify" }) ? btnActiveClass : btnInactiveClass
             }`}
             title="Justify"
@@ -711,7 +735,7 @@ export function TiptapEditor({
             <AlignJustify className="h-3.5 w-3.5" />
           </Button>
 
-          <div className="h-4 w-px bg-border mx-1" />
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
 
           {/* Links */}
           <Button
@@ -719,7 +743,7 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={openLinkModal}
-            className={`h-7 w-7 p-0 ${
+            className={`${btnBaseClass} ${
               editor.isActive("link") ? btnActiveClass : btnInactiveClass
             }`}
             title="Add Link"
@@ -733,14 +757,14 @@ export function TiptapEditor({
               variant="ghost"
               size="sm"
               onClick={() => editor.chain().focus().unsetLink().run()}
-              className="h-7 w-7 p-0 text-destructive"
+              className={`${btnBaseClass} text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50`}
               title="Remove Link"
             >
               <Unlink className="h-3.5 w-3.5" />
             </Button>
           )}
 
-          <div className="h-4 w-px bg-border mx-1" />
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
 
           {/* Image Insertion */}
           <Button
@@ -748,10 +772,10 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => setImageModalOpen(true)}
-            className={`h-7 w-7 p-0 border border-border bg-card/60 hover:bg-accent ${btnInactiveClass}`}
+            className={`${btnBaseClass} ${btnInactiveClass}`}
             title="Insert Artwork / Illustration Image"
           >
-            <ImageIcon className="h-3.5 w-3.5 text-foreground" />
+            <ImageIcon className="h-3.5 w-3.5" />
           </Button>
 
           {/* Horizontal Rule / Divider */}
@@ -760,13 +784,13 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            className={`h-7 w-7 p-0 border border-border bg-card/60 hover:bg-accent ${btnInactiveClass}`}
+            className={`${btnBaseClass} ${btnInactiveClass}`}
             title="Insert Divider"
           >
-            <Minus className="h-3.5 w-3.5 text-foreground" />
+            <Minus className="h-3.5 w-3.5" />
           </Button>
 
-          <div className="h-4 w-px bg-border mx-1" />
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
 
           {/* Inline AI Assistant */}
           <AiAssistantModal

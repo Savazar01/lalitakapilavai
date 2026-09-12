@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1789198031.8677409,
+    "mtime": 1789207308.3016257,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\tiptap-editor.tsx": {
-    "mtime": 1789197410.6281252,
-    "ast_hash": "6104035b8e70df3cccf68f5d0916ae46",
+    "mtime": 1789207059.1281776,
+    "ast_hash": "e3cd58a509506635fb5f7c1bf6c1ea27",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\viewport-switcher.tsx": {
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\AGENTS.md": {
-    "mtime": 1789195468.8642237,
-    "ast_hash": "97c3ba34be9dee5277102a35b8f9b298",
+    "mtime": 1789206963.2854357,
+    "ast_hash": "cc8c509ee8a5589a8ab98055a3e07423",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\CLAUDE.md": {
@@ -455,8 +455,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\settings\\page.tsx": {
-    "mtime": 1789197863.9323008,
-    "ast_hash": "2bd3622831fe8d16c0b210a4637b003f",
+    "mtime": 1789207149.5453196,
+    "ast_hash": "08256832b281b2772ed65d52e4694765",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\users\\page.tsx": {
@@ -830,13 +830,18 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\admin\\settings\\theme\\route.ts": {
-    "mtime": 1789197554.6752157,
-    "ast_hash": "dbb04fb15c425910029281a1de6a2eb6",
+    "mtime": 1789207068.0966227,
+    "ast_hash": "fb536bc539129801325c1ad4456a3ee2",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\dynamic-theme-provider.tsx": {
-    "mtime": 1789197570.0143824,
-    "ast_hash": "15cff47067acf1f561d00d1185079faf",
+    "mtime": 1789206981.597394,
+    "ast_hash": "1ddddd25b0468cb9a3628870811e219a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\theme-config.ts": {
+    "mtime": 1789206973.5798264,
+    "ast_hash": "24bd781d9599027845acf97e2b2277c5",
     "semantic_hash": ""
   }
 }

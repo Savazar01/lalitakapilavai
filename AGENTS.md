@@ -138,26 +138,15 @@ To prevent unreadable/invisible text when users toggle Dark, Light, or System th
 
 ---
 
-## 8. Admin Portal Semantic Neutral Architecture (Zero Low-Contrast Yellows)
-To guarantee 100% legibility and rock-solid usability across Light, Dark, and System modes in admin management screens:
-
-1. **Strict Separation of Admin Chrome vs. Public Exhibition**:
-   - The Admin Portal is a mission-critical curation tool. It prioritizes contrast, legibility, and neutral surfaces over aesthetic gold foil effects.
-   - Gold styling (`#D4AF37`, amber tones, gold badges) is strictly reserved for the public exhibition frontend (`/`, `/gallery`, `/catalogs`, `/posts`).
-   - Admin surfaces MUST use neutral Slate palettes (`.admin-scope`).
-2. **Scoped Admin Token Standard (`.admin-scope` in `globals.css`)**:
-   - Light Mode: Neutral crisp Slate tokens (`--background: #F8F9FA`, `--foreground: #0F172A`, `--card: #FFFFFF`, `--border: #E2E8F0`, `--primary: #0F172A`, `--muted-foreground: #475569`).
-   - Dark Mode: Deep dark Slate tokens (`--background: #0B0F17`, `--foreground: #F8FAFC`, `--card: #151B26`, `--border: #1E293B`, `--primary: #F8FAFC`, `--muted-foreground: #94A3B8`).
-3. **Strict Ban on Yellow & Amber in Admin Chrome**:
-   - Never use `amber-*` or `yellow-*` for labels, badges, sidebar highlights, tabs, or inspector chrome in the admin portal.
-   - Navigation: Active menu pills use solid Slate fills (`bg-slate-900 text-white dark:bg-slate-800 dark:text-white`). Inactive items use `text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200`.
-   - Badges & Status Indicators: Use semantic colors with high contrast:
-     - Published / Active: Emerald (`bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60`).
-     - Homepage / Featured / AEO: Blue (`bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/60`).
-     - Draft / Inactive / System: Slate (`bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800/60 dark:text-slate-300 dark:border-slate-700/60`).
-     - Required / Danger / Concluded: Rose (`bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/60`).
-4. **Visual Builder & Inspector Controls**:
-   - Inspector headings, mode buttons (Color, Patterns, Image), and toolbar controls must use neutral slate tokens, guaranteeing high contrast in all themes.
+## 8. Unified Application & Admin Theme System
+- All design tokens configured via the Admin Theme Studio (`SystemSetting.themeConfig`) apply globally across BOTH the public visitor application and the Admin Portal.
+- The Theme Studio controls Light Mode, Dark Mode, and Common typographic/border invariants.
+- High contrast (WCAG AAA for text, WCAG AA for structural borders) must be preserved across all custom configurations.
+- Badges & Status Indicators continue to use semantic colors with high contrast:
+  - Published / Active: Emerald (`bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60`).
+  - Homepage / Featured / AEO: Blue (`bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/60`).
+  - Draft / Inactive / System: Slate (`bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800/60 dark:text-slate-300 dark:border-slate-700/60`).
+  - Required / Danger / Concluded: Rose (`bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/60`).
 
 ---
 
