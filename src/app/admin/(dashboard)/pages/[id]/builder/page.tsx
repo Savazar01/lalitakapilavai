@@ -56,6 +56,7 @@ import { getPatternById } from "@/lib/background-patterns";
 import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
 import { TimelineInspector } from "@/components/builder/timeline-inspector";
+import { TimelineGranularity, TimelineLayout, TimelineItem } from "@/types/timeline";
 import { FormBlockInspector, FormFieldConfig } from "@/components/builder/form-block-inspector";
 import { DynamicFormBlock } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryInspector } from "@/components/builder/media-gallery-inspector";
@@ -507,8 +508,10 @@ function SortableSection({
   const [activeTimelineModal, setActiveTimelineModal] = React.useState<{
     colIdx: number;
     blockId: string;
-    items?: TimelineMilestone[];
-    layout?: "alternating" | "compact" | "horizontal";
+    items?: TimelineItem[];
+    layout?: TimelineLayout;
+    granularity?: TimelineGranularity;
+    sortDirection?: "asc" | "desc";
     title?: string;
     subtitle?: string;
   } | null>(null);
@@ -1136,8 +1139,10 @@ function SortableSection({
                                 setActiveTimelineModal({
                                   colIdx,
                                   blockId: block.id,
-                                  items: (block.timelineItems || []) as TimelineMilestone[],
+                                  items: block.timelineItems,
                                   layout: block.timelineLayout || "alternating",
+                                  granularity: block.timelineGranularity || "YEAR",
+                                  sortDirection: block.timelineSortDirection || "desc",
                                   title: block.title,
                                   subtitle: block.subtitle,
                                 })
@@ -1162,14 +1167,14 @@ function SortableSection({
                                 value={block.timelineLayout || "alternating"}
                                 onChange={(e) =>
                                   updateBlock(colIdx, block.id, {
-                                    timelineLayout: e.target.value as "alternating" | "compact" | "horizontal",
+                                    timelineLayout: e.target.value as TimelineLayout,
                                   })
                                 }
                                 className="w-full text-xs p-1.5 rounded border border-border bg-background text-foreground"
                               >
                                 <option value="alternating">Alternating Zig-Zag</option>
                                 <option value="compact">Compact Left Rail</option>
-                                <option value="horizontal">Horizontal Scroll Rail</option>
+                                <option value="horizontal-serpentine">Horizontal Z-Serpentine</option>
                               </select>
                             </div>
                           </div>
@@ -1177,8 +1182,10 @@ function SortableSection({
                           {/* Embedded Timeline Preview */}
                           <div className="pt-2 border-t border-border/40 max-h-96 overflow-y-auto rounded bg-background/50 p-2">
                             <TimelineBlock
-                              items={(block.timelineItems || []) as TimelineMilestone[]}
+                              items={(block.timelineItems || []) as TimelineItem[]}
                               layout={block.timelineLayout || "alternating"}
+                              granularity={block.timelineGranularity}
+                              sortDirection={block.timelineSortDirection}
                               title={block.title}
                               subtitle={block.subtitle}
                               showFilters={block.showFilters !== false}
@@ -1656,12 +1663,16 @@ function SortableSection({
             <TimelineInspector
               items={activeTimelineModal.items}
               layout={activeTimelineModal.layout}
+              granularity={activeTimelineModal.granularity}
+              sortDirection={activeTimelineModal.sortDirection}
               title={activeTimelineModal.title}
               subtitle={activeTimelineModal.subtitle}
               onChange={(data) => {
                 updateBlock(activeTimelineModal.colIdx, activeTimelineModal.blockId, {
                   timelineItems: data.items,
                   timelineLayout: data.layout,
+                  timelineGranularity: data.granularity,
+                  timelineSortDirection: data.sortDirection,
                   title: data.title,
                   subtitle: data.subtitle,
                 });
@@ -1671,6 +1682,8 @@ function SortableSection({
                         ...prev,
                         items: data.items,
                         layout: data.layout,
+                        granularity: data.granularity,
+                        sortDirection: data.sortDirection,
                         title: data.title,
                         subtitle: data.subtitle,
                       }

@@ -54,6 +54,7 @@ import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 import { ColumnBlock } from "@/components/public/tiptap-renderer";
 import { TimelineInspector } from "@/components/builder/timeline-inspector";
 import type { TimelineMilestone } from "@/components/public/blocks/timeline-block";
+import type { TimelineGranularity, TimelineLayout, TimelineItem } from "@/types/timeline";
 import { FormBlockInspector, type FormFieldConfig } from "@/components/builder/form-block-inspector";
 import { MediaGalleryInspector } from "@/components/builder/media-gallery-inspector";
 import { MediaGalleryBlock, type MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
@@ -1955,6 +1956,14 @@ export function PageMatrixStudio({
                 selectedCell?.blocks?.find((b) => b.id === timelineEditingCell.blockId)
                   ?.timelineLayout || "alternating"
               }
+              granularity={
+                selectedCell?.blocks?.find((b) => b.id === timelineEditingCell.blockId)
+                  ?.timelineGranularity || "YEAR"
+              }
+              sortDirection={
+                selectedCell?.blocks?.find((b) => b.id === timelineEditingCell.blockId)
+                  ?.timelineSortDirection || "desc"
+              }
               title={
                 selectedCell?.blocks?.find((b) => b.id === timelineEditingCell.blockId)?.title ||
                 "Artistic Journey & Honors"
@@ -1970,6 +1979,8 @@ export function PageMatrixStudio({
                   {
                     timelineItems: data.items,
                     timelineLayout: data.layout,
+                    timelineGranularity: data.granularity,
+                    timelineSortDirection: data.sortDirection,
                     title: data.title,
                     subtitle: data.subtitle,
                   }

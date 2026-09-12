@@ -476,7 +476,9 @@ export interface ColumnBlock {
   allowDownload?: boolean;
   // Timeline Properties
   timelineItems?: TimelineMilestone[];
-  timelineLayout?: "alternating" | "compact" | "horizontal";
+  timelineLayout?: "alternating" | "compact" | "horizontal-serpentine" | "horizontal";
+  timelineGranularity?: "YEAR" | "YEAR_MONTH" | "DATE" | "DATE_TIME";
+  timelineSortDirection?: "asc" | "desc";
   timelineTitle?: string;
   timelineSubtitle?: string;
   subtitle?: string;
@@ -596,9 +598,12 @@ export function renderColumnBlock(block: ColumnBlock, contrast: ContrastMode = "
         <TimelineBlock
           items={block.timelineItems}
           layout={block.timelineLayout}
+          granularity={block.timelineGranularity}
+          sortDirection={block.timelineSortDirection}
           title={block.title || block.timelineTitle}
           subtitle={block.subtitle || block.timelineSubtitle}
           showFilters={block.showFilters !== false}
+          contrast={contrast}
         />
       </div>
     );
