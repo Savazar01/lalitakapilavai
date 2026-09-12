@@ -206,10 +206,10 @@ export function StyleInspector({
 
 
   return (
-    <aside className="w-80 border-l border-border bg-card/60 backdrop-blur-md p-4 overflow-y-auto max-h-screen text-xs space-y-5">
-      <div className="flex items-center justify-between pb-2 border-b border-border">
+    <aside className="w-80 border-l border-slate-300 dark:border-slate-800 bg-white dark:bg-[#151B26] p-4 overflow-y-auto max-h-screen text-xs space-y-5">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 font-bold text-base text-slate-900 dark:text-slate-100">
-          <Sliders className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+          <Sliders className="w-4 h-4 text-slate-800 dark:text-slate-200" />
           <span>{isSubSection ? "Column Inspector" : "Section Inspector"}</span>
         </div>
       </div>

@@ -497,29 +497,53 @@ export default function AdminSettingsPage() {
       ) : (
         <form onSubmit={handleSave}>
           <Tabs defaultValue="general" className="w-full space-y-6">
-            <TabsList className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 w-full h-auto p-1 bg-muted/60">
-              <TabsTrigger value="general" className="text-xs py-2">
+            <TabsList className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-1.5 w-full h-auto p-1.5 bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl">
+              <TabsTrigger
+                value="general"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
                 <Settings className="w-3.5 h-3.5 mr-1" /> General
               </TabsTrigger>
-              <TabsTrigger value="branding" className="text-xs py-2">
+              <TabsTrigger
+                value="branding"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
                 <Sliders className="w-3.5 h-3.5 mr-1" /> White-Labeling
               </TabsTrigger>
-              <TabsTrigger value="watermark" className="text-xs py-2">
+              <TabsTrigger
+                value="watermark"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
                 <Shield className="w-3.5 h-3.5 mr-1" /> Watermark
               </TabsTrigger>
-              <TabsTrigger value="storage" className="text-xs py-2">
+              <TabsTrigger
+                value="storage"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
                 <Cloud className="w-3.5 h-3.5 mr-1" /> R2 / S3
               </TabsTrigger>
-              <TabsTrigger value="footer" className="text-xs py-2">
+              <TabsTrigger
+                value="footer"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
                 <FileText className="w-3.5 h-3.5 mr-1" /> Footer
               </TabsTrigger>
-              <TabsTrigger value="email" className="text-xs py-2">
+              <TabsTrigger
+                value="email"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
                 <Mail className="w-3.5 h-3.5 mr-1" /> Gmail / SMTP
               </TabsTrigger>
-              <TabsTrigger value="ai" className="text-xs py-2">
+              <TabsTrigger
+                value="ai"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
                 <Sparkles className="w-3.5 h-3.5 mr-1" /> AI Engine
               </TabsTrigger>
-              <TabsTrigger value="socials" className="text-xs py-2">
+              <TabsTrigger
+                value="socials"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
                 <Share2 className="w-3.5 h-3.5 mr-1" /> Socials
               </TabsTrigger>
             </TabsList>

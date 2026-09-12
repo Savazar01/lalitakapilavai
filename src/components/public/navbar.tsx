@@ -64,7 +64,7 @@ export async function Navbar() {
   ]);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/85 backdrop-blur-md transition-colors duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-stone-300 dark:border-stone-800 bg-background/90 backdrop-blur-md transition-colors duration-300">
       {/* Top Gold Accent Border */}
       <div className="h-0.5 w-full bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600" />
 

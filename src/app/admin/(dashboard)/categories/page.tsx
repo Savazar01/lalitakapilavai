@@ -317,8 +317,7 @@ export default function AdminCategoriesPage() {
       >
         <Button
           onClick={handleOpenCreate}
-          variant="gold"
-          className="shadow-sm cursor-pointer gap-2 text-xs"
+          className="gap-2 shrink-0 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 shadow-xs"
         >
           <Plus className="w-4 h-4" />
           Add Category
@@ -360,13 +359,13 @@ export default function AdminCategoriesPage() {
           {filtered.map((cat) => (
             <Card
               key={cat.id}
-              className="border border-border/80 bg-card hover:border-primary/40 transition-all hover:shadow-md flex flex-col justify-between"
+              className="border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#151B26] hover:border-slate-400 dark:hover:border-slate-700 shadow-xs transition-all flex flex-col justify-between rounded-xl"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3 min-w-0">
                     {cat.coverImage ? (
-                      <div className="w-12 h-12 rounded-md overflow-hidden border border-border/80 bg-background shrink-0 mt-0.5 shadow-sm">
+                      <div className="w-12 h-12 rounded-md overflow-hidden border border-slate-300 dark:border-slate-700 bg-background shrink-0 mt-0.5 shadow-sm">
                         <img
                           src={cat.coverImage}
                           alt={cat.name}
@@ -374,36 +373,36 @@ export default function AdminCategoriesPage() {
                         />
                       </div>
                     ) : (
-                      <div className="w-10 h-10 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                        <Palette className="w-4 h-4 text-primary" />
+                      <div className="w-10 h-10 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center shrink-0 mt-0.5 text-slate-700 dark:text-slate-300">
+                        <Palette className="w-4 h-4" />
                       </div>
                     )}
                     <div className="min-w-0">
-                      <CardTitle className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
+                      <CardTitle className="font-serif text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                         <span className="truncate">{cat.name}</span>
                       </CardTitle>
                       <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-                        <code className="text-[11px] text-muted-foreground font-mono">
+                        <code className="text-[11px] text-slate-600 dark:text-slate-400 font-mono font-semibold">
                           /{cat.slug}
                         </code>
                         {cat.parent && (
-                          <Badge variant="secondary" className="text-[10px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-medium">
+                          <Badge className="text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-bold dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-500/40">
                             Sub of {cat.parent.name}
                           </Badge>
                         )}
                         {cat.children && cat.children.length > 0 && (
-                          <Badge variant="outline" className="text-[10px] border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">
+                          <Badge variant="outline" className="text-[10px] border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold">
                             {cat.children.length} Sub-categories
                           </Badge>
                         )}
                       </div>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-[10px] font-mono shrink-0">
+                  <Badge variant="outline" className="text-[10px] font-mono font-bold shrink-0 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                     Order: {cat.displayOrder}
                   </Badge>
                 </div>
-                <CardDescription className="text-xs text-muted-foreground line-clamp-2 mt-2">
+                <CardDescription className="text-xs text-slate-700 dark:text-slate-300 line-clamp-2 mt-2 leading-relaxed font-medium">
                   {cat.description || "No specific curatorial description provided."}
                 </CardDescription>
 
@@ -412,10 +411,10 @@ export default function AdminCategoriesPage() {
                   <button
                     type="button"
                     onClick={() => handleToggleActive(cat)}
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                       cat.isActive
-                        ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40 hover:bg-emerald-200"
-                        : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-300 dark:border-slate-700 hover:bg-slate-200"
+                        ? "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-600/40 hover:bg-emerald-200"
+                        : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200"
                     }`}
                     title="Click to toggle Active status"
                   >
@@ -426,10 +425,10 @@ export default function AdminCategoriesPage() {
                   <button
                     type="button"
                     onClick={() => handleToggleHomepage(cat)}
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                       cat.showOnHomepage
-                        ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-600/40 hover:bg-blue-200"
-                        : "bg-slate-100 text-slate-500 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:bg-slate-200 opacity-60 hover:opacity-100"
+                        ? "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/70 dark:text-blue-200 dark:border-blue-600/40 hover:bg-blue-200"
+                        : "bg-slate-100 text-slate-600 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:bg-slate-200"
                     }`}
                     title="Click to toggle Homepage visibility"
                   >
@@ -440,9 +439,9 @@ export default function AdminCategoriesPage() {
               </CardHeader>
 
               <CardContent className="pt-0">
-                <div className="flex items-center justify-between pt-3 border-t border-border/60">
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Palette className="w-3.5 h-3.5 text-primary" />
+                <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-800 dark:text-slate-200 font-semibold">
+                    <Palette className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
                     <span>
                       <strong>{cat._count?.artworks ?? 0}</strong> Artworks Cataloged
                     </span>

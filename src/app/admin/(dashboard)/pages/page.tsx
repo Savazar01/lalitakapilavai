@@ -314,7 +314,7 @@ export default function PagesAdminPage() {
       >
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="gold" className="gap-2 shrink-0 text-xs">
+            <Button className="gap-2 shrink-0 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 shadow-xs">
               <Plus className="w-4 h-4" />
               Create New Page
             </Button>
@@ -418,22 +418,22 @@ export default function PagesAdminPage() {
           {pages.map((p) => {
             const isCorePage = ["home", "blogs", "gallery", "events", "categories"].includes(p.slug);
             return (
-              <Card key={p.id} className="hover:border-slate-400 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+              <Card key={p.id} className="border border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 shadow-xs bg-white dark:bg-[#151B26] transition-all flex flex-col justify-between">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       {p.eyebrowTag && (
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-0.5 truncate">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 block mb-0.5 truncate">
                           {p.eyebrowTag}
                         </span>
                       )}
-                      <CardTitle className="text-base font-serif font-bold text-foreground">
+                      <CardTitle className="text-base font-serif font-bold text-slate-900 dark:text-slate-100">
                         {p.title}
                       </CardTitle>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       {isCorePage && (
-                        <Badge variant="outline" className="text-[9px] border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold">
+                        <Badge variant="outline" className="text-[9px] border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold">
                           Core
                         </Badge>
                       )}
@@ -441,17 +441,19 @@ export default function PagesAdminPage() {
                         variant="outline"
                         className={`text-[10px] uppercase font-semibold ${
                           p.isPublished
-                            ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40"
-                            : "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                            ? "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-600/40"
+                            : "bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700"
                         }`}
                       >
                         {p.isPublished ? "Published" : "Draft"}
                       </Badge>
                     </div>
                   </div>
-                  <CardDescription className="text-xs font-mono text-slate-600 dark:text-slate-400 flex items-center justify-between mt-1">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">/{p.slug}</span>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans">Order: {p.sortOrder || 0}</span>
+                  <CardDescription className="text-xs font-mono text-slate-700 dark:text-slate-300 flex items-center justify-between mt-1">
+                    <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded font-mono text-xs font-semibold">
+                      /{p.slug}
+                    </span>
+                    <span className="text-[10px] text-slate-700 dark:text-slate-400 font-bold">Order: {p.sortOrder || 0}</span>
                   </CardDescription>
 
                   {/* Visibility & Display Toggles */}
@@ -461,8 +463,8 @@ export default function PagesAdminPage() {
                       onClick={() => handleToggleActive(p)}
                       className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                         p.isActive
-                          ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40 hover:bg-emerald-200"
-                          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-300 dark:border-slate-700 hover:bg-slate-200"
+                          ? "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-600/40 hover:bg-emerald-200"
+                          : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200"
                       }`}
                       title="Click to toggle Active status"
                     >
@@ -475,8 +477,8 @@ export default function PagesAdminPage() {
                       onClick={() => handleToggleHomepage(p)}
                       className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                         p.showOnHomepage
-                          ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-600/40 hover:bg-blue-200"
-                          : "bg-slate-100 text-slate-500 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:bg-slate-200 opacity-70 hover:opacity-100"
+                          ? "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/70 dark:text-blue-200 dark:border-blue-600/40 hover:bg-blue-200"
+                          : "bg-slate-100 text-slate-600 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:bg-slate-200"
                       }`}
                       title="Click to toggle Homepage visibility"
                     >
@@ -487,21 +489,21 @@ export default function PagesAdminPage() {
                 </CardHeader>
 
                 <CardContent className="pb-4">
-                  <p className="text-xs text-muted-foreground line-clamp-2">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 line-clamp-2 leading-relaxed font-medium">
                     {p.heroSubtitle || p.metaDescription || "No hero description or meta summary provided."}
                   </p>
-                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50 text-[11px] text-muted-foreground">
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-medium">
                     <span>{p._count?.sections || 0} Sections</span>
                     <span>•</span>
                     <span>Updated {new Date(p.updatedAt).toLocaleDateString()}</span>
                   </div>
                 </CardContent>
 
-                <div className="p-3 bg-secondary/30 border-t border-border/60 flex items-center justify-between gap-2 flex-wrap">
+                <div className="p-3 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
                   <Link
                     href={`/${p.slug === "home" ? "" : p.slug}`}
                     target="_blank"
-                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                    className="inline-flex items-center gap-1 text-xs text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium transition-colors"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     View Live
@@ -512,7 +514,7 @@ export default function PagesAdminPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleOpenSettings(p)}
-                      className="h-8 text-xs gap-1 cursor-pointer hover:border-primary/50"
+                      className="h-8 text-xs gap-1 cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-50 font-medium shadow-2xs"
                       title="Edit Page Copy & Settings"
                     >
                       <Settings className="w-3.5 h-3.5" />
@@ -532,7 +534,7 @@ export default function PagesAdminPage() {
                     )}
 
                     <Link href={`/admin/pages/${p.id}/builder`}>
-                      <Button variant="default" size="sm" className="h-8 text-xs gap-1.5 font-semibold">
+                      <Button size="sm" className="h-8 text-xs gap-1.5 font-semibold bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 shadow-xs">
                         <Pencil className="w-3.5 h-3.5" />
                         Builder
                       </Button>

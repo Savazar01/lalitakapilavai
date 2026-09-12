@@ -9,78 +9,78 @@
 
 @layer base {
   :root {
-    /* UI-UX-Pro-Max: Light Mode (Parchment, Ivory & Antique Temple Gold) */
-    --background: #FAF7F2;
-    --foreground: #1A1A1A;
+    /* UI-UX-Pro-Max: High-Contrast Light Mode Baseline */
+    --background: #F1F3F5;
+    --foreground: #0F172A;
 
     --card: #FFFFFF;
-    --card-foreground: #1A1A1A;
+    --card-foreground: #0F172A;
 
     --popover: #FFFFFF;
-    --popover-foreground: #1A1A1A;
+    --popover-foreground: #0F172A;
 
-    /* Primary: Deep Antique Gold / Bronze for WCAG AA readability on Parchment & White */
+    /* Primary: Deep Antique Gold / Bronze for WCAG AA readability */
     --primary: #8C6512;
     --primary-foreground: #FFFFFF;
 
-    /* Secondary: Madder Terracotta / Raw Silk */
-    --secondary: #F3EBDD;
-    --secondary-foreground: #5A4731;
+    /* Secondary: Crisp Slate 200 Surface */
+    --secondary: #E2E8F0;
+    --secondary-foreground: #0F172A;
 
-    /* Accent & Crimson Highlights */
-    --accent: #F7F0E3;
-    --accent-foreground: #6B4D0D;
+    /* Accent & Neutral Highlights */
+    --accent: #E2E8F0;
+    --accent-foreground: #0F172A;
 
-    --muted: #EFE9DC;
-    --muted-foreground: #57534E;
+    --muted: #E2E8F0;
+    --muted-foreground: #334155;
 
     --destructive: #A3281E;
     --destructive-foreground: #FFFFFF;
 
-    --border: #E8E2D5;
-    --input: #E8E2D5;
-    --ring: #8C6512;
+    --border: #CBD5E1;
+    --input: #94A3B8;
+    --ring: #0F172A;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    /* UI-UX-Pro-Max: Dark Mode (Obsidian, Slate & Luminous Warm Gold) */
-    --background: #0D0E12;
-    --foreground: #EAEAEA;
+    /* UI-UX-Pro-Max: Dark Mode Baseline (Obsidian, Slate & Luminous Warm Gold) */
+    --background: #0B0F17;
+    --foreground: #F8FAFC;
 
-    --card: #16181F;
-    --card-foreground: #EAEAEA;
+    --card: #151B26;
+    --card-foreground: #F8FAFC;
 
-    --popover: #16181F;
-    --popover-foreground: #EAEAEA;
+    --popover: #151B26;
+    --popover-foreground: #F8FAFC;
 
     /* Primary: Luminous 22k Warm Gold */
     --primary: #F3C64F;
     --primary-foreground: #0D0E12;
 
-    /* Secondary: Aged Teak / Slate Surface */
-    --secondary: #1E222D;
-    --secondary-foreground: #D6DCE8;
+    /* Secondary: Deep Slate Surface */
+    --secondary: #1E293B;
+    --secondary-foreground: #F8FAFC;
 
     /* Accent & Ember Highlights */
-    --accent: #252A38;
+    --accent: #1E293B;
     --accent-foreground: #F3C64F;
 
-    --muted: #1A1D27;
-    --muted-foreground: #9EA4B0;
+    --muted: #1E293B;
+    --muted-foreground: #94A3B8;
 
     --destructive: #CF4436;
     --destructive-foreground: #FFFFFF;
 
-    --border: #2C2F3B;
-    --input: #2C2F3B;
+    --border: #1E293B;
+    --input: #1E293B;
     --ring: #F3C64F;
   }
 
   /* Admin Portal Semantic Neutral Architecture (Zero Low-Contrast Yellows) */
   .admin-scope {
-    --background: #F8F9FA;
+    --background: #F1F3F5;
     --foreground: #0F172A;
 
     --card: #FFFFFF;
@@ -92,20 +92,20 @@
     --primary: #0F172A;
     --primary-foreground: #FFFFFF;
 
-    --secondary: #F1F5F9;
+    --secondary: #E2E8F0;
     --secondary-foreground: #0F172A;
 
-    --accent: #F1F5F9;
+    --accent: #E2E8F0;
     --accent-foreground: #0F172A;
 
-    --muted: #F1F5F9;
-    --muted-foreground: #475569;
+    --muted: #E2E8F0;
+    --muted-foreground: #334155;
 
     --destructive: #DC2626;
     --destructive-foreground: #FFFFFF;
 
-    --border: #E2E8F0;
-    --input: #E2E8F0;
+    --border: #CBD5E1;
+    --input: #94A3B8;
     --ring: #0F172A;
   }
 

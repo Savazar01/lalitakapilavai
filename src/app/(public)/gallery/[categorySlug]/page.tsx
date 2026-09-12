@@ -109,8 +109,8 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
     currentCategory.borderStyle === "none"
       ? "border-0 shadow-none"
       : currentCategory.borderStyle === "subtle"
-      ? "border border-border/80 shadow-md"
-      : "border-2 border-primary/30 shadow-xl";
+      ? "border border-stone-300 dark:border-stone-800 shadow-md"
+      : "border-2 border-primary/40 shadow-xl";
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
@@ -128,8 +128,8 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                 className={cn(
                   "px-4 py-2 rounded-full text-xs font-serif transition-all duration-200",
                   isRootActive
-                    ? "bg-primary text-primary-foreground font-bold shadow-md ring-2 ring-primary/40"
-                    : "border border-border/80 bg-card hover:bg-muted/70 text-muted-foreground hover:text-foreground font-medium shadow-2xs"
+                    ? "bg-amber-700 text-white font-bold shadow-md border border-amber-800 dark:bg-amber-500 dark:text-stone-950 dark:border-amber-400"
+                    : "border border-stone-300 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-50 font-semibold shadow-2xs"
                 )}
               >
                 {cat.name}
@@ -142,7 +142,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
         <div className="max-w-5xl mx-auto space-y-6">
           {currentCategory.coverImage ? (
             <div
-              className={`relative w-full rounded-2xl overflow-hidden group ${borderClass}`}
+              className={`relative w-full rounded-2xl overflow-hidden group shadow-md border border-stone-300 dark:border-stone-800 ${borderClass}`}
               style={{ height: `${bannerHeight}px` }}
             >
               <img
@@ -159,7 +159,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent pointer-events-none" />
 
               <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8 sm:right-8 text-left z-10">
-                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest mb-2 bg-background/85 backdrop-blur-md px-3 py-1 rounded-full border border-primary/20 shadow-sm">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider mb-2 bg-background/95 backdrop-blur-md px-3 py-1 rounded-full border border-amber-500/30 shadow-sm">
                   <Sparkles className="w-3 h-3" />
                   {badgeLabel}
                 </div>
@@ -173,7 +173,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                     <TiptapRenderer content={currentCategory.curatorialNote} />
                   </div>
                 ) : currentCategory.description ? (
-                  <p className="text-xs sm:text-sm text-foreground/85 leading-relaxed max-w-2xl mt-1.5 line-clamp-2">
+                  <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed max-w-2xl mt-1.5 line-clamp-2 font-medium">
                     {currentCategory.description}
                   </p>
                 ) : null}
@@ -181,7 +181,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
             </div>
           ) : (
             <div className="text-center max-w-3xl mx-auto space-y-3">
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider bg-amber-100 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-300 dark:border-amber-500/40">
                 <Sparkles className="w-3.5 h-3.5" />
                 {badgeLabel}
               </div>
@@ -190,11 +190,11 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
               </h1>
 
               {currentCategory.curatorialNote ? (
-                <div className="text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                <div className="text-sm text-stone-800 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto">
                   <TiptapRenderer content={currentCategory.curatorialNote} />
                 </div>
               ) : currentCategory.description ? (
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                <p className="text-sm text-stone-800 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto font-medium">
                   {currentCategory.description}
                 </p>
               ) : null}
@@ -203,11 +203,11 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
 
           {/* Full Curatorial Note Expansion if banner had line-clamp */}
           {currentCategory.coverImage && currentCategory.curatorialNote && (
-            <div className="bg-card/40 border border-border/70 rounded-xl p-6 sm:p-8 space-y-3">
-              <h3 className="text-xs font-mono uppercase tracking-wider text-primary font-bold">
+            <div className="bg-white dark:bg-[#151B26] border border-stone-300 dark:border-stone-800 rounded-xl p-6 sm:p-8 space-y-3 shadow-xs">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-amber-900 dark:text-amber-400 font-bold">
                 Curatorial Overview &amp; Iconography
               </h3>
-              <div className="text-sm text-foreground/90 leading-relaxed">
+              <div className="text-sm text-stone-800 dark:text-stone-200 leading-relaxed">
                 <TiptapRenderer content={currentCategory.curatorialNote} />
               </div>
             </div>
@@ -217,9 +217,9 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
         {/* 2.5 Secondary Sub-Category Pill Bar (When Root has Sub-categories) */}
         {hasSubCategories && (
           <div className="max-w-5xl mx-auto pt-1">
-            <div className="p-3 rounded-2xl bg-muted/30 border border-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono uppercase tracking-widest text-primary font-bold">
+                <span className="text-[11px] font-mono uppercase tracking-widest text-amber-900 dark:text-amber-400 font-bold">
                   {rootCategory.name} Schools:
                 </span>
               </div>
@@ -228,10 +228,10 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                 <Link
                   href={`/gallery/${rootCategory.slug}`}
                   className={cn(
-                    "px-3.5 py-1.5 rounded-full text-xs font-serif transition-all",
+                    "px-4 py-1.5 rounded-full text-xs font-serif transition-all",
                     !isChild
-                      ? "bg-primary text-primary-foreground font-bold shadow-sm ring-2 ring-primary/40"
-                      : "bg-card/90 border border-border/70 text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                      ? "bg-amber-700 text-white font-bold border border-amber-800 shadow-xs dark:bg-amber-500 dark:text-stone-950 dark:border-amber-400"
+                      : "bg-white text-stone-800 hover:bg-stone-100 font-semibold border border-stone-300 shadow-2xs dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white dark:border-stone-800"
                   )}
                 >
                   All {rootCategory.name}
@@ -245,10 +245,10 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                       key={sub.id}
                       href={`/gallery/${sub.slug}`}
                       className={cn(
-                        "px-3.5 py-1.5 rounded-full text-xs font-serif transition-all",
+                        "px-4 py-1.5 rounded-full text-xs font-serif transition-all",
                         isSubActive
-                          ? "bg-primary text-primary-foreground font-bold shadow-sm ring-2 ring-primary/40"
-                          : "bg-card/90 border border-border/70 text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                          ? "bg-amber-700 text-white font-bold border border-amber-800 shadow-xs dark:bg-amber-500 dark:text-stone-950 dark:border-amber-400"
+                          : "bg-white text-stone-800 hover:bg-stone-100 font-semibold border border-stone-300 shadow-2xs dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white dark:border-stone-800"
                       )}
                     >
                       {sub.name}

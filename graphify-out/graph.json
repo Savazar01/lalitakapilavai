@@ -4659,7 +4659,7 @@
       "label": "BadgeProps",
       "file_type": "code",
       "source_file": "src/components/ui/badge.tsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "id": "ui_badge_badgeprops",
       "community": 7,
       "norm_label": "badgeprops"
@@ -4668,7 +4668,7 @@
       "label": "Badge()",
       "file_type": "code",
       "source_file": "src/components/ui/badge.tsx",
-      "source_location": "L31",
+      "source_location": "L32",
       "id": "ui_badge_badge",
       "community": 7,
       "norm_label": "badge()"
@@ -27462,9 +27462,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L141",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_operational_context_architecture_lalita_kapilavai_portfolio_archive",
-      "target": "lalitakapilavai_agents_8_admin_portal_semantic_neutral_architecture_zero_low_contrast_yellows",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_8_admin_portal_semantic_neutral_architecture_zero_low_contrast_yellows"
     },
     {
       "relation": "contains",
@@ -28758,5 +28758,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5b09a19f47068931dc0d02fef9239e8b0bd06df2"
+  "built_at_commit": "913070d6dc23bc1fc47d583df4732a63742beae5"
 }
