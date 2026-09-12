@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import * as React from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -70,10 +68,7 @@ import {
 import {
   resolveContainerContrast,
   getContrastTypographyClasses,
-  isLightColor as themeIsLightColor,
 } from "@/lib/theme-contrast";
-
-export const isLightColor = themeIsLightColor;
 import {
   Dialog,
   DialogContent,
@@ -1801,7 +1796,8 @@ function SortableSection({
 }
 
 export default function VisualPageBuilder() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams();
+  const id = params?.id ? (Array.isArray(params.id) ? params.id[0] : params.id) : "";
   const router = useRouter();
 
   const [page, setPage] = React.useState<PageData | null>(null);
@@ -1830,6 +1826,7 @@ export default function VisualPageBuilder() {
   );
 
   React.useEffect(() => {
+    if (!id) return;
     let isMounted = true;
     fetch(`/api/admin/pages/${id}`)
       .then((res) => {

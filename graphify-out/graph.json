@@ -1896,7 +1896,7 @@
       "label": "SubSectionData",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L85",
+      "source_location": "L80",
       "id": "builder_page_subsectiondata",
       "community": 44,
       "norm_label": "subsectiondata"
@@ -1905,7 +1905,7 @@
       "label": "SectionData",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L93",
+      "source_location": "L88",
       "id": "builder_page_sectiondata",
       "community": 44,
       "norm_label": "sectiondata"
@@ -1914,7 +1914,7 @@
       "label": "PageData",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L111",
+      "source_location": "L106",
       "id": "builder_page_pagedata",
       "community": 44,
       "norm_label": "pagedata"
@@ -1923,7 +1923,7 @@
       "label": "columnPresets",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L121",
+      "source_location": "L116",
       "id": "builder_page_columnpresets",
       "community": 44,
       "norm_label": "columnpresets"
@@ -1932,7 +1932,7 @@
       "label": "SortableSection()",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L155",
+      "source_location": "L150",
       "id": "builder_page_sortablesection",
       "community": 44,
       "norm_label": "sortablesection()"
@@ -1941,7 +1941,7 @@
       "label": "VisualPageBuilder()",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L1803",
+      "source_location": "L1798",
       "id": "builder_page_visualpagebuilder",
       "community": 44,
       "norm_label": "visualpagebuilder()"
@@ -7581,15 +7581,6 @@
       "norm_label": "code:mermaid (graph td)"
     },
     {
-      "label": "isLightColor",
-      "file_type": "code",
-      "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L76",
-      "id": "builder_page_islightcolor",
-      "community": 44,
-      "norm_label": "islightcolor"
-    },
-    {
       "label": "{\n  signIn,\n  signOut,\n  useSession,\n  getSession,\n  changePassword,\n  updateUser,\n}",
       "file_type": "code",
       "source_file": "src/lib/auth-client.ts",
@@ -7597,6 +7588,15 @@
       "id": "lib_auth_client_signin_signout_usesession_getsession_changepassword_updateuser",
       "community": 41,
       "norm_label": "{\n  signin,\n  signout,\n  usesession,\n  getsession,\n  changepassword,\n  updateuser,\n}"
+    },
+    {
+      "label": "isLightColor",
+      "file_type": "code",
+      "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
+      "source_location": "L76",
+      "community": 44,
+      "norm_label": "islightcolor",
+      "id": "builder_page_islightcolor"
     },
     {
       "label": "ALLOWED_TOKENS",
@@ -8163,9 +8163,9 @@
       "source_file": "package.json",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_package_dependencies",
-      "target": "lalitakapilavai_package_dependencies_radix_ui_react_popover",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_package_dependencies_radix_ui_react_popover"
     },
     {
       "relation": "contains",
@@ -15500,17 +15500,6 @@
       "target": "lib_theme_contrast_getcontrasttypographyclasses"
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
-      "source_location": "L70",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_admin_dashboard_pages_id_builder_page_tsx",
-      "target": "lib_theme_contrast_islightcolor"
-    },
-    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -15624,6 +15613,17 @@
       "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_pages_id_builder_page_tsx",
       "target": "builder_page_visualpagebuilder"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
+      "source_location": "L70",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_admin_dashboard_pages_id_builder_page_tsx",
+      "target": "lib_theme_contrast_islightcolor"
     },
     {
       "relation": "contains",
@@ -23791,9 +23791,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "src_components_ui_popover_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_popover_tsx"
     },
     {
       "relation": "imports",
@@ -23802,9 +23802,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "ui_popover_popovercontent",
-      "confidence_score": 1.0
+      "target": "ui_popover_popovercontent"
     },
     {
       "relation": "imports_from",
@@ -23813,9 +23813,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "src_components_ui_button_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_button_tsx"
     },
     {
       "relation": "imports",
@@ -23824,9 +23824,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "ui_button_button",
-      "confidence_score": 1.0
+      "target": "ui_button_button"
     },
     {
       "relation": "contains",
@@ -23834,9 +23834,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "builder_tiptap_divider_node_dividernodeattributes",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_dividernodeattributes"
     },
     {
       "relation": "contains",
@@ -23844,9 +23844,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "builder_tiptap_divider_node_divider_colors",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_divider_colors"
     },
     {
       "relation": "contains",
@@ -23854,9 +23854,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "builder_tiptap_divider_node_styles",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_styles"
     },
     {
       "relation": "contains",
@@ -23864,9 +23864,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "builder_tiptap_divider_node_widths",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_widths"
     },
     {
       "relation": "contains",
@@ -23874,9 +23874,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "builder_tiptap_divider_node_thicknesses",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_thicknesses"
     },
     {
       "relation": "contains",
@@ -23884,9 +23884,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "builder_tiptap_divider_node_dividerviewcomponent",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_dividerviewcomponent"
     },
     {
       "relation": "contains",
@@ -23894,9 +23894,9 @@
       "source_file": "src/components/builder/tiptap-divider-node.tsx",
       "source_location": "L222",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_divider_node_tsx",
-      "target": "builder_tiptap_divider_node_customdividernode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_customdividernode"
     },
     {
       "relation": "imports_from",
@@ -23905,9 +23905,9 @@
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_editor_tsx",
-      "target": "src_components_builder_tiptap_divider_node_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_builder_tiptap_divider_node_tsx"
     },
     {
       "relation": "re_exports",
@@ -23916,9 +23916,9 @@
       "source_file": "src/components/builder/universal-wysiwyg-editor.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_universal_wysiwyg_editor_tsx",
-      "target": "src_components_builder_tiptap_divider_node_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_builder_tiptap_divider_node_tsx"
     },
     {
       "relation": "imports",
@@ -23927,9 +23927,9 @@
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_editor_tsx",
-      "target": "builder_tiptap_divider_node_customdividernode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_customdividernode"
     },
     {
       "relation": "re_exports",
@@ -23938,9 +23938,9 @@
       "source_file": "src/components/builder/universal-wysiwyg-editor.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_universal_wysiwyg_editor_tsx",
-      "target": "builder_tiptap_divider_node_customdividernode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_divider_node_customdividernode"
     },
     {
       "relation": "imports_from",
@@ -24114,9 +24114,9 @@
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_editor_tsx",
-      "target": "src_components_builder_tiptap_shape_node_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_builder_tiptap_shape_node_tsx"
     },
     {
       "relation": "imports",
@@ -24125,9 +24125,9 @@
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_editor_tsx",
-      "target": "builder_tiptap_shape_node_customshapenode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_customshapenode"
     },
     {
       "relation": "contains",
@@ -24206,9 +24206,9 @@
       "source_file": "src/components/builder/universal-wysiwyg-editor.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_universal_wysiwyg_editor_tsx",
-      "target": "src_components_builder_tiptap_editor_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_builder_tiptap_editor_tsx"
     },
     {
       "relation": "re_exports",
@@ -24217,9 +24217,9 @@
       "source_file": "src/components/builder/universal-wysiwyg-editor.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_universal_wysiwyg_editor_tsx",
-      "target": "builder_tiptap_editor_tiptapeditorprops",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_editor_tiptapeditorprops"
     },
     {
       "relation": "references",
@@ -24239,9 +24239,9 @@
       "source_file": "src/components/builder/universal-wysiwyg-editor.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_universal_wysiwyg_editor_tsx",
-      "target": "builder_tiptap_editor_tiptapeditor",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_editor_tiptapeditor"
     },
     {
       "relation": "calls",
@@ -24272,9 +24272,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "src_components_ui_popover_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_popover_tsx"
     },
     {
       "relation": "imports",
@@ -24283,9 +24283,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "ui_popover_popovercontent",
-      "confidence_score": 1.0
+      "target": "ui_popover_popovercontent"
     },
     {
       "relation": "imports_from",
@@ -24294,9 +24294,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "src_components_ui_button_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_button_tsx"
     },
     {
       "relation": "imports",
@@ -24305,9 +24305,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "ui_button_button",
-      "confidence_score": 1.0
+      "target": "ui_button_button"
     },
     {
       "relation": "contains",
@@ -24315,9 +24315,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "builder_tiptap_shape_node_shapetype",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_shapetype"
     },
     {
       "relation": "contains",
@@ -24325,9 +24325,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "builder_tiptap_shape_node_shapenodeattributes",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_shapenodeattributes"
     },
     {
       "relation": "contains",
@@ -24335,9 +24335,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "builder_tiptap_shape_node_shapes",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_shapes"
     },
     {
       "relation": "contains",
@@ -24345,9 +24345,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "builder_tiptap_shape_node_preset_fills",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_preset_fills"
     },
     {
       "relation": "contains",
@@ -24355,9 +24355,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "builder_tiptap_shape_node_preset_borders",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_preset_borders"
     },
     {
       "relation": "contains",
@@ -24365,9 +24365,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "builder_tiptap_shape_node_shapeviewcomponent",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_shapeviewcomponent"
     },
     {
       "relation": "contains",
@@ -24375,9 +24375,9 @@
       "source_file": "src/components/builder/tiptap-shape-node.tsx",
       "source_location": "L281",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_shape_node_tsx",
-      "target": "builder_tiptap_shape_node_customshapenode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_customshapenode"
     },
     {
       "relation": "re_exports",
@@ -24386,9 +24386,9 @@
       "source_file": "src/components/builder/universal-wysiwyg-editor.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_universal_wysiwyg_editor_tsx",
-      "target": "src_components_builder_tiptap_shape_node_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_builder_tiptap_shape_node_tsx"
     },
     {
       "relation": "re_exports",
@@ -24397,9 +24397,9 @@
       "source_file": "src/components/builder/universal-wysiwyg-editor.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_universal_wysiwyg_editor_tsx",
-      "target": "builder_tiptap_shape_node_customshapenode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_shape_node_customshapenode"
     },
     {
       "relation": "imports_from",
@@ -27097,9 +27097,9 @@
       "source_file": "src/components/ui/popover.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_ui_popover_tsx",
-      "target": "src_lib_utils_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_utils_ts"
     },
     {
       "relation": "imports",
@@ -27108,9 +27108,9 @@
       "source_file": "src/components/ui/popover.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_ui_popover_tsx",
-      "target": "lib_utils_cn",
-      "confidence_score": 1.0
+      "target": "lib_utils_cn"
     },
     {
       "relation": "contains",
@@ -27118,9 +27118,9 @@
       "source_file": "src/components/ui/popover.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_ui_popover_tsx",
-      "target": "ui_popover_popovercontent",
-      "confidence_score": 1.0
+      "target": "ui_popover_popovercontent"
     },
     {
       "relation": "imports_from",
@@ -30071,5 +30071,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b1a506c65cf4f53ce0de58b445e02253822edb40"
+  "built_at_commit": "41d318a205cfb8450fd84106c06278fd40baa18d"
 }
