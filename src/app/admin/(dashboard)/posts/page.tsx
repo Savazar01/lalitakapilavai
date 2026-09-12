@@ -361,8 +361,8 @@ export default function AdminPostsPage() {
       >
         <Button
           onClick={handleOpenCreate}
-          variant="gold"
-          className="shadow-sm cursor-pointer gap-2 text-xs"
+          variant="default"
+          className="shadow-sm cursor-pointer gap-2 text-xs font-semibold"
         >
           <Plus className="w-4 h-4" />
           Write Article
@@ -376,10 +376,10 @@ export default function AdminPostsPage() {
             <button
               key={tab}
               onClick={() => setStatusFilter(tab)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                 statusFilter === tab
-                  ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold shadow-sm"
+                  : "bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
               }`}
             >
               {tab === "ALL" ? "All Articles" : tab === "PUBLISHED" ? "Published" : "Drafts"}
@@ -425,8 +425,12 @@ export default function AdminPostsPage() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <Badge
-                    variant={post.isPublished ? "gold" : "outline"}
-                    className="text-[10px] uppercase tracking-wider flex items-center gap-1"
+                    variant="outline"
+                    className={`text-[10px] uppercase tracking-wider flex items-center gap-1 font-semibold ${
+                      post.isPublished
+                        ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40"
+                        : "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                    }`}
                   >
                     {post.isPublished ? (
                       <>
@@ -439,7 +443,7 @@ export default function AdminPostsPage() {
                     )}
                   </Badge>
 
-                  <Badge variant="outline" className="text-[10px] flex items-center gap-1 text-primary">
+                  <Badge variant="outline" className="text-[10px] flex items-center gap-1 font-semibold bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-700/40">
                     <Sparkles className="w-2.5 h-2.5" /> Schema.org AEO
                   </Badge>
                 </div>
@@ -642,9 +646,9 @@ export default function AdminPostsPage() {
                       />
                       <Button
                         type="button"
-                        variant={editorMode === "VISUAL" ? "gold" : "outline"}
+                        variant={editorMode === "VISUAL" ? "default" : "outline"}
                         size="sm"
-                        className="h-7 text-[11px] gap-1 px-2 cursor-pointer"
+                        className="h-7 text-[11px] gap-1 px-2 cursor-pointer font-semibold"
                         onClick={() => setEditorMode("VISUAL")}
                       >
                         <Layout className="w-3 h-3" />
@@ -652,9 +656,9 @@ export default function AdminPostsPage() {
                       </Button>
                       <Button
                         type="button"
-                        variant={editorMode === "RAW" ? "gold" : "outline"}
+                        variant={editorMode === "RAW" ? "default" : "outline"}
                         size="sm"
-                        className="h-7 text-[11px] gap-1 px-2 cursor-pointer"
+                        className="h-7 text-[11px] gap-1 px-2 cursor-pointer font-semibold"
                         onClick={() => setEditorMode("RAW")}
                       >
                         <FileText className="w-3 h-3" />

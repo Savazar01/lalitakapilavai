@@ -77,6 +77,68 @@
     --input: #2C2F3B;
     --ring: #F3C64F;
   }
+
+  /* Admin Portal Semantic Neutral Architecture (Zero Low-Contrast Yellows) */
+  .admin-scope {
+    --background: #F8F9FA;
+    --foreground: #0F172A;
+
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+
+    --popover: #FFFFFF;
+    --popover-foreground: #0F172A;
+
+    --primary: #0F172A;
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #F1F5F9;
+    --secondary-foreground: #0F172A;
+
+    --accent: #F1F5F9;
+    --accent-foreground: #0F172A;
+
+    --muted: #F1F5F9;
+    --muted-foreground: #475569;
+
+    --destructive: #DC2626;
+    --destructive-foreground: #FFFFFF;
+
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #0F172A;
+  }
+
+  .dark .admin-scope,
+  .dark.admin-scope {
+    --background: #0B0F17;
+    --foreground: #F8FAFC;
+
+    --card: #151B26;
+    --card-foreground: #F8FAFC;
+
+    --popover: #151B26;
+    --popover-foreground: #F8FAFC;
+
+    --primary: #F8FAFC;
+    --primary-foreground: #0F172A;
+
+    --secondary: #1E293B;
+    --secondary-foreground: #F8FAFC;
+
+    --accent: #1E293B;
+    --accent-foreground: #F8FAFC;
+
+    --muted: #1E293B;
+    --muted-foreground: #94A3B8;
+
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+
+    --border: #1E293B;
+    --input: #1E293B;
+    --ring: #94A3B8;
+  }
 }
 
 @theme inline {

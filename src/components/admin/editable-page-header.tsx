@@ -131,56 +131,55 @@ export function EditablePageHeader({
       <div className="flex-1 min-w-0 flex flex-col items-start gap-1 text-left w-full">
         {/* 1. TOP: Eyebrow Tag / Badge */}
         {badge && (
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-200 uppercase tracking-widest mb-0.5">
-            {badgeIcon || <Sparkles className="w-3.5 h-3.5 shrink-0 text-amber-700 dark:text-amber-300" />}
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest mb-0.5">
+            {badgeIcon || <Sparkles className="w-3.5 h-3.5 shrink-0 text-slate-500 dark:text-slate-400" />}
             <span>{badge}</span>
           </div>
         )}
 
         {isEditing ? (
-          <div className="w-full space-y-3 p-3.5 rounded-lg border border-primary/40 bg-card/95 shadow-sm max-w-2xl mt-1 text-left">
+          <div className="w-full space-y-3 p-3.5 rounded-lg border border-border bg-card shadow-sm max-w-2xl mt-1 text-left">
             <div className="space-y-1">
-              <label className="text-[11px] font-mono text-primary uppercase tracking-wider font-semibold">
+              <label className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider font-semibold">
                 Eyebrow Badge / Tag
               </label>
               <Input
                 value={editBadge}
                 onChange={(e) => setEditBadge(e.target.value)}
                 placeholder="e.g. Navigation Architecture"
-                className="text-xs h-9 border-primary/30 focus-visible:ring-primary"
+                className="text-xs h-9 border-border focus-visible:ring-ring"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-mono text-primary uppercase tracking-wider font-semibold">
+              <label className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider font-semibold">
                 Page Title
               </label>
               <Input
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                placeholder="Enter page title..."
-                className="font-serif font-bold text-lg h-10 border-primary/30 focus-visible:ring-primary"
-                autoFocus
+                placeholder="e.g. Navigation Menus"
+                className="text-xs h-9 border-border focus-visible:ring-ring"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-mono text-primary uppercase tracking-wider font-semibold">
-                Subtitle / Description
+              <label className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider font-semibold">
+                Description / Subtitle
               </label>
               <Textarea
                 value={editSubtitle}
                 onChange={(e) => setEditSubtitle(e.target.value)}
-                placeholder="Enter page subtitle or curatorial notes..."
+                placeholder="Brief summary of section function..."
                 rows={2}
-                className="text-xs text-muted-foreground resize-none border-primary/30 focus-visible:ring-primary"
+                className="text-xs border-border focus-visible:ring-ring"
               />
             </div>
 
             <div className="flex items-center gap-2 pt-1">
               <Button
                 type="button"
-                variant="gold"
+                variant="default"
                 size="sm"
                 onClick={handleSave}
                 disabled={saving}

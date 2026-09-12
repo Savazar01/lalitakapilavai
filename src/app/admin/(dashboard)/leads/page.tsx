@@ -73,7 +73,7 @@ interface LeadItem {
 const statusColors: Record<string, string> = {
   NEW: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
   CONTACTED: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30",
-  IN_DISCUSSION: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30",
+  IN_DISCUSSION: "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-600/40",
   QUALIFIED: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30",
   CLOSED: "bg-muted text-muted-foreground border-border",
   ARCHIVED: "bg-destructive/10 text-destructive border-destructive/20",
@@ -302,7 +302,7 @@ export default function AdminLeadsPage() {
                           <div className="flex flex-col gap-1">
                             <Badge
                               variant="outline"
-                              className="w-fit text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 flex items-center gap-1"
+                              className="w-fit text-[10px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 flex items-center gap-1 font-semibold"
                             >
                               <QrCode className="w-3 h-3" /> Exhibition Floor QR
                             </Badge>
@@ -489,9 +489,9 @@ export default function AdminLeadsPage() {
               </div>
 
               {selectedLead.sourceArtwork && (
-                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                  <span className="text-[10px] text-amber-700 dark:text-amber-400 uppercase font-semibold flex items-center gap-1">
-                    <QrCode className="w-3 h-3" /> Scanned Exhibition Floor QR Code
+                <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <span className="text-[10px] text-slate-700 dark:text-slate-300 uppercase font-semibold flex items-center gap-1">
+                    <QrCode className="w-3 h-3 text-slate-700 dark:text-slate-300" /> Scanned Exhibition Floor QR Code
                   </span>
                   <p className="text-foreground font-semibold mt-1">
                     {selectedLead.sourceArtwork.title}

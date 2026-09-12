@@ -208,8 +208,8 @@ export function StyleInspector({
   return (
     <aside className="w-80 border-l border-border bg-card/60 backdrop-blur-md p-4 overflow-y-auto max-h-screen text-xs space-y-5">
       <div className="flex items-center justify-between pb-2 border-b border-border">
-        <div className="flex items-center gap-2 font-serif font-bold text-sm text-foreground">
-          <Sliders className="w-4 h-4 text-primary" />
+        <div className="flex items-center gap-2 font-bold text-base text-slate-900 dark:text-slate-100">
+          <Sliders className="w-4 h-4 text-slate-700 dark:text-slate-300" />
           <span>{isSubSection ? "Column Inspector" : "Section Inspector"}</span>
         </div>
       </div>
@@ -457,19 +457,19 @@ export function StyleInspector({
       {/* Background Section with Three-Mode Switcher */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-serif uppercase tracking-wider text-stone-800 dark:text-stone-200 font-bold flex items-center gap-1.5">
-            <Paintbrush className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
+          <label className="text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 font-bold flex items-center gap-1.5">
+            <Paintbrush className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
             Background Mode
           </label>
-          <div className="flex rounded-md bg-stone-100 dark:bg-stone-900 p-0.5 border border-border">
+          <div className="flex rounded-md bg-slate-100 dark:bg-slate-800 p-0.5 border border-border">
             <button
               type="button"
               onClick={() => update("backgroundType", "COLOR")}
               className={cn(
-                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-medium",
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-semibold",
                 (style.backgroundType || "COLOR") === "COLOR"
-                  ? "bg-amber-600 text-white font-semibold shadow-sm"
-                  : "text-stone-600 dark:text-stone-400 hover:text-foreground"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
               )}
             >
               Color
@@ -478,10 +478,10 @@ export function StyleInspector({
               type="button"
               onClick={() => update("backgroundType", "PATTERN")}
               className={cn(
-                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-medium",
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-semibold",
                 style.backgroundType === "PATTERN"
-                  ? "bg-amber-600 text-white font-semibold shadow-sm"
-                  : "text-stone-600 dark:text-stone-400 hover:text-foreground"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
               )}
             >
               Patterns
@@ -490,10 +490,10 @@ export function StyleInspector({
               type="button"
               onClick={() => update("backgroundType", "IMAGE")}
               className={cn(
-                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-medium",
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-semibold",
                 style.backgroundType === "IMAGE"
-                  ? "bg-amber-600 text-white font-semibold shadow-sm"
-                  : "text-stone-600 dark:text-stone-400 hover:text-foreground"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
               )}
             >
               Image
@@ -579,7 +579,7 @@ export function StyleInspector({
                     className={cn(
                       "p-2 rounded-lg border text-left flex flex-col gap-1.5 transition-all cursor-pointer relative overflow-hidden",
                       isSelected
-                        ? "border-amber-500 bg-amber-500/10 ring-1 ring-amber-500 shadow-sm"
+                        ? "border-slate-900 bg-slate-100 ring-1 ring-slate-900 dark:border-slate-100 dark:bg-slate-800 dark:ring-slate-100 shadow-sm"
                         : "border-stone-800 bg-stone-900/60 hover:border-stone-700 hover:bg-muted/30"
                     )}
                   >
@@ -770,8 +770,8 @@ export function StyleInspector({
 
       {/* Typography Styling */}
       <div className="space-y-3">
-        <label className="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider flex items-center gap-1.5 text-xs">
-          <Type className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
+        <label className="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5 text-xs">
+          <Type className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
           Typography
         </label>
 
@@ -857,8 +857,8 @@ export function StyleInspector({
 
       {/* Traditional Indian Framing & Artistic Accents */}
       <div className="space-y-3">
-        <label className="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider flex items-center gap-1.5 text-xs">
-          <Sparkles className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
+        <label className="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5 text-xs">
+          <Sparkles className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
           Fine Art Borders &amp; Accents
         </label>
 

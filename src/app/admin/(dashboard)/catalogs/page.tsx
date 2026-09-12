@@ -372,19 +372,19 @@ export default function AdminCatalogsPage() {
                           {cat.isActive ? "Active" : "Inactive"}
                         </button>
 
-                        <button
-                          type="button"
-                          onClick={() => handleToggleHomepage(cat)}
-                          className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
-                            cat.showOnHomepage
-                              ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
-                              : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
-                          }`}
-                          title="Click to toggle Feature on Homepage"
-                        >
-                          <Home className="w-3 h-3" />
-                          {cat.showOnHomepage ? "On Home" : "Not on Home"}
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleHomepage(cat)}
+                            className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                              cat.showOnHomepage
+                                ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-600/40 hover:bg-blue-200"
+                                : "bg-slate-100 text-slate-500 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:bg-slate-200 opacity-60 hover:opacity-100"
+                            }`}
+                            title="Click to toggle Feature on Homepage"
+                          >
+                            <Home className="w-3 h-3" />
+                            {cat.showOnHomepage ? "On Home" : "Not on Home"}
+                          </button>
                       </div>
                     </div>
                   </div>

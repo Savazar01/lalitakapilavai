@@ -484,25 +484,25 @@ export default function EventsAdminPage() {
                     />
                     <div className="absolute top-2 left-2 flex gap-1">
                       {ev.statusOverride === "FORCE_PAST" ? (
-                        <Badge variant="outline" className="text-[10px] uppercase font-mono bg-background/80 backdrop-blur-sm border-amber-500/40 text-amber-300">
+                        <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                           Forced Past
                         </Badge>
                       ) : ev.statusOverride === "FORCE_UPCOMING" ? (
-                        <Badge variant="gold" className="text-[10px] uppercase font-mono shadow-md">
+                        <Badge variant="outline" className="text-[10px] uppercase font-mono bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-600/40 font-semibold">
                           Forced Upcoming
                         </Badge>
                       ) : eventIsPast ? (
-                        <Badge variant="outline" className="text-[10px] uppercase font-mono bg-background/80 backdrop-blur-sm">
+                        <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700">
                           Concluded
                         </Badge>
                       ) : (
-                        <Badge variant="gold" className="text-[10px] uppercase font-mono shadow-md">
+                        <Badge variant="outline" className="text-[10px] uppercase font-mono bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40 font-semibold">
                           Upcoming
                         </Badge>
                       )}
                     </div>
                     <div className="absolute top-2 right-2 flex gap-1">
-                      <Badge variant="gold" className="text-[10px] uppercase font-mono shadow-md">
+                      <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold shadow-xs">
                         {ev.eventType}
                       </Badge>
                     </div>
@@ -513,11 +513,11 @@ export default function EventsAdminPage() {
                   {!banner && (
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <div className="flex items-center gap-1.5">
-                        <Badge variant="gold" className="text-[10px] uppercase">
+                        <Badge variant="outline" className="text-[10px] uppercase bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-semibold">
                           {ev.eventType}
                         </Badge>
                         {eventIsPast && (
-                          <Badge variant="outline" className="text-[10px] uppercase font-mono">
+                          <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700">
                             Concluded
                           </Badge>
                         )}
@@ -535,7 +535,7 @@ export default function EventsAdminPage() {
                     {ev.title}
                   </CardTitle>
 
-                  <CardDescription className="text-xs font-mono text-primary truncate">
+                  <CardDescription className="text-xs font-mono text-slate-500 dark:text-slate-400 truncate">
                     /{ev.slug}
                   </CardDescription>
 
@@ -546,8 +546,8 @@ export default function EventsAdminPage() {
                       onClick={() => handleToggleActive(ev)}
                       className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                         ev.isActive
-                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20 dark:text-emerald-400"
-                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                          ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40 hover:bg-emerald-200"
+                          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-300 dark:border-slate-700 hover:bg-slate-200"
                       }`}
                       title="Click to toggle Active status"
                     >
@@ -560,8 +560,8 @@ export default function EventsAdminPage() {
                       onClick={() => handleToggleHomepage(ev)}
                       className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                         ev.showOnHomepage
-                          ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
-                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
+                          ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-600/40 hover:bg-blue-200"
+                          : "bg-slate-100 text-slate-500 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:bg-slate-200 opacity-60 hover:opacity-100"
                       }`}
                       title="Click to toggle Feature on Homepage"
                     >

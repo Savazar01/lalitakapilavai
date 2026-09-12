@@ -126,7 +126,7 @@ export function MediaUploader({
         <div className="relative rounded-lg border border-border/80 bg-card/70 p-3 shadow-sm transition-all flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             {isPdf ? (
-              <div className="w-12 h-12 rounded-md bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+              <div className="w-12 h-12 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 shrink-0">
                 <FileText className="w-6 h-6" />
               </div>
             ) : (

@@ -301,8 +301,8 @@ export default function UserManagementPage() {
             setCreateError(null);
             setCreateModalOpen(true);
           }}
-          variant="gold"
-          className="gap-2 shrink-0 shadow-sm text-xs"
+          variant="default"
+          className="shadow-sm cursor-pointer gap-2 text-xs font-semibold"
         >
           <UserPlus className="w-4 h-4" /> Add Administrator
         </Button>
@@ -424,14 +424,14 @@ export default function UserManagementPage() {
 
                     <TableCell>
                       <Badge
-                        variant={
+                        variant="outline"
+                        className={`text-[10px] uppercase font-mono tracking-wider font-semibold ${
                           u.role === "SUPER_ADMIN"
-                            ? "gold"
+                            ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
                             : u.role === "ADMIN"
-                            ? "default"
-                            : "outline"
-                        }
-                        className="text-[10px] uppercase font-mono tracking-wider"
+                            ? "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700"
+                            : "bg-muted text-muted-foreground"
+                        }`}
                       >
                         {u.role}
                       </Badge>
@@ -612,7 +612,7 @@ export default function UserManagementPage() {
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="gold" size="sm" disabled={createLoading}>
+              <Button type="submit" variant="default" size="sm" disabled={createLoading}>
                 {createLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Create Account"}
               </Button>
             </DialogFooter>
@@ -678,7 +678,7 @@ export default function UserManagementPage() {
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="gold" size="sm" disabled={editLoading}>
+              <Button type="submit" variant="default" size="sm" disabled={editLoading}>
                 {editLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save Changes"}
               </Button>
             </DialogFooter>
@@ -727,7 +727,7 @@ export default function UserManagementPage() {
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="gold" size="sm" disabled={passwordLoading}>
+              <Button type="submit" variant="default" size="sm" disabled={passwordLoading}>
                 {passwordLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Update Password"}
               </Button>
             </DialogFooter>

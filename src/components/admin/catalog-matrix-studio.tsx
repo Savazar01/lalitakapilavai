@@ -642,9 +642,9 @@ export function CatalogMatrixStudio({
                   {verticalSpineMode !== "NONE" && (
                     <div
                       style={{ width: verticalSpineWidth || "25%" }}
-                      className="vertical-spine-box rounded-xl border border-dashed border-amber-600/60 bg-amber-500/5 p-2.5 flex flex-col justify-between text-center shrink-0"
+                      className="vertical-spine-box rounded-xl border border-dashed border-slate-400/60 dark:border-slate-600/60 bg-slate-100/50 dark:bg-slate-800/50 p-2.5 flex flex-col justify-between text-center shrink-0"
                     >
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-500">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                         {verticalSpineMode} Spine ({verticalSpineWidth})
                       </span>
                       <div className="text-[11px] text-foreground/80 font-serif my-auto line-clamp-4 overflow-hidden">

@@ -223,7 +223,7 @@ export function DashboardLayoutManager({
             {widgets.length} Active Tiles
           </Badge>
           {isCustomizing && (
-            <span className="text-xs font-semibold text-primary animate-pulse">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 animate-pulse">
               ● Customization Mode Active
             </span>
           )}
@@ -270,13 +270,13 @@ export function DashboardLayoutManager({
               <Card
                 key={widget.id}
                 className={`sm:col-span-2 relative transition-all ${
-                  isCustomizing ? "ring-2 ring-primary/40 border-primary" : "hover:border-primary/50"
+                  isCustomizing ? "ring-2 ring-slate-400/40 border-slate-700 dark:border-slate-300" : "hover:border-slate-400 dark:hover:border-slate-700"
                 }`}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-medium">{widget.title}</CardTitle>
-                    <Badge variant="gold" className="text-[10px]">
+                    <Badge variant="outline" className="text-[10px] bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40 font-semibold">
                       Operational
                     </Badge>
                   </div>
@@ -353,13 +353,13 @@ export function DashboardLayoutManager({
               <Card
                 key={widget.id}
                 className={`sm:col-span-2 relative transition-all ${
-                  isCustomizing ? "ring-2 ring-primary/40 border-primary" : "hover:border-primary/50"
+                  isCustomizing ? "ring-2 ring-slate-400/40 border-slate-700 dark:border-slate-300" : "hover:border-slate-400 dark:hover:border-slate-700"
                 }`}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-medium">{widget.title}</CardTitle>
-                    <IconComponent className="w-4 h-4 text-primary" />
+                    <IconComponent className="w-4 h-4 text-slate-700 dark:text-slate-300" />
                   </div>
                   <CardDescription className="text-xs">
                     {widget.description || "Direct access to management operations"}
@@ -371,7 +371,7 @@ export function DashboardLayoutManager({
                     className="flex items-center justify-between p-2.5 rounded-md bg-secondary/50 hover:bg-secondary border border-border/60 transition-colors"
                   >
                     <span>{widget.metricSub || "Manage Core Archive Catalog"}</span>
-                    <ArrowUpRight className="w-4 h-4 text-primary" />
+                    <ArrowUpRight className="w-4 h-4 text-slate-700 dark:text-slate-300" />
                   </Link>
                 </CardContent>
 
@@ -425,7 +425,7 @@ export function DashboardLayoutManager({
           const cardContent = (
             <Card
               className={`h-full flex flex-col justify-between transition-all ${
-                isCustomizing ? "ring-2 ring-primary/40 border-primary" : "hover:border-primary/60 hover:shadow-md cursor-pointer"
+                isCustomizing ? "ring-2 ring-slate-400/40 border-slate-700 dark:border-slate-300" : "border-border hover:border-slate-400 dark:hover:border-slate-700 hover:shadow-md cursor-pointer"
               }`}
             >
               <div>
@@ -433,7 +433,7 @@ export function DashboardLayoutManager({
                   <CardTitle className="text-sm font-medium text-foreground truncate pr-2">
                     {widget.title}
                   </CardTitle>
-                  <div className="w-8 h-8 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <div className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 shrink-0">
                     <IconComponent className="w-4 h-4" />
                   </div>
                 </CardHeader>
@@ -446,7 +446,7 @@ export function DashboardLayoutManager({
                       {widget.computedSub || widget.metricSub || widget.description || ""}
                     </span>
                     {widget.targetUrl && (
-                      <Badge variant="outline" className="text-[9px] shrink-0">
+                      <Badge variant="outline" className="text-[9px] shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700">
                         View
                       </Badge>
                     )}

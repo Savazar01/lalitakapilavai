@@ -132,8 +132,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Welcome Banner */}
-      <div className="rounded-xl border border-primary/30 bg-gradient-to-br from-card via-card to-primary/5 p-6 sm:p-8 relative overflow-hidden shadow-sm">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="rounded-xl border border-border bg-card p-6 sm:p-8 relative overflow-hidden shadow-sm">
         <EditablePageHeader
           sectionKey="overview"
           defaultTitle="Welcome to Lalita Kapilavai Archive"
@@ -141,7 +140,7 @@ export default async function AdminDashboardPage() {
           badgeLabel="Administrative Overview"
           className="border-b-0 pb-0"
         >
-          <Badge variant="gold" className="shrink-0 text-xs px-3 py-1">
+          <Badge variant="outline" className="shrink-0 text-xs px-3 py-1 font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-semibold">
             PostgreSQL 17 :5633 • Web :3060
           </Badge>
         </EditablePageHeader>

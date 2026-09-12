@@ -544,8 +544,8 @@ function SortableSection({
       style={style}
       className={`relative group rounded-xl border-2 transition-all my-4 overflow-hidden ${
         isSelected
-          ? "border-primary ring-2 ring-primary/20 shadow-lg"
-          : "border-border/60 hover:border-border"
+          ? "border-slate-800 dark:border-slate-300 ring-2 ring-slate-400/20 shadow-lg"
+          : "border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700"
       }`}
     >
       {/* Background Image Dark Overlay */}
@@ -580,14 +580,14 @@ function SortableSection({
           >
             <GripVertical className="w-3.5 h-3.5" />
           </button>
-          <span className="font-serif font-bold text-foreground text-xs flex items-center gap-1.5">
-            <span className="w-5 h-5 rounded bg-primary/15 text-primary text-[10px] flex items-center justify-center font-mono font-bold">
+          <span className="font-bold text-slate-800 dark:text-slate-200 text-xs flex items-center gap-1.5">
+            <span className="w-5 h-5 rounded bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 text-[10px] flex items-center justify-center font-mono font-bold">
               {index + 1}
             </span>
             {section.title || `Section ${index + 1}`}
           </span>
           {section.backgroundType === "PATTERN" && (
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
               Pattern: {section.backgroundPattern || "none"}
             </span>
           )}
@@ -1471,7 +1471,7 @@ function SortableSection({
               <div className="mt-3 pt-2 border-t border-border/40 flex flex-wrap items-center gap-1">
                 <span
                   className={`text-[9px] font-mono mr-1 ${
-                    isSectionLight ? "text-stone-600 font-semibold" : "text-muted-foreground"
+                    isSectionLight ? "text-slate-600 font-semibold" : "text-slate-400 font-semibold"
                   }`}
                 >
                   + Add Row Block:
@@ -1484,8 +1484,8 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
                   + Text
@@ -1498,8 +1498,8 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
                   + Image
@@ -1512,8 +1512,8 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
                   + Video
@@ -1526,8 +1526,8 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
                   + Audio
@@ -1540,8 +1540,8 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
                   + Divider
@@ -1554,8 +1554,8 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-medium ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-border/60 hover:border-primary bg-background/80 hover:bg-accent text-foreground"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
                   + Button
@@ -1568,8 +1568,8 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-stone-100 shadow-xs"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
                   + 4-Col Blog Grid
@@ -1582,11 +1582,11 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-stone-100 shadow-xs"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
-                  <FileText className="w-2.5 h-2.5 text-amber-400" /> + PDF Document
+                  <FileText className="w-2.5 h-2.5 text-slate-500 dark:text-slate-400" /> + PDF Document
                 </button>
                 <button
                   type="button"
@@ -1596,11 +1596,11 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-stone-100 shadow-xs"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
-                  <History className="w-2.5 h-2.5 text-amber-400" /> + Artist Timeline
+                  <History className="w-2.5 h-2.5 text-slate-500 dark:text-slate-400" /> + Artist Timeline
                 </button>
                 <button
                   type="button"
@@ -1610,11 +1610,11 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-stone-100 shadow-xs"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
-                  <FileText className="w-2.5 h-2.5 text-amber-400" /> + Contact / Lead Form
+                  <FileText className="w-2.5 h-2.5 text-slate-500 dark:text-slate-400" /> + Contact / Lead Form
                 </button>
                 <button
                   type="button"
@@ -1624,11 +1624,11 @@ function SortableSection({
                   }}
                   className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
                     isSectionLight
-                      ? "border-stone-400 bg-stone-100 hover:bg-stone-200 text-stone-900 shadow-2xs"
-                      : "border-amber-500/50 hover:border-amber-400 bg-stone-900 hover:bg-stone-850 text-amber-300 shadow-xs"
+                      ? "border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs"
+                      : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-100 shadow-2xs"
                   }`}
                 >
-                  <Images className="w-2.5 h-2.5 text-amber-400" /> + Media Gallery (Carousel/Collage)
+                  <Images className="w-2.5 h-2.5 text-slate-500 dark:text-slate-400" /> + Media Gallery (Carousel/Collage)
                 </button>
               </div>
             </div>
@@ -2131,10 +2131,10 @@ export default function VisualPageBuilder() {
           </Link>
           <div className="h-4 w-px bg-border hidden sm:block" />
           <div className="flex flex-col">
-            <span className="font-serif font-bold text-sm text-foreground truncate max-w-[200px] sm:max-w-xs">
+            <span className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate max-w-[200px] sm:max-w-xs">
               {page.title}
             </span>
-            <span className="text-[10px] font-mono text-amber-900 dark:text-amber-300 font-semibold truncate">
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 font-semibold truncate">
               /{page.slug}
             </span>
           </div>
@@ -2412,7 +2412,7 @@ export default function VisualPageBuilder() {
           {/* Featured InDesign Matrix Engine Card */}
           <div
             onClick={handleAddMatrixSection}
-            className="p-4 rounded-xl border-2 border-primary/70 bg-gradient-to-br from-primary/15 via-card to-amber-500/10 hover:border-primary cursor-pointer transition-all shadow-md group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-1"
+            className="p-4 rounded-xl border border-border bg-card hover:border-slate-400 dark:hover:border-slate-600 cursor-pointer transition-all shadow-md group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-1"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">

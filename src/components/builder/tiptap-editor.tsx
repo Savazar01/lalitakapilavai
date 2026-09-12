@@ -386,12 +386,12 @@ export function TiptapEditor({
   const isLightEffective = effectiveContrast === "light-bg";
 
   const btnInactiveClass = isLightEffective
-    ? "text-stone-800 hover:text-stone-950 hover:bg-stone-200/90 font-medium"
-    : "text-stone-200 hover:text-amber-200 hover:bg-stone-800 font-medium";
+    ? "text-slate-700 hover:text-slate-950 hover:bg-slate-100 font-medium"
+    : "text-slate-300 hover:text-white hover:bg-slate-800 font-medium";
 
   const btnActiveClass = isLightEffective
-    ? "bg-amber-400 text-stone-950 font-bold shadow-xs border border-amber-500"
-    : "bg-stone-900 text-amber-300 font-bold shadow-xs border border-amber-500/60";
+    ? "bg-slate-900 text-white font-semibold shadow-xs border border-slate-900"
+    : "bg-slate-100 text-slate-900 font-semibold shadow-xs border border-slate-200";
 
   return (
     <div className="w-full relative group">
@@ -490,7 +490,7 @@ export function TiptapEditor({
               className={`h-7 text-[11px] font-medium px-1.5 rounded border ${
                 isLight
                   ? "bg-white border-stone-300 text-stone-800 hover:border-stone-400"
-                  : "bg-stone-900 border-amber-500/40 text-stone-100 hover:border-amber-500/70"
+                  : "bg-stone-900 border-border text-stone-100 hover:border-slate-500"
               } cursor-pointer outline-none max-w-[140px]`}
               title="Font Family Presets"
             >
@@ -514,7 +514,7 @@ export function TiptapEditor({
                 className="w-4 h-4 rounded-full border border-border hover:scale-125 transition-transform cursor-pointer overflow-hidden relative shadow-2xs group/auto"
                 title="Default / Auto (Theme-Adaptive Text Color)"
               >
-                <span className="absolute inset-0 bg-gradient-to-tr from-stone-900 via-stone-500 to-amber-100" />
+                <span className="absolute inset-0 bg-gradient-to-tr from-stone-900 via-stone-500 to-stone-200" />
                 <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold text-white opacity-0 group-hover/auto:opacity-100 drop-shadow-xs">
                   A
                 </span>
@@ -750,10 +750,10 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => setImageModalOpen(true)}
-            className={`h-7 w-7 p-0 border border-stone-700/60 bg-stone-900/60 hover:bg-stone-800 ${btnInactiveClass}`}
+            className={`h-7 w-7 p-0 border border-border bg-card/60 hover:bg-accent ${btnInactiveClass}`}
             title="Insert Artwork / Illustration Image"
           >
-            <ImageIcon className="h-3.5 w-3.5 text-amber-400" />
+            <ImageIcon className="h-3.5 w-3.5 text-foreground" />
           </Button>
 
           {/* Horizontal Rule / Divider */}
@@ -762,10 +762,10 @@ export function TiptapEditor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            className={`h-7 w-7 p-0 border border-stone-700/60 bg-stone-900/60 hover:bg-stone-800 ${btnInactiveClass}`}
-            title="Insert Gold Divider"
+            className={`h-7 w-7 p-0 border border-border bg-card/60 hover:bg-accent ${btnInactiveClass}`}
+            title="Insert Divider"
           >
-            <Minus className="h-3.5 w-3.5 text-amber-400" />
+            <Minus className="h-3.5 w-3.5 text-foreground" />
           </Button>
 
           <div className="h-4 w-px bg-border mx-1" />
@@ -777,7 +777,7 @@ export function TiptapEditor({
               editor.chain().focus().insertContent(aiText).run();
             }}
             triggerLabel="AI Polish"
-            triggerClassName="bg-amber-500 text-stone-950 font-bold px-3 py-1 rounded border border-amber-400 hover:bg-amber-400 shadow-sm"
+            triggerClassName="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold px-3 py-1 rounded border border-slate-800 dark:border-slate-200 hover:bg-slate-800 dark:hover:bg-slate-200 shadow-sm"
           />
         </div>
       )}
@@ -942,7 +942,7 @@ export function TiptapEditor({
               </Button>
               <Button
                 type="submit"
-                variant="gold"
+                variant="default"
                 size="sm"
                 disabled={!imageUrl || uploadingImage}
                 className="text-xs"

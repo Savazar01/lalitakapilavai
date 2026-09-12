@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import {
@@ -276,11 +276,11 @@ export function ArtworkBulkImportModal({
                     {auditResult.created}
                   </span>
                 </div>
-                <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-center">
-                  <span className="text-[10px] uppercase font-mono text-amber-600 dark:text-amber-400 block">
+                <div className="p-3 rounded-lg border border-blue-300 bg-blue-50 dark:border-blue-700/40 dark:bg-blue-950/60 text-center">
+                  <span className="text-[10px] uppercase font-mono text-blue-700 dark:text-blue-300 block">
                     Updated
                   </span>
-                  <span className="text-xl font-bold font-mono text-amber-600 dark:text-amber-400">
+                  <span className="text-xl font-bold font-mono text-blue-700 dark:text-blue-300">
                     {auditResult.updated}
                   </span>
                 </div>

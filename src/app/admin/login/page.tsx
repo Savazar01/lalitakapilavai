@@ -53,15 +53,15 @@ function LoginForm() {
   };
 
   return (
-    <Card className="border-2 border-primary/40 shadow-xl overflow-hidden backdrop-blur-sm">
-      {/* Gold header accent line */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600" />
+    <Card className="border border-border shadow-xl overflow-hidden backdrop-blur-sm">
+      {/* High contrast header accent line */}
+      <div className="h-1.5 w-full bg-slate-900 dark:bg-slate-100" />
 
       <CardHeader className="text-center pb-4 pt-6">
-        <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mb-3">
-          <Shield className="w-6 h-6 text-primary" />
+        <div className="mx-auto w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-border flex items-center justify-center mb-3">
+          <Shield className="w-6 h-6 text-foreground" />
         </div>
-        <span className="text-[11px] uppercase tracking-[0.25em] text-primary font-semibold">
+        <span className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground font-semibold">
           Restricted Access
         </span>
         <CardTitle className="text-2xl mt-1 text-foreground font-serif">
@@ -155,7 +155,7 @@ function LoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background selection:bg-primary selection:text-primary-foreground relative">
+    <div className="admin-scope min-h-screen flex flex-col items-center justify-center p-4 bg-background selection:bg-primary selection:text-primary-foreground relative">
       {/* Top right theme toggle */}
       <div className="absolute top-6 right-6">
         <ThemeToggle />

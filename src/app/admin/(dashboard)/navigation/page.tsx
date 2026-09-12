@@ -584,7 +584,7 @@ export default function NavigationManagerPage() {
                           if (!label) setLabel(c.name);
                           setPath(`/gallery/${c.slug}`);
                         }}
-                        className="px-2 py-0.5 rounded text-[11px] font-mono border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/15 text-foreground transition-colors cursor-pointer"
+                        className="px-2 py-0.5 rounded text-[11px] font-mono border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 transition-colors cursor-pointer"
                       >
                         /gallery/{c.slug}
                       </button>

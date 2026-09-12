@@ -51,7 +51,7 @@ export default function AdminDashboardLayout({
   const brandTitle = adminConfig.sidebarBrandTitle || DEFAULT_ADMIN_CONFIG.sidebarBrandTitle;
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground">
+    <div className="admin-scope min-h-screen flex bg-background text-foreground">
       {/* Desktop Sidebar */}
       <Sidebar
         logoUrl={logoUrl}

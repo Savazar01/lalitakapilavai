@@ -1239,7 +1239,7 @@ export default function AdminSettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-6 text-xs">
                   {/* Google App Password Notice */}
-                  <div className="p-3.5 rounded-lg border border-amber-500/30 bg-amber-500/5 text-amber-800 dark:text-amber-300 space-y-1">
+                  <div className="p-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 space-y-1">
                     <p className="font-semibold text-xs flex items-center gap-1.5">
                       <Mail className="w-4 h-4" /> Gmail App Password Integration Guide
                     </p>

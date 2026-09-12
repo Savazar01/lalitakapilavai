@@ -31,10 +31,10 @@ export function ViewportSwitcher({ mode, onChange }: ViewportSwitcherProps) {
             variant={isActive ? "secondary" : "ghost"}
             size="sm"
             onClick={() => onChange(item.mode)}
-            className={`h-8 px-2.5 text-xs gap-1.5 cursor-pointer font-medium ${
+            className={`h-8 px-2.5 text-xs gap-1.5 cursor-pointer font-medium transition-all ${
               isActive
-                ? "bg-amber-500/15 text-amber-900 border border-amber-600/40 dark:bg-amber-500/25 dark:text-amber-200 dark:border-amber-400/40 font-bold shadow-xs"
-                : "text-stone-600 hover:text-stone-900 hover:bg-stone-100 dark:text-stone-400 dark:hover:text-stone-100 dark:hover:bg-stone-800"
+                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold shadow-sm"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
             }`}
           >
             <Icon className="h-3.5 w-3.5" />
@@ -42,7 +42,7 @@ export function ViewportSwitcher({ mode, onChange }: ViewportSwitcherProps) {
           </Button>
         );
       })}
-      <Badge variant="outline" className="text-[10px] ml-1 font-mono">
+      <Badge variant="outline" className="text-[10px] ml-1 font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700">
         {mode === "desktop" ? "1440px" : mode === "tablet" ? "768px" : "375px"}
       </Badge>
     </div>

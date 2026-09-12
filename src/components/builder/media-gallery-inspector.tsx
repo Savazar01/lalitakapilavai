@@ -319,7 +319,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               Gallery Media Items ({items.length})
             </h4>
             {displayMode === "collage" && items.length > 5 && (
-              <Badge variant="outline" className="text-[10px] border-amber-500/50 text-amber-500">
+              <Badge variant="outline" className="text-[10px] border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400">
                 Notice: Bento mode displays first 5 items
               </Badge>
             )}

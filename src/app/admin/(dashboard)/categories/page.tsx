@@ -387,12 +387,12 @@ export default function AdminCategoriesPage() {
                           /{cat.slug}
                         </code>
                         {cat.parent && (
-                          <Badge variant="secondary" className="text-[10px] bg-amber-500/10 text-amber-300 border-amber-500/20 font-medium">
+                          <Badge variant="secondary" className="text-[10px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-medium">
                             Sub of {cat.parent.name}
                           </Badge>
                         )}
                         {cat.children && cat.children.length > 0 && (
-                          <Badge variant="outline" className="text-[10px] border-primary/40 text-primary font-medium">
+                          <Badge variant="outline" className="text-[10px] border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">
                             {cat.children.length} Sub-categories
                           </Badge>
                         )}
@@ -414,8 +414,8 @@ export default function AdminCategoriesPage() {
                     onClick={() => handleToggleActive(cat)}
                     className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                       cat.isActive
-                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20 dark:text-emerald-400"
-                        : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                        ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40 hover:bg-emerald-200"
+                        : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-300 dark:border-slate-700 hover:bg-slate-200"
                     }`}
                     title="Click to toggle Active status"
                   >
@@ -428,8 +428,8 @@ export default function AdminCategoriesPage() {
                     onClick={() => handleToggleHomepage(cat)}
                     className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                       cat.showOnHomepage
-                        ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
-                        : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
+                        ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-600/40 hover:bg-blue-200"
+                        : "bg-slate-100 text-slate-500 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:bg-slate-200 opacity-60 hover:opacity-100"
                     }`}
                     title="Click to toggle Homepage visibility"
                   >

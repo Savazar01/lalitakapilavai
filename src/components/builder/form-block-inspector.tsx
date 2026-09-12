@@ -334,7 +334,7 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
             variant="default"
             size="sm"
             onClick={handleOpenAddField}
-            className="text-xs bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold cursor-pointer"
+            className="text-xs bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 font-semibold cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 mr-1" /> Add Field
           </Button>
@@ -344,7 +344,7 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
           {fields.map((field, idx) => (
             <div
               key={field.id}
-              className="flex items-center justify-between gap-3 p-3 rounded-xl border border-border/80 bg-card hover:border-primary/40 transition-colors shadow-xs"
+              className="flex items-center justify-between gap-3 p-3 rounded-xl border border-border/80 bg-card hover:border-slate-400 dark:hover:border-slate-700 transition-colors shadow-xs"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="w-5 h-5 rounded-full bg-muted text-muted-foreground font-mono text-[10px] flex items-center justify-center font-bold">
@@ -358,7 +358,7 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
                     {field.required && (
                       <Badge
                         variant="outline"
-                        className="text-[9px] px-1.5 py-0 border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 font-mono"
+                        className="text-[9px] px-1.5 py-0 border-rose-300 dark:border-rose-700/40 text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 font-mono font-semibold"
                       >
                         Required
                       </Badge>
@@ -532,7 +532,7 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
               type="button"
               size="sm"
               onClick={handleSaveFieldModal}
-              className="text-xs bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold"
+              className="text-xs bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 font-semibold"
             >
               <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Save Field
             </Button>

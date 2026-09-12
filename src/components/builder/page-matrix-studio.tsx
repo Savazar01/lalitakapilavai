@@ -921,9 +921,9 @@ export function PageMatrixStudio({
                   {verticalSpineMode !== "NONE" && (
                     <div
                       style={{ width: verticalSpineWidth || "25%" }}
-                      className="vertical-spine-box rounded-xl border border-dashed border-amber-600/60 bg-amber-500/5 p-2.5 flex flex-col justify-between text-center shrink-0"
+                      className="vertical-spine-box rounded-xl border border-dashed border-slate-400/60 dark:border-slate-600/60 bg-slate-100/50 dark:bg-slate-800/50 p-2.5 flex flex-col justify-between text-center shrink-0"
                     >
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                         {verticalSpineMode} Spine ({verticalSpineWidth})
                       </span>
                       <div className="text-[11px] text-foreground/80 font-serif my-auto line-clamp-4 overflow-hidden">
@@ -1735,7 +1735,7 @@ export function PageMatrixStudio({
             {/* Vertical Spine */}
             <div className="p-4 rounded-xl border border-border/70 bg-card/50 space-y-2">
               <div className="flex items-center justify-between pb-1 border-b border-border/50">
-                <span className="text-xs font-semibold flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+                <span className="text-xs font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
                   <PanelLeft className="w-3.5 h-3.5" /> Vertical Sidebar Spine
                 </span>
                 <span className="text-[10px] font-mono text-muted-foreground">{verticalSpineMode}</span>

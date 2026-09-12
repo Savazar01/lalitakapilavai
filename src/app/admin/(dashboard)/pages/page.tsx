@@ -418,12 +418,12 @@ export default function PagesAdminPage() {
           {pages.map((p) => {
             const isCorePage = ["home", "blogs", "gallery", "events", "categories"].includes(p.slug);
             return (
-              <Card key={p.id} className="hover:border-primary/50 transition-all flex flex-col justify-between">
+              <Card key={p.id} className="hover:border-slate-400 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       {p.eyebrowTag && (
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-900 dark:text-amber-300 block mb-0.5 truncate">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-0.5 truncate">
                           {p.eyebrowTag}
                         </span>
                       )}
@@ -433,18 +433,25 @@ export default function PagesAdminPage() {
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       {isCorePage && (
-                        <Badge variant="outline" className="text-[9px] border-amber-600/40 text-amber-900 dark:text-amber-300 font-bold">
+                        <Badge variant="outline" className="text-[9px] border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold">
                           Core
                         </Badge>
                       )}
-                      <Badge variant={p.isPublished ? "gold" : "outline"} className="text-[10px] uppercase">
+                      <Badge
+                        variant="outline"
+                        className={`text-[10px] uppercase font-semibold ${
+                          p.isPublished
+                            ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40"
+                            : "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                        }`}
+                      >
                         {p.isPublished ? "Published" : "Draft"}
                       </Badge>
                     </div>
                   </div>
-                  <CardDescription className="text-xs font-mono text-stone-600 dark:text-stone-300 flex items-center justify-between mt-1">
-                    <span className="font-semibold text-amber-900 dark:text-amber-300">/{p.slug}</span>
-                    <span className="text-[10px] text-stone-500 dark:text-stone-400 font-sans">Order: {p.sortOrder || 0}</span>
+                  <CardDescription className="text-xs font-mono text-slate-600 dark:text-slate-400 flex items-center justify-between mt-1">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">/{p.slug}</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans">Order: {p.sortOrder || 0}</span>
                   </CardDescription>
 
                   {/* Visibility & Display Toggles */}
@@ -454,8 +461,8 @@ export default function PagesAdminPage() {
                       onClick={() => handleToggleActive(p)}
                       className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                         p.isActive
-                          ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/25"
-                          : "bg-muted text-stone-600 dark:text-stone-400 border-border hover:bg-muted/80"
+                          ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-600/40 hover:bg-emerald-200"
+                          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-300 dark:border-slate-700 hover:bg-slate-200"
                       }`}
                       title="Click to toggle Active status"
                     >
@@ -468,8 +475,8 @@ export default function PagesAdminPage() {
                       onClick={() => handleToggleHomepage(p)}
                       className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                         p.showOnHomepage
-                          ? "bg-amber-500/15 text-amber-900 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/25"
-                          : "bg-muted text-stone-500 dark:text-stone-400 border-border hover:bg-muted/80 opacity-70 hover:opacity-100"
+                          ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-600/40 hover:bg-blue-200"
+                          : "bg-slate-100 text-slate-500 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:bg-slate-200 opacity-70 hover:opacity-100"
                       }`}
                       title="Click to toggle Homepage visibility"
                     >

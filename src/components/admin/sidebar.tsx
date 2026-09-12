@@ -91,15 +91,15 @@ export function Sidebar({
               className="h-8 w-auto max-w-[100px] object-contain rounded"
             />
           ) : (
-            <div className="w-8 h-8 rounded-md bg-primary/20 border border-primary/40 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-primary" />
+            <div className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-800 border border-border flex items-center justify-center">
+              <Shield className="w-4 h-4 text-slate-800 dark:text-slate-200" />
             </div>
           )}
           <div className="flex flex-col">
-            <span className="font-serif font-bold text-sm leading-tight text-foreground">
+            <span className="font-serif font-bold text-sm leading-tight text-slate-900 dark:text-slate-100">
               {brandTitle}
             </span>
-            <span className="text-[10px] text-amber-900 dark:text-amber-300 uppercase tracking-widest font-semibold">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold">
               {brandSubtitle}
             </span>
           </div>
@@ -108,7 +108,7 @@ export function Sidebar({
 
       {/* Dynamic Navigation list */}
       <nav className="flex flex-col gap-1.5 p-4 flex-1 overflow-y-auto">
-        <div className="px-3 py-2 text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">
+        <div className="px-3 py-2 text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">
           Platform Management
         </div>
         {ADMIN_NAV_ITEMS.filter((item) => !item.superAdminOnly || isSuperAdmin).map((item) => {
@@ -125,15 +125,15 @@ export function Sidebar({
               key={item.href}
               href={item.href}
               onClick={onItemClick}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all ${
                 isActive
-                  ? "bg-amber-500/15 text-amber-900 dark:text-amber-200 font-bold border-l-2 border-amber-600 dark:border-amber-400"
-                  : "text-stone-700 hover:text-stone-900 hover:bg-accent dark:text-stone-400 dark:hover:text-stone-200"
+                  ? "bg-slate-900 text-white dark:bg-slate-800 dark:text-white font-semibold shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/60 font-medium"
               }`}
             >
               <Icon
                 className={`w-4 h-4 shrink-0 ${
-                  isActive ? "text-amber-700 dark:text-amber-300" : "text-muted-foreground"
+                  isActive ? "text-white" : "text-slate-500 dark:text-slate-400"
                 }`}
               />
               <span className="truncate">{label}</span>
@@ -157,7 +157,7 @@ export function Sidebar({
               {session?.user?.email || "admin@lalitakapilavai.com"}
             </span>
           </div>
-          <Badge variant="gold" className="text-[10px] uppercase">
+          <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-semibold">
             {(session?.user as { role?: string } | undefined)?.role || "SUPER_ADMIN"}
           </Badge>
         </Link>
@@ -166,7 +166,7 @@ export function Sidebar({
           <Link
             href="/"
             target="_blank"
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             Live Site
