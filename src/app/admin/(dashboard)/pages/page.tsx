@@ -423,7 +423,7 @@ export default function PagesAdminPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       {p.eyebrowTag && (
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80 block mb-0.5 truncate">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-900 dark:text-amber-300 block mb-0.5 truncate">
                           {p.eyebrowTag}
                         </span>
                       )}
@@ -433,7 +433,7 @@ export default function PagesAdminPage() {
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       {isCorePage && (
-                        <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-600 dark:text-amber-400">
+                        <Badge variant="outline" className="text-[9px] border-amber-600/40 text-amber-900 dark:text-amber-300 font-bold">
                           Core
                         </Badge>
                       )}
@@ -442,9 +442,9 @@ export default function PagesAdminPage() {
                       </Badge>
                     </div>
                   </div>
-                  <CardDescription className="text-xs font-mono text-primary flex items-center justify-between mt-1">
-                    <span>/{p.slug}</span>
-                    <span className="text-[10px] text-muted-foreground font-sans">Order: {p.sortOrder || 0}</span>
+                  <CardDescription className="text-xs font-mono text-stone-600 dark:text-stone-300 flex items-center justify-between mt-1">
+                    <span className="font-semibold text-amber-900 dark:text-amber-300">/{p.slug}</span>
+                    <span className="text-[10px] text-stone-500 dark:text-stone-400 font-sans">Order: {p.sortOrder || 0}</span>
                   </CardDescription>
 
                   {/* Visibility & Display Toggles */}
@@ -452,10 +452,10 @@ export default function PagesAdminPage() {
                     <button
                       type="button"
                       onClick={() => handleToggleActive(p)}
-                      className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                      className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                         p.isActive
-                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20 dark:text-emerald-400"
-                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                          ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/25"
+                          : "bg-muted text-stone-600 dark:text-stone-400 border-border hover:bg-muted/80"
                       }`}
                       title="Click to toggle Active status"
                     >
@@ -466,10 +466,10 @@ export default function PagesAdminPage() {
                     <button
                       type="button"
                       onClick={() => handleToggleHomepage(p)}
-                      className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
+                      className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                         p.showOnHomepage
-                          ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20 dark:text-amber-400"
-                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80 opacity-60 hover:opacity-100"
+                          ? "bg-amber-500/15 text-amber-900 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/25"
+                          : "bg-muted text-stone-500 dark:text-stone-400 border-border hover:bg-muted/80 opacity-70 hover:opacity-100"
                       }`}
                       title="Click to toggle Homepage visibility"
                     >

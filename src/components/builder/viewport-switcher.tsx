@@ -31,10 +31,10 @@ export function ViewportSwitcher({ mode, onChange }: ViewportSwitcherProps) {
             variant={isActive ? "secondary" : "ghost"}
             size="sm"
             onClick={() => onChange(item.mode)}
-            className={`h-8 px-2.5 text-xs gap-1.5 cursor-pointer ${
+            className={`h-8 px-2.5 text-xs gap-1.5 cursor-pointer font-medium ${
               isActive
-                ? "bg-primary/15 text-primary border border-primary/40 font-semibold"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-amber-500/15 text-amber-900 border border-amber-600/40 dark:bg-amber-500/25 dark:text-amber-200 dark:border-amber-400/40 font-bold shadow-xs"
+                : "text-stone-600 hover:text-stone-900 hover:bg-stone-100 dark:text-stone-400 dark:hover:text-stone-100 dark:hover:bg-stone-800"
             }`}
           >
             <Icon className="h-3.5 w-3.5" />

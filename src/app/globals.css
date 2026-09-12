@@ -19,9 +19,9 @@
     --popover: #FFFFFF;
     --popover-foreground: #1A1A1A;
 
-    /* Primary: Antique Temple Gold */
-    --primary: #D4AF37;
-    --primary-foreground: #1A1A1A;
+    /* Primary: Deep Antique Gold / Bronze for WCAG AA readability on Parchment & White */
+    --primary: #8C6512;
+    --primary-foreground: #FFFFFF;
 
     /* Secondary: Madder Terracotta / Raw Silk */
     --secondary: #F3EBDD;
@@ -29,17 +29,17 @@
 
     /* Accent & Crimson Highlights */
     --accent: #F7F0E3;
-    --accent-foreground: #A3281E;
+    --accent-foreground: #6B4D0D;
 
     --muted: #EFE9DC;
-    --muted-foreground: #6E675F;
+    --muted-foreground: #57534E;
 
     --destructive: #A3281E;
     --destructive-foreground: #FFFFFF;
 
     --border: #E8E2D5;
     --input: #E8E2D5;
-    --ring: #D4AF37;
+    --ring: #8C6512;
 
     --radius: 0.5rem;
   }

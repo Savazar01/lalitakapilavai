@@ -77,7 +77,7 @@ export function PdfViewerBlock({
             <a
               href={fileUrl}
               download={fileName || "document.pdf"}
-              className="w-full py-2.5 px-4 rounded-lg border border-amber-500/40 hover:bg-amber-500/10 text-amber-200 font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-lg border border-amber-600/40 hover:bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               Download Document

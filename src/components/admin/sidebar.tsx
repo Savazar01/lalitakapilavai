@@ -99,7 +99,7 @@ export function Sidebar({
             <span className="font-serif font-bold text-sm leading-tight text-foreground">
               {brandTitle}
             </span>
-            <span className="text-[10px] text-primary uppercase tracking-widest font-semibold">
+            <span className="text-[10px] text-amber-900 dark:text-amber-300 uppercase tracking-widest font-semibold">
               {brandSubtitle}
             </span>
           </div>
@@ -127,13 +127,13 @@ export function Sidebar({
               onClick={onItemClick}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-primary/15 text-primary font-semibold border-l-2 border-primary"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  ? "bg-amber-500/15 text-amber-900 dark:text-amber-200 font-bold border-l-2 border-amber-600 dark:border-amber-400"
+                  : "text-stone-700 hover:text-stone-900 hover:bg-accent dark:text-stone-400 dark:hover:text-stone-200"
               }`}
             >
               <Icon
                 className={`w-4 h-4 shrink-0 ${
-                  isActive ? "text-primary" : "text-muted-foreground"
+                  isActive ? "text-amber-700 dark:text-amber-300" : "text-muted-foreground"
                 }`}
               />
               <span className="truncate">{label}</span>

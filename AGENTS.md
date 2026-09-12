@@ -136,4 +136,22 @@ To prevent unreadable/invisible text when users toggle Dark, Light, or System th
    - Conflicting monochrome inline color attributes (`color: #000000` on dark backgrounds or `color: #ffffff` on light backgrounds) are sanitized dynamically based on the resolved container contrast mode.
    - In `TiptapEditor` (`src/components/builder/tiptap-editor.tsx`), the editor content and toolbar reflect the container's contrast mode in real-time, preventing black-on-dark or white-on-light composition in admin studios.
 
+---
+
+## 8. Admin Portal Dual-Theme Contrast Invariant
+To ensure 100% readability across Light, Dark, and System modes in admin management screens:
+
+1. **No Static Pale Accents Without Dark Variants**:
+   - Static pale text colors (`text-amber-100`, `text-amber-200`, `text-yellow-100`, `text-[#E8DCC4]`, `text-stone-300`) MUST NOT be used without a corresponding `dark:` variant.
+2. **Mandatory Dual-Theme Pairing for Gold/Accent Typography**:
+   - In Light Mode: Gold accents, tags, and section headers must resolve to deep warm bronze / rich antique gold (`text-amber-900`, `text-[#785416]`, or `text-amber-800`), achieving WCAG AA contrast (> 4.5:1) against `#FAF7F2` parchment or white cards.
+   - In Dark Mode: Gold accents resolve to radiant pale gold (`dark:text-amber-200` or `dark:text-amber-300`).
+   - Pairing standard: `text-amber-900 dark:text-amber-200` (or `dark:text-amber-300`).
+3. **Muted Labels & Metadata**:
+   - Secondary subtitles, route slugs, breadcrumbs, and order numbers must use `text-stone-600 dark:text-stone-400`.
+4. **Curatorial Badges & Status Pills**:
+   - Gold badges must use `bg-amber-500/10 text-amber-900 border-amber-600/30 dark:bg-amber-500/20 dark:text-amber-200 dark:border-amber-400/40`.
+   - Active status pills must use `bg-emerald-500/15 text-emerald-800 border-emerald-500/40 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-500/40`.
+
+
 

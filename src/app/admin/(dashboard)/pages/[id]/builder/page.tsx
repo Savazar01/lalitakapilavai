@@ -2134,7 +2134,7 @@ export default function VisualPageBuilder() {
             <span className="font-serif font-bold text-sm text-foreground truncate max-w-[200px] sm:max-w-xs">
               {page.title}
             </span>
-            <span className="text-[10px] font-mono text-primary truncate">
+            <span className="text-[10px] font-mono text-amber-900 dark:text-amber-300 font-semibold truncate">
               /{page.slug}
             </span>
           </div>

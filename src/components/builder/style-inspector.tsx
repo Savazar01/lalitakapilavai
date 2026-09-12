@@ -457,19 +457,19 @@ export function StyleInspector({
       {/* Background Section with Three-Mode Switcher */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-serif uppercase tracking-wider text-amber-200/80 font-semibold flex items-center gap-1.5">
-            <Paintbrush className="w-3.5 h-3.5 text-primary" />
+          <label className="text-xs font-serif uppercase tracking-wider text-stone-800 dark:text-stone-200 font-bold flex items-center gap-1.5">
+            <Paintbrush className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
             Background Mode
           </label>
-          <div className="flex rounded-md bg-stone-900 p-0.5 border border-stone-800">
+          <div className="flex rounded-md bg-stone-100 dark:bg-stone-900 p-0.5 border border-border">
             <button
               type="button"
               onClick={() => update("backgroundType", "COLOR")}
               className={cn(
-                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer",
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-medium",
                 (style.backgroundType || "COLOR") === "COLOR"
-                  ? "bg-amber-600 text-white font-medium shadow-sm"
-                  : "text-stone-400 hover:text-white"
+                  ? "bg-amber-600 text-white font-semibold shadow-sm"
+                  : "text-stone-600 dark:text-stone-400 hover:text-foreground"
               )}
             >
               Color
@@ -478,10 +478,10 @@ export function StyleInspector({
               type="button"
               onClick={() => update("backgroundType", "PATTERN")}
               className={cn(
-                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer",
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-medium",
                 style.backgroundType === "PATTERN"
-                  ? "bg-amber-600 text-white font-medium shadow-sm"
-                  : "text-stone-400 hover:text-white"
+                  ? "bg-amber-600 text-white font-semibold shadow-sm"
+                  : "text-stone-600 dark:text-stone-400 hover:text-foreground"
               )}
             >
               Patterns
@@ -490,10 +490,10 @@ export function StyleInspector({
               type="button"
               onClick={() => update("backgroundType", "IMAGE")}
               className={cn(
-                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer",
+                "px-2.5 py-1 text-xs rounded transition-all cursor-pointer font-medium",
                 style.backgroundType === "IMAGE"
-                  ? "bg-amber-600 text-white font-medium shadow-sm"
-                  : "text-stone-400 hover:text-white"
+                  ? "bg-amber-600 text-white font-semibold shadow-sm"
+                  : "text-stone-600 dark:text-stone-400 hover:text-foreground"
               )}
             >
               Image
@@ -770,8 +770,8 @@ export function StyleInspector({
 
       {/* Typography Styling */}
       <div className="space-y-3">
-        <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <Type className="w-3.5 h-3.5 text-primary" />
+        <label className="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider flex items-center gap-1.5 text-xs">
+          <Type className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
           Typography
         </label>
 
@@ -857,8 +857,8 @@ export function StyleInspector({
 
       {/* Traditional Indian Framing & Artistic Accents */}
       <div className="space-y-3">
-        <label className="font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
+        <label className="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider flex items-center gap-1.5 text-xs">
+          <Sparkles className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
           Fine Art Borders &amp; Accents
         </label>
 
