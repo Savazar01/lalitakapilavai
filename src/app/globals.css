@@ -499,3 +499,64 @@ body {
     grid-column: span 1 !important;
   }
 }
+
+/* ==========================================================================
+   MULTI-TENANT CONTAINER CONTRAST ENGINE (WCAG AAA SCOPED INVARIANTS)
+   ========================================================================== */
+.force-contrast-light {
+  color-scheme: light !important;
+  color: var(--current-body, #1E293B) !important;
+}
+
+.force-contrast-light h1,
+.force-contrast-light h2,
+.force-contrast-light h3,
+.force-contrast-light h4,
+.force-contrast-light h5,
+.force-contrast-light h6,
+.force-contrast-light .font-serif,
+.force-contrast-light [data-slot="heading"] {
+  color: var(--current-heading, #0F172A) !important;
+}
+
+.force-contrast-light p,
+.force-contrast-light li,
+.force-contrast-light blockquote,
+.force-contrast-light span:not([style*="color"]) {
+  color: var(--current-body, #1E293B);
+}
+
+.force-contrast-light .text-muted-foreground,
+.force-contrast-light .opacity-90,
+.force-contrast-light .opacity-80 {
+  color: var(--current-muted, #475569) !important;
+}
+
+.force-contrast-dark {
+  color-scheme: dark !important;
+  color: var(--current-body, #F8FAFC) !important;
+}
+
+.force-contrast-dark h1,
+.force-contrast-dark h2,
+.force-contrast-dark h3,
+.force-contrast-dark h4,
+.force-contrast-dark h5,
+.force-contrast-dark h6,
+.force-contrast-dark .font-serif,
+.force-contrast-dark [data-slot="heading"] {
+  color: var(--current-heading, #FFFFFF) !important;
+}
+
+.force-contrast-dark p,
+.force-contrast-dark li,
+.force-contrast-dark blockquote,
+.force-contrast-dark span:not([style*="color"]) {
+  color: var(--current-body, #F8FAFC);
+}
+
+.force-contrast-dark .text-muted-foreground,
+.force-contrast-dark .opacity-90,
+.force-contrast-dark .opacity-80 {
+  color: var(--current-muted, #94A3B8) !important;
+}

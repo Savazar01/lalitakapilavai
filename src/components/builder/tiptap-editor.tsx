@@ -35,6 +35,13 @@ import {
   Shapes,
   Music,
   Table,
+  Maximize2,
+  Minimize2,
+  Type,
+  Columns,
+  FileDown,
+  Clock,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -319,12 +326,37 @@ export function TiptapEditor({
     }
   }, [editor, parsedContent]);
 
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
   const [linkModalOpen, setLinkModalOpen] = React.useState(false);
   const [linkUrl, setLinkUrl] = React.useState("");
   const [imageModalOpen, setImageModalOpen] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState("");
   const [imageCaption, setImageCaption] = React.useState("");
   const [uploadingImage, setUploadingImage] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isFullscreen) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setIsFullscreen(false);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = origOverflow;
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [isFullscreen]);
+
+  const editorText = editor ? editor.getText() : "";
+  const wordCount = React.useMemo(() => {
+    const trimmed = editorText.trim();
+    return trimmed ? trimmed.split(/\s+/).length : 0;
+  }, [editorText]);
+  const charCount = editorText.length;
 
   if (!editor) {
     return null;
@@ -398,7 +430,13 @@ export function TiptapEditor({
   const btnActiveClass = "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 font-bold shadow-xs";
 
   return (
-    <div className="w-full relative group">
+    <div
+      className={cn(
+        "w-full relative group transition-all",
+        isFullscreen &&
+          "fixed inset-0 z-50 bg-background/98 backdrop-blur-md p-4 sm:p-8 flex flex-col h-screen w-screen overflow-hidden shadow-2xl"
+      )}
+    >
       {/* Floating / Sticky Inline Action Toolbar (visible when editable) */}
       {!readOnly && (
         <div
@@ -862,14 +900,38 @@ export function TiptapEditor({
             triggerLabel="AI Polish"
             triggerClassName="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold px-3 py-1 rounded border border-slate-800 dark:border-slate-200 hover:bg-slate-800 dark:hover:bg-slate-200 shadow-sm"
           />
+
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
+
+          {/* Fullscreen Expansion Studio Toggle */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className={cn(btnBaseClass, btnInactiveClass, "ml-auto")}
+            title={isFullscreen ? "Exit Fullscreen Studio (Esc)" : "Expand to Fullscreen Studio"}
+          >
+            {isFullscreen ? (
+              <Minimize2 className="h-4 w-4 text-primary" />
+            ) : (
+              <Maximize2 className="h-4 w-4" />
+            )}
+          </Button>
         </div>
       )}
 
       {/* Live Content Surface */}
-      <EditorContent
-        editor={editor}
-        className={cn(getContrastTypographyClasses(effectiveContrast), "min-h-[80px] outline-none")}
-      />
+      <div className={cn("relative", isFullscreen && "flex-1 overflow-y-auto pr-2")}>
+        <EditorContent
+          editor={editor}
+          className={cn(
+            getContrastTypographyClasses(effectiveContrast),
+            isFullscreen ? "min-h-[400px]" : "min-h-[80px]",
+            "outline-none"
+          )}
+        />
+      </div>
 
       {/* Standardized Bottom Quick-Block Inserters Bar */}
       {editor && !readOnly && (
@@ -878,7 +940,71 @@ export function TiptapEditor({
             + Quick Blocks:
           </span>
 
-          {/* 1. Add Divider */}
+          {/* 1. Text Paragraph */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent("<p>Write reflective narrative, verse, or commentary...</p>")
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Paragraph Block"
+          >
+            <Type className="w-3 h-3 text-primary" />
+            Text
+          </button>
+
+          {/* 2. Large Heading */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent("<h2>Sacred Section Heading</h2>")
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Section Heading"
+          >
+            <Heading2 className="w-3 h-3 text-primary" />
+            Heading
+          </button>
+
+          {/* 3. Callout Quote */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "blockquote",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        {
+                          type: "text",
+                          text: "“The essence of Carnatic nada and Tanjore gold relief coalesce into pure contemplation.”",
+                        },
+                      ],
+                    },
+                  ],
+                })
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Callout Epigraph Quote"
+          >
+            <Quote className="w-3 h-3 text-primary" />
+            Callout Quote
+          </button>
+
+          {/* 4. Visual Divider */}
           <button
             type="button"
             onClick={() =>
@@ -904,7 +1030,7 @@ export function TiptapEditor({
             Divider
           </button>
 
-          {/* 2. Insert Shape */}
+          {/* 5. Cultural Shape & Geometry */}
           <button
             type="button"
             onClick={() =>
@@ -942,7 +1068,7 @@ export function TiptapEditor({
             Shape Block
           </button>
 
-          {/* 3. Image Block */}
+          {/* 6. High-Res Image Block */}
           <button
             type="button"
             onClick={() => setImageModalOpen(true)}
@@ -953,52 +1079,22 @@ export function TiptapEditor({
             Image Block
           </button>
 
-          {/* 4. Callout Quote */}
+          {/* 7. Audio / Raga Meditation Snippet */}
           <button
             type="button"
             onClick={() =>
               editor
                 .chain()
                 .focus()
-                .insertContent({
-                  type: "blockquote",
-                  content: [
-                    {
-                      type: "paragraph",
-                      content: [
-                        {
-                          type: "text",
-                          text: "“The essence of Carnatic nada and Tanjore gold relief coalesce into pure contemplation.”",
-                        },
-                      ],
-                    },
-                  ],
-                })
-                .run()
-            }
-            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
-            title="Insert Callout Epigraph Quote"
-          >
-            <Quote className="w-3 h-3 text-primary" />
-            Callout Quote
-          </button>
-
-          {/* 5. Audio / Raga Block */}
-          <button
-            type="button"
-            onClick={() =>
-              editor
-                .chain()
-                .focus()
-                .insertContent({
-                  type: "paragraph",
-                  content: [
-                    {
-                      type: "text",
-                      text: "🎵 Raga Meditation: Kalyani (Adi Tala) — Pure Melodic Elevation.",
-                    },
-                  ],
-                })
+                .insertContent(
+                  `<div class="my-4 p-4 rounded-xl border border-primary/30 bg-primary/5 flex items-center gap-3">
+                    <span class="text-xl">🎵</span>
+                    <div>
+                      <h4 class="font-serif font-bold text-sm text-foreground">Carnatic Raga Meditation: Kalyani</h4>
+                      <p class="text-xs text-muted-foreground">Adi Tala • Tyagaraja Kriti • Rendition by Lalita Kapilavai</p>
+                    </div>
+                  </div>`
+                )
                 .run()
             }
             className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
@@ -1008,7 +1104,7 @@ export function TiptapEditor({
             Audio / Raga
           </button>
 
-          {/* 6. Specs Table */}
+          {/* 8. Curatorial Specs Table */}
           <button
             type="button"
             onClick={() =>
@@ -1042,8 +1138,112 @@ export function TiptapEditor({
             Specs Table
           </button>
 
-          {/* 7. AI Polish */}
-          <div className="ml-auto">
+          {/* 9. CTA Button / Commission Link */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent(
+                  `<p class="my-3 text-center"><a href="/contact" class="inline-block px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium text-xs tracking-wide shadow-sm hover:opacity-90">Inquire for Private Commission</a></p>`
+                )
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert CTA Button"
+          >
+            <Sparkles className="w-3 h-3 text-primary" />
+            CTA Button
+          </button>
+
+          {/* 10. Responsive Two-Column Layout */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent(
+                  `<div class="my-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-3.5 rounded-lg border border-border bg-card/60">
+                      <h4 class="font-serif font-semibold text-sm">Column 1: Iconographic Lineage</h4>
+                      <p class="text-xs text-muted-foreground mt-1">Detailed descriptions of traditional Tanjore gold embossing methods.</p>
+                    </div>
+                    <div class="p-3.5 rounded-lg border border-border bg-card/60">
+                      <h4 class="font-serif font-semibold text-sm">Column 2: Musical Symbiosis</h4>
+                      <p class="text-xs text-muted-foreground mt-1">Devotional lyrical parallels corresponding to the visual depiction.</p>
+                    </div>
+                  </div>`
+                )
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert 2-Column Responsive Layout"
+          >
+            <Columns className="w-3 h-3 text-primary" />
+            2-Col Layout
+          </button>
+
+          {/* 11. Curatorial PDF Dossier Card */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent(
+                  `<div class="my-4 p-3.5 rounded-xl border border-border bg-muted/20 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-base">📄</span>
+                      <div>
+                        <div class="font-serif font-bold text-xs text-foreground">Curatorial Catalog &amp; Provenance Dossier</div>
+                        <div class="text-[10px] text-muted-foreground">Archival PDF • Atelier Lalita Kapilavai</div>
+                      </div>
+                    </div>
+                    <a href="#" class="text-xs font-mono text-primary font-semibold hover:underline">Download Archive</a>
+                  </div>`
+                )
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Curatorial PDF Card"
+          >
+            <FileDown className="w-3 h-3 text-primary" />
+            PDF Dossier
+          </button>
+
+          {/* 12. Cultural Timeline / Milestones */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent(
+                  `<div class="my-4 space-y-2 border-l-2 border-primary/50 pl-3">
+                    <div class="text-xs font-serif font-bold text-foreground">Phase I: Sacred Gesso &amp; Embossing</div>
+                    <p class="text-xs text-muted-foreground">Preparation of unbleached muslin, tamarind seed paste, and French chalk relief.</p>
+                    <div class="text-xs font-serif font-bold text-foreground mt-2">Phase II: 22k Gold Foil Gilding</div>
+                    <p class="text-xs text-muted-foreground">Precision application of authentic gold leaf with semi-precious Jaipur gemstones.</p>
+                  </div>`
+                )
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Timeline Milestones"
+          >
+            <Clock className="w-3 h-3 text-primary" />
+            Timeline
+          </button>
+
+          {/* Word & Character Counts + AI Polish */}
+          <div className="ml-auto flex items-center gap-3">
+            <div className="text-[11px] font-mono text-muted-foreground select-none hidden sm:inline-flex items-center gap-1.5">
+              <span>{wordCount} words</span>
+              <span>•</span>
+              <span>{charCount} chars</span>
+            </div>
             <AiAssistantModal
               initialContext={editor.getText()}
               onApply={(aiText) => {

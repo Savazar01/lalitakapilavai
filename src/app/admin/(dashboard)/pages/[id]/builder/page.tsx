@@ -66,6 +66,7 @@ import {
   reconcilePageMatrixCells,
 } from "@/components/builder/page-matrix-studio";
 import {
+  resolveContainerThemeScope,
   resolveContainerContrast,
   getContrastTypographyClasses,
 } from "@/lib/theme-contrast";
@@ -194,7 +195,19 @@ function SortableSection({
     section.backgroundSize === "contain" ||
     (section.customCssClass && section.customCssClass.includes("bg-contain"));
 
+  const sectionScope = resolveContainerThemeScope({
+    backgroundType: section.backgroundType || undefined,
+    backgroundColor: section.backgroundColor,
+    backgroundImage: section.backgroundImage,
+    overlayOpacity: section.backgroundOverlayOpacity,
+    backgroundPattern: section.backgroundPattern,
+  });
+  const sectionContrast = sectionScope.legacyMode;
+  const isSectionLight = sectionScope.contrastMode === "light-surface";
+  const sectionTypographyClasses = getContrastTypographyClasses(sectionScope.contrastMode);
+
   const style: React.CSSProperties = {
+    ...sectionScope.wrapperStyle,
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
@@ -210,16 +223,6 @@ function SortableSection({
         }
       : {}),
   };
-
-  const sectionContrast = resolveContainerContrast({
-    backgroundType: section.backgroundType || undefined,
-    backgroundColor: section.backgroundColor,
-    backgroundImage: section.backgroundImage,
-    overlayOpacity: section.backgroundOverlayOpacity,
-    backgroundPattern: section.backgroundPattern,
-  });
-  const isSectionLight = sectionContrast === "light-bg";
-  const sectionTypographyClasses = getContrastTypographyClasses(sectionContrast);
 
   const addBlockToCol = (colIdx: number, type: ColumnBlock["type"]) => {
     const col = section.subSections[colIdx];
@@ -537,7 +540,7 @@ function SortableSection({
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group rounded-xl border-2 transition-all my-4 overflow-hidden ${
+      className={`relative group rounded-xl border-2 transition-all my-4 overflow-hidden ${sectionScope.wrapperClass} ${sectionTypographyClasses} ${
         isSelected
           ? "border-slate-800 dark:border-slate-300 ring-2 ring-slate-400/20 shadow-lg"
           : "border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700"

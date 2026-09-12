@@ -20,7 +20,14 @@ import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/tim
 import { DynamicFormBlock, FormFieldConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
 import { cn } from "@/lib/utils";
-import { type ContrastMode, getContrastTypographyClasses } from "@/lib/theme-contrast";
+import {
+  type ContrastMode,
+  type DynamicContrastScope,
+  getContrastTypographyClasses,
+  parseColorToRgb,
+  computeRelativeLuminance,
+  getColorSaturation,
+} from "@/lib/theme-contrast";
 
 interface TiptapMark {
   type: string;
@@ -54,7 +61,7 @@ interface MediaBlockConfig {
 export interface TiptapRendererProps {
   content: Record<string, unknown> | string | null | undefined;
   className?: string;
-  contrast?: ContrastMode;
+  contrast?: ContrastMode | DynamicContrastScope;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -75,49 +82,52 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
  * Strips conflicting hardcoded monochrome inline styles based on container contrast
  * so typography dynamically inherits container or theme foreground.
  */
-export function sanitizeAdaptiveThemeHtml(html: string, contrast: ContrastMode = "auto"): string {
+export function sanitizeAdaptiveThemeHtml(
+  html: string,
+  contrast: ContrastMode | DynamicContrastScope = "auto"
+): string {
   if (!html) return "";
 
-  if (contrast === "light-bg") {
-    // In light background containers: strip white/light inline colors so text stays dark charcoal
-    return html
-      .replace(
-        /style="([^"]*?)color:\s*(#ffffff|#fff|#faf7f2|#fbf8f1|#f5f5f0|#f3ebdd|white|rgb\(\s*255,\s*255,\s*255\s*\)|rgba\(\s*255,\s*255,\s*255,\s*[0-9.]+\s*\));?([^"]*?)"/gi,
-        (match, p1, color, p2) => {
-          const remaining = `${p1} ${p2}`.trim().replace(/;\s*;/g, ";");
-          return remaining && remaining !== ";" ? `style="${remaining}"` : "";
-        }
-      )
-      .replace(/\sstyle=""/gi, "");
-  }
+  const isLight = contrast === "light-surface" || contrast === "light-bg";
+  const isDark = contrast === "dark-surface" || contrast === "dark-bg";
 
-  if (contrast === "dark-bg") {
-    // In dark background containers: strip black/dark inline colors so text stays radiant ivory/white
-    return html
-      .replace(
-        /style="([^"]*?)color:\s*(#000000|#000|#1c1814|#0f0e0d|#0d0e12|#1e1b18|#1a1a1a|#2a2622|black|rgb\(\s*0,\s*0,\s*0\s*\)|rgba\(\s*0,\s*0,\s*0,\s*[0-9.]+\s*\));?([^"]*?)"/gi,
-        (match, p1, color, p2) => {
-          const remaining = `${p1} ${p2}`.trim().replace(/;\s*;/g, ";");
-          return remaining && remaining !== ";" ? `style="${remaining}"` : "";
-        }
-      )
-      .replace(/\sstyle=""/gi, "");
-  }
+  return html.replace(
+    /style="([^"]*?)color:\s*([^;"]+);?([^"]*?)"/gi,
+    (match, p1, rawColor, p2) => {
+      const rgb = parseColorToRgb(rawColor);
+      if (!rgb) return match;
 
-  // "auto": Strip both monochrome white and black styles to defer to global CSS theme variables
-  return html
-    .replace(
-      /style="([^"]*?)color:\s*(#ffffff|#fff|#000000|#000|#1c1814|#faf7f2|#fbf8f1|#0f0e0d|rgb\(\s*255,\s*255,\s*255\s*\)|rgb\(\s*0,\s*0,\s*0\s*\)|rgba\(\s*255,\s*255,\s*255,\s*[0-9.]+\s*\)|rgba\(\s*0,\s*0,\s*0,\s*[0-9.]+\s*\));?([^"]*?)"/gi,
-      (match, p1, color, p2) => {
+      const lum = computeRelativeLuminance(rgb);
+      const sat = getColorSaturation(rgb);
+      const isMonochrome = sat < 0.25;
+
+      let strip = false;
+      if (isLight && lum > 0.45 && isMonochrome) {
+        strip = true;
+      } else if (isDark && lum <= 0.45 && isMonochrome) {
+        strip = true;
+      } else if (!isLight && !isDark && isMonochrome && (lum > 0.85 || lum < 0.15)) {
+        strip = true;
+      }
+
+      if (strip) {
         const remaining = `${p1} ${p2}`.trim().replace(/;\s*;/g, ";");
         return remaining && remaining !== ";" ? `style="${remaining}"` : "";
       }
-    )
-    .replace(/\sstyle=""/gi, "");
+      return match;
+    }
+  ).replace(/\sstyle=""/gi, "");
 }
 
-function renderMarks(text: string, marks?: TiptapMark[], contrast: ContrastMode = "auto"): React.ReactNode {
+function renderMarks(
+  text: string,
+  marks?: TiptapMark[],
+  contrast: ContrastMode | DynamicContrastScope = "auto"
+): React.ReactNode {
   if (!marks || marks.length === 0) return text;
+
+  const isLight = contrast === "light-surface" || contrast === "light-bg";
+  const isDark = contrast === "dark-surface" || contrast === "dark-bg";
 
   return marks.reduce<React.ReactNode>((acc, mark, idx) => {
     switch (mark.type) {
@@ -130,38 +140,27 @@ function renderMarks(text: string, marks?: TiptapMark[], contrast: ContrastMode 
       case "textStyle": {
         const styleObj: React.CSSProperties = {};
         if (mark.attrs?.color) {
-          const c = String(mark.attrs.color).trim().toLowerCase();
-          const isWhiteOrLight =
-            c === "#ffffff" ||
-            c === "#fff" ||
-            c === "#faf7f2" ||
-            c === "#fbf8f1" ||
-            c === "#f5f5f0" ||
-            c === "#f3ebdd" ||
-            c === "white" ||
-            c === "rgb(255, 255, 255)" ||
-            c.startsWith("rgba(255, 255, 255");
-          const isBlackOrDark =
-            c === "#000000" ||
-            c === "#000" ||
-            c === "#1c1814" ||
-            c === "#0f0e0d" ||
-            c === "#0d0e12" ||
-            c === "#1e1b18" ||
-            c === "#1a1a1a" ||
-            c === "#2a2622" ||
-            c === "black" ||
-            c === "rgb(0, 0, 0)" ||
-            c.startsWith("rgba(0, 0, 0");
+          const colorStr = String(mark.attrs.color).trim();
+          const rgb = parseColorToRgb(colorStr);
+          if (rgb) {
+            const lum = computeRelativeLuminance(rgb);
+            const sat = getColorSaturation(rgb);
+            const isMonochrome = sat < 0.25;
 
-          if (contrast === "light-bg" && isWhiteOrLight) {
-            // Strip conflicting white/light inline color on light background
-          } else if (contrast === "dark-bg" && isBlackOrDark) {
-            // Strip conflicting black/dark inline color on dark background
-          } else if (contrast === "auto" && (isWhiteOrLight || isBlackOrDark)) {
-            // Strip monochrome colors in auto mode so theme controls color
+            let strip = false;
+            if (isLight && lum > 0.45 && isMonochrome) {
+              strip = true;
+            } else if (isDark && lum <= 0.45 && isMonochrome) {
+              strip = true;
+            } else if (!isLight && !isDark && isMonochrome && (lum > 0.85 || lum < 0.15)) {
+              strip = true;
+            }
+
+            if (!strip) {
+              styleObj.color = colorStr;
+            }
           } else {
-            styleObj.color = mark.attrs.color as string;
+            styleObj.color = colorStr;
           }
         }
         if (mark.attrs?.fontSize) styleObj.fontSize = mark.attrs.fontSize as string;
@@ -196,7 +195,11 @@ function renderMarks(text: string, marks?: TiptapMark[], contrast: ContrastMode 
   }, text);
 }
 
-function renderNode(node: TiptapNode, key: React.Key, contrast: ContrastMode = "auto"): React.ReactNode {
+function renderNode(
+  node: TiptapNode,
+  key: React.Key,
+  contrast: ContrastMode | DynamicContrastScope = "auto"
+): React.ReactNode {
   const children = node.content?.map((child, i) => renderNode(child, `${String(key)}-c${i}`, contrast));
 
   const textAlign = node.attrs?.textAlign as string | undefined;
@@ -225,20 +228,20 @@ function renderNode(node: TiptapNode, key: React.Key, contrast: ContrastMode = "
           : "text-lg sm:text-xl font-serif font-semibold mb-2";
 
       if (level === 1) {
-        return <h1 key={key} className={`${sizeClasses} ${alignClass}`}>{children}</h1>;
+        return <h1 key={key} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h1>;
       }
       if (level === 2) {
-        return <h2 key={key} className={`${sizeClasses} ${alignClass}`}>{children}</h2>;
+        return <h2 key={key} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h2>;
       }
       if (level === 3) {
-        return <h3 key={key} className={`${sizeClasses} ${alignClass}`}>{children}</h3>;
+        return <h3 key={key} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h3>;
       }
-      return <h4 key={key} className={`${sizeClasses} ${alignClass}`}>{children}</h4>;
+      return <h4 key={key} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h4>;
     }
 
     case "paragraph":
       return (
-        <p key={key} className={`text-base leading-relaxed mb-4 opacity-90 ${alignClass}`}>
+        <p key={key} className={`text-base leading-relaxed mb-4 text-inherit ${alignClass}`}>
           {children && children.length > 0 ? children : "\u00A0"}
         </p>
       );
@@ -648,6 +651,12 @@ export function renderColumnBlock(block: ColumnBlock, contrast: ContrastMode = "
 
 export function TiptapRenderer({ content, className = "", contrast = "auto" }: TiptapRendererProps) {
   if (!content) return null;
+  const legacyContrast: ContrastMode =
+    contrast === "light-surface" || contrast === "light-bg"
+      ? "light-bg"
+      : contrast === "dark-surface" || contrast === "dark-bg"
+      ? "dark-bg"
+      : "auto";
   const contrastClasses = getContrastTypographyClasses(contrast);
 
   if (typeof content === "string") {
@@ -685,7 +694,7 @@ export function TiptapRenderer({ content, className = "", contrast = "auto" }: T
 
     // If string contains HTML tags, render safely as HTML so tags like <p> do not appear literally
     if (/<[a-z][\s\S]*>/i.test(trimmed)) {
-      const sanitized = sanitizeAdaptiveThemeHtml(trimmed, contrast);
+      const sanitized = sanitizeAdaptiveThemeHtml(trimmed, legacyContrast);
       return (
         <div
           className={cn(contrastClasses, "max-w-none leading-relaxed", className)}
@@ -707,7 +716,7 @@ export function TiptapRenderer({ content, className = "", contrast = "auto" }: T
   if (Array.isArray(rawObj.blocks) && rawObj.blocks.length > 0) {
     return (
       <div className={cn(contrastClasses, "space-y-4", className)}>
-        {rawObj.blocks.map((block: ColumnBlock) => renderColumnBlock(block, contrast))}
+        {rawObj.blocks.map((block: ColumnBlock) => renderColumnBlock(block, legacyContrast))}
       </div>
     );
   }
@@ -719,7 +728,7 @@ export function TiptapRenderer({ content, className = "", contrast = "auto" }: T
   return (
     <div className={cn(contrastClasses, "max-w-none leading-relaxed", className)}>
       {mediaConfig && renderMediaBlock(mediaConfig)}
-      {doc.type === "doc" && renderNode(doc, "root", contrast)}
+      {doc.type === "doc" && renderNode(doc, "root", legacyContrast)}
     </div>
   );
 }

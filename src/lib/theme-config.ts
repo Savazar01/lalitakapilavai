@@ -193,6 +193,8 @@ export function generateUnifiedThemeCSS(theme: DetailedThemeConfig): string {
 
   return `
     :root, .admin-scope {
+      --token-text-dark: #0F172A;
+      --token-text-light: #FFFFFF;
       --background: ${theme.light.canvasBg};
       --card: ${theme.light.cardBg};
       --border: ${theme.light.borderColor};

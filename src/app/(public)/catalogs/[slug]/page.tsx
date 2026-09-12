@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
 import { cn } from "@/lib/utils";
-import { resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
+import { resolveContainerThemeScope, resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -516,20 +516,24 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           const segments = Array.isArray(page.segments)
             ? (page.segments as unknown as { id: string; colSpan: number; contentHtml: string }[])
             : [];
-          const pageContrast = resolveContainerContrast({
+          const pageScope = resolveContainerThemeScope({
             backgroundColor: page.backgroundColor,
             backgroundMode: page.backgroundColor ? "color" : "none",
           });
-          const pageTypographyClasses = getContrastTypographyClasses(pageContrast);
+          const pageTypographyClasses = getContrastTypographyClasses(pageScope.contrastMode);
 
           return (
             <section
               key={page.id}
               className={cn(
                 "catalog-page catalog-magazine-page editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none",
+                pageScope.wrapperClass,
                 pageTypographyClasses
               )}
-              style={page.backgroundColor ? { backgroundColor: page.backgroundColor } : undefined}
+              style={{
+                ...pageScope.wrapperStyle,
+                ...(page.backgroundColor ? { backgroundColor: page.backgroundColor } : {}),
+              }}
             >
               {bgLayerNode}
               <div className={`catalog-frame relative z-10 ${pageFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
@@ -563,12 +567,12 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                         key={seg.id || sIdx}
                         className={cn("magazine-col font-serif leading-relaxed overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}
                       >
-                        <TiptapRenderer content={seg.contentHtml} contrast={pageContrast} />
+                        <TiptapRenderer content={seg.contentHtml} contrast={pageScope.contrastMode} />
                       </div>
                     ))
                   ) : page.contentHtml ? (
                     <div className={cn("magazine-col font-serif leading-relaxed overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}>
-                      <TiptapRenderer content={page.contentHtml} contrast={pageContrast} />
+                      <TiptapRenderer content={page.contentHtml} contrast={pageScope.contrastMode} />
                     </div>
                   ) : (
                     <p className="italic text-muted-foreground">No editorial content compiled for this page.</p>
@@ -845,21 +849,23 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               );
             })()
           ) : (() => {
-            const endContrast = resolveContainerContrast({
+            const endScope = resolveContainerThemeScope({
               backgroundColor: endBgColor,
               backgroundImage: endBgImage,
               backgroundType: endBgType,
               overlayOpacity: endOverlayOpacity,
             });
-            const endTypographyClasses = getContrastTypographyClasses(endContrast);
 
             return (
               <section
                 className={cn(
                   "catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none",
-                  endTypographyClasses
+                  endScope.wrapperClass
                 )}
-                style={endBgColor ? { backgroundColor: endBgColor } : undefined}
+                style={{
+                  ...(endBgColor ? { backgroundColor: endBgColor } : {}),
+                  ...endScope.wrapperStyle,
+                }}
               >
                 <CatalogBackgroundLayer
                   bgType={endBgType}
@@ -883,9 +889,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                     </h2>
                   </div>
 
-                  <div className={cn("font-serif leading-relaxed max-w-xl mx-auto flex-1 flex flex-col justify-center", endTypographyClasses)}>
+                  <div className={cn("font-serif leading-relaxed max-w-xl mx-auto flex-1 flex flex-col justify-center", endScope.typographyClass)}>
                     {endPageConfig.contentHtml ? (
-                      <TiptapRenderer content={endPageConfig.contentHtml as string} contrast={endContrast} />
+                      <TiptapRenderer content={endPageConfig.contentHtml as string} contrast={endScope.contrastMode} />
                     ) : (
                       <p>
                         Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic 22k gold foil Thanjavur art and classical Carnatic musicianship.
