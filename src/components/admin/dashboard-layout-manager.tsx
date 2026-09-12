@@ -219,7 +219,7 @@ export function DashboardLayoutManager({
       {/* Controls Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-border/80 bg-card/60">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700">
             {widgets.length} Active Tiles
           </Badge>
           {isCustomizing && (
@@ -280,22 +280,22 @@ export function DashboardLayoutManager({
                       Operational
                     </Badge>
                   </div>
-                  <CardDescription className="text-xs">
+                  <CardDescription className="text-xs text-slate-800 dark:text-slate-300 font-medium">
                     {widget.description || "Live container and infrastructure status"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 text-xs">
                     <div className="flex justify-between py-1.5 border-b border-border/50">
-                      <span className="text-muted-foreground">Database Port:</span>
+                      <span className="text-slate-800 dark:text-slate-300 font-medium">Database Port:</span>
                       <span className="font-mono font-semibold text-foreground">5633 (Mapped to 5432)</span>
                     </div>
                     <div className="flex justify-between py-1.5 border-b border-border/50">
-                      <span className="text-muted-foreground">Vector Extension:</span>
+                      <span className="text-slate-800 dark:text-slate-300 font-medium">Vector Extension:</span>
                       <span className="font-mono font-semibold text-emerald-500">pgvector 0.8.2 Active</span>
                     </div>
                     <div className="flex justify-between py-1.5">
-                      <span className="text-muted-foreground">Web Platform:</span>
+                      <span className="text-slate-800 dark:text-slate-300 font-medium">Web Platform:</span>
                       <span className="font-mono font-semibold text-foreground">Port 3060 (Next.js 16)</span>
                     </div>
                   </div>
@@ -441,7 +441,7 @@ export function DashboardLayoutManager({
                   <div className="text-3xl font-serif font-bold text-foreground">
                     {widget.computedMetric || widget.metricValue || "0"}
                   </div>
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50 text-xs font-semibold text-slate-800 dark:text-slate-200">
                     <span className="truncate mr-2">
                       {widget.computedSub || widget.metricSub || widget.description || ""}
                     </span>

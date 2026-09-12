@@ -99,7 +99,7 @@ export function Sidebar({
             <span className="font-serif font-bold text-sm leading-tight text-slate-900 dark:text-slate-100">
               {brandTitle}
             </span>
-            <span className="text-[10px] text-slate-600 dark:text-slate-400 uppercase tracking-widest font-bold">
+            <span className="text-[10px] text-slate-700 dark:text-slate-300 uppercase tracking-widest font-bold">
               {brandSubtitle}
             </span>
           </div>
@@ -108,7 +108,7 @@ export function Sidebar({
 
       {/* Dynamic Navigation list */}
       <nav className="flex flex-col gap-1.5 p-4 flex-1 overflow-y-auto">
-        <div className="px-3 py-2 text-[11px] uppercase tracking-widest text-slate-600 dark:text-slate-400 font-bold">
+        <div className="px-3 py-2 text-[11px] uppercase tracking-widest text-slate-700 dark:text-slate-300 font-bold">
           Platform Management
         </div>
         {ADMIN_NAV_ITEMS.filter((item) => !item.superAdminOnly || isSuperAdmin).map((item) => {
@@ -128,12 +128,12 @@ export function Sidebar({
               className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all ${
                 isActive
                   ? "bg-slate-900 text-white dark:bg-slate-800 dark:text-white font-semibold shadow-sm"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/60 font-medium"
+                  : "text-slate-700 hover:text-slate-950 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60 font-medium"
               }`}
             >
               <Icon
                 className={`w-4 h-4 shrink-0 ${
-                  isActive ? "text-white" : "text-slate-500 dark:text-slate-400"
+                  isActive ? "text-white" : "text-slate-600 dark:text-slate-400"
                 }`}
               />
               <span className="truncate">{label}</span>

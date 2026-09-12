@@ -307,7 +307,7 @@ export default function NavigationManagerPage() {
           <CardDescription className="text-xs max-w-sm mx-auto mt-1 mb-4">
             Click &quot;Add Root Nav Item&quot; to configure links for {selectedPosition}.
           </CardDescription>
-          <Button variant="gold" onClick={() => openAddDialog(null)}>
+          <Button variant="default" onClick={() => openAddDialog(null)}>
             <Plus className="w-4 h-4 mr-1.5" />
             Add First Link
           </Button>
@@ -614,7 +614,7 @@ export default function NavigationManagerPage() {
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="gold" disabled={submitting}>
+              <Button type="submit" variant="default" disabled={submitting}>
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />

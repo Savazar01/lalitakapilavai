@@ -377,7 +377,7 @@ export default function PagesAdminPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" variant="gold" disabled={creating}>
+                <Button type="submit" variant="default" disabled={creating}>
                   {creating ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -408,7 +408,7 @@ export default function PagesAdminPage() {
           <CardDescription className="text-xs max-w-sm mx-auto mt-1 mb-4">
             Click &quot;Create New Page&quot; to begin designing bespoke sections, devotional essays, or exhibition portfolios.
           </CardDescription>
-          <Button variant="gold" onClick={() => setDialogOpen(true)}>
+          <Button variant="default" onClick={() => setDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-1.5" />
             Create First Page
           </Button>
@@ -800,7 +800,7 @@ export default function PagesAdminPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" variant="gold" disabled={savingSettings}>
+                <Button type="submit" variant="default" disabled={savingSettings}>
                   {savingSettings ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />

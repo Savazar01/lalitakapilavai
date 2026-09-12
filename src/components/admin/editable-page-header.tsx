@@ -131,8 +131,8 @@ export function EditablePageHeader({
       <div className="flex-1 min-w-0 flex flex-col items-start gap-1 text-left w-full">
         {/* 1. TOP: Eyebrow Tag / Badge */}
         {badge && (
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider mb-0.5">
-            {badgeIcon || <Sparkles className="w-3.5 h-3.5 shrink-0 text-amber-700 dark:text-amber-400" />}
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-amber-300 uppercase tracking-wider mb-0.5">
+            {badgeIcon || <Sparkles className="w-3.5 h-3.5 shrink-0 text-slate-800 dark:text-amber-400" />}
             <span>{badge}</span>
           </div>
         )}
@@ -228,7 +228,7 @@ export function EditablePageHeader({
             </div>
 
             {/* 3. BOTTOM: Subtitle / Description */}
-            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium mt-1 max-w-3xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-900 dark:text-slate-200 font-medium mt-1 max-w-3xl leading-relaxed">
               {subtitle}
             </p>
           </div>

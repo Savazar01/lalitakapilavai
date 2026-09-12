@@ -265,7 +265,7 @@ export default function AdminCatalogsPage() {
             setError(null);
             setCreateModalOpen(true);
           }}
-          variant="gold"
+          variant="default"
           className="shadow-sm cursor-pointer gap-2 text-xs"
         >
           <Plus className="w-4 h-4" />

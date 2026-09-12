@@ -2170,20 +2170,20 @@ export default function VisualPageBuilder() {
 
           {/* Save & Publish */}
           <Button
-            variant="gold"
+            variant="default"
             size="sm"
             onClick={() => handleSave(true)}
             disabled={saving}
             className="h-8 text-xs gap-1.5 font-bold shadow-md cursor-pointer"
           >
             {saving ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary-foreground" />
             ) : savedSuccess && page.isPublished ? (
-              <Check className="w-3.5 h-3.5 text-black" />
+              <Check className="w-3.5 h-3.5 text-primary-foreground" />
             ) : (
-              <Sparkles className="w-3.5 h-3.5 text-black" />
+              <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
             )}
-            {savedSuccess && page.isPublished ? "Published Live!" : "Save & Publish"}
+            {saving ? "Saving..." : page.isPublished ? "Published" : "Save & Publish"}
           </Button>
         </div>
       </header>

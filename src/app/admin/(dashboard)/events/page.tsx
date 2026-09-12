@@ -382,7 +382,7 @@ export default function EventsAdminPage() {
         defaultSubtitle="Curate international schedules, venue coordinates, timezones, and masterwork exhibition linkages."
         badgeLabel="Cultural Calendar & Recitals"
       >
-        <Button onClick={handleOpenCreate} variant="gold" className="gap-2 text-xs">
+        <Button onClick={handleOpenCreate} variant="default" className="gap-2 text-xs">
           <Plus className="w-4 h-4" />
           Schedule Event
         </Button>
@@ -453,7 +453,7 @@ export default function EventsAdminPage() {
               ? "All existing events have concluded or are set as past. Schedule a new exhibition."
               : "Create your first Tanjore exhibition, classical concert, or workshop masterclass."}
           </CardDescription>
-          <Button onClick={handleOpenCreate} variant="gold" size="sm" className="mt-4 gap-1">
+          <Button onClick={handleOpenCreate} variant="default" size="sm" className="mt-4 gap-1">
             <Plus className="w-3.5 h-3.5" />
             Create Event
           </Button>
@@ -804,7 +804,7 @@ export default function EventsAdminPage() {
                     </span>
                   </div>
                   <div className="text-right">
-                    <Badge variant="gold" className="text-[10px]">
+                    <Badge variant="secondary" className="text-[10px]">
                       {a.ticketCount} {a.ticketCount === 1 ? "seat" : "seats"}
                     </Badge>
                     <span className="text-[10px] text-muted-foreground block mt-0.5">

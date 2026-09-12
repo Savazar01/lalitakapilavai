@@ -140,7 +140,7 @@ export default function AdminProfilePage() {
           </p>
         </div>
 
-        <Badge variant="gold" className="text-xs uppercase w-fit">
+        <Badge variant="secondary" className="text-xs uppercase w-fit font-semibold">
           {(session?.user as { role?: string } | undefined)?.role || "SUPER_ADMIN"}
         </Badge>
       </div>

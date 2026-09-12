@@ -151,29 +151,29 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 style={{ objectPosition }}
               />
-              {/* Dynamic Overlay Scrim */}
+              {/* Dynamic Overlay Scrim: Permanent Dark Scrim Invariant (AGENTS.md Section 7.2) */}
               <div
-                className="absolute inset-0 bg-background"
-                style={{ opacity: overlayOpacity }}
+                className="absolute inset-0 bg-black/60"
+                style={{ opacity: Math.max(0.6, overlayOpacity) }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
 
-              <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8 sm:right-8 text-left z-10">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider mb-2 bg-background/95 backdrop-blur-md px-3 py-1 rounded-full border border-amber-500/30 shadow-sm">
+              <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8 sm:right-8 text-left z-10 [color-scheme:dark]">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-wider mb-2 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full border border-amber-500/40 shadow-sm">
                   <Sparkles className="w-3 h-3" />
                   {badgeLabel}
                 </div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-foreground drop-shadow-sm">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white drop-shadow-md">
                   {heroTitle}
                 </h1>
 
                 {/* Curatorial Note / Description Preview */}
                 {currentCategory.curatorialNote ? (
-                  <div className="text-xs sm:text-sm text-foreground/90 leading-relaxed max-w-3xl mt-2 line-clamp-3 prose-invert [&_p]:m-0">
-                    <TiptapRenderer content={currentCategory.curatorialNote} />
+                  <div className="text-xs sm:text-sm text-stone-200 leading-relaxed max-w-3xl mt-2 line-clamp-3 prose prose-invert [&_p]:m-0">
+                    <TiptapRenderer content={currentCategory.curatorialNote} contrast="dark-bg" />
                   </div>
                 ) : currentCategory.description ? (
-                  <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed max-w-2xl mt-1.5 line-clamp-2 font-medium">
+                  <p className="text-xs sm:text-sm text-stone-200 leading-relaxed max-w-2xl mt-1.5 line-clamp-2 font-medium">
                     {currentCategory.description}
                   </p>
                 ) : null}

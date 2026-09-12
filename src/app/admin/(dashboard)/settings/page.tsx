@@ -948,7 +948,7 @@ export default function AdminSettingsPage() {
                   <div className="pt-3 border-t border-border flex justify-end">
                     <Button
                       type="button"
-                      variant="gold"
+                      variant="default"
                       onClick={() => handleSaveBranding()}
                       disabled={savingBranding}
                       className="gap-2 text-xs"

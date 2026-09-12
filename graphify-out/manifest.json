@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1789192531.1976693,
+    "mtime": 1789195555.305905,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
@@ -65,23 +65,23 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\navigation\\page.tsx": {
-    "mtime": 1789190700.5537093,
-    "ast_hash": "88613ee413a36436d4c2a7a5067396de",
+    "mtime": 1789195435.9927769,
+    "ast_hash": "371475bb7131a49212c7bfb80d5b8264",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\pages\\page.tsx": {
-    "mtime": 1789190641.0418274,
-    "ast_hash": "457299c876410dcfb531ae179d84f6a8",
+    "mtime": 1789195418.4666958,
+    "ast_hash": "edc5e86db60366f7248b7cd522e0d2ad",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\pages\\[id]\\builder\\page.tsx": {
-    "mtime": 1789188687.8744524,
-    "ast_hash": "933e567ab36f5f7aed362455aa2c8bd0",
+    "mtime": 1789195382.5955694,
+    "ast_hash": "eb9f99fc9134f2e1d6b3ba51b0f79ec8",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\login\\page.tsx": {
-    "mtime": 1789188535.0147672,
-    "ast_hash": "c5b1b7d361fcd9b04954d9241002b702",
+    "mtime": 1789195451.8858924,
+    "ast_hash": "4ba97b3ebb9bfb45666944ac3d74cd15",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\admin\\media\\upload\\route.ts": {
@@ -175,8 +175,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\ui\\card.tsx": {
-    "mtime": 1789190522.8102956,
-    "ast_hash": "59ba1ebc11ff06e8394220964f55b5a5",
+    "mtime": 1789195205.9024386,
+    "ast_hash": "61589f7833cfb4fd87de149e1a39f124",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\ui\\dialog.tsx": {
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\AGENTS.md": {
-    "mtime": 1789192456.3393476,
-    "ast_hash": "2cfb888d9f20c97128b702becb4601d9",
+    "mtime": 1789195468.8642237,
+    "ast_hash": "97c3ba34be9dee5277102a35b8f9b298",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\CLAUDE.md": {
@@ -370,13 +370,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\artworks\\page.tsx": {
-    "mtime": 1789192376.275501,
-    "ast_hash": "f4b59896c02492f52d4217176fb9e2d2",
+    "mtime": 1789195317.6948757,
+    "ast_hash": "50732395acc3581679265a50fdf191eb",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\events\\page.tsx": {
-    "mtime": 1789192364.3656137,
-    "ast_hash": "c059117deaf034172d604a88e33cbac1",
+    "mtime": 1789195342.2612283,
+    "ast_hash": "7fa8f21e59cd5d38f9fabd7336fd2367",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\admin\\artworks\\route.ts": {
@@ -450,13 +450,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\profile\\page.tsx": {
-    "mtime": 1788022182.6136405,
-    "ast_hash": "28afb654f4471056c394dceea31d1f9b",
+    "mtime": 1789195357.733373,
+    "ast_hash": "99d023d5c029884561d7e6b998f3763b",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\settings\\page.tsx": {
-    "mtime": 1789190615.1519957,
-    "ast_hash": "8482b7c45dad495d39bc4147d819a53d",
+    "mtime": 1789195282.96923,
+    "ast_hash": "04407836f8333bfe6f148aa5dcf6e106",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\users\\page.tsx": {
@@ -540,8 +540,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\(public)\\gallery\\[categorySlug]\\page.tsx": {
-    "mtime": 1789190794.984835,
-    "ast_hash": "c2b377c96b7f107b0ceb85eb33863c66",
+    "mtime": 1789195272.2994998,
+    "ast_hash": "7c6c8efebf04605ff0cee43e36fc6c72",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\(public)\\posts\\page.tsx": {
@@ -625,8 +625,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\dashboard-layout-manager.tsx": {
-    "mtime": 1789188759.4819372,
-    "ast_hash": "fc59ab8d17afa455cc880edb9be8a427",
+    "mtime": 1789195245.8549168,
+    "ast_hash": "09af0932ae3c26cd0f2fedce34505219",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\ui\\label.tsx": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\catalogs\\page.tsx": {
-    "mtime": 1789188825.5672688,
-    "ast_hash": "669284ec8d38212fc069d479359a43f8",
+    "mtime": 1789195350.7664309,
+    "ast_hash": "57f7a3cd1707c1375a156842909ed963",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\catalogs\\[id]\\page.tsx": {
@@ -785,13 +785,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\editable-page-header.tsx": {
-    "mtime": 1789190590.4819043,
-    "ast_hash": "ab5bd8cb5f7ca68a3110177b02c570bc",
+    "mtime": 1789195221.4031134,
+    "ast_hash": "171e0f3820af19409993d69c01b292d7",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\sidebar.tsx": {
-    "mtime": 1789192400.492167,
-    "ast_hash": "143eac6ebeab0e44a8ace63dd88690c9",
+    "mtime": 1789195254.4665496,
+    "ast_hash": "1021ac94e0707d405e1fdd75d4211610",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\admin-config.ts": {

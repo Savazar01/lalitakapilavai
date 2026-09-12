@@ -130,8 +130,8 @@ function LoginForm() {
         <CardFooter className="pt-2 pb-6 flex flex-col gap-3">
           <Button
             type="submit"
-            variant="gold"
-            className="w-full text-stone-950 font-bold"
+            variant="default"
+            className="w-full font-bold"
             disabled={isLoading}
           >
             {isLoading ? (

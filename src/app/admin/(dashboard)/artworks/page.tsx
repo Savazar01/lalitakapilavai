@@ -637,7 +637,7 @@ export default function ArtworksAdminPage() {
         </Button>
 
         <Button
-          variant="gold"
+          variant="default"
           size="sm"
           onClick={handleOpenCreate}
           className="text-xs gap-1.5"
@@ -732,7 +732,7 @@ export default function ArtworksAdminPage() {
               ? "No artworks match your query."
               : "Begin cataloging masterworks with 22k gold leaf relief details."}
           </p>
-          <Button variant="gold" size="sm" onClick={handleOpenCreate}>
+          <Button variant="default" size="sm" onClick={handleOpenCreate}>
             <Plus className="w-3.5 h-3.5 mr-1" />
             Catalog First Artwork
           </Button>
@@ -1365,7 +1365,7 @@ export default function ArtworksAdminPage() {
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="gold" disabled={saving || uploadingImage}>
+              <Button type="submit" variant="default" disabled={saving || uploadingImage}>
                 {saving ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -1418,7 +1418,7 @@ export default function ArtworksAdminPage() {
           <DialogFooter className="sm:justify-center">
             {qrPreviewUrl && (
               <a href={qrPreviewUrl} download={`qr-${qrTargetSlug}.png`}>
-                <Button variant="gold" size="sm" className="gap-1.5 cursor-pointer">
+                <Button variant="default" size="sm" className="gap-1.5 cursor-pointer">
                   <Download className="w-3.5 h-3.5" />
                   Download Print High-Res QR
                 </Button>
@@ -1458,7 +1458,7 @@ export default function ArtworksAdminPage() {
               />
               <Button
                 type="submit"
-                variant="gold"
+                variant="default"
                 size="sm"
                 className="h-8 text-xs shrink-0"
                 disabled={creatingCat}

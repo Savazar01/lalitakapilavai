@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 .font-playfair { font-family: 'Playfair Display', serif; }
 .font-cormorant { font-family: 'Cormorant Garamond', serif; }
@@ -32,7 +33,7 @@
     --accent-foreground: #0F172A;
 
     --muted: #E2E8F0;
-    --muted-foreground: #334155;
+    --muted-foreground: #1E293B;
 
     --destructive: #A3281E;
     --destructive-foreground: #FFFFFF;
@@ -99,7 +100,7 @@
     --accent-foreground: #0F172A;
 
     --muted: #E2E8F0;
-    --muted-foreground: #334155;
+    --muted-foreground: #1E293B;
 
     --destructive: #DC2626;
     --destructive-foreground: #FFFFFF;

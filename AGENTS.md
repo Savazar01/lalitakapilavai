@@ -182,3 +182,12 @@ To prevent theme regressions, broken light mode artifacts, or unreadable black-o
    - Active state: High-contrast solid fill (`bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs`).
    - Inactive state: Distinct neutral surface (`bg-slate-100 text-slate-800 border border-slate-300 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700 font-semibold`).
    - Eliminate transparent pills or unbordered buttons with washed-out text.
+5. **Tailwind CSS v4 Class-Based Dark Variant Engine (`@custom-variant dark`)**:
+   - In Tailwind CSS v4, the `dark:` variant by default compiles to `@media (prefers-color-scheme: dark)`.
+   - Without `@custom-variant dark (&:where(.dark, .dark *));` in `src/app/globals.css`, any browser running on an OS with dark mode active will ALWAYS execute `dark:` utility classes even when the user selects Light Mode in Next-Themes.
+   - Therefore, `src/app/globals.css` MUST ALWAYS declare:
+     ```css
+     @import "tailwindcss";
+     @custom-variant dark (&:where(.dark, .dark *));
+     ```
+   - This ensures `dark:*` classes only activate when the `.dark` class is present on the document element, completely preventing inverted dark boxes or faint text in Light Mode on dark OS environments.
