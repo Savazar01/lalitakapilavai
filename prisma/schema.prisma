@@ -131,6 +131,7 @@ model SystemSetting {
   emailConfig       Json?
   aiConfig          Json?
   adminConfig       Json?
+  themeConfig       Json?   // Public design token overrides: { light: { "--background": "#...", ... }, dark: { ... } }
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

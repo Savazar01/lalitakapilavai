@@ -21,6 +21,8 @@ import {
   Plus,
   Wand2,
   Sliders,
+  Palette,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -107,6 +109,47 @@ export default function AdminSettingsPage() {
   // Admin Portal White-Labeling State
   const [adminConfig, setAdminConfig] = React.useState<AdminPortalConfig>(DEFAULT_ADMIN_CONFIG);
   const [savingBranding, setSavingBranding] = React.useState(false);
+
+  // Theme & Design Studio State
+  type ThemeTokenSet = {
+    "--background": string;
+    "--foreground": string;
+    "--card": string;
+    "--border": string;
+    "--muted-foreground": string;
+    "--primary": string;
+    "--primary-foreground": string;
+  };
+  const DEFAULT_LIGHT_TOKENS: ThemeTokenSet = {
+    "--background": "#F4F5F7",
+    "--foreground": "#0F172A",
+    "--card": "#FFFFFF",
+    "--border": "#CBD5E1",
+    "--muted-foreground": "#1E293B",
+    "--primary": "#8C6512",
+    "--primary-foreground": "#FFFFFF",
+  };
+  const DEFAULT_DARK_TOKENS: ThemeTokenSet = {
+    "--background": "#0B0F17",
+    "--foreground": "#F8FAFC",
+    "--card": "#151B26",
+    "--border": "#1E293B",
+    "--muted-foreground": "#94A3B8",
+    "--primary": "#F3C64F",
+    "--primary-foreground": "#0D0E12",
+  };
+  const TOKEN_LABELS: Record<keyof ThemeTokenSet, string> = {
+    "--background": "Canvas Background",
+    "--foreground": "Primary Text",
+    "--card": "Card Surface",
+    "--border": "Border",
+    "--muted-foreground": "Secondary Text",
+    "--primary": "Primary Accent",
+    "--primary-foreground": "Accent Text (on Primary)",
+  };
+  const [themeLight, setThemeLight] = React.useState<ThemeTokenSet>({ ...DEFAULT_LIGHT_TOKENS });
+  const [themeDark, setThemeDark] = React.useState<ThemeTokenSet>({ ...DEFAULT_DARK_TOKENS });
+  const [savingTheme, setSavingTheme] = React.useState(false);
 
   // Core Settings Form
   const [form, setForm] = React.useState({
@@ -229,6 +272,11 @@ export default function AdminSettingsPage() {
           if (data.adminConfig) {
             setAdminConfig((prev) => ({ ...prev, ...data.adminConfig }));
           }
+          if (data.themeConfig) {
+            const tc = data.themeConfig as { light?: Record<string, string>; dark?: Record<string, string> };
+            if (tc.light) setThemeLight((prev) => ({ ...prev, ...tc.light }));
+            if (tc.dark) setThemeDark((prev) => ({ ...prev, ...tc.dark }));
+          }
         }
         setLoading(false);
       })
@@ -265,6 +313,50 @@ export default function AdminSettingsPage() {
       toast.error("Error saving portal configuration");
     } finally {
       setSavingBranding(false);
+    }
+  };
+
+  const handleSaveTheme = async () => {
+    setSavingTheme(true);
+    try {
+      const res = await fetch("/api/admin/settings/theme", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ themeConfig: { light: themeLight, dark: themeDark } }),
+      });
+      if (res.ok) {
+        toast.success("Theme tokens saved! Refresh any public page to see changes.");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to save theme configuration");
+      }
+    } catch {
+      toast.error("Error saving theme configuration");
+    } finally {
+      setSavingTheme(false);
+    }
+  };
+
+  const handleResetTheme = async () => {
+    setSavingTheme(true);
+    try {
+      const res = await fetch("/api/admin/settings/theme", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ themeConfig: null }),
+      });
+      if (res.ok) {
+        setThemeLight({ ...DEFAULT_LIGHT_TOKENS });
+        setThemeDark({ ...DEFAULT_DARK_TOKENS });
+        toast.success("Theme reset to globals.css defaults.");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to reset theme");
+      }
+    } catch {
+      toast.error("Error resetting theme");
+    } finally {
+      setSavingTheme(false);
     }
   };
 
@@ -497,7 +589,7 @@ export default function AdminSettingsPage() {
       ) : (
         <form onSubmit={handleSave}>
           <Tabs defaultValue="general" className="w-full space-y-6">
-            <TabsList className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-1.5 w-full h-auto p-1.5 bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl">
+            <TabsList className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-9 gap-1.5 w-full h-auto p-1.5 bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl">
               <TabsTrigger
                 value="general"
                 className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
@@ -545,6 +637,12 @@ export default function AdminSettingsPage() {
                 className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
               >
                 <Share2 className="w-3.5 h-3.5 mr-1" /> Socials
+              </TabsTrigger>
+              <TabsTrigger
+                value="theme"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
+                <Palette className="w-3.5 h-3.5 mr-1" /> Theme Studio
               </TabsTrigger>
             </TabsList>
 
@@ -1625,6 +1723,233 @@ export default function AdminSettingsPage() {
                         className="text-xs"
                       />
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab 9: Theme & Design Studio */}
+            <TabsContent value="theme">
+              <Card className="border-border/80 shadow-sm">
+                <CardHeader className="border-b border-border/50 pb-4">
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Palette className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                        Theme &amp; Design Studio
+                      </CardTitle>
+                      <CardDescription className="mt-1 text-xs">
+                        Override public CSS design tokens for Light and Dark modes. Changes persist in the database and apply globally on the next page load. Admin portal tokens remain locked to neutral Slate and are not affected.
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleResetTheme}
+                        disabled={savingTheme}
+                        className="text-xs border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                      >
+                        {savingTheme ? (
+                          <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                        ) : (
+                          <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                        )}
+                        Reset to Defaults
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleSaveTheme}
+                        disabled={savingTheme}
+                        size="sm"
+                        className="text-xs bg-slate-900 text-white hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 cursor-pointer"
+                      >
+                        {savingTheme ? (
+                          <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                        ) : (
+                          <Save className="w-3.5 h-3.5 mr-1.5" />
+                        )}
+                        Save Theme
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Light Mode Tokens */}
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2">
+                        ☀️ Light Mode Tokens
+                      </h3>
+                      {(Object.keys(TOKEN_LABELS) as (keyof typeof TOKEN_LABELS)[]).map((key) => (
+                        <div key={`light-${key}`} className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <label
+                              htmlFor={`light-${key}`}
+                              className="text-xs font-semibold text-slate-800 dark:text-slate-200 block"
+                            >
+                              {TOKEN_LABELS[key]}
+                            </label>
+                            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">{key}</span>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <input
+                              id={`light-${key}`}
+                              type="color"
+                              value={themeLight[key]}
+                              onChange={(e) =>
+                                setThemeLight((prev) => ({ ...prev, [key]: e.target.value }))
+                              }
+                              className="h-8 w-8 rounded border border-slate-300 dark:border-slate-700 cursor-pointer p-0.5 bg-white"
+                              title={`${TOKEN_LABELS[key]} color picker`}
+                            />
+                            <input
+                              type="text"
+                              value={themeLight[key]}
+                              onChange={(e) =>
+                                setThemeLight((prev) => ({ ...prev, [key]: e.target.value }))
+                              }
+                              className="w-24 text-xs font-mono border-[1.5px] border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                              placeholder="#FFFFFF"
+                              maxLength={25}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Dark Mode Tokens */}
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2">
+                        🌙 Dark Mode Tokens
+                      </h3>
+                      {(Object.keys(TOKEN_LABELS) as (keyof typeof TOKEN_LABELS)[]).map((key) => (
+                        <div key={`dark-${key}`} className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <label
+                              htmlFor={`dark-${key}`}
+                              className="text-xs font-semibold text-slate-800 dark:text-slate-200 block"
+                            >
+                              {TOKEN_LABELS[key]}
+                            </label>
+                            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">{key}</span>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <input
+                              id={`dark-${key}`}
+                              type="color"
+                              value={themeDark[key]}
+                              onChange={(e) =>
+                                setThemeDark((prev) => ({ ...prev, [key]: e.target.value }))
+                              }
+                              className="h-8 w-8 rounded border border-slate-300 dark:border-slate-700 cursor-pointer p-0.5 bg-white"
+                              title={`${TOKEN_LABELS[key]} dark color picker`}
+                            />
+                            <input
+                              type="text"
+                              value={themeDark[key]}
+                              onChange={(e) =>
+                                setThemeDark((prev) => ({ ...prev, [key]: e.target.value }))
+                              }
+                              className="w-24 text-xs font-mono border-[1.5px] border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                              placeholder="#0B0F17"
+                              maxLength={25}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Live Preview Panel */}
+                  <div className="mt-8 space-y-4">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2">
+                      🔍 Live Preview (reflects current editor values)
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Light Preview */}
+                      <div
+                        className="rounded-xl border-[1.5px] p-4 space-y-3"
+                        style={{
+                          backgroundColor: themeLight["--background"],
+                          borderColor: themeLight["--border"],
+                        }}
+                      >
+                        <div
+                          className="text-xs font-bold uppercase tracking-widest mb-1"
+                          style={{ color: themeLight["--primary"] }}
+                        >
+                          ☀️ Light Mode Preview
+                        </div>
+                        <div
+                          className="rounded-lg border p-3 space-y-2"
+                          style={{
+                            backgroundColor: themeLight["--card"],
+                            borderColor: themeLight["--border"],
+                          }}
+                        >
+                          <p className="text-sm font-bold" style={{ color: themeLight["--foreground"] }}>
+                            Lalita Kapilavai — Sacred Art Archive
+                          </p>
+                          <p className="text-xs" style={{ color: themeLight["--muted-foreground"] }}>
+                            Tanjore painting, 22k gold foil, classical devotional iconography.
+                          </p>
+                          <button
+                            className="text-xs font-semibold px-3 py-1.5 rounded-md mt-1"
+                            style={{
+                              backgroundColor: themeLight["--primary"],
+                              color: themeLight["--primary-foreground"],
+                            }}
+                          >
+                            Commission Artwork →
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Dark Preview */}
+                      <div
+                        className="rounded-xl border-[1.5px] p-4 space-y-3"
+                        style={{
+                          backgroundColor: themeDark["--background"],
+                          borderColor: themeDark["--border"],
+                        }}
+                      >
+                        <div
+                          className="text-xs font-bold uppercase tracking-widest mb-1"
+                          style={{ color: themeDark["--primary"] }}
+                        >
+                          🌙 Dark Mode Preview
+                        </div>
+                        <div
+                          className="rounded-lg border p-3 space-y-2"
+                          style={{
+                            backgroundColor: themeDark["--card"],
+                            borderColor: themeDark["--border"],
+                          }}
+                        >
+                          <p className="text-sm font-bold" style={{ color: themeDark["--foreground"] }}>
+                            Lalita Kapilavai — Sacred Art Archive
+                          </p>
+                          <p className="text-xs" style={{ color: themeDark["--muted-foreground"] }}>
+                            Tanjore painting, 22k gold foil, classical devotional iconography.
+                          </p>
+                          <button
+                            className="text-xs font-semibold px-3 py-1.5 rounded-md mt-1"
+                            style={{
+                              backgroundColor: themeDark["--primary"],
+                              color: themeDark["--primary-foreground"],
+                            }}
+                          >
+                            Commission Artwork →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 dark:text-slate-500 italic mt-2">
+                      Note: Admin portal tokens (.admin-scope) remain permanently locked to neutral Slate per design system governance. Only the public exhibition palette is controlled here.
+                    </p>
                   </div>
                 </CardContent>
               </Card>

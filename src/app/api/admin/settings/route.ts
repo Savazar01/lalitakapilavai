@@ -94,6 +94,7 @@ export async function PUT(request: NextRequest) {
       emailConfig: body.emailConfig !== undefined ? body.emailConfig : undefined,
       aiConfig: body.aiConfig !== undefined ? body.aiConfig : undefined,
       adminConfig: body.adminConfig !== undefined ? body.adminConfig : undefined,
+      themeConfig: body.themeConfig !== undefined ? body.themeConfig : undefined,
     };
 
     let updated;
