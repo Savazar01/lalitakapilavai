@@ -140,10 +140,15 @@ export default function AdminSettingsPage() {
     { key: "mutedColor", label: "Secondary / Muted Text", description: "Subtitles, metadata & captions (--muted-foreground)" },
     { key: "btnPrimaryBg", label: "Primary Button Background", description: "Main call-to-action fill (--primary)" },
     { key: "btnPrimaryText", label: "Primary Button Text", description: "Contrast text on primary button (--primary-foreground)" },
+    { key: "btnPrimaryHover", label: "Primary Button Hover", description: "Hover state background for primary buttons (--primary-hover)" },
     { key: "btnSecondaryBg", label: "Secondary Button Background", description: "Subtle secondary action fill (--secondary)" },
     { key: "btnSecondaryText", label: "Secondary Button Text", description: "Text on secondary button (--secondary-foreground)" },
-    { key: "activePillBg", label: "Active Pill / Badge Background", description: "Selected filter pills & active tabs" },
-    { key: "activePillText", label: "Active Pill / Badge Text", description: "Text on selected filter pills & tabs" },
+    { key: "btnSecondaryHover", label: "Secondary Button Hover", description: "Hover state background for secondary buttons (--secondary-hover)" },
+    { key: "activePillBg", label: "Active Pill / Badge Background", description: "Selected filter pills & active tabs (--active-pill-bg)" },
+    { key: "activePillText", label: "Active Pill / Badge Text", description: "Text on selected filter pills & tabs (--active-pill-text)" },
+    { key: "badgeBg", label: "Eyebrow Badge Background", description: "Earmark & section badge fill (--badge-bg)" },
+    { key: "badgeText", label: "Eyebrow Badge Text", description: "Earmark & section badge typography (--badge-text)" },
+    { key: "badgeBorder", label: "Eyebrow Badge Border", description: "Earmark & section badge outline (--badge-border)" },
   ];
 
   // Core Settings Form
@@ -2118,6 +2123,18 @@ export default function AdminSettingsPage() {
                             borderRadius: themeConfig.common.borderRadius,
                           }}
                         >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border transition-all"
+                              style={{
+                                backgroundColor: themeConfig.light.badgeBg,
+                                color: themeConfig.light.badgeText,
+                                borderColor: themeConfig.light.badgeBorder,
+                              }}
+                            >
+                              ✨ Tanjore Classical Plate
+                            </span>
+                          </div>
                           <h4
                             className="text-base font-bold"
                             style={{
@@ -2232,6 +2249,18 @@ export default function AdminSettingsPage() {
                             borderRadius: themeConfig.common.borderRadius,
                           }}
                         >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border transition-all"
+                              style={{
+                                backgroundColor: themeConfig.dark.badgeBg,
+                                color: themeConfig.dark.badgeText,
+                                borderColor: themeConfig.dark.badgeBorder,
+                              }}
+                            >
+                              ✨ Tanjore Classical Plate
+                            </span>
+                          </div>
                           <h4
                             className="text-base font-bold"
                             style={{

@@ -32,6 +32,9 @@ import {
   Minus,
   UploadCloud,
   Loader2,
+  Shapes,
+  Music,
+  Table,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +49,8 @@ import {
 import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 import { cn } from "@/lib/utils";
 import { type ContrastMode, getContrastTypographyClasses } from "@/lib/theme-contrast";
+import { CustomDividerNode } from "@/components/builder/tiptap-divider-node";
+import { CustomShapeNode } from "@/components/builder/tiptap-shape-node";
 
 export const CustomImageNode = Node.create({
   name: "image",
@@ -260,6 +265,8 @@ export function TiptapEditor({
       }),
       TextStyleMark,
       CustomImageNode,
+      CustomDividerNode,
+      CustomShapeNode,
     ],
     content: parsedContent || "<p>Click to compose devotional verses or artwork narrative...</p>",
     editable: !readOnly,
@@ -778,16 +785,70 @@ export function TiptapEditor({
             <ImageIcon className="h-3.5 w-3.5" />
           </Button>
 
-          {/* Horizontal Rule / Divider */}
+          {/* Custom Architectural Divider */}
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "customDivider",
+                  attrs: {
+                    style: "solid",
+                    thickness: 2,
+                    color: "#D4AF37",
+                    width: "100%",
+                    alignment: "center",
+                  },
+                })
+                .run()
+            }
             className={`${btnBaseClass} ${btnInactiveClass}`}
-            title="Insert Divider"
+            title="Insert Custom Gold / Architectural Divider"
           >
             <Minus className="h-3.5 w-3.5" />
+          </Button>
+
+          {/* Custom Shape Container */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "customShape",
+                  attrs: {
+                    shapeType: "cartouche",
+                    fillColor: "rgba(251, 248, 241, 0.7)",
+                    borderColor: "#D4AF37",
+                    borderWidth: 2,
+                    shadow: "sm",
+                    alignment: "center",
+                  },
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        {
+                          type: "text",
+                          text: "Enter devotional verse, raga meditation, or philosophical quote...",
+                        },
+                      ],
+                    },
+                  ],
+                })
+                .run()
+            }
+            className={`${btnBaseClass} ${btnInactiveClass}`}
+            title="Insert Shape Container (Cartouche / Arch / Pill)"
+          >
+            <Shapes className="h-3.5 w-3.5" />
           </Button>
 
           <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
@@ -809,6 +870,191 @@ export function TiptapEditor({
         editor={editor}
         className={cn(getContrastTypographyClasses(effectiveContrast), "min-h-[80px] outline-none")}
       />
+
+      {/* Standardized Bottom Quick-Block Inserters Bar */}
+      {editor && !readOnly && (
+        <div className="mt-3 pt-2 border-t border-border/60 flex flex-wrap items-center gap-1.5 px-2 pb-1">
+          <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider font-semibold mr-1">
+            + Quick Blocks:
+          </span>
+
+          {/* 1. Add Divider */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "customDivider",
+                  attrs: {
+                    style: "solid",
+                    thickness: 2,
+                    color: "#D4AF37",
+                    width: "100%",
+                    alignment: "center",
+                  },
+                })
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Architectural Divider"
+          >
+            <Minus className="w-3 h-3 text-primary" />
+            Divider
+          </button>
+
+          {/* 2. Insert Shape */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "customShape",
+                  attrs: {
+                    shapeType: "cartouche",
+                    fillColor: "rgba(251, 248, 241, 0.7)",
+                    borderColor: "#D4AF37",
+                    borderWidth: 2,
+                    shadow: "sm",
+                    alignment: "center",
+                  },
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        {
+                          type: "text",
+                          text: "Devotional verse, raga meditation, or philosophical quote...",
+                        },
+                      ],
+                    },
+                  ],
+                })
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Shape Container"
+          >
+            <Shapes className="w-3 h-3 text-primary" />
+            Shape Block
+          </button>
+
+          {/* 3. Image Block */}
+          <button
+            type="button"
+            onClick={() => setImageModalOpen(true)}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Upload / Insert Artwork Image"
+          >
+            <ImageIcon className="w-3 h-3 text-primary" />
+            Image Block
+          </button>
+
+          {/* 4. Callout Quote */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "blockquote",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        {
+                          type: "text",
+                          text: "“The essence of Carnatic nada and Tanjore gold relief coalesce into pure contemplation.”",
+                        },
+                      ],
+                    },
+                  ],
+                })
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Callout Epigraph Quote"
+          >
+            <Quote className="w-3 h-3 text-primary" />
+            Callout Quote
+          </button>
+
+          {/* 5. Audio / Raga Block */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: "🎵 Raga Meditation: Kalyani (Adi Tala) — Pure Melodic Elevation.",
+                    },
+                  ],
+                })
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Audio / Raga Meditation Snippet"
+          >
+            <Music className="w-3 h-3 text-primary" />
+            Audio / Raga
+          </button>
+
+          {/* 6. Specs Table */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent(
+                  `<table class="my-4 w-full border-collapse border border-border text-xs">
+                    <thead>
+                      <tr class="bg-muted/40">
+                        <th class="border border-border p-2 text-left font-serif font-bold">Medium &amp; Materials</th>
+                        <th class="border border-border p-2 text-left font-serif font-bold">Archival Dimensions</th>
+                        <th class="border border-border p-2 text-left font-serif font-bold">Iconographic Canon</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="border border-border p-2">22k Gold Leaf on Teakwood</td>
+                        <td class="border border-border p-2">24 x 36 in (Framed)</td>
+                        <td class="border border-border p-2">Thanjavur Traditional Guild</td>
+                      </tr>
+                    </tbody>
+                  </table>`
+                )
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            title="Insert Curatorial Specs Table"
+          >
+            <Table className="w-3 h-3 text-primary" />
+            Specs Table
+          </button>
+
+          {/* 7. AI Polish */}
+          <div className="ml-auto">
+            <AiAssistantModal
+              initialContext={editor.getText()}
+              onApply={(aiText) => {
+                editor.chain().focus().insertContent(aiText).run();
+              }}
+              triggerLabel="AI Polish"
+              triggerClassName="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold px-2.5 py-1 text-xs rounded border border-slate-800 dark:border-slate-200 hover:bg-slate-800 dark:hover:bg-slate-200 shadow-2xs cursor-pointer"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Styled Link Modal Dialog */}
       <Dialog open={linkModalOpen} onOpenChange={setLinkModalOpen}>
@@ -979,3 +1225,5 @@ export function TiptapEditor({
   );
 }
 
+// Universal Standardized WYSIWYG Suite Alias
+export const UniversalWysiwygEditor = TiptapEditor;

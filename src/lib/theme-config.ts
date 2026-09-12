@@ -16,10 +16,15 @@ export interface ThemeModeTokens {
   mutedColor: string;
   btnPrimaryBg: string;
   btnPrimaryText: string;
+  btnPrimaryHover?: string;
   btnSecondaryBg: string;
   btnSecondaryText: string;
+  btnSecondaryHover?: string;
   activePillBg: string;
   activePillText: string;
+  badgeBg: string;
+  badgeText: string;
+  badgeBorder: string;
 }
 
 export interface DetailedThemeConfig {
@@ -46,10 +51,15 @@ export const DEFAULT_DETAILED_THEME_CONFIG: DetailedThemeConfig = {
     mutedColor: "#475569",
     btnPrimaryBg: "#0F172A",
     btnPrimaryText: "#FFFFFF",
+    btnPrimaryHover: "#1E293B",
     btnSecondaryBg: "#E2E8F0",
     btnSecondaryText: "#0F172A",
+    btnSecondaryHover: "#CBD5E1",
     activePillBg: "#0F172A",
     activePillText: "#FFFFFF",
+    badgeBg: "#FEF3C7",
+    badgeText: "#78350F",
+    badgeBorder: "#FCD34D",
   },
   dark: {
     canvasBg: "#0B0F17",
@@ -60,10 +70,15 @@ export const DEFAULT_DETAILED_THEME_CONFIG: DetailedThemeConfig = {
     mutedColor: "#94A3B8",
     btnPrimaryBg: "#D4AF37",
     btnPrimaryText: "#0B0F17",
+    btnPrimaryHover: "#E6C65A",
     btnSecondaryBg: "#1E293B",
     btnSecondaryText: "#F8FAFC",
+    btnSecondaryHover: "#2A374A",
     activePillBg: "#D4AF37",
     activePillText: "#0B0F17",
+    badgeBg: "#451A03",
+    badgeText: "#FDE68A",
+    badgeBorder: "#92400E",
   },
 };
 
@@ -87,6 +102,9 @@ export const BORDER_WIDTH_OPTIONS = [
   { label: "Standard (1.5px)", value: "1.5px" },
   { label: "Pronounced (2px)", value: "2px" },
   { label: "Bold (2.5px)", value: "2.5px" },
+  { label: "Heavy (3px)", value: "3px" },
+  { label: "Super Heavy (4px)", value: "4px" },
+  { label: "Display Archival (5px)", value: "5px" },
 ];
 
 export const BORDER_RADIUS_OPTIONS = [
@@ -98,10 +116,14 @@ export const BORDER_RADIUS_OPTIONS = [
 ];
 
 export const FONT_SIZE_OPTIONS = [
-  { label: "Compact (14px)", value: "14px" },
+  { label: "Compact (13px)", value: "13px" },
+  { label: "Small (14px)", value: "14px" },
   { label: "Medium (15px)", value: "15px" },
   { label: "Standard (16px)", value: "16px" },
   { label: "Comfortable (18px)", value: "18px" },
+  { label: "Large (20px)", value: "20px" },
+  { label: "Extra Large (22px)", value: "22px" },
+  { label: "Archival Display (24px)", value: "24px" },
 ];
 
 export const LINE_HEIGHT_OPTIONS = [
@@ -146,10 +168,15 @@ export function sanitizeDetailedThemeConfig(raw: unknown): DetailedThemeConfig {
     mutedColor: cleanColor(mode?.mutedColor, defaults.mutedColor),
     btnPrimaryBg: cleanColor(mode?.btnPrimaryBg, defaults.btnPrimaryBg),
     btnPrimaryText: cleanColor(mode?.btnPrimaryText, defaults.btnPrimaryText),
+    btnPrimaryHover: cleanColor(mode?.btnPrimaryHover, defaults.btnPrimaryHover || defaults.btnPrimaryBg),
     btnSecondaryBg: cleanColor(mode?.btnSecondaryBg, defaults.btnSecondaryBg),
     btnSecondaryText: cleanColor(mode?.btnSecondaryText, defaults.btnSecondaryText),
+    btnSecondaryHover: cleanColor(mode?.btnSecondaryHover, defaults.btnSecondaryHover || defaults.btnSecondaryBg),
     activePillBg: cleanColor(mode?.activePillBg, defaults.activePillBg),
     activePillText: cleanColor(mode?.activePillText, defaults.activePillText),
+    badgeBg: cleanColor(mode?.badgeBg, defaults.badgeBg),
+    badgeText: cleanColor(mode?.badgeText, defaults.badgeText),
+    badgeBorder: cleanColor(mode?.badgeBorder, defaults.badgeBorder),
   });
 
   return {
@@ -173,9 +200,16 @@ export function generateUnifiedThemeCSS(theme: DetailedThemeConfig): string {
       --muted-foreground: ${theme.light.mutedColor};
       --primary: ${theme.light.btnPrimaryBg};
       --primary-foreground: ${theme.light.btnPrimaryText};
+      --primary-hover: ${theme.light.btnPrimaryHover || theme.light.btnPrimaryBg};
       --secondary: ${theme.light.btnSecondaryBg};
       --secondary-foreground: ${theme.light.btnSecondaryText};
+      --secondary-hover: ${theme.light.btnSecondaryHover || theme.light.btnSecondaryBg};
       --headings: ${theme.light.headingColor};
+      --active-pill-bg: ${theme.light.activePillBg};
+      --active-pill-text: ${theme.light.activePillText};
+      --badge-bg: ${theme.light.badgeBg};
+      --badge-text: ${theme.light.badgeText};
+      --badge-border: ${theme.light.badgeBorder};
       --border-width: ${theme.common.borderWidth};
       --radius: ${theme.common.borderRadius};
       --font-heading: ${fontHeadingFamily};
@@ -192,9 +226,16 @@ export function generateUnifiedThemeCSS(theme: DetailedThemeConfig): string {
       --muted-foreground: ${theme.dark.mutedColor};
       --primary: ${theme.dark.btnPrimaryBg};
       --primary-foreground: ${theme.dark.btnPrimaryText};
+      --primary-hover: ${theme.dark.btnPrimaryHover || theme.dark.btnPrimaryBg};
       --secondary: ${theme.dark.btnSecondaryBg};
       --secondary-foreground: ${theme.dark.btnSecondaryText};
+      --secondary-hover: ${theme.dark.btnSecondaryHover || theme.dark.btnSecondaryBg};
       --headings: ${theme.dark.headingColor};
+      --active-pill-bg: ${theme.dark.activePillBg};
+      --active-pill-text: ${theme.dark.activePillText};
+      --badge-bg: ${theme.dark.badgeBg};
+      --badge-text: ${theme.dark.badgeText};
+      --badge-border: ${theme.dark.badgeBorder};
     }
 
     /* Universal Typography & Border Application */

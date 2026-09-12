@@ -129,7 +129,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                   "px-4 py-2 rounded-full text-xs font-serif transition-all duration-200",
                   isRootActive
                     ? "bg-amber-700 text-white font-bold shadow-md border border-amber-800 dark:bg-amber-500 dark:text-stone-950 dark:border-amber-400"
-                    : "border border-stone-300 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-50 font-semibold shadow-2xs"
+                    : "border border-stone-300 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-slate-800 font-semibold shadow-2xs"
                 )}
               >
                 {cat.name}
@@ -231,7 +231,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                     "px-4 py-1.5 rounded-full text-xs font-serif transition-all",
                     !isChild
                       ? "bg-amber-700 text-white font-bold border border-amber-800 shadow-xs dark:bg-amber-500 dark:text-stone-950 dark:border-amber-400"
-                      : "bg-white text-stone-800 hover:bg-stone-100 font-semibold border border-stone-300 shadow-2xs dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white dark:border-stone-800"
+                      : "bg-white text-stone-800 hover:bg-stone-100 hover:text-stone-950 font-semibold border border-stone-300 shadow-2xs dark:bg-stone-900 dark:text-stone-300 dark:hover:bg-slate-800 dark:hover:text-white dark:border-stone-800"
                   )}
                 >
                   All {rootCategory.name}
@@ -248,7 +248,7 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
                         "px-4 py-1.5 rounded-full text-xs font-serif transition-all",
                         isSubActive
                           ? "bg-amber-700 text-white font-bold border border-amber-800 shadow-xs dark:bg-amber-500 dark:text-stone-950 dark:border-amber-400"
-                          : "bg-white text-stone-800 hover:bg-stone-100 font-semibold border border-stone-300 shadow-2xs dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white dark:border-stone-800"
+                          : "bg-white text-stone-800 hover:bg-stone-100 hover:text-stone-950 font-semibold border border-stone-300 shadow-2xs dark:bg-stone-900 dark:text-stone-300 dark:hover:bg-slate-800 dark:hover:text-white dark:border-stone-800"
                       )}
                     >
                       {sub.name}

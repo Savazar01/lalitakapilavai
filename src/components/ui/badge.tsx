@@ -15,6 +15,7 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
         outline: "text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 font-medium",
         gold: "border border-amber-300 bg-amber-100 text-amber-900 dark:border-amber-500/40 dark:bg-amber-950/60 dark:text-amber-200 font-bold",
+        theme: "border-[var(--badge-border,#FCD34D)] bg-[var(--badge-bg,#FEF3C7)] text-[var(--badge-text,#78350F)] font-bold",
         success: "bg-emerald-100 text-emerald-900 border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-200 dark:border-emerald-600/40 font-semibold",
         crimson: "border-destructive/40 bg-destructive/10 text-destructive font-bold",
       },
