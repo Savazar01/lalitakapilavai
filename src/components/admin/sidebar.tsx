@@ -99,7 +99,7 @@ export function Sidebar({
             <span className="font-serif font-bold text-sm leading-tight text-slate-900 dark:text-slate-100">
               {brandTitle}
             </span>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold">
+            <span className="text-[10px] text-slate-600 dark:text-slate-400 uppercase tracking-widest font-bold">
               {brandSubtitle}
             </span>
           </div>
@@ -108,7 +108,7 @@ export function Sidebar({
 
       {/* Dynamic Navigation list */}
       <nav className="flex flex-col gap-1.5 p-4 flex-1 overflow-y-auto">
-        <div className="px-3 py-2 text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">
+        <div className="px-3 py-2 text-[11px] uppercase tracking-widest text-slate-600 dark:text-slate-400 font-bold">
           Platform Management
         </div>
         {ADMIN_NAV_ITEMS.filter((item) => !item.superAdminOnly || isSuperAdmin).map((item) => {

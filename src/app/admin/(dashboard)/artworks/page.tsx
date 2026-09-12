@@ -650,29 +650,31 @@ export default function ArtworksAdminPage() {
       {/* Control Bar: Filters & Search */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-2 rounded-lg border border-border bg-card/60 backdrop-blur-md">
         {/* Category Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0">
-          <Button
-            variant={selectedCategory === "ALL" ? "secondary" : "ghost"}
-            size="sm"
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+          <button
+            type="button"
             onClick={() => setSelectedCategory("ALL")}
-            className={`h-8 text-xs shrink-0 ${
-              selectedCategory === "ALL" ? "border border-primary/50 text-primary font-bold" : ""
+            className={`h-8 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+              selectedCategory === "ALL"
+                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs"
+                : "bg-slate-100 text-slate-800 border border-slate-300 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700"
             }`}
           >
             All Works ({artworks.length})
-          </Button>
+          </button>
           {categories.map((c) => (
-            <Button
+            <button
               key={c.id}
-              variant={selectedCategory === c.id ? "secondary" : "ghost"}
-              size="sm"
+              type="button"
               onClick={() => setSelectedCategory(c.id)}
-              className={`h-8 text-xs shrink-0 ${
-                selectedCategory === c.id ? "border border-primary/50 text-primary font-bold" : ""
+              className={`h-8 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                selectedCategory === c.id
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs"
+                  : "bg-slate-100 text-slate-800 border border-slate-300 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700"
               }`}
             >
               {c.name} ({c._count?.artworks ?? 0})
-            </Button>
+            </button>
           ))}
         </div>
 

@@ -159,5 +159,26 @@ To guarantee 100% legibility and rock-solid usability across Light, Dark, and Sy
 4. **Visual Builder & Inspector Controls**:
    - Inspector headings, mode buttons (Color, Patterns, Image), and toolbar controls must use neutral slate tokens, guaranteeing high contrast in all themes.
 
+---
 
+## 9. Strict Binary Theme & Contrast Invariant (Elimination of System Mode)
+To prevent theme regressions, broken light mode artifacts, or unreadable black-on-black boxes:
 
+1. **Strict Binary Theme Engine**:
+   - The application strictly uses binary theme modes: `"dark"` and `"light"`.
+   - `enableSystem` is permanently set to `false`. "System" mode is eliminated globally.
+   - `"dark"` is the permanent default theme on initial load and when unauthenticated (`defaultTheme="dark"`).
+   - The theme switcher is a direct binary button (Sun ☀️ / Moon 🌙) toggling directly between `dark` and `light`.
+2. **Surface Invariant (Zero Inverted Black-on-Black Containers)**:
+   - NEVER hardcode dark backgrounds (`bg-slate-900`, `bg-[#151B26]`, `bg-[#1C1814]`, `bg-black`, `bg-stone-900`, `bg-stone-950`) on cards, panels, or navigation wrappers without a `dark:` prefix.
+   - In Light mode, every card, tile, and section MUST resolve to `bg-card` (`#FFFFFF`) with visible borders (`#CBD5E1` Slate 300 1.5px boundary).
+   - In Dark mode, surfaces resolve to elevated obsidian (`#151B26`) with `#1E293B` borders.
+3. **Universal Typography Contrast & Readability**:
+   - NEVER use pale yellow (`text-amber-100`, `text-amber-200`, `text-yellow-100`) or faint grey (`text-slate-400`, `text-stone-400`) for text or labels on light surfaces.
+   - Primary titles & headings: `text-slate-900 dark:text-slate-50 font-bold`.
+   - Body text, descriptions & metadata: `text-slate-800 dark:text-slate-200` (WCAG AAA compliant, > 10:1 ratio against white/pearl canvas).
+   - Eyebrow tags: High-contrast `text-amber-900 dark:text-amber-300 font-bold text-xs uppercase tracking-wider`.
+4. **Standardized High-Contrast Tabs & Filter Pills**:
+   - Active state: High-contrast solid fill (`bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs`).
+   - Inactive state: Distinct neutral surface (`bg-slate-100 text-slate-800 border border-slate-300 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700 font-semibold`).
+   - Eliminate transparent pills or unbordered buttons with washed-out text.

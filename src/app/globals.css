@@ -10,7 +10,7 @@
 @layer base {
   :root {
     /* UI-UX-Pro-Max: High-Contrast Light Mode Baseline */
-    --background: #F1F3F5;
+    --background: #F4F5F7;
     --foreground: #0F172A;
 
     --card: #FFFFFF;
@@ -80,7 +80,7 @@
 
   /* Admin Portal Semantic Neutral Architecture (Zero Low-Contrast Yellows) */
   .admin-scope {
-    --background: #F1F3F5;
+    --background: #F4F5F7;
     --foreground: #0F172A;
 
     --card: #FFFFFF;

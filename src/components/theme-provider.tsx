@@ -12,6 +12,8 @@ export function ThemeProvider({
       attribute="class"
       defaultTheme="dark"
       enableSystem={false}
+      storageKey="lalita-theme"
+      themes={["dark", "light"]}
       disableTransitionOnChange
       {...props}
     >

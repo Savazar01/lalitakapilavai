@@ -390,14 +390,14 @@ export default function EventsAdminPage() {
 
       {/* Segmented Filter Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
-        <div className="inline-flex rounded-lg border border-border bg-card p-1 text-xs">
+        <div className="inline-flex rounded-lg border border-slate-300 dark:border-slate-800 bg-slate-200/80 dark:bg-slate-900 p-1 text-xs">
           <button
             type="button"
             onClick={() => setActiveSegment("upcoming")}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
               activeSegment === "upcoming"
-                ? "bg-primary/20 text-primary font-semibold shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs"
+                : "text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             }`}
           >
             <Calendar className="w-3.5 h-3.5" />
@@ -406,10 +406,10 @@ export default function EventsAdminPage() {
           <button
             type="button"
             onClick={() => setActiveSegment("past")}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
               activeSegment === "past"
-                ? "bg-primary/20 text-primary font-semibold shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs"
+                : "text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -418,10 +418,10 @@ export default function EventsAdminPage() {
           <button
             type="button"
             onClick={() => setActiveSegment("all")}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
               activeSegment === "all"
-                ? "bg-primary/20 text-primary font-semibold shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs"
+                : "text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             }`}
           >
             All Schedules ({events.length})
