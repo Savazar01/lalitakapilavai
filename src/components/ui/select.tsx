@@ -18,9 +18,9 @@ const SelectTrigger = React.forwardRef<
       className
     )}
     style={{
-      backgroundColor: "var(--form-input-bg)",
-      color: "var(--form-input-text)",
-      borderColor: "var(--form-input-border)",
+      backgroundColor: "var(--form-input-bg, inherit)",
+      color: "var(--form-input-text, inherit)",
+      borderColor: "var(--form-input-border, inherit)",
       ...style,
     }}
     {...props}

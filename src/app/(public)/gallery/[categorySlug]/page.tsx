@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CategoryGalleryPage({ params }: PageProps) {
   const { categorySlug } = await params;
 
-  const [currentCategory, rootCategories] = await Promise.all([
+  const [currentCategory, rootCategories, systemSettings] = await Promise.all([
     prisma.artCategory.findUnique({
       where: { slug: categorySlug },
       include: {
@@ -56,7 +56,14 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
       where: { parentId: null, isActive: true, isDeleted: false },
       orderBy: [{ sortOrder: "asc" }, { displayOrder: "asc" }],
     }),
+    prisma.systemSetting.findFirst({
+      select: { watermarkConfig: true },
+    }),
   ]);
+
+  const watermarkConfig = (systemSettings?.watermarkConfig as Record<string, unknown>) || {};
+  const defaultFoilEarmarkText = (watermarkConfig.defaultFoilEarmarkText as string) || "Gold Foil";
+  const showFoilEarmark = watermarkConfig.showFoilEarmark !== false;
 
   if (!currentCategory || !currentCategory.isActive || currentCategory.isDeleted) {
     notFound();
@@ -271,7 +278,11 @@ export default async function CategoryGalleryPage({ params }: PageProps) {
         </div>
 
         {/* 4. Filterable Gallery Grid strictly for this category */}
-        <GalleryGrid artworks={serializedArtworks} />
+        <GalleryGrid
+          artworks={serializedArtworks}
+          defaultFoilEarmarkText={defaultFoilEarmarkText}
+          showFoilEarmark={showFoilEarmark}
+        />
       </main>
 
       <Footer />

@@ -95,6 +95,7 @@ export async function PUT(request: NextRequest) {
       aiConfig: body.aiConfig !== undefined ? body.aiConfig : undefined,
       adminConfig: body.adminConfig !== undefined ? body.adminConfig : undefined,
       themeConfig: body.themeConfig !== undefined ? body.themeConfig : undefined,
+      watermarkConfig: body.watermarkConfig !== undefined ? body.watermarkConfig : undefined,
     };
 
     let updated;

@@ -82,6 +82,7 @@ interface Artwork {
   yearCreated: number;
   hasGoldFoil: boolean;
   goldPurity: string | null;
+  customFoilLabel?: string | null;
   price: string | number | null;
   currency?: string;
   isAvailable: boolean;
@@ -118,10 +119,11 @@ export default function ArtworksAdminPage() {
   const [categoryId, setCategoryId] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [dimensions, setDimensions] = React.useState("24 x 36 inches");
-  const [medium, setMedium] = React.useState("22k Gold Foil, Teakwood, Semi-Precious Gemstones");
+  const [medium, setMedium] = React.useState("Gold Foil, Teakwood, Semi-Precious Gemstones");
   const [yearCreated, setYearCreated] = React.useState(new Date().getFullYear().toString());
   const [hasGoldFoil, setHasGoldFoil] = React.useState(false);
   const [goldPurity, setGoldPurity] = React.useState("");
+  const [customFoilLabel, setCustomFoilLabel] = React.useState("");
   const [price, setPrice] = React.useState("");
   const [currency, setCurrency] = React.useState("INR");
   const [isAvailable, setIsAvailable] = React.useState(true);
@@ -241,10 +243,11 @@ export default function ArtworksAdminPage() {
     setCategoryId(categories[0]?.id || "");
     setDescription("");
     setDimensions("24 x 36 inches");
-    setMedium("22k Gold Foil, Teakwood, Semi-Precious Gemstones");
+    setMedium("Gold Foil, Teakwood, Semi-Precious Gemstones");
     setYearCreated(new Date().getFullYear().toString());
     setHasGoldFoil(false);
     setGoldPurity("");
+    setCustomFoilLabel("");
     setPrice("");
     setCurrency("INR");
     setIsAvailable(true);
@@ -270,6 +273,7 @@ export default function ArtworksAdminPage() {
     setYearCreated(art.yearCreated.toString());
     setHasGoldFoil(art.hasGoldFoil);
     setGoldPurity(art.goldPurity || "");
+    setCustomFoilLabel(art.customFoilLabel || "");
     setPrice(art.price ? art.price.toString() : "");
     setCurrency(art.currency || "INR");
     setIsAvailable(art.isAvailable);
@@ -403,6 +407,7 @@ export default function ArtworksAdminPage() {
       yearCreated: parseInt(yearCreated, 10),
       hasGoldFoil,
       goldPurity: hasGoldFoil && goldPurity?.trim() ? goldPurity.trim() : null,
+      customFoilLabel: hasGoldFoil && customFoilLabel?.trim() ? customFoilLabel.trim() : null,
       price: price ? parseFloat(price) : null,
       currency,
       isAvailable,
@@ -767,7 +772,7 @@ export default function ArtworksAdminPage() {
                   </Badge>
                   {art.hasGoldFoil && (
                     <Badge variant="gold" className="text-[9px]">
-                      22k Gold Foil
+                      {art.customFoilLabel || art.goldPurity || "Gold Foil"}
                     </Badge>
                   )}
                 </div>
@@ -1182,7 +1187,7 @@ export default function ArtworksAdminPage() {
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">Medium Used</label>
                   <Input
-                    placeholder="22k Gold Foil, Teakwood, Semi-Precious Gemstones"
+                    placeholder="Gold Foil, Teakwood, Semi-Precious Gemstones"
                     value={medium}
                     onChange={(e) => setMedium(e.target.value)}
                     required
@@ -1212,23 +1217,42 @@ export default function ArtworksAdminPage() {
                       setHasGoldFoil(checked);
                       if (!checked) {
                         setGoldPurity("");
+                        setCustomFoilLabel("");
                       }
                     }}
-                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    className="rounded border-border text-primary focus:ring-primary h-4 w-4 cursor-pointer"
                   />
-                  <label htmlFor="hasGoldFoil" className="text-xs font-semibold text-foreground">
-                    Includes Authentic Gold Foil Relief Work
+                  <label htmlFor="hasGoldFoil" className="text-xs font-semibold text-foreground cursor-pointer select-none">
+                    Includes Authentic Gold / Silver Foil Work
                   </label>
                 </div>
 
                 {hasGoldFoil && (
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Gold Purity / Certification</label>
-                    <Input
-                      placeholder="e.g. 22 Carat Jaipur Gold Leaf"
-                      value={goldPurity}
-                      onChange={(e) => setGoldPurity(e.target.value)}
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-foreground">Custom Foil Earmark Badge (Optional)</label>
+                      <Input
+                        placeholder="e.g. Gold Foil, 24K Gold Leaf"
+                        value={customFoilLabel}
+                        onChange={(e) => setCustomFoilLabel(e.target.value)}
+                        className="text-xs"
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        Overrides the global watermark setting badge on gallery cards.
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-foreground">Gold Purity / Certification Spec</label>
+                      <Input
+                        placeholder="e.g. 22 Carat Jaipur Gold Leaf"
+                        value={goldPurity}
+                        onChange={(e) => setGoldPurity(e.target.value)}
+                        className="text-xs"
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        Technical specification shown in the artwork provenance specifications.
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>

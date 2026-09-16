@@ -725,7 +725,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                         <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
                           <ShieldCheck className="w-3 h-3 text-primary" />
                           <span className="text-[9px] font-mono font-semibold text-primary">
-                            {item.artwork.hasGoldFoil ? "22k Gold Foil Masterwork" : "Traditional Classical Masterwork"}
+                            {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
                           </span>
                         </div>
                       </div>
@@ -749,7 +749,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       <div className="space-y-1.5 text-xs text-foreground/90 border-t border-primary/20 pt-3">
                         <p>
                           <strong className="text-muted-foreground font-mono text-[11px] uppercase mr-1">Medium:</strong>
-                          <span>{item.artwork.medium || "Natural Mineral Pigments & 22k Jaipur Gold Foil"}</span>
+                          <span>{item.artwork.medium || "Natural Mineral Pigments & Gold Foil"}</span>
                         </p>
                         {item.artwork.dimensions && (
                           <p>
@@ -804,7 +804,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                         <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
                           <ShieldCheck className="w-3 h-3 text-primary" />
                           <span className="text-[9px] font-mono font-semibold text-primary">
-                            {item.artwork.hasGoldFoil ? "22k Gold Foil Masterwork" : "Traditional Classical Masterwork"}
+                            {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
                           </span>
                         </div>
                       </div>
@@ -959,7 +959,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       <TiptapRenderer content={endPageConfig.contentHtml as string} contrast={endScope.contrastMode} />
                     ) : (
                       <p>
-                        Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic 22k gold foil Thanjavur art and classical Carnatic musicianship.
+                        Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic gold foil Thanjavur art and classical Carnatic musicianship.
                       </p>
                     )}
                   </div>

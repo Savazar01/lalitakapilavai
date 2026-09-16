@@ -179,6 +179,8 @@ export default function AdminSettingsPage() {
     watermarkOpacity: 0.35,
     watermarkFontSize: 28,
     watermarkStyle: "REPEAT_DIAGONAL",
+    defaultFoilEarmarkText: "Gold Foil",
+    showFoilEarmark: true,
     storageProvider: "R2",
     r2AccountId: "",
     r2BucketName: "lalitakapilavai-media",
@@ -255,6 +257,8 @@ export default function AdminSettingsPage() {
             watermarkOpacity: data.watermarkOpacity ?? 0.35,
             watermarkFontSize: data.watermarkFontSize ?? 28,
             watermarkStyle: data.watermarkStyle || "REPEAT_DIAGONAL",
+            defaultFoilEarmarkText: data.watermarkConfig?.defaultFoilEarmarkText || "Gold Foil",
+            showFoilEarmark: data.watermarkConfig?.showFoilEarmark !== false,
             storageProvider: data.storageProvider || "R2",
             r2AccountId: data.r2AccountId || "",
             r2BucketName: data.r2BucketName || "lalitakapilavai-media",
@@ -471,6 +475,10 @@ export default function AdminSettingsPage() {
         footerConfig: updatedFooterConfig,
         emailConfig,
         aiConfig,
+        watermarkConfig: {
+          defaultFoilEarmarkText: form.defaultFoilEarmarkText?.trim() || "Gold Foil",
+          showFoilEarmark: form.showFoilEarmark,
+        },
       };
 
       const res = await fetch("/api/admin/settings", {
@@ -1132,6 +1140,47 @@ export default function AdminSettingsPage() {
                         onChange={(e) => setForm({ ...form, watermarkFontSize: parseInt(e.target.value) || 28 })}
                         className="text-xs"
                       />
+                    </div>
+                  </div>
+
+                  {/* Foil & Medium Earmarks */}
+                  <div className="pt-4 border-t border-border/60">
+                    <h4 className="font-serif font-bold text-sm text-foreground mb-1">
+                      Foil &amp; Medium Earmarks (Gallery &amp; Detail Overlays)
+                    </h4>
+                    <p className="text-muted-foreground text-xs mb-3">
+                      Configure the default label and global visibility of authentic foil work badges on artwork cards and master detail views.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Default Foil Earmark Text</Label>
+                        <Input
+                          value={form.defaultFoilEarmarkText}
+                          onChange={(e) => setForm({ ...form, defaultFoilEarmarkText: e.target.value })}
+                          placeholder="e.g. Gold Foil, 24K Gold Leaf"
+                          className="text-xs"
+                        />
+                        <p className="text-[11px] text-muted-foreground">
+                          Applied across gallery cards and detail views when an artwork has foil work enabled without an individual override.
+                        </p>
+                      </div>
+
+                      <div className="space-y-1.5 flex flex-col justify-center">
+                        <label className="flex items-center gap-2 cursor-pointer pt-2">
+                          <input
+                            type="checkbox"
+                            checked={form.showFoilEarmark}
+                            onChange={(e) => setForm({ ...form, showFoilEarmark: e.target.checked })}
+                            className="rounded border-slate-300 text-amber-600 focus:ring-amber-500 w-4 h-4"
+                          />
+                          <span className="font-semibold text-foreground text-xs select-none">
+                            Display Foil Work Earmarks / Badges across Galleries
+                          </span>
+                        </label>
+                        <p className="text-[11px] text-muted-foreground pl-6">
+                          When checked, artworks with gold or silver foil work display a gold badge in gallery grids and the detail canvas.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

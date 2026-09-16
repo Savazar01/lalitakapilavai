@@ -11,9 +11,9 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className
         )}
         style={{
-          backgroundColor: "var(--form-input-bg)",
-          color: "var(--form-input-text)",
-          borderColor: "var(--form-input-border)",
+          backgroundColor: "var(--form-input-bg, inherit)",
+          color: "var(--form-input-text, inherit)",
+          borderColor: "var(--form-input-border, inherit)",
           borderWidth: "var(--form-input-border-width, 1.5px)",
           ...style,
         }}

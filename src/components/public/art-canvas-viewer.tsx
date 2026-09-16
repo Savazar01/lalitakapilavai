@@ -19,6 +19,8 @@ export interface ArtCanvasViewerProps {
   dimensions?: string;
   hasGoldFoil?: boolean;
   goldPurity?: string;
+  customFoilLabel?: string;
+  defaultFoilText?: string;
   yearCreated?: number;
   className?: string;
 }
@@ -30,6 +32,8 @@ export function ArtCanvasViewer({
   dimensions,
   hasGoldFoil,
   goldPurity,
+  customFoilLabel,
+  defaultFoilText,
   yearCreated,
   className = "",
 }: ArtCanvasViewerProps) {
@@ -126,7 +130,7 @@ export function ArtCanvasViewer({
                 className="shadow-md backdrop-blur-md bg-amber-500/20 border border-amber-400 text-amber-900 dark:text-amber-300 font-bold text-[11px] gap-1"
               >
                 <Sparkles className="w-3 h-3" />
-                {goldPurity || "22k Gold Foil Relief"}
+                {customFoilLabel || defaultFoilText || goldPurity || "Gold Foil Relief"}
               </Badge>
             )}
             {yearCreated && (

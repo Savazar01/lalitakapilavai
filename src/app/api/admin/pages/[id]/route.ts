@@ -17,9 +17,16 @@ export async function GET(
     }
 
     const { id } = await params;
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
 
-    const page = await prisma.page.findUnique({
-      where: { id },
+    const page = await prisma.page.findFirst({
+      where: {
+        OR: [
+          ...(isUuid ? [{ id }] : []),
+          { slug: id },
+        ],
+        isDeleted: false,
+      },
       include: {
         sections: {
           orderBy: { orderIndex: "asc" },
@@ -57,6 +64,21 @@ export async function PUT(
     }
 
     const { id } = await params;
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+    const existingPage = await prisma.page.findFirst({
+      where: {
+        OR: [
+          ...(isUuid ? [{ id }] : []),
+          { slug: id },
+        ],
+      },
+    });
+
+    if (!existingPage) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    }
+
+    const resolvedId = existingPage.id;
     const body = await request.json();
     const {
       title,
@@ -77,7 +99,7 @@ export async function PUT(
     const updatedPage = await prisma.$transaction(async (tx) => {
       // 1. Update Page metadata
       const page = await tx.page.update({
-        where: { id },
+        where: { id: resolvedId },
         data: {
           title,
           slug,
@@ -99,11 +121,11 @@ export async function PUT(
         // Remove existing sections to ensure atomic replacement
         await tx.subSection.deleteMany({
           where: {
-            section: { pageId: id },
+            section: { pageId: resolvedId },
           },
         });
         await tx.pageSection.deleteMany({
-          where: { pageId: id },
+          where: { pageId: resolvedId },
         });
 
         // Insert incoming sections and subsections
@@ -200,14 +222,22 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const existing = await prisma.page.findUnique({ where: { id } });
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+    const existing = await prisma.page.findFirst({
+      where: {
+        OR: [
+          ...(isUuid ? [{ id }] : []),
+          { slug: id },
+        ],
+      },
+    });
     if (!existing) {
       return NextResponse.json({ error: "Page not found" }, { status: 404 });
     }
 
     const deletedSlug = `${existing.slug}-deleted-${Date.now()}`;
     await prisma.page.update({
-      where: { id },
+      where: { id: existing.id },
       data: {
         isDeleted: true,
         isActive: false,

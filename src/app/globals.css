@@ -590,53 +590,162 @@ body {
 /* ==========================================================================
    CONTAINER BOUNDARY ISOLATION FOR EMBEDDED & MODAL FORMS
    ========================================================================== */
-[data-form-container="true"],
-.force-contrast-light [data-form-container="true"],
-.force-contrast-dark [data-form-container="true"] {
-  color: var(--form-input-text, var(--foreground));
+.dark [data-form-container="true"],
+.dark .force-contrast-light [data-form-container="true"],
+.dark .force-contrast-dark [data-form-container="true"] {
+  --form-card-bg: #151B26;
+  --form-card-text: #F8FAFC;
+  --form-label-color: #F8FAFC;
+  --form-input-bg: #0B0F17;
+  --form-input-text: #F8FAFC;
+  --form-input-border: #334155;
+  --headings: #F8FAFC;
+  --foreground: #F8FAFC;
+  --muted-foreground: #CBD5E1;
+  color: #F8FAFC !important;
 }
 
-[data-form-container="true"] h1,
-[data-form-container="true"] h2,
-[data-form-container="true"] h3,
-[data-form-container="true"] h4,
-[data-form-container="true"] h5,
-[data-form-container="true"] h6,
-.force-contrast-light [data-form-container="true"] h1,
-.force-contrast-light [data-form-container="true"] h2,
-.force-contrast-light [data-form-container="true"] h3,
-.force-contrast-light [data-form-container="true"] h4,
-.force-contrast-light [data-form-container="true"] h5,
-.force-contrast-light [data-form-container="true"] h6,
-.force-contrast-dark [data-form-container="true"] h1,
-.force-contrast-dark [data-form-container="true"] h2,
-.force-contrast-dark [data-form-container="true"] h3,
-.force-contrast-dark [data-form-container="true"] h4,
-.force-contrast-dark [data-form-container="true"] h5,
-.force-contrast-dark [data-form-container="true"] h6 {
-  color: var(--headings, var(--foreground)) !important;
+.dark [data-form-container="true"] h1,
+.dark [data-form-container="true"] h2,
+.dark [data-form-container="true"] h3,
+.dark [data-form-container="true"] h4,
+.dark [data-form-container="true"] h5,
+.dark [data-form-container="true"] h6,
+.dark [data-form-container="true"] [data-slot="heading"],
+.dark .force-contrast-light [data-form-container="true"] h1,
+.dark .force-contrast-light [data-form-container="true"] h2,
+.dark .force-contrast-light [data-form-container="true"] h3,
+.dark .force-contrast-light [data-form-container="true"] h4,
+.dark .force-contrast-light [data-form-container="true"] h5,
+.dark .force-contrast-light [data-form-container="true"] h6,
+.dark .force-contrast-light [data-form-container="true"] [data-slot="heading"] {
+  color: #F8FAFC !important;
 }
 
-[data-form-container="true"] label,
-.force-contrast-light [data-form-container="true"] label,
-.force-contrast-dark [data-form-container="true"] label {
-  color: var(--form-label-color, var(--foreground)) !important;
+.dark [data-form-container="true"] p,
+.dark [data-form-container="true"] span:not([style*="color"]),
+.dark [data-form-container="true"] .text-muted-foreground,
+.dark .force-contrast-light [data-form-container="true"] p,
+.dark .force-contrast-light [data-form-container="true"] span:not([style*="color"]),
+.dark .force-contrast-light [data-form-container="true"] .text-muted-foreground {
+  color: #CBD5E1 !important;
 }
 
-[data-form-container="true"] input,
-[data-form-container="true"] textarea,
-[data-form-container="true"] select,
-[data-form-container="true"] [role="combobox"],
-.force-contrast-light [data-form-container="true"] input,
-.force-contrast-light [data-form-container="true"] textarea,
-.force-contrast-light [data-form-container="true"] select,
-.force-contrast-light [data-form-container="true"] [role="combobox"],
-.force-contrast-dark [data-form-container="true"] input,
-.force-contrast-dark [data-form-container="true"] textarea,
-.force-contrast-dark [data-form-container="true"] select,
-.force-contrast-dark [data-form-container="true"] [role="combobox"] {
-  background-color: var(--form-input-bg, var(--background));
-  color: var(--form-input-text, var(--foreground));
-  border-color: var(--form-input-border, var(--border));
+.dark [data-form-container="true"] label,
+.dark [data-form-container="true"] .form-label,
+.dark .force-contrast-light [data-form-container="true"] label,
+.dark .force-contrast-light [data-form-container="true"] .form-label {
+  color: var(--form-label-color, #F8FAFC) !important;
 }
+
+.dark [data-form-container="true"] input,
+.dark [data-form-container="true"] textarea,
+.dark [data-form-container="true"] select,
+.dark [data-form-container="true"] [role="combobox"],
+.dark [data-form-container="true"] button[role="combobox"],
+.dark .force-contrast-light [data-form-container="true"] input,
+.dark .force-contrast-light [data-form-container="true"] textarea,
+.dark .force-contrast-light [data-form-container="true"] select,
+.dark .force-contrast-light [data-form-container="true"] [role="combobox"],
+.dark .force-contrast-light [data-form-container="true"] button[role="combobox"] {
+  background-color: var(--form-input-bg, #0B0F17) !important;
+  color: var(--form-input-text, #F8FAFC) !important;
+  border-color: var(--form-input-border, #334155) !important;
+}
+
+.dark [data-form-container="true"] [role="combobox"] span,
+.dark [data-form-container="true"] button[role="combobox"] span,
+.dark .force-contrast-light [data-form-container="true"] [role="combobox"] span,
+.dark .force-contrast-light [data-form-container="true"] button[role="combobox"] span {
+  color: var(--form-input-text, #F8FAFC) !important;
+}
+
+.dark [data-form-container="true"] input::placeholder,
+.dark [data-form-container="true"] textarea::placeholder,
+.dark [data-form-container="true"] [data-placeholder],
+.dark .force-contrast-light [data-form-container="true"] input::placeholder,
+.dark .force-contrast-light [data-form-container="true"] textarea::placeholder,
+.dark .force-contrast-light [data-form-container="true"] [data-placeholder] {
+  color: #94A3B8 !important;
+}
+
+:root:not(.dark) [data-form-container="true"],
+:root:not(.dark) .force-contrast-light [data-form-container="true"],
+:root:not(.dark) .force-contrast-dark [data-form-container="true"] {
+  --form-card-bg: #FFFFFF;
+  --form-card-text: #0F172A;
+  --form-label-color: #0F172A;
+  --form-input-bg: #FFFFFF;
+  --form-input-text: #0F172A;
+  --form-input-border: #CBD5E1;
+  --headings: #0F172A;
+  --foreground: #0F172A;
+  --muted-foreground: #475569;
+  color: #0F172A !important;
+}
+
+:root:not(.dark) [data-form-container="true"] h1,
+:root:not(.dark) [data-form-container="true"] h2,
+:root:not(.dark) [data-form-container="true"] h3,
+:root:not(.dark) [data-form-container="true"] h4,
+:root:not(.dark) [data-form-container="true"] h5,
+:root:not(.dark) [data-form-container="true"] h6,
+:root:not(.dark) [data-form-container="true"] [data-slot="heading"],
+:root:not(.dark) .force-contrast-light [data-form-container="true"] h1,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] h2,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] h3,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] h4,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] h5,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] h6,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] [data-slot="heading"] {
+  color: #0F172A !important;
+}
+
+:root:not(.dark) [data-form-container="true"] p,
+:root:not(.dark) [data-form-container="true"] span:not([style*="color"]),
+:root:not(.dark) [data-form-container="true"] .text-muted-foreground,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] p,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] span:not([style*="color"]),
+:root:not(.dark) .force-contrast-light [data-form-container="true"] .text-muted-foreground {
+  color: #475569 !important;
+}
+
+:root:not(.dark) [data-form-container="true"] label,
+:root:not(.dark) [data-form-container="true"] .form-label,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] label,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] .form-label {
+  color: var(--form-label-color, #0F172A) !important;
+}
+
+:root:not(.dark) [data-form-container="true"] input,
+:root:not(.dark) [data-form-container="true"] textarea,
+:root:not(.dark) [data-form-container="true"] select,
+:root:not(.dark) [data-form-container="true"] [role="combobox"],
+:root:not(.dark) [data-form-container="true"] button[role="combobox"],
+:root:not(.dark) .force-contrast-light [data-form-container="true"] input,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] textarea,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] select,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] [role="combobox"],
+:root:not(.dark) .force-contrast-light [data-form-container="true"] button[role="combobox"] {
+  background-color: var(--form-input-bg, #FFFFFF) !important;
+  color: var(--form-input-text, #0F172A) !important;
+  border-color: var(--form-input-border, #CBD5E1) !important;
+}
+
+:root:not(.dark) [data-form-container="true"] [role="combobox"] span,
+:root:not(.dark) [data-form-container="true"] button[role="combobox"] span,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] [role="combobox"] span,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] button[role="combobox"] span {
+  color: var(--form-input-text, #0F172A) !important;
+}
+
+:root:not(.dark) [data-form-container="true"] input::placeholder,
+:root:not(.dark) [data-form-container="true"] textarea::placeholder,
+:root:not(.dark) [data-form-container="true"] [data-placeholder],
+:root:not(.dark) .force-contrast-light [data-form-container="true"] input::placeholder,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] textarea::placeholder,
+:root:not(.dark) .force-contrast-light [data-form-container="true"] [data-placeholder] {
+  color: #64748B !important;
+}
+
 

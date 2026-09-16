@@ -72,6 +72,14 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
   }
 
   const baseUrl = await getServerBaseUrl();
+  const settings = await prisma.systemSetting.findFirst({
+    select: { watermarkConfig: true },
+  });
+  const watermarkConfig = (settings?.watermarkConfig as Record<string, unknown>) || {};
+  const defaultFoilText = (watermarkConfig.defaultFoilEarmarkText as string) || "Gold Foil";
+  const showFoilEarmark = watermarkConfig.showFoilEarmark !== false;
+  const foilBadgeText = artwork.customFoilLabel || defaultFoilText;
+
   const targetScanUrl = `${baseUrl}/artwork/${artwork.slug}?qr=true`;
   const qrDataUrl = await generateQRCodeDataUrl(targetScanUrl, {
     width: 480,
@@ -106,9 +114,9 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
             <Badge variant="outline" className="text-xs">
               {artwork.category.name}
             </Badge>
-            {artwork.hasGoldFoil && (
+            {artwork.hasGoldFoil && showFoilEarmark && (
               <Badge variant="gold" className="text-xs">
-                22k Gold Foil
+                {foilBadgeText}
               </Badge>
             )}
           </div>
@@ -123,8 +131,10 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               watermarkedUrl={artwork.watermarkedWebpUrl}
               medium={artwork.medium}
               dimensions={artwork.dimensions}
-              hasGoldFoil={artwork.hasGoldFoil}
+              hasGoldFoil={artwork.hasGoldFoil && showFoilEarmark}
               goldPurity={artwork.goldPurity || undefined}
+              customFoilLabel={artwork.customFoilLabel || undefined}
+              defaultFoilText={defaultFoilText}
               yearCreated={artwork.yearCreated}
             />
 
@@ -135,7 +145,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
                 <span className="font-serif font-bold text-foreground block mb-0.5">
                   Archival Provenance &amp; Copyright Notice
                 </span>
-                Original hand-crafted masterwork by Lalita Kapilavai. Layered on unblemished teakwood planks, gilded with certified 22k gold foil, and finished with semi-precious gemstones. Unauthorized reproduction or digital harvesting is prohibited.
+                Original hand-crafted masterwork by Lalita Kapilavai. Layered on unblemished teakwood planks, gilded with certified {artwork.customFoilLabel || artwork.goldPurity || defaultFoilText || "authentic gold foil"}, and finished with semi-precious gemstones. Unauthorized reproduction or digital harvesting is prohibited.
               </div>
             </div>
           </div>

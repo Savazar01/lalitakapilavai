@@ -22,6 +22,8 @@ interface Artwork {
   medium: string;
   yearCreated: number;
   hasGoldFoil: boolean;
+  goldPurity?: string | null;
+  customFoilLabel?: string | null;
   price: string | number | null;
   currency?: string;
   isAvailable: boolean;
@@ -33,10 +35,14 @@ interface Artwork {
 export interface GalleryGridProps {
   artworks: Artwork[];
   categories?: Category[];
+  defaultFoilEarmarkText?: string;
+  showFoilEarmark?: boolean;
 }
 
 export function GalleryGrid({
   artworks,
+  defaultFoilEarmarkText = "Gold Foil",
+  showFoilEarmark = true,
 }: GalleryGridProps) {
   return (
     <div className="space-y-8 w-full">
@@ -81,10 +87,10 @@ export function GalleryGrid({
                       <Badge variant="outline" className="text-[10px] bg-background/85 backdrop-blur-md">
                         {art.category.name}
                       </Badge>
-                      {art.hasGoldFoil && (
+                      {art.hasGoldFoil && showFoilEarmark !== false && (
                         <Badge variant="gold" className="text-[9px] shadow-sm">
                           <Sparkles className="w-2.5 h-2.5 mr-1" />
-                          22k Gold Foil
+                          {art.customFoilLabel || defaultFoilEarmarkText || "Gold Foil"}
                         </Badge>
                       )}
                     </div>

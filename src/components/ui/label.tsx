@@ -16,7 +16,7 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
       ref={ref}
       className={cn(labelVariants(), className)}
       style={{
-        color: "var(--form-label-color)",
+        color: "var(--form-label-color, inherit)",
         ...style,
       }}
       {...props}
