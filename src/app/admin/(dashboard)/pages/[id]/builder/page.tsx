@@ -58,7 +58,7 @@ import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/tim
 import { TimelineInspector } from "@/components/builder/timeline-inspector";
 import { TimelineGranularity, TimelineLayout, TimelineItem } from "@/types/timeline";
 import { FormBlockInspector, FormFieldConfig } from "@/components/builder/form-block-inspector";
-import { DynamicFormBlock } from "@/components/public/blocks/dynamic-form-block";
+import { DynamicFormBlock, DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryInspector } from "@/components/builder/media-gallery-inspector";
 import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
 import {
@@ -527,6 +527,7 @@ function SortableSection({
     recipientEmails?: string;
     emailSubjectTemplate?: string;
     fields?: FormFieldConfig[];
+    formConfig?: DynamicFormConfig;
   } | null>(null);
 
   const [activeGalleryModal, setActiveGalleryModal] = React.useState<{
@@ -1331,6 +1332,7 @@ function SortableSection({
                                   recipientEmails: block.recipientEmails,
                                   emailSubjectTemplate: block.emailSubjectTemplate,
                                   fields: block.fields,
+                                  formConfig: block.formConfig,
                                 })
                               }
                               className="text-xs h-7 border-primary/40 text-primary hover:bg-primary/10 gap-1 cursor-pointer"
@@ -1359,6 +1361,7 @@ function SortableSection({
                           {/* Interactive Preview of the Form */}
                           <div className="pt-2 border-t border-border/40 max-h-96 overflow-y-auto rounded bg-background/40 p-2">
                             <DynamicFormBlock
+                              formConfig={block.formConfig}
                               formTitle={block.formTitle}
                               formSubtitle={block.formSubtitle}
                               submitButtonText={block.submitButtonText}
@@ -1723,6 +1726,7 @@ function SortableSection({
                 recipientEmails: activeFormModal.recipientEmails,
                 emailSubjectTemplate: activeFormModal.emailSubjectTemplate,
                 fields: activeFormModal.fields,
+                formConfig: activeFormModal.formConfig,
               }}
               onChange={(updated) => {
                 updateBlock(activeFormModal.colIdx, activeFormModal.blockId, {
@@ -1734,6 +1738,7 @@ function SortableSection({
                   recipientEmails: updated.recipientEmails,
                   emailSubjectTemplate: updated.emailSubjectTemplate,
                   fields: updated.fields,
+                  formConfig: updated.formConfig,
                 });
                 setActiveFormModal((prev) =>
                   prev
@@ -1747,6 +1752,7 @@ function SortableSection({
                         recipientEmails: updated.recipientEmails,
                         emailSubjectTemplate: updated.emailSubjectTemplate,
                         fields: updated.fields,
+                        formConfig: updated.formConfig,
                       }
                     : null
                 );

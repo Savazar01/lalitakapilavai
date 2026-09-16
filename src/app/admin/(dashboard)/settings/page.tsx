@@ -39,6 +39,7 @@ import {
   LINE_HEIGHT_OPTIONS,
   sanitizeDetailedThemeConfig,
   ThemeModeTokens,
+  FormThemeTokens,
 } from "@/lib/theme-config";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -149,6 +150,18 @@ export default function AdminSettingsPage() {
     { key: "badgeBg", label: "Eyebrow Badge Background", description: "Earmark & section badge fill (--badge-bg)" },
     { key: "badgeText", label: "Eyebrow Badge Text", description: "Earmark & section badge typography (--badge-text)" },
     { key: "badgeBorder", label: "Eyebrow Badge Border", description: "Earmark & section badge outline (--badge-border)" },
+  ];
+
+  const FORM_TOKEN_DEFINITIONS: { key: keyof FormThemeTokens; label: string; description: string }[] = [
+    { key: "formCardBg", label: "Form Card Background", description: "Container card surface for forms (--form-card-bg)" },
+    { key: "formLabelColor", label: "Form Label Color", description: "Text color for input and field labels (--form-label-color)" },
+    { key: "formInputBg", label: "Input / Textarea Background", description: "Background fill for input, textarea, and select (--form-input-bg)" },
+    { key: "formInputText", label: "Input Value Text Color", description: "Typed text color inside inputs and dropdowns (--form-input-text)" },
+    { key: "formPlaceholderColor", label: "Input Placeholder Color", description: "Placeholder text color in inputs and select triggers (--form-placeholder-color)" },
+    { key: "formInputBorderColor", label: "Input Border Color", description: "Structural border color of inputs and select fields (--form-input-border)" },
+    { key: "formFocusRingColor", label: "Input Focus Ring Color", description: "Glow/focus outline color on active inputs (--form-focus-ring-color)" },
+    { key: "formSubmitBtnBg", label: "Submit Button Background", description: "Primary CTA button fill for inquiry submission (--form-btn-bg)" },
+    { key: "formSubmitBtnText", label: "Submit Button Text", description: "Contrast text on submit button (--form-btn-text)" },
   ];
 
   // Core Settings Form
@@ -2025,6 +2038,67 @@ export default function AdminSettingsPage() {
                             </div>
                           </div>
                         ))}
+
+                        {/* Dedicated Form Design Tokens */}
+                        <div className="col-span-full pt-4 mt-2 border-t border-slate-200 dark:border-slate-800">
+                          <div className="mb-3">
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 uppercase tracking-wider">
+                              <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                              Form & Input Design Tokens (Light Mode)
+                            </h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Controls styling for curatorial inquiry forms, contact blocks, input boxes, and dropdown triggers.
+                            </p>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {FORM_TOKEN_DEFINITIONS.map((def) => (
+                              <div
+                                key={`light-${def.key}`}
+                                className="flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <label
+                                    htmlFor={`light-${def.key}`}
+                                    className="text-xs font-bold text-slate-900 dark:text-slate-100 block"
+                                  >
+                                    {def.label}
+                                  </label>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
+                                    {def.description}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <input
+                                    id={`light-${def.key}`}
+                                    type="color"
+                                    value={themeConfig.light[def.key] || "#000000"}
+                                    onChange={(e) =>
+                                      setThemeConfig((prev) => ({
+                                        ...prev,
+                                        light: { ...prev.light, [def.key]: e.target.value },
+                                      }))
+                                    }
+                                    className="h-8 w-8 rounded border border-slate-300 dark:border-slate-700 cursor-pointer p-0.5 bg-white"
+                                    title={`${def.label} picker`}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={themeConfig.light[def.key] || ""}
+                                    onChange={(e) =>
+                                      setThemeConfig((prev) => ({
+                                        ...prev,
+                                        light: { ...prev.light, [def.key]: e.target.value },
+                                      }))
+                                    }
+                                    className="w-24 text-xs font-mono border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                                    placeholder="#FFFFFF"
+                                    maxLength={25}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -2079,6 +2153,67 @@ export default function AdminSettingsPage() {
                             </div>
                           </div>
                         ))}
+
+                        {/* Dedicated Form Design Tokens */}
+                        <div className="col-span-full pt-4 mt-2 border-t border-slate-200 dark:border-slate-800">
+                          <div className="mb-3">
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 uppercase tracking-wider">
+                              <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                              Form & Input Design Tokens (Dark Mode)
+                            </h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Controls styling for curatorial inquiry forms, contact blocks, input boxes, and dropdown triggers.
+                            </p>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {FORM_TOKEN_DEFINITIONS.map((def) => (
+                              <div
+                                key={`dark-${def.key}`}
+                                className="flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <label
+                                    htmlFor={`dark-${def.key}`}
+                                    className="text-xs font-bold text-slate-900 dark:text-slate-100 block"
+                                  >
+                                    {def.label}
+                                  </label>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
+                                    {def.description}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <input
+                                    id={`dark-${def.key}`}
+                                    type="color"
+                                    value={themeConfig.dark[def.key] || "#000000"}
+                                    onChange={(e) =>
+                                      setThemeConfig((prev) => ({
+                                        ...prev,
+                                        dark: { ...prev.dark, [def.key]: e.target.value },
+                                      }))
+                                    }
+                                    className="h-8 w-8 rounded border border-slate-300 dark:border-slate-700 cursor-pointer p-0.5 bg-white"
+                                    title={`${def.label} dark picker`}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={themeConfig.dark[def.key] || ""}
+                                    onChange={(e) =>
+                                      setThemeConfig((prev) => ({
+                                        ...prev,
+                                        dark: { ...prev.dark, [def.key]: e.target.value },
+                                      }))
+                                    }
+                                    className="w-24 text-xs font-mono border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                                    placeholder="#0B0F17"
+                                    maxLength={25}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -2218,6 +2353,78 @@ export default function AdminSettingsPage() {
                               View Catalog
                             </button>
                           </div>
+
+                          {/* Live Form Simulation */}
+                          <div
+                            className="p-4 space-y-2.5 border transition-all mt-4"
+                            style={{
+                              backgroundColor: themeConfig.light.formCardBg,
+                              borderColor: themeConfig.light.formInputBorderColor,
+                              borderWidth: themeConfig.common.borderWidth,
+                              borderRadius: themeConfig.common.borderRadius,
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span
+                                className="text-[10px] font-mono uppercase tracking-widest font-bold"
+                                style={{ color: themeConfig.light.formSubmitBtnBg }}
+                              >
+                                Curatorial Inquiry Form
+                              </span>
+                            </div>
+                            <div>
+                              <label
+                                className="text-[11px] font-semibold block mb-1"
+                                style={{ color: themeConfig.light.formLabelColor }}
+                              >
+                                Full Name *
+                              </label>
+                              <div
+                                className="px-2.5 py-1.5 text-xs rounded border flex items-center justify-between"
+                                style={{
+                                  backgroundColor: themeConfig.light.formInputBg,
+                                  color: themeConfig.light.formInputText,
+                                  borderColor: themeConfig.light.formInputBorderColor,
+                                  borderWidth: themeConfig.common.borderWidth,
+                                  borderRadius: themeConfig.common.borderRadius,
+                                }}
+                              >
+                                <span>Smt. Gayatri Iyer</span>
+                              </div>
+                            </div>
+                            <div>
+                              <label
+                                className="text-[11px] font-semibold block mb-1"
+                                style={{ color: themeConfig.light.formLabelColor }}
+                              >
+                                Inquiry Type
+                              </label>
+                              <div
+                                className="px-2.5 py-1.5 text-xs rounded border flex items-center justify-between"
+                                style={{
+                                  backgroundColor: themeConfig.light.formInputBg,
+                                  color: themeConfig.light.formPlaceholderColor,
+                                  borderColor: themeConfig.light.formInputBorderColor,
+                                  borderWidth: themeConfig.common.borderWidth,
+                                  borderRadius: themeConfig.common.borderRadius,
+                                }}
+                              >
+                                <span>Select an option</span>
+                                <span className="opacity-50 text-[10px]">▼</span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              className="w-full py-2 text-xs font-bold shadow-sm transition-all"
+                              style={{
+                                backgroundColor: themeConfig.light.formSubmitBtnBg,
+                                color: themeConfig.light.formSubmitBtnText,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              Submit Inquiry
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -2342,6 +2549,78 @@ export default function AdminSettingsPage() {
                               }}
                             >
                               View Catalog
+                            </button>
+                          </div>
+
+                          {/* Live Form Simulation */}
+                          <div
+                            className="p-4 space-y-2.5 border transition-all mt-4"
+                            style={{
+                              backgroundColor: themeConfig.dark.formCardBg,
+                              borderColor: themeConfig.dark.formInputBorderColor,
+                              borderWidth: themeConfig.common.borderWidth,
+                              borderRadius: themeConfig.common.borderRadius,
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span
+                                className="text-[10px] font-mono uppercase tracking-widest font-bold"
+                                style={{ color: themeConfig.dark.formSubmitBtnBg }}
+                              >
+                                Curatorial Inquiry Form
+                              </span>
+                            </div>
+                            <div>
+                              <label
+                                className="text-[11px] font-semibold block mb-1"
+                                style={{ color: themeConfig.dark.formLabelColor }}
+                              >
+                                Full Name *
+                              </label>
+                              <div
+                                className="px-2.5 py-1.5 text-xs rounded border flex items-center justify-between"
+                                style={{
+                                  backgroundColor: themeConfig.dark.formInputBg,
+                                  color: themeConfig.dark.formInputText,
+                                  borderColor: themeConfig.dark.formInputBorderColor,
+                                  borderWidth: themeConfig.common.borderWidth,
+                                  borderRadius: themeConfig.common.borderRadius,
+                                }}
+                              >
+                                <span>Smt. Gayatri Iyer</span>
+                              </div>
+                            </div>
+                            <div>
+                              <label
+                                className="text-[11px] font-semibold block mb-1"
+                                style={{ color: themeConfig.dark.formLabelColor }}
+                              >
+                                Inquiry Type
+                              </label>
+                              <div
+                                className="px-2.5 py-1.5 text-xs rounded border flex items-center justify-between"
+                                style={{
+                                  backgroundColor: themeConfig.dark.formInputBg,
+                                  color: themeConfig.dark.formPlaceholderColor,
+                                  borderColor: themeConfig.dark.formInputBorderColor,
+                                  borderWidth: themeConfig.common.borderWidth,
+                                  borderRadius: themeConfig.common.borderRadius,
+                                }}
+                              >
+                                <span>Select an option</span>
+                                <span className="opacity-50 text-[10px]">▼</span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              className="w-full py-2 text-xs font-bold shadow-sm transition-all"
+                              style={{
+                                backgroundColor: themeConfig.dark.formSubmitBtnBg,
+                                color: themeConfig.dark.formSubmitBtnText,
+                                borderRadius: themeConfig.common.borderRadius,
+                              }}
+                            >
+                              Submit Inquiry
                             </button>
                           </div>
                         </div>

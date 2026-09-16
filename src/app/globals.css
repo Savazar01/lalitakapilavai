@@ -43,6 +43,19 @@
     --ring: #0F172A;
 
     --radius: 0.5rem;
+
+    /* Form Design Tokens (Light Baseline) */
+    --form-card-bg: #FFFFFF;
+    --form-label-color: #0F172A;
+    --form-input-bg: #FFFFFF;
+    --form-input-text: #0F172A;
+    --form-placeholder-color: #64748B;
+    --form-input-border: #CBD5E1;
+    --form-input-border-width: 1.5px;
+    --form-focus-ring-color: #D97706;
+    --form-btn-bg: #D97706;
+    --form-btn-text: #FFFFFF;
+    --form-btn-hover: #B45309;
   }
 
   .dark {
@@ -77,6 +90,19 @@
     --border: #1E293B;
     --input: #1E293B;
     --ring: #F3C64F;
+
+    /* Form Design Tokens (Dark Baseline) */
+    --form-card-bg: #151B26;
+    --form-label-color: #F8FAFC;
+    --form-input-bg: #0B0F17;
+    --form-input-text: #F8FAFC;
+    --form-placeholder-color: #94A3B8;
+    --form-input-border: #334155;
+    --form-input-border-width: 1.5px;
+    --form-focus-ring-color: #F59E0B;
+    --form-btn-bg: #F59E0B;
+    --form-btn-text: #0F172A;
+    --form-btn-hover: #D97706;
   }
 
   /* Admin Portal Semantic Neutral Architecture (Zero Low-Contrast Yellows) */
@@ -560,3 +586,57 @@ body {
 .force-contrast-dark .opacity-80 {
   color: var(--current-muted, #94A3B8) !important;
 }
+
+/* ==========================================================================
+   CONTAINER BOUNDARY ISOLATION FOR EMBEDDED & MODAL FORMS
+   ========================================================================== */
+[data-form-container="true"],
+.force-contrast-light [data-form-container="true"],
+.force-contrast-dark [data-form-container="true"] {
+  color: var(--form-input-text, var(--foreground));
+}
+
+[data-form-container="true"] h1,
+[data-form-container="true"] h2,
+[data-form-container="true"] h3,
+[data-form-container="true"] h4,
+[data-form-container="true"] h5,
+[data-form-container="true"] h6,
+.force-contrast-light [data-form-container="true"] h1,
+.force-contrast-light [data-form-container="true"] h2,
+.force-contrast-light [data-form-container="true"] h3,
+.force-contrast-light [data-form-container="true"] h4,
+.force-contrast-light [data-form-container="true"] h5,
+.force-contrast-light [data-form-container="true"] h6,
+.force-contrast-dark [data-form-container="true"] h1,
+.force-contrast-dark [data-form-container="true"] h2,
+.force-contrast-dark [data-form-container="true"] h3,
+.force-contrast-dark [data-form-container="true"] h4,
+.force-contrast-dark [data-form-container="true"] h5,
+.force-contrast-dark [data-form-container="true"] h6 {
+  color: var(--headings, var(--foreground)) !important;
+}
+
+[data-form-container="true"] label,
+.force-contrast-light [data-form-container="true"] label,
+.force-contrast-dark [data-form-container="true"] label {
+  color: var(--form-label-color, var(--foreground)) !important;
+}
+
+[data-form-container="true"] input,
+[data-form-container="true"] textarea,
+[data-form-container="true"] select,
+[data-form-container="true"] [role="combobox"],
+.force-contrast-light [data-form-container="true"] input,
+.force-contrast-light [data-form-container="true"] textarea,
+.force-contrast-light [data-form-container="true"] select,
+.force-contrast-light [data-form-container="true"] [role="combobox"],
+.force-contrast-dark [data-form-container="true"] input,
+.force-contrast-dark [data-form-container="true"] textarea,
+.force-contrast-dark [data-form-container="true"] select,
+.force-contrast-dark [data-form-container="true"] [role="combobox"] {
+  background-color: var(--form-input-bg, var(--background));
+  color: var(--form-input-text, var(--foreground));
+  border-color: var(--form-input-border, var(--border));
+}
+

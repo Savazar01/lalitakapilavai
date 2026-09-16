@@ -10,6 +10,7 @@ import {
   FileText,
   Sliders,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
 
 export interface FormFieldConfig {
   id: string;
@@ -50,6 +52,7 @@ export interface FormBlockData {
   recipientEmails?: string;
   emailSubjectTemplate?: string;
   fields?: FormFieldConfig[];
+  formConfig?: DynamicFormConfig;
 }
 
 export interface FormBlockInspectorProps {
@@ -128,6 +131,8 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
   const [isFieldModalOpen, setIsFieldModalOpen] = React.useState(false);
   const [optionsStr, setOptionsStr] = React.useState("");
 
+  const formConfig: DynamicFormConfig = data.formConfig ?? {};
+
   const updateConfig = (patch: Partial<FormBlockData>) => {
     onChange({
       formTitle,
@@ -138,7 +143,17 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
       recipientEmails,
       emailSubjectTemplate,
       fields,
+      formConfig,
       ...patch,
+    });
+  };
+
+  const updateFormConfig = (patch: Partial<DynamicFormConfig>) => {
+    updateConfig({
+      formConfig: {
+        ...formConfig,
+        ...patch,
+      },
     });
   };
 
@@ -315,6 +330,141 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
             </div>
           )}
         </div>
+      </div>
+
+      {/* Instance-Level Form Theming Overrides */}
+      <div className="space-y-4 p-4 rounded-xl border border-border/80 bg-card/60">
+        <div>
+          <h4 className="font-serif font-bold text-sm text-foreground flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-primary" />
+            Instance Styling &amp; Color Overrides (Optional)
+          </h4>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Override global Theme Studio tokens for this specific form instance. Leave blank to cleanly fall back to global `--form-*` theme tokens.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Card Surface</Label>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="color"
+                value={formConfig.cardBg || "#ffffff"}
+                onChange={(e) => updateFormConfig({ cardBg: e.target.value })}
+                className="h-7 w-7 rounded border border-border cursor-pointer p-0.5 bg-white shrink-0"
+              />
+              <Input
+                value={formConfig.cardBg || ""}
+                onChange={(e) => updateFormConfig({ cardBg: e.target.value })}
+                placeholder="Global default"
+                className="text-xs font-mono h-7"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Label Color</Label>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="color"
+                value={formConfig.labelColor || "#0f172a"}
+                onChange={(e) => updateFormConfig({ labelColor: e.target.value })}
+                className="h-7 w-7 rounded border border-border cursor-pointer p-0.5 bg-white shrink-0"
+              />
+              <Input
+                value={formConfig.labelColor || ""}
+                onChange={(e) => updateFormConfig({ labelColor: e.target.value })}
+                placeholder="Global default"
+                className="text-xs font-mono h-7"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Input Fill</Label>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="color"
+                value={formConfig.inputBg || "#ffffff"}
+                onChange={(e) => updateFormConfig({ inputBg: e.target.value })}
+                className="h-7 w-7 rounded border border-border cursor-pointer p-0.5 bg-white shrink-0"
+              />
+              <Input
+                value={formConfig.inputBg || ""}
+                onChange={(e) => updateFormConfig({ inputBg: e.target.value })}
+                placeholder="Global default"
+                className="text-xs font-mono h-7"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Input Border</Label>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="color"
+                value={formConfig.inputBorderColor || "#cbd5e1"}
+                onChange={(e) => updateFormConfig({ inputBorderColor: e.target.value })}
+                className="h-7 w-7 rounded border border-border cursor-pointer p-0.5 bg-white shrink-0"
+              />
+              <Input
+                value={formConfig.inputBorderColor || ""}
+                onChange={(e) => updateFormConfig({ inputBorderColor: e.target.value })}
+                placeholder="Global default"
+                className="text-xs font-mono h-7"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Submit Button Fill</Label>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="color"
+                value={formConfig.btnBg || "#d97706"}
+                onChange={(e) => updateFormConfig({ btnBg: e.target.value })}
+                className="h-7 w-7 rounded border border-border cursor-pointer p-0.5 bg-white shrink-0"
+              />
+              <Input
+                value={formConfig.btnBg || ""}
+                onChange={(e) => updateFormConfig({ btnBg: e.target.value })}
+                placeholder="Global default"
+                className="text-xs font-mono h-7"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Submit Button Text</Label>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="color"
+                value={formConfig.btnText || "#ffffff"}
+                onChange={(e) => updateFormConfig({ btnText: e.target.value })}
+                className="h-7 w-7 rounded border border-border cursor-pointer p-0.5 bg-white shrink-0"
+              />
+              <Input
+                value={formConfig.btnText || ""}
+                onChange={(e) => updateFormConfig({ btnText: e.target.value })}
+                placeholder="Global default"
+                className="text-xs font-mono h-7"
+              />
+            </div>
+          </div>
+        </div>
+
+        {(formConfig.cardBg || formConfig.labelColor || formConfig.inputBg || formConfig.inputBorderColor || formConfig.btnBg || formConfig.btnText) && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => updateConfig({ formConfig: undefined })}
+            className="text-[11px] h-7 text-muted-foreground hover:text-destructive cursor-pointer"
+          >
+            Reset to Global Theme Studio Defaults
+          </Button>
+        )}
       </div>
 
       {/* Fields List */}

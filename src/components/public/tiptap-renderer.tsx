@@ -17,7 +17,7 @@ import {
 import { BlogGridEmbed } from "@/components/public/blog-grid-embed";
 import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
-import { DynamicFormBlock, FormFieldConfig } from "@/components/public/blocks/dynamic-form-block";
+import { DynamicFormBlock, FormFieldConfig, DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
 import { cn } from "@/lib/utils";
 import {
@@ -492,6 +492,7 @@ export interface ColumnBlock {
   recipientEmails?: string;
   emailSubjectTemplate?: string;
   fields?: FormFieldConfig[];
+  formConfig?: DynamicFormConfig;
   pageSlug?: string;
   // Media Gallery Block Properties
   galleryDisplayMode?: "carousel" | "scroll" | "collage";
@@ -613,6 +614,7 @@ export function renderColumnBlock(block: ColumnBlock, contrast: ContrastMode = "
     return (
       <div key={block.id} className="py-4 w-full">
         <DynamicFormBlock
+          formConfig={block.formConfig}
           formTitle={block.formTitle}
           formSubtitle={block.formSubtitle}
           submitButtonText={block.submitButtonText}

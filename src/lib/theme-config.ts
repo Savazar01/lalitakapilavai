@@ -7,7 +7,20 @@ export interface ThemeCommonConfig {
   lineHeight: string;
 }
 
-export interface ThemeModeTokens {
+export interface FormThemeTokens {
+  formCardBg: string;           // Light: "#FFFFFF", Dark: "#151B26"
+  formLabelColor: string;       // Light: "#0F172A", Dark: "#F8FAFC"
+  formInputBg: string;          // Light: "#FFFFFF", Dark: "#0B0F17"
+  formInputText: string;        // Light: "#0F172A", Dark: "#F8FAFC"
+  formPlaceholderColor: string; // Light: "#64748B", Dark: "#94A3B8"
+  formInputBorderColor: string; // Light: "#CBD5E1", Dark: "#334155"
+  formFocusRingColor: string;   // Light: "#D97706", Dark: "#F59E0B"
+  formSubmitBtnBg: string;      // Light: "#D97706", Dark: "#F59E0B"
+  formSubmitBtnText: string;    // Light: "#FFFFFF", Dark: "#0F172A"
+  formSubmitBtnHover?: string;  // Light: "#B45309", Dark: "#D97706"
+}
+
+export interface ThemeModeTokens extends FormThemeTokens {
   canvasBg: string;
   cardBg: string;
   borderColor: string;
@@ -60,6 +73,16 @@ export const DEFAULT_DETAILED_THEME_CONFIG: DetailedThemeConfig = {
     badgeBg: "#FEF3C7",
     badgeText: "#78350F",
     badgeBorder: "#FCD34D",
+    formCardBg: "#FFFFFF",
+    formLabelColor: "#0F172A",
+    formInputBg: "#FFFFFF",
+    formInputText: "#0F172A",
+    formPlaceholderColor: "#64748B",
+    formInputBorderColor: "#CBD5E1",
+    formFocusRingColor: "#D97706",
+    formSubmitBtnBg: "#D97706",
+    formSubmitBtnText: "#FFFFFF",
+    formSubmitBtnHover: "#B45309",
   },
   dark: {
     canvasBg: "#0B0F17",
@@ -79,6 +102,16 @@ export const DEFAULT_DETAILED_THEME_CONFIG: DetailedThemeConfig = {
     badgeBg: "#451A03",
     badgeText: "#FDE68A",
     badgeBorder: "#92400E",
+    formCardBg: "#151B26",
+    formLabelColor: "#F8FAFC",
+    formInputBg: "#0B0F17",
+    formInputText: "#F8FAFC",
+    formPlaceholderColor: "#94A3B8",
+    formInputBorderColor: "#334155",
+    formFocusRingColor: "#F59E0B",
+    formSubmitBtnBg: "#F59E0B",
+    formSubmitBtnText: "#0F172A",
+    formSubmitBtnHover: "#D97706",
   },
 };
 
@@ -177,6 +210,16 @@ export function sanitizeDetailedThemeConfig(raw: unknown): DetailedThemeConfig {
     badgeBg: cleanColor(mode?.badgeBg, defaults.badgeBg),
     badgeText: cleanColor(mode?.badgeText, defaults.badgeText),
     badgeBorder: cleanColor(mode?.badgeBorder, defaults.badgeBorder),
+    formCardBg: cleanColor(mode?.formCardBg, defaults.formCardBg),
+    formLabelColor: cleanColor(mode?.formLabelColor, defaults.formLabelColor),
+    formInputBg: cleanColor(mode?.formInputBg, defaults.formInputBg),
+    formInputText: cleanColor(mode?.formInputText, defaults.formInputText),
+    formPlaceholderColor: cleanColor(mode?.formPlaceholderColor, defaults.formPlaceholderColor),
+    formInputBorderColor: cleanColor(mode?.formInputBorderColor, defaults.formInputBorderColor),
+    formFocusRingColor: cleanColor(mode?.formFocusRingColor, defaults.formFocusRingColor),
+    formSubmitBtnBg: cleanColor(mode?.formSubmitBtnBg, defaults.formSubmitBtnBg),
+    formSubmitBtnText: cleanColor(mode?.formSubmitBtnText, defaults.formSubmitBtnText),
+    formSubmitBtnHover: cleanColor(mode?.formSubmitBtnHover, defaults.formSubmitBtnHover || defaults.formSubmitBtnBg),
   });
 
   return {
@@ -218,6 +261,19 @@ export function generateUnifiedThemeCSS(theme: DetailedThemeConfig): string {
       --font-body: ${fontBodyFamily};
       --base-font-size: ${theme.common.baseFontSize};
       --line-height: ${theme.common.lineHeight};
+
+      /* Form Design Tokens */
+      --form-card-bg: ${theme.light.formCardBg};
+      --form-label-color: ${theme.light.formLabelColor};
+      --form-input-bg: ${theme.light.formInputBg};
+      --form-input-text: ${theme.light.formInputText};
+      --form-placeholder-color: ${theme.light.formPlaceholderColor};
+      --form-input-border: ${theme.light.formInputBorderColor};
+      --form-input-border-width: ${theme.common.borderWidth || "1.5px"};
+      --form-focus-ring-color: ${theme.light.formFocusRingColor};
+      --form-btn-bg: ${theme.light.formSubmitBtnBg};
+      --form-btn-text: ${theme.light.formSubmitBtnText};
+      --form-btn-hover: ${theme.light.formSubmitBtnHover || theme.light.formSubmitBtnBg};
     }
 
     .dark, .dark .admin-scope {
@@ -238,6 +294,19 @@ export function generateUnifiedThemeCSS(theme: DetailedThemeConfig): string {
       --badge-bg: ${theme.dark.badgeBg};
       --badge-text: ${theme.dark.badgeText};
       --badge-border: ${theme.dark.badgeBorder};
+
+      /* Form Design Tokens */
+      --form-card-bg: ${theme.dark.formCardBg};
+      --form-label-color: ${theme.dark.formLabelColor};
+      --form-input-bg: ${theme.dark.formInputBg};
+      --form-input-text: ${theme.dark.formInputText};
+      --form-placeholder-color: ${theme.dark.formPlaceholderColor};
+      --form-input-border: ${theme.dark.formInputBorderColor};
+      --form-input-border-width: ${theme.common.borderWidth || "1.5px"};
+      --form-focus-ring-color: ${theme.dark.formFocusRingColor};
+      --form-btn-bg: ${theme.dark.formSubmitBtnBg};
+      --form-btn-text: ${theme.dark.formSubmitBtnText};
+      --form-btn-hover: ${theme.dark.formSubmitBtnHover || theme.dark.formSubmitBtnBg};
     }
 
     /* Universal Typography & Border Application */

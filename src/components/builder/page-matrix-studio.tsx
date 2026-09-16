@@ -2020,6 +2020,7 @@ export function PageMatrixStudio({
                 recipientEmails: selectedCell?.blocks?.find((b) => b.id === formEditingCell.blockId)?.recipientEmails,
                 emailSubjectTemplate: selectedCell?.blocks?.find((b) => b.id === formEditingCell.blockId)?.emailSubjectTemplate,
                 fields: selectedCell?.blocks?.find((b) => b.id === formEditingCell.blockId)?.fields,
+                formConfig: selectedCell?.blocks?.find((b) => b.id === formEditingCell.blockId)?.formConfig,
               }}
               onChange={(data) => {
                 updateBlockInCell(
