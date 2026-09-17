@@ -21,7 +21,11 @@ import {
   LayoutGrid,
   Sliders,
   ExternalLink,
+  Search,
+  Filter,
+  FolderOpen,
 } from "lucide-react";
+import { UniversalMediaDialog } from "@/components/admin/universal-media-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -124,6 +128,11 @@ interface ArtworkSummary {
   slug: string;
   medium: string;
   primaryImageUrl: string;
+  category?: {
+    id: string;
+    name: string;
+    slug?: string;
+  } | null;
 }
 
 interface EventFormModalProps {
@@ -283,6 +292,16 @@ function EventFormContent({
   const [uploadingBanner, setUploadingBanner] = React.useState(false);
   const [uploadingGallery, setUploadingGallery] = React.useState(false);
   const [uploadingBrochure, setUploadingBrochure] = React.useState(false);
+
+  // Universal Media Dialog states
+  const [bannerPickerOpen, setBannerPickerOpen] = React.useState(false);
+  const [galleryPickerOpen, setGalleryPickerOpen] = React.useState(false);
+  const [brochurePickerOpen, setBrochurePickerOpen] = React.useState(false);
+
+  // Tab 8: Artworks Search & Filter States
+  const [artworkSearchQuery, setArtworkSearchQuery] = React.useState("");
+  const [selectedSchoolFilter, setSelectedSchoolFilter] = React.useState<string>("ALL");
+  const [showOnlySelected, setShowOnlySelected] = React.useState(false);
 
   // Countries and Timezones Data
   const countries = React.useMemo(() => getAllCountries(), []);
@@ -455,6 +474,45 @@ function EventFormContent({
     );
   };
 
+  // Distinct Traditional Schools / Categories from artworks catalog
+  const artworkSchools = React.useMemo(() => {
+    const set = new Set<string>();
+    artworksCatalog.forEach((art) => {
+      if (art.category?.name) {
+        set.add(art.category.name);
+      }
+    });
+    return Array.from(set).sort();
+  }, [artworksCatalog]);
+
+  // Filtered artworks for Tab 8
+  const filteredArtworks = React.useMemo(() => {
+    return artworksCatalog.filter((art) => {
+      // 1. "Selected Only" filter
+      if (showOnlySelected && !selectedArtworkIds.includes(art.id)) {
+        return false;
+      }
+      // 2. School/Category filter
+      if (selectedSchoolFilter !== "ALL") {
+        if (art.category?.name !== selectedSchoolFilter) {
+          return false;
+        }
+      }
+      // 3. Search query filter (title, medium, slug, school)
+      if (artworkSearchQuery.trim()) {
+        const query = artworkSearchQuery.toLowerCase().trim();
+        const matchesTitle = art.title.toLowerCase().includes(query);
+        const matchesMedium = art.medium?.toLowerCase().includes(query);
+        const matchesSlug = art.slug?.toLowerCase().includes(query);
+        const matchesSchool = art.category?.name?.toLowerCase().includes(query);
+        if (!matchesTitle && !matchesMedium && !matchesSlug && !matchesSchool) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [artworksCatalog, selectedArtworkIds, showOnlySelected, selectedSchoolFilter, artworkSearchQuery]);
+
   // Submit Handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -547,7 +605,7 @@ function EventFormContent({
   }, [startDate, endDate, timezone]);
 
   return (
-    <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-card border-border shadow-2xl">
+    <DialogContent className="max-w-4xl sm:max-w-4xl lg:max-w-5xl w-full max-h-[90vh] flex flex-col p-0 overflow-hidden bg-card border-border shadow-2xl">
       <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/60 bg-muted/20">
         <div className="flex items-center justify-between">
           <div>
@@ -568,16 +626,16 @@ function EventFormContent({
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-6 pt-3 pb-2 border-b border-border/60 bg-card overflow-x-auto no-scrollbar scroll-smooth">
-            <TabsList className="inline-flex w-max min-w-full h-auto bg-muted/40 p-1 text-xs gap-1 justify-start md:justify-between items-center rounded-lg">
-              <TabsTrigger value="general" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">General</TabsTrigger>
-              <TabsTrigger value="dates" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Dates &amp; Timezone</TabsTrigger>
-              <TabsTrigger value="venue" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Venue &amp; Address</TabsTrigger>
-              <TabsTrigger value="contacts" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Curator Contact</TabsTrigger>
-              <TabsTrigger value="rsvp" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 font-semibold text-primary">RSVP Builder</TabsTrigger>
-              <TabsTrigger value="media" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Banner &amp; Gallery</TabsTrigger>
-              <TabsTrigger value="brochure" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Brochure (PDF)</TabsTrigger>
-              <TabsTrigger value="artworks" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Artworks ({selectedArtworkIds.length})</TabsTrigger>
+          <div className="px-4 py-2 border-b border-border/60 bg-card">
+            <TabsList className="flex flex-wrap h-auto w-full items-center justify-start gap-1 bg-transparent p-0">
+              <TabsTrigger value="general" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 border border-transparent data-[state=active]:border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-xs rounded-md">General</TabsTrigger>
+              <TabsTrigger value="dates" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 border border-transparent data-[state=active]:border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-xs rounded-md">Dates &amp; Timezone</TabsTrigger>
+              <TabsTrigger value="venue" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 border border-transparent data-[state=active]:border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-xs rounded-md">Venue &amp; Address</TabsTrigger>
+              <TabsTrigger value="contacts" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 border border-transparent data-[state=active]:border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-xs rounded-md">Curator Contact</TabsTrigger>
+              <TabsTrigger value="rsvp" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 border border-transparent data-[state=active]:border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-xs rounded-md">RSVP Builder</TabsTrigger>
+              <TabsTrigger value="media" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 border border-transparent data-[state=active]:border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-xs rounded-md">Banner &amp; Gallery</TabsTrigger>
+              <TabsTrigger value="brochure" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 border border-transparent data-[state=active]:border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-xs rounded-md">Brochure (PDF)</TabsTrigger>
+              <TabsTrigger value="artworks" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 border border-transparent data-[state=active]:border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-xs rounded-md">Artworks ({selectedArtworkIds.length})</TabsTrigger>
             </TabsList>
           </div>
 
@@ -1213,17 +1271,29 @@ function EventFormContent({
                     </span>
                   </div>
 
-                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors">
-                    <Upload className="w-3.5 h-3.5 text-primary" />
-                    {uploadingBanner ? "Uploading..." : "Upload Banner"}
-                    <input
-                      type="file"
-                      accept="image/*,.heic,.heics"
-                      disabled={uploadingBanner}
-                      onChange={handleBannerUpload}
-                      className="hidden"
-                    />
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBannerPickerOpen(true)}
+                      className="text-xs h-8 gap-1.5"
+                    >
+                      <FolderOpen className="w-3.5 h-3.5 text-primary" />
+                      Media Vault / Upload
+                    </Button>
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors">
+                      <Upload className="w-3.5 h-3.5 text-primary" />
+                      {uploadingBanner ? "Uploading..." : "Direct Upload"}
+                      <input
+                        type="file"
+                        accept="image/*,.heic,.heics"
+                        disabled={uploadingBanner}
+                        onChange={handleBannerUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 {bannerImage ? (
@@ -1235,6 +1305,15 @@ function EventFormContent({
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setBannerPickerOpen(true)}
+                      >
+                        <FolderOpen className="w-3.5 h-3.5 mr-1" />
+                        Change Banner
+                      </Button>
                       <Button
                         type="button"
                         variant="destructive"
@@ -1266,18 +1345,30 @@ function EventFormContent({
                     </span>
                   </div>
 
-                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors self-start sm:self-auto">
-                    <Upload className="w-3.5 h-3.5 text-primary" />
-                    {uploadingGallery ? "Uploading..." : "Add Photos"}
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*,.heic,.heics"
-                      disabled={uploadingGallery}
-                      onChange={handleGalleryUpload}
-                      className="hidden"
-                    />
-                  </label>
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setGalleryPickerOpen(true)}
+                      className="text-xs h-8 gap-1.5"
+                    >
+                      <FolderOpen className="w-3.5 h-3.5 text-primary" />
+                      Add from Vault / Local
+                    </Button>
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors">
+                      <Upload className="w-3.5 h-3.5 text-primary" />
+                      {uploadingGallery ? "Uploading..." : "Direct Files"}
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*,.heic,.heics"
+                        disabled={uploadingGallery}
+                        onChange={handleGalleryUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 {/* Display Mode & Settings Bar */}
@@ -1470,17 +1561,29 @@ function EventFormContent({
                     </span>
                   </div>
 
-                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors self-start sm:self-auto">
-                    <Upload className="w-3.5 h-3.5 text-primary" />
-                    {uploadingBrochure ? "Uploading PDF..." : "Upload Brochure (PDF)"}
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      disabled={uploadingBrochure}
-                      onChange={handleBrochureUpload}
-                      className="hidden"
-                    />
-                  </label>
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBrochurePickerOpen(true)}
+                      className="text-xs h-8 gap-1.5"
+                    >
+                      <FolderOpen className="w-3.5 h-3.5 text-primary" />
+                      Select / Upload PDF
+                    </Button>
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-input/50 hover:bg-input text-xs font-medium cursor-pointer transition-colors">
+                      <Upload className="w-3.5 h-3.5 text-primary" />
+                      {uploadingBrochure ? "Uploading..." : "Direct PDF"}
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        disabled={uploadingBrochure}
+                        onChange={handleBrochureUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -1578,71 +1681,152 @@ function EventFormContent({
               )}
             </TabsContent>
 
-            {/* TAB 7: EXHIBITION ARTWORKS CATALOG */}
+            {/* TAB 8: EXHIBITION ARTWORKS CATALOG */}
             <TabsContent value="artworks" className="m-0 space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-border/60">
                 <div>
                   <span className="text-xs font-semibold text-foreground block">
                     Attach Masterworks to Exhibition Floor
                   </span>
                   <span className="text-[11px] text-muted-foreground">
-                    Selected works are linked and displayed on the event page.
+                    Filter by traditional school, search titles/mediums, or audit selected works ({selectedArtworkIds.length} chosen).
                   </span>
                 </div>
 
-                <Badge variant="outline" className="text-xs font-mono">
-                  {selectedArtworkIds.length} Selected
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant={showOnlySelected ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowOnlySelected(!showOnlySelected)}
+                    className="text-xs h-8 gap-1.5"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Selected Only ({selectedArtworkIds.length})
+                  </Button>
+                  {selectedArtworkIds.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedArtworkIds([])}
+                      className="text-xs h-8 text-destructive hover:text-destructive"
+                    >
+                      Clear All
+                    </Button>
+                  )}
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-1">
-                {artworksCatalog.map((art) => {
-                  const isSelected = selectedArtworkIds.includes(art.id);
-                  return (
-                    <div
-                      key={art.id}
-                      onClick={() => toggleArtworkSelection(art.id)}
-                      className={`cursor-pointer rounded-lg border p-2.5 flex items-center gap-3 transition-all ${
-                        isSelected
-                          ? "border-primary bg-primary/10 shadow-xs ring-1 ring-primary"
-                          : "border-border bg-card/60 hover:border-primary/40 hover:bg-card"
-                      }`}
+              {/* Instant Search & School Filter Toolbar */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-muted/20 p-2.5 rounded-lg border border-border/70">
+                <div className="relative flex-1">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by artwork title, medium, school, or slug..."
+                    value={artworkSearchQuery}
+                    onChange={(e) => setArtworkSearchQuery(e.target.value)}
+                    className="pl-9 text-xs h-8 bg-card"
+                  />
+                  {artworkSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setArtworkSearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
                     >
-                      <div className="relative w-12 h-12 rounded overflow-hidden bg-muted/40 shrink-0">
-                        {art.primaryImageUrl ? (
-                          <Image
-                            src={art.primaryImageUrl}
-                            alt={art.title}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <Palette className="w-5 h-5 m-auto text-muted-foreground" />
-                        )}
-                      </div>
+                      ×
+                    </button>
+                  )}
+                </div>
 
-                      <div className="min-w-0 flex-1">
-                        <span className="text-xs font-semibold text-foreground block truncate">
-                          {art.title}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground block truncate">
-                          {art.medium}
-                        </span>
-                      </div>
+                {artworkSchools.length > 0 && (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Filter className="w-3.5 h-3.5 text-muted-foreground shrink-0 hidden sm:inline" />
+                    <select
+                      value={selectedSchoolFilter}
+                      onChange={(e) => setSelectedSchoolFilter(e.target.value)}
+                      className="bg-card border border-border text-foreground text-xs rounded-md px-2.5 py-1.5 focus:ring-1 focus:ring-primary focus:outline-none h-8 min-w-[140px]"
+                    >
+                      <option value="ALL">All Schools ({artworksCatalog.length})</option>
+                      {artworkSchools.map((school) => {
+                        const count = artworksCatalog.filter((a) => a.category?.name === school).length;
+                        return (
+                          <option key={school} value={school}>
+                            {school} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                )}
+              </div>
 
+              {/* Artwork Cards Grid */}
+              {filteredArtworks.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-border/80 p-8 text-center text-xs text-muted-foreground bg-muted/10">
+                  <Palette className="w-8 h-8 text-primary mx-auto mb-2 opacity-40" />
+                  <p className="font-medium text-foreground">No artworks match the current filters.</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Try clearing the search query or switching schools.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[360px] overflow-y-auto pr-1">
+                  {filteredArtworks.map((art) => {
+                    const isSelected = selectedArtworkIds.includes(art.id);
+                    return (
                       <div
-                        className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                        key={art.id}
+                        onClick={() => toggleArtworkSelection(art.id)}
+                        className={`cursor-pointer rounded-lg border p-2.5 flex items-center gap-3 transition-all select-none ${
                           isSelected
-                            ? "bg-primary border-primary text-primary-foreground"
-                            : "border-border"
+                            ? "border-primary bg-primary/10 shadow-xs ring-1 ring-primary"
+                            : "border-border bg-card/70 hover:border-primary/40 hover:bg-card"
                         }`}
                       >
-                        {isSelected && <Check className="w-2.5 h-2.5" />}
+                        <div className="relative w-12 h-12 rounded overflow-hidden bg-muted/40 shrink-0 border border-border/60">
+                          {art.primaryImageUrl ? (
+                            <Image
+                              src={art.primaryImageUrl}
+                              alt={art.title}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <Palette className="w-5 h-5 m-auto text-muted-foreground" />
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <span className="text-xs font-semibold text-foreground block truncate" title={art.title}>
+                            {art.title}
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            {art.category?.name && (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-900 dark:text-amber-300 font-medium truncate max-w-[90px]">
+                                {art.category.name}
+                              </span>
+                            )}
+                            <span className="text-[10px] text-muted-foreground truncate max-w-[110px]" title={art.medium}>
+                              {art.medium}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div
+                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
+                            isSelected
+                              ? "bg-primary border-primary text-primary-foreground"
+                              : "border-border"
+                          }`}
+                        >
+                          {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </TabsContent>
           </div>
 
@@ -1679,6 +1863,63 @@ function EventFormContent({
           </DialogFooter>
         </Tabs>
       </form>
+
+      {/* Universal Media Dialogs */}
+      <UniversalMediaDialog
+        open={bannerPickerOpen}
+        onOpenChange={setBannerPickerOpen}
+        title="Select Event Hero Banner"
+        acceptedTypes="image"
+        allowMultiple={false}
+        onSelect={(item) => {
+          setBannerImage(item.url);
+          toast.success("Hero banner updated");
+        }}
+      />
+
+      <UniversalMediaDialog
+        open={galleryPickerOpen}
+        onOpenChange={setGalleryPickerOpen}
+        title="Add Event Gallery Photos"
+        acceptedTypes="image"
+        allowMultiple={true}
+        onSelectMultiple={(items) => {
+          const newGalleryItems: GalleryImageItem[] = items.map((item, idx) => {
+            const cleanName = (item.originalFileName || item.title || "Photo")
+              .replace(/\.[^/.]+$/, "")
+              .replace(/[-_]/g, " ");
+            return {
+              id: `gal-${Date.now()}-${idx}`,
+              url: item.url,
+              title: cleanName,
+              caption: "",
+              alt: cleanName,
+              linkType: "none",
+              linkTarget: "",
+            };
+          });
+          setGalleryImages((prev) => [...prev, ...newGalleryItems]);
+          toast.success(`Added ${newGalleryItems.length} photos to gallery`);
+        }}
+      />
+
+      <UniversalMediaDialog
+        open={brochurePickerOpen}
+        onOpenChange={setBrochurePickerOpen}
+        title="Select Program Brochure (PDF)"
+        acceptedTypes="pdf"
+        allowMultiple={false}
+        onSelect={(item) => {
+          setBrochurePdfUrl(item.url);
+          if (!brochureTitle || brochureTitle === "Exhibition Monograph & Program Brochure") {
+            const docName = (item.originalFileName || item.title || "Exhibition Monograph")
+              .replace(/\.[^/.]+$/, "")
+              .replace(/[-_]/g, " ");
+            setBrochureTitle(docName);
+          }
+          toast.success("PDF Brochure selected");
+        }}
+      />
     </DialogContent>
   );
 }

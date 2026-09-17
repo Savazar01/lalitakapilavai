@@ -49,6 +49,11 @@ interface ArtworkSummary {
   slug: string;
   medium: string;
   primaryImageUrl: string;
+  category?: {
+    id: string;
+    name: string;
+    slug?: string;
+  } | null;
 }
 
 interface Registration {

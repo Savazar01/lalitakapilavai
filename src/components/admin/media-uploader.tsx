@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MediaVaultDialog } from "@/components/admin/media-vault-dialog";
+import { UniversalMediaDialog } from "@/components/admin/universal-media-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,7 @@ export function MediaUploader({
   onUploadComplete,
   onUploadCompleteWithMeta,
   onRemove,
+  label,
   accept = "image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics",
   mediaType = "general",
   className = "",
@@ -52,16 +53,16 @@ export function MediaUploader({
     setUrlInput(value || "");
   }
 
-  const handleSelectFromVault = (vaultUrl: string) => {
-    onUploadComplete(vaultUrl);
+  const handleSelectFromVault = (item: { url: string; originalFileName?: string }) => {
+    onUploadComplete(item.url);
     if (onUploadCompleteWithMeta) {
       onUploadCompleteWithMeta({
-        url: vaultUrl,
-        originalFileName: vaultUrl.split("/").pop()?.split("?")[0],
+        url: item.url,
+        originalFileName: item.originalFileName || item.url.split("/").pop()?.split("?")[0],
       });
     }
-    setUrlInput(vaultUrl);
-    toast.success("Media selected from Vault");
+    setUrlInput(item.url);
+    toast.success("Media selected successfully");
   };
 
   const handleProcessFile = async (file: File) => {
@@ -352,10 +353,13 @@ export function MediaUploader({
         </div>
       )}
 
-      {/* Server Media Vault Modal */}
-      <MediaVaultDialog
+      {/* Universal Media Suite Modal */}
+      <UniversalMediaDialog
         open={vaultOpen}
         onOpenChange={setVaultOpen}
+        title={label ? `Select / Upload ${label}` : "Select Media Asset"}
+        acceptedTypes={accept.includes("pdf") ? "all" : "image"}
+        allowMultiple={false}
         onSelect={handleSelectFromVault}
       />
     </div>

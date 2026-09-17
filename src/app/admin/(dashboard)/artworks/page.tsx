@@ -28,8 +28,10 @@ import {
   Home,
   UploadCloud,
   FileSpreadsheet,
+  FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
+import { UniversalMediaDialog } from "@/components/admin/universal-media-dialog";
 import { ArtworkBulkImportModal } from "@/components/admin/artwork-bulk-import-modal";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -139,6 +141,7 @@ export default function ArtworksAdminPage() {
   const [watermarkedWebpUrl, setWatermarkedWebpUrl] = React.useState("");
   const [originalFileName, setOriginalFileName] = React.useState("");
   const [protectedS3Key, setProtectedS3Key] = React.useState("");
+  const [mediaVaultPickerOpen, setMediaVaultPickerOpen] = React.useState(false);
 
   // QR Preview Modal
   const [qrModalOpen, setQrModalOpen] = React.useState(false);
@@ -1020,12 +1023,24 @@ export default function ArtworksAdminPage() {
                   <label className="text-xs font-semibold uppercase tracking-wider text-foreground">
                     Masterwork Image (JPEG, PNG, WebP, GIF, TIFF)
                   </label>
-                  {primaryImageUrl && (
-                    <span className="text-[11px] font-mono text-primary flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-[#D4AF37]" />
-                      Watermarked Derivative Ready
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setMediaVaultPickerOpen(true)}
+                      className="text-xs h-7 gap-1.5"
+                    >
+                      <FolderOpen className="w-3 h-3 text-primary" />
+                      Media Vault / Upload Suite
+                    </Button>
+                    {primaryImageUrl && (
+                      <span className="text-[11px] font-mono text-primary flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-[#D4AF37]" />
+                        Derivative Ready
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div
@@ -1091,13 +1106,23 @@ export default function ArtworksAdminPage() {
                         <div className="flex items-center gap-2 pt-1">
                           <Button
                             type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setMediaVaultPickerOpen(true)}
+                            className="text-xs h-7 gap-1"
+                          >
+                            <FolderOpen className="w-3 h-3 text-primary" />
+                            Change via Vault
+                          </Button>
+                          <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => fileInputRef.current?.click()}
                             className="text-xs h-7 gap-1"
                           >
                             <RefreshCw className="w-3 h-3" />
-                            Replace Image
+                            Direct File
                           </Button>
                           <Button
                             type="button"
@@ -1114,7 +1139,7 @@ export default function ArtworksAdminPage() {
                     </div>
                   ) : (
                     <div
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={() => setMediaVaultPickerOpen(true)}
                       className="cursor-pointer py-6 flex flex-col items-center justify-center gap-2 text-center"
                     >
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -1122,7 +1147,7 @@ export default function ArtworksAdminPage() {
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-foreground">
-                          Click to upload or drag and drop artwork
+                          Click to select from Vault, upload local, or paste URL
                         </p>
                         <p className="text-[11px] text-muted-foreground mt-0.5">
                           Supports high-resolution JPEG, PNG, WebP, TIFF, and Apple HEIC/HEICS
@@ -1541,6 +1566,23 @@ export default function ArtworksAdminPage() {
         isDestructive={true}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
+      />
+
+      {/* Universal Media Suite Modal */}
+      <UniversalMediaDialog
+        open={mediaVaultPickerOpen}
+        onOpenChange={setMediaVaultPickerOpen}
+        title="Select Masterwork Image Asset"
+        acceptedTypes="image"
+        allowMultiple={false}
+        onSelect={(item) => {
+          setPrimaryImageUrl(item.url);
+          setWatermarkedWebpUrl(item.url);
+          if (item.originalFileName) {
+            setOriginalFileName(item.originalFileName);
+          }
+          toast.success("Artwork image selected successfully");
+        }}
       />
     </div>
   );
