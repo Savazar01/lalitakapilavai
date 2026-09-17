@@ -235,6 +235,7 @@ export async function POST(request: NextRequest) {
       primaryImageUrl: watermarkedUpload.publicUrl,
       isWatermarked: true,
       mediaType: "artwork",
+      originalFileName: file.name,
       protectedS3Key: masterUpload.key,
       vaultKey: masterUpload.key,
       masterKey: masterUpload.key,

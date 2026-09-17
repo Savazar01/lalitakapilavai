@@ -92,6 +92,7 @@ interface Artwork {
   sortOrder: number;
   primaryImageUrl: string;
   watermarkedWebpUrl: string;
+  originalFileName?: string | null;
   category: Category;
   categoryId: string;
   createdAt: string;
@@ -136,6 +137,7 @@ export default function ArtworksAdminPage() {
   const [uploadingImage, setUploadingImage] = React.useState(false);
   const [primaryImageUrl, setPrimaryImageUrl] = React.useState("");
   const [watermarkedWebpUrl, setWatermarkedWebpUrl] = React.useState("");
+  const [originalFileName, setOriginalFileName] = React.useState("");
   const [protectedS3Key, setProtectedS3Key] = React.useState("");
 
   // QR Preview Modal
@@ -257,6 +259,7 @@ export default function ArtworksAdminPage() {
     setSortOrder(artworks.length + 1);
     setPrimaryImageUrl("");
     setWatermarkedWebpUrl("");
+    setOriginalFileName("");
     setProtectedS3Key("");
     setDialogOpen(true);
   };
@@ -283,6 +286,7 @@ export default function ArtworksAdminPage() {
     setSortOrder(art.sortOrder !== undefined ? art.sortOrder : 0);
     setPrimaryImageUrl(art.primaryImageUrl);
     setWatermarkedWebpUrl(art.watermarkedWebpUrl);
+    setOriginalFileName(art.originalFileName || "");
     setDialogOpen(true);
   };
 
@@ -309,6 +313,7 @@ export default function ArtworksAdminPage() {
     const isHeic = /\.(heic|heics)$/i.test(file.name) || file.type.includes("heic") || file.type.includes("heif");
     setIsHeicUpload(isHeic);
     setUploadingImage(true);
+    setOriginalFileName(file.name);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("mediaType", "artwork");
@@ -334,6 +339,7 @@ export default function ArtworksAdminPage() {
 
         setPrimaryImageUrl(uploadedUrl);
         setWatermarkedWebpUrl(uploadedUrl);
+        setOriginalFileName(data.originalFileName || file.name);
         setProtectedS3Key(s3Key);
         toast.success("Artwork image uploaded & watermarked successfully!");
       } else {
@@ -418,6 +424,7 @@ export default function ArtworksAdminPage() {
       primaryImageUrl,
       watermarkedWebpUrl: watermarkedWebpUrl || primaryImageUrl,
       protectedS3Key,
+      originalFileName: originalFileName || null,
     };
 
     try {

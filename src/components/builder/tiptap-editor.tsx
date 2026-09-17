@@ -43,6 +43,9 @@ import {
   FileDown,
   Clock,
   Sparkles,
+  FolderOpen,
+  Search,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +57,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AiAssistantModal } from "@/components/admin/ai-assistant-modal";
 import { cn } from "@/lib/utils";
 import { type ContrastMode, getContrastTypographyClasses } from "@/lib/theme-contrast";
@@ -337,9 +341,46 @@ export function TiptapEditor({
   const [linkModalOpen, setLinkModalOpen] = React.useState(false);
   const [linkUrl, setLinkUrl] = React.useState("");
   const [imageModalOpen, setImageModalOpen] = React.useState(false);
+  const [imageModalTab, setImageModalTab] = React.useState<"vault" | "upload" | "url">("vault");
   const [imageUrl, setImageUrl] = React.useState("");
   const [imageCaption, setImageCaption] = React.useState("");
   const [uploadingImage, setUploadingImage] = React.useState(false);
+  const [vaultItems, setVaultItems] = React.useState<Array<{ id: string; url: string; fileName: string; title?: string }>>([]);
+  const [vaultLoading, setVaultLoading] = React.useState(false);
+  const [vaultSearch, setVaultSearch] = React.useState("");
+  const [vaultSource, setVaultSource] = React.useState("all");
+
+  React.useEffect(() => {
+    if (imageModalOpen && imageModalTab === "vault") {
+      let active = true;
+      const loadVault = async () => {
+        setVaultLoading(true);
+        try {
+          const params = new URLSearchParams({
+            search: vaultSearch,
+            source: vaultSource,
+            limit: "40",
+          });
+          const res = await fetch("/api/admin/media?" + params.toString());
+          if (res.ok) {
+            const data = await res.json();
+            if (active) {
+              setVaultItems(Array.isArray(data) ? data : data.items || []);
+            }
+          }
+        } catch (e) {
+          console.error("Vault load error:", e);
+        } finally {
+          if (active) setVaultLoading(false);
+        }
+      };
+      const debounce = setTimeout(loadVault, 200);
+      return () => {
+        active = false;
+        clearTimeout(debounce);
+      };
+    }
+  }, [imageModalOpen, imageModalTab, vaultSearch, vaultSource]);
 
   React.useEffect(() => {
     if (isFullscreen) {
@@ -1328,64 +1369,185 @@ export function TiptapEditor({
         </DialogContent>
       </Dialog>
 
-      {/* Styled Image Insertion Modal Dialog */}
+      {/* Styled Image Insertion Modal Dialog with 3 Tabs */}
       <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-        <DialogContent className="max-w-md border-border bg-card">
-          <form onSubmit={handleInsertImage} className="space-y-4">
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col border-border bg-card">
+          <form onSubmit={handleInsertImage} className="flex-1 flex flex-col min-h-0 space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-serif font-bold text-foreground">
                 Insert Image Block
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground">
-                Upload an image from your computer or provide an existing URL.
+                Select an archived asset from the Media Vault, upload a local file, or specify a remote URL.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-3 py-1">
-              {/* Local File Upload */}
-              <div className="border-2 border-dashed border-border hover:border-primary/50 rounded-lg p-3 text-center transition-colors">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/webp,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
-                  id="tiptap-modal-image-upload"
-                  className="hidden"
-                  onChange={handleImageModalUpload}
-                  disabled={uploadingImage}
-                />
-                <label
-                  htmlFor="tiptap-modal-image-upload"
-                  className="cursor-pointer flex flex-col items-center justify-center gap-1.5"
-                >
-                  {uploadingImage ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            <Tabs
+              value={imageModalTab}
+              onValueChange={(v) => setImageModalTab(v as "vault" | "upload" | "url")}
+              className="flex-1 flex flex-col min-h-0"
+            >
+              <TabsList className="grid grid-cols-3 bg-muted/50 p-1 mb-2">
+                <TabsTrigger value="vault" className="text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                  <FolderOpen className="w-3.5 h-3.5" /> Media Vault
+                </TabsTrigger>
+                <TabsTrigger value="upload" className="text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                  <UploadCloud className="w-3.5 h-3.5" /> Upload Local
+                </TabsTrigger>
+                <TabsTrigger value="url" className="text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                  <LinkIcon className="w-3.5 h-3.5" /> Remote URL
+                </TabsTrigger>
+              </TabsList>
+
+              {/* TAB 1: MEDIA VAULT */}
+              <TabsContent value="vault" className="m-0 space-y-2.5 flex-1 flex flex-col min-h-0">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder="Search archive title or filename..."
+                      value={vaultSearch}
+                      onChange={(e) => setVaultSearch(e.target.value)}
+                      className="pl-8 text-xs h-8"
+                    />
+                  </div>
+                  <div className="flex gap-1">
+                    {["all", "artwork", "event", "storage"].map((src) => (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() => setVaultSource(src)}
+                        className={`px-2 py-1 text-[11px] rounded capitalize transition-all cursor-pointer ${
+                          vaultSource === src
+                            ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold"
+                            : "bg-muted/40 hover:bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {src}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex-1 min-h-[200px] max-h-[250px] overflow-y-auto border border-border/70 rounded-lg p-2 bg-muted/20">
+                  {vaultLoading ? (
+                    <div className="h-full flex items-center justify-center text-xs text-muted-foreground gap-2 py-12">
+                      <Loader2 className="w-4 h-4 animate-spin text-primary" /> Loading media assets...
+                    </div>
+                  ) : vaultItems.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-xs text-muted-foreground py-12">
+                      No matching assets found in Media Vault.
+                    </div>
                   ) : (
-                    <UploadCloud className="w-5 h-5 text-primary" />
+                    <div className="grid grid-cols-4 gap-2">
+                      {vaultItems.map((item) => {
+                        const isSelected = imageUrl === item.url;
+                        return (
+                          <button
+                            key={item.id + item.url}
+                            type="button"
+                            onClick={() => {
+                              setImageUrl(item.url);
+                              if (item.title && !imageCaption) {
+                                setImageCaption(item.title);
+                              }
+                            }}
+                            className={`relative group rounded-md overflow-hidden border aspect-square text-left cursor-pointer transition-all ${
+                              isSelected
+                                ? "ring-2 ring-primary border-primary shadow-md"
+                                : "border-border/60 hover:border-primary/50 hover:shadow-xs"
+                            }`}
+                          >
+                            <img
+                              src={item.url}
+                              alt={item.title || item.fileName}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            {isSelected && (
+                              <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5 shadow-xs">
+                                <Check className="w-3 h-3 stroke-[3]" />
+                              </div>
+                            )}
+                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-1">
+                              <p className="text-[10px] text-white font-medium truncate leading-tight">
+                                {item.title || item.fileName}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
-                  <span className="text-xs font-semibold text-foreground">
-                    {uploadingImage ? "Uploading clean asset..." : "Upload local image"}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    JPG, PNG, WebP (Bypasses watermark)
-                  </span>
-                </label>
-              </div>
+                </div>
+              </TabsContent>
 
-              <div className="flex items-center gap-2">
-                <div className="h-px bg-border flex-1" />
-                <span className="text-[10px] uppercase text-muted-foreground font-mono">or enter url</span>
-                <div className="h-px bg-border flex-1" />
-              </div>
+              {/* TAB 2: UPLOAD LOCAL */}
+              <TabsContent value="upload" className="m-0 space-y-3 py-2">
+                <div className="border-2 border-dashed border-border hover:border-primary/50 rounded-lg p-6 text-center transition-colors">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics"
+                    id="tiptap-modal-image-upload"
+                    className="hidden"
+                    onChange={handleImageModalUpload}
+                    disabled={uploadingImage}
+                  />
+                  <label
+                    htmlFor="tiptap-modal-image-upload"
+                    className="cursor-pointer flex flex-col items-center justify-center gap-2"
+                  >
+                    {uploadingImage ? (
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    ) : (
+                      <UploadCloud className="w-6 h-6 text-primary" />
+                    )}
+                    <span className="text-xs font-semibold text-foreground">
+                      {uploadingImage ? "Uploading clean asset to Media Vault..." : "Click to select or drag & drop image"}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground">
+                      JPG, PNG, WebP (Bypasses watermarks for editorial blocks)
+                    </span>
+                  </label>
+                </div>
+              </TabsContent>
 
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Image URL</label>
-                <Input
-                  type="text"
-                  placeholder="https://... or /media/public/..."
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  className="text-xs font-mono"
-                />
-              </div>
+              {/* TAB 3: REMOTE URL */}
+              <TabsContent value="url" className="m-0 space-y-3 py-2">
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">Direct Image URL</label>
+                  <Input
+                    type="text"
+                    placeholder="https://... or /media/public/..."
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    className="text-xs font-mono"
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            {/* Selection & Caption Bar */}
+            <div className="pt-2 border-t border-border/60 space-y-2">
+              {imageUrl && (
+                <div className="rounded border border-border p-1.5 bg-muted/20 flex items-center gap-2.5">
+                  <img
+                    src={imageUrl}
+                    alt="Selected Preview"
+                    className="w-10 h-10 object-cover rounded border border-border/80 shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-mono text-foreground truncate">{imageUrl}</p>
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Selected for Insertion</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setImageUrl("")}
+                    className="text-[10px] text-rose-500 hover:underline px-2 cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
 
               <div>
                 <label className="text-xs text-muted-foreground block mb-1">Caption / Subtitle (Optional)</label>
@@ -1394,25 +1556,12 @@ export function TiptapEditor({
                   placeholder="e.g. Traditional Tanjore gold relief detail"
                   value={imageCaption}
                   onChange={(e) => setImageCaption(e.target.value)}
-                  className="text-xs"
+                  className="text-xs h-8"
                 />
               </div>
-
-              {imageUrl && (
-                <div className="rounded border border-border p-2 bg-muted/20 flex items-center gap-3">
-                  <img
-                    src={imageUrl}
-                    alt="Preview"
-                    className="w-12 h-12 object-cover rounded border border-border/80"
-                  />
-                  <span className="text-xs font-mono text-muted-foreground truncate flex-1">
-                    {imageUrl}
-                  </span>
-                </div>
-              )}
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2 sm:gap-0 pt-1">
               <Button
                 type="button"
                 variant="outline"

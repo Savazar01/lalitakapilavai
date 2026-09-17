@@ -248,6 +248,7 @@ export async function POST(request: NextRequest) {
           existing = await prisma.artwork.findFirst({
             where: {
               OR: [
+                { originalFileName: { equals: originalFileNameVal, mode: "insensitive" } },
                 { protectedS3Key: { endsWith: originalFileNameVal } },
                 { primaryImageUrl: { contains: originalFileNameVal } },
               ],
@@ -278,6 +279,7 @@ export async function POST(request: NextRequest) {
               sortOrder: sortOrderVal,
               primaryImageUrl: primaryImageUrlVal,
               watermarkedWebpUrl: existing.watermarkedWebpUrl || primaryImageUrlVal,
+              originalFileName: originalFileNameVal || undefined,
               description: descriptionVal || existing.description,
             },
           });
@@ -322,6 +324,7 @@ export async function POST(request: NextRequest) {
               sortOrder: sortOrderVal,
               primaryImageUrl: primaryImageUrlVal,
               watermarkedWebpUrl: primaryImageUrlVal,
+              originalFileName: originalFileNameVal || null,
               description: descriptionVal,
             },
           });

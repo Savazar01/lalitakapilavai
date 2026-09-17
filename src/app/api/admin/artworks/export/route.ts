@@ -150,6 +150,7 @@ export async function GET(request: NextRequest) {
       const subCatName = art.category.parent ? art.category.name : "";
       const traditionalSchool = art.category.parent?.name || art.category.name;
       const originalFileName =
+        art.originalFileName ||
         (art.protectedS3Key ? art.protectedS3Key.split("/").pop() : "") ||
         (art.primaryImageUrl ? art.primaryImageUrl.split("/").pop()?.split("?")[0] : "") ||
         "";

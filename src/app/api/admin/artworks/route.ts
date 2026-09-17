@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
       primaryImageUrl,
       watermarkedWebpUrl,
       protectedS3Key,
+      originalFileName,
     } = body;
 
     if (!title || !slug || !categoryId || !primaryImageUrl) {
@@ -149,6 +150,7 @@ export async function POST(request: NextRequest) {
         primaryImageUrl,
         watermarkedWebpUrl: watermarkedWebpUrl || primaryImageUrl,
         protectedS3Key: protectedS3Key || null,
+        originalFileName: originalFileName || null,
       },
       include: {
         category: true,

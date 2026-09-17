@@ -318,11 +318,13 @@ function renderNode(
       const borderWidth = Number(attrs.borderWidth) || 2;
       const shadow = (attrs.shadow as string) || "sm";
       const alignment = (attrs.alignment as string) || "center";
+      const size = (attrs.size as string) || "md";
       const imageUrl = (attrs.imageUrl as string) || "";
       const imageFit = (attrs.imageFit as string) || "cover";
       const imageOpacity = typeof attrs.imageOpacity === "number" ? attrs.imageOpacity : 1;
       const scrimOpacity = typeof attrs.scrimOpacity === "number" ? attrs.scrimOpacity : 0.35;
       const scrimColor = (attrs.scrimColor as string) || "#000000";
+      const focalPosition = (attrs.focalPosition as string) || "center center";
 
       let containerClass = "p-6 my-6 relative transition-all overflow-hidden";
       const shapeStyle: React.CSSProperties = {
@@ -334,6 +336,9 @@ function renderNode(
 
       if (shapeType === "circle") {
         containerClass += " rounded-full aspect-square flex items-center justify-center text-center max-w-[340px] mx-auto";
+      } else if (shapeType === "oval") {
+        containerClass += " rounded-[50%/35%] aspect-[16/10] flex items-center justify-center text-center p-8";
+        shapeStyle.borderRadius = "50% / 35%";
       } else if (shapeType === "pill") {
         containerClass += " rounded-full px-8 py-4";
       } else if (shapeType === "templeArch") {
@@ -366,10 +371,19 @@ function renderNode(
           ? "ml-auto mr-0"
           : "mx-auto";
 
+      const sizeClass =
+        size === "sm"
+          ? "max-w-[280px]"
+          : size === "lg"
+          ? "max-w-[680px]"
+          : size === "full"
+          ? "w-full max-w-full"
+          : "max-w-[440px]";
+
       return (
         <div
           key={key}
-          className={cn(containerClass, shadowClass, alignClass, "max-w-2xl")}
+          className={cn(containerClass, shadowClass, alignClass, sizeClass, "w-full")}
           style={shapeStyle}
           data-tiptap-shape="true"
         >
@@ -388,7 +402,10 @@ function renderNode(
                     ? "object-fill"
                     : "object-cover"
                 }`}
-                style={{ opacity: imageOpacity }}
+                style={{
+                  opacity: imageOpacity,
+                  objectPosition: focalPosition,
+                }}
               />
               {scrimOpacity > 0 && (
                 <div

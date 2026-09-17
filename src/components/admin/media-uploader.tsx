@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 export interface MediaUploaderProps {
   value?: string;
   onUploadComplete: (url: string) => void;
+  onUploadCompleteWithMeta?: (data: { url: string; originalFileName?: string; protectedS3Key?: string }) => void;
   onRemove?: () => void;
   label?: string;
   accept?: string;
@@ -30,6 +31,7 @@ export interface MediaUploaderProps {
 export function MediaUploader({
   value = "",
   onUploadComplete,
+  onUploadCompleteWithMeta,
   onRemove,
   accept = "image/jpeg,image/jpg,image/png,image/webp,image/gif,image/tiff,image/heic,image/heif,image/heic-sequence,.heic,.heics",
   mediaType = "general",
@@ -52,6 +54,12 @@ export function MediaUploader({
 
   const handleSelectFromVault = (vaultUrl: string) => {
     onUploadComplete(vaultUrl);
+    if (onUploadCompleteWithMeta) {
+      onUploadCompleteWithMeta({
+        url: vaultUrl,
+        originalFileName: vaultUrl.split("/").pop()?.split("?")[0],
+      });
+    }
     setUrlInput(vaultUrl);
     toast.success("Media selected from Vault");
   };
@@ -91,6 +99,13 @@ export function MediaUploader({
       }
 
       onUploadComplete(finalUrl);
+      if (onUploadCompleteWithMeta) {
+        onUploadCompleteWithMeta({
+          url: finalUrl,
+          originalFileName: data.originalFileName || file.name,
+          protectedS3Key: data.protectedS3Key,
+        });
+      }
       setUrlInput(finalUrl);
       toast.success("Media uploaded successfully");
     } catch (err: unknown) {

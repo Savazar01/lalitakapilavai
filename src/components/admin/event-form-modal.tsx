@@ -568,16 +568,16 @@ function EventFormContent({
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-6 pt-3 border-b border-border/60 bg-card overflow-x-auto">
-            <TabsList className="flex min-w-[700px] h-9 bg-muted/40 p-1 text-xs justify-between">
-              <TabsTrigger value="general" className="text-xs">General</TabsTrigger>
-              <TabsTrigger value="dates" className="text-xs">Dates &amp; Timezone</TabsTrigger>
-              <TabsTrigger value="venue" className="text-xs">Venue &amp; Address</TabsTrigger>
-              <TabsTrigger value="contacts" className="text-xs">Curator Contact</TabsTrigger>
-              <TabsTrigger value="rsvp" className="text-xs font-semibold text-primary">RSVP Builder</TabsTrigger>
-              <TabsTrigger value="media" className="text-xs">Banner &amp; Gallery</TabsTrigger>
-              <TabsTrigger value="brochure" className="text-xs">Brochure (PDF)</TabsTrigger>
-              <TabsTrigger value="artworks" className="text-xs">Artworks ({selectedArtworkIds.length})</TabsTrigger>
+          <div className="px-6 pt-3 pb-2 border-b border-border/60 bg-card overflow-x-auto no-scrollbar scroll-smooth">
+            <TabsList className="inline-flex w-max min-w-full h-auto bg-muted/40 p-1 text-xs gap-1 justify-start md:justify-between items-center rounded-lg">
+              <TabsTrigger value="general" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">General</TabsTrigger>
+              <TabsTrigger value="dates" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Dates &amp; Timezone</TabsTrigger>
+              <TabsTrigger value="venue" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Venue &amp; Address</TabsTrigger>
+              <TabsTrigger value="contacts" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Curator Contact</TabsTrigger>
+              <TabsTrigger value="rsvp" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5 font-semibold text-primary">RSVP Builder</TabsTrigger>
+              <TabsTrigger value="media" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Banner &amp; Gallery</TabsTrigger>
+              <TabsTrigger value="brochure" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Brochure (PDF)</TabsTrigger>
+              <TabsTrigger value="artworks" className="text-xs shrink-0 whitespace-nowrap px-3 py-1.5">Artworks ({selectedArtworkIds.length})</TabsTrigger>
             </TabsList>
           </div>
 

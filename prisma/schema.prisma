@@ -310,6 +310,7 @@ model Artwork {
   sortOrder          Int                  @default(0)
   primaryImageUrl    String
   watermarkedWebpUrl String
+  originalFileName   String?              // Authentic uploaded client file name
   protectedS3Key     String?              // Protected original master S3 key
   qrCodeUrl          String?              // Generated high-res Exhibition Floor QR code URL
   

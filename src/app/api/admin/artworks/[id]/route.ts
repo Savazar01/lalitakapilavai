@@ -83,6 +83,7 @@ export async function PUT(
       primaryImageUrl,
       watermarkedWebpUrl,
       protectedS3Key,
+      originalFileName,
     } = body;
 
     if (categoryId !== undefined && (!categoryId || typeof categoryId !== "string" || !categoryId.trim())) {
@@ -115,6 +116,7 @@ export async function PUT(
         primaryImageUrl,
         watermarkedWebpUrl,
         protectedS3Key,
+        originalFileName: originalFileName !== undefined ? (originalFileName || null) : undefined,
       },
       include: {
         category: true,
