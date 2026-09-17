@@ -24,12 +24,22 @@ import {
   Search,
   Sparkles,
   LayoutTemplate,
+  QrCode,
+  Download,
+  ChevronDown,
+  Sliders,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -146,7 +156,8 @@ interface CatalogPlate {
   pageNumber: number;
   curatorialNote?: string | null;
   highlightPlate: boolean;
-  plateLayout?: "SIDE_BY_SIDE" | "STACKED" | null;
+  plateLayout?: "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW" | null;
+  plateRatio?: "40:60" | "45:55" | "50:50" | "55:45" | "60:40" | null;
   customTitle?: string | null;
   customSubtitle?: string | null;
   showPlateNumber?: boolean;
@@ -172,6 +183,9 @@ interface ECatalogCoverConfig extends CatalogBackgroundConfig {
   contentHtml?: string;
   useMatrixLayout?: boolean;
   matrixConfig?: CatalogMatrixConfig;
+  coverMattingColor?: string;
+  innerBorderColor?: string;
+  mattingPadding?: number;
 }
 
 interface ECatalogEssayConfig extends CatalogBackgroundConfig {
@@ -221,7 +235,8 @@ interface ECatalogDetail {
   coverImageUrl: string | null;
   themeColor: string;
   orientation?: string;
-  plateLayout?: "SIDE_BY_SIDE" | "STACKED";
+  plateLayout?: "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW";
+  plateRatio?: "40:60" | "45:55" | "50:50" | "55:45" | "60:40";
   themeConfig?: ECatalogThemeConfig | null;
   coverConfig?: ECatalogCoverConfig | null;
   essayConfig?: ECatalogEssayConfig | null;
@@ -257,7 +272,8 @@ export default function AdminCatalogStudioPage() {
   const [coverImageUrl, setCoverImageUrl] = React.useState("");
   const [themeColor, setThemeColor] = React.useState("gold");
   const [orientation, setOrientation] = React.useState<"portrait" | "landscape">("portrait");
-  const [plateLayout, setPlateLayout] = React.useState<"SIDE_BY_SIDE" | "STACKED">("SIDE_BY_SIDE");
+  const [plateLayout, setPlateLayout] = React.useState<"SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW">("SIDE_BY_SIDE");
+  const [plateRatio, setPlateRatio] = React.useState<"40:60" | "45:55" | "50:50" | "55:45" | "60:40">("55:45");
   const [isPublished, setIsPublished] = React.useState(false);
   const [downloadablePdfUrl, setDownloadablePdfUrl] = React.useState("");
   const [eventId, setEventId] = React.useState<string>("none");
@@ -334,7 +350,16 @@ export default function AdminCatalogStudioPage() {
           setCoverImageUrl(catData.coverImageUrl || "");
           setThemeColor(catData.themeColor || "gold");
           setOrientation(catData.orientation === "landscape" ? "landscape" : "portrait");
-          setPlateLayout(catData.plateLayout === "STACKED" ? "STACKED" : "SIDE_BY_SIDE");
+          setPlateLayout(
+            catData.plateLayout === "STACKED"
+              ? "STACKED"
+              : catData.plateLayout === "TOP_LEFT_FLOW"
+              ? "TOP_LEFT_FLOW"
+              : "SIDE_BY_SIDE"
+          );
+          if (catData.plateRatio) {
+            setPlateRatio(catData.plateRatio as "40:60" | "45:55" | "50:50" | "55:45" | "60:40");
+          }
           if (catData.themeConfig) {
             setThemeConfig({
               backgroundMode: catData.themeConfig.backgroundMode || "COLOR",
@@ -485,6 +510,7 @@ export default function AdminCatalogStudioPage() {
         themeColor,
         orientation,
         plateLayout,
+        plateRatio,
         themeConfig,
         coverConfig,
         essayConfig,
@@ -525,6 +551,7 @@ export default function AdminCatalogStudioPage() {
           curatorialNote: p.curatorialNote || null,
           highlightPlate: p.highlightPlate,
           plateLayout: p.plateLayout || null,
+          plateRatio: p.plateRatio || null,
           customTitle: p.customTitle ? p.customTitle.trim() : null,
           customSubtitle: p.customSubtitle ? p.customSubtitle.trim() : null,
           showPlateNumber: p.showPlateNumber !== false,
@@ -858,6 +885,42 @@ export default function AdminCatalogStudioPage() {
             <Eye className="w-3.5 h-3.5" /> Preview Reader
           </Link>
 
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs h-8.5 gap-1.5 border-border bg-card hover:bg-muted cursor-pointer"
+              >
+                <QrCode className="w-3.5 h-3.5 text-primary" />
+                <span>Download QR Code</span>
+                <ChevronDown className="w-3 h-3 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="text-xs w-48">
+              <DropdownMenuItem asChild>
+                <a
+                  href={`/api/admin/catalogs/${id}/qrcode?format=svg&download=true`}
+                  download={`${slug}-qr.svg`}
+                  className="flex items-center gap-2 cursor-pointer w-full text-foreground"
+                >
+                  <Download className="w-3.5 h-3.5 text-primary" />
+                  <span>Vector SVG (Print)</span>
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a
+                  href={`/api/admin/catalogs/${id}/qrcode?format=png&download=true`}
+                  download={`${slug}-qr.png`}
+                  className="flex items-center gap-2 cursor-pointer w-full text-foreground"
+                >
+                  <Download className="w-3.5 h-3.5 text-primary" />
+                  <span>High-Res PNG (1024px)</span>
+                </a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button
             onClick={handleSave}
             disabled={saving}
@@ -1020,25 +1083,59 @@ export default function AdminCatalogStudioPage() {
                   <label className="text-xs font-semibold text-foreground flex items-center justify-between">
                     <span>Plate Display Layout</span>
                     <Badge variant="outline" className="text-[9px] px-1 py-0 text-primary border-primary/30">
-                      {plateLayout === "SIDE_BY_SIDE" ? "Side-by-Side" : "Stacked"}
+                      {plateLayout === "SIDE_BY_SIDE" ? `Side-by-Side (${plateRatio})` : plateLayout === "TOP_LEFT_FLOW" ? "Top-Left Flow" : "Stacked"}
                     </Badge>
                   </label>
                   <Select
                     value={plateLayout}
-                    onValueChange={(val: "SIDE_BY_SIDE" | "STACKED") => setPlateLayout(val)}
+                    onValueChange={(val: "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW") => setPlateLayout(val)}
                   >
                     <SelectTrigger className="text-xs">
                       <SelectValue placeholder="Select Plate Layout" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="SIDE_BY_SIDE">Side-by-Side (55:45 Monograph)</SelectItem>
+                      <SelectItem value="SIDE_BY_SIDE">Side-by-Side Split</SelectItem>
                       <SelectItem value="STACKED">Stacked (Centered Image Above)</SelectItem>
+                      <SelectItem value="TOP_LEFT_FLOW">Top-Left Floated (Long Narrative Flow)</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-[10px] text-muted-foreground">
-                    Image left + specifications right vs. centered top/bottom stack.
+                    Artwork floated top-left with wrapped text, 2-column split, or centered stack.
                   </p>
                 </div>
+
+                {plateLayout === "SIDE_BY_SIDE" && (
+                  <div className="space-y-1.5 pt-2 border-t border-border/40 sm:col-span-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        <Sliders className="w-3.5 h-3.5 text-primary" /> Column Split Ratio (Artwork : Curatorial Text)
+                      </label>
+                      <span className="text-xs font-mono font-bold text-primary">{plateRatio}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { ratio: "40:60", label: "40:60 (Expanded Text)" },
+                        { ratio: "45:55", label: "45:55" },
+                        { ratio: "50:50", label: "50:50" },
+                        { ratio: "55:45", label: "55:45 (Standard)" },
+                        { ratio: "60:40", label: "60:40 (Expanded Image)" },
+                      ].map((r) => (
+                        <button
+                          key={r.ratio}
+                          type="button"
+                          onClick={() => setPlateRatio(r.ratio as "40:60" | "45:55" | "50:50" | "55:45" | "60:40")}
+                          className={`px-2.5 py-1 text-xs rounded-md border transition-all cursor-pointer font-medium ${
+                            plateRatio === r.ratio
+                              ? "bg-primary text-primary-foreground border-primary shadow-xs font-bold ring-1 ring-primary"
+                              : "border-border/80 bg-background hover:bg-muted text-foreground"
+                          }`}
+                        >
+                          {r.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-1.5 pt-2">
@@ -1052,6 +1149,91 @@ export default function AdminCatalogStudioPage() {
                   mediaType="general"
                   description="High-resolution visual representing the front cover of the digital book."
                 />
+              </div>
+
+              {/* Cover Matting & Framing Customization */}
+              <div className="p-4 rounded-xl border border-border/80 bg-muted/10 space-y-4 pt-4">
+                <div>
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-primary" /> Cover Matting &amp; Framing Customization
+                  </label>
+                  <p className="text-[11px] text-muted-foreground">
+                    Customize the outer matting canvas, inner framing fillet, and matting thickness around the e-catalog cover.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Outer Matting / Border Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={coverConfig.coverMattingColor || themeConfig.backgroundColor || "#1C1814"}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, coverMattingColor: e.target.value }))
+                        }
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                      />
+                      <Input
+                        value={coverConfig.coverMattingColor || ""}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, coverMattingColor: e.target.value }))
+                        }
+                        className="text-xs font-mono"
+                        placeholder="Inherit / #1C1814"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Inner Framing Border Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={coverConfig.innerBorderColor || "#D4AF37"}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, innerBorderColor: e.target.value }))
+                        }
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                      />
+                      <Input
+                        value={coverConfig.innerBorderColor || "#D4AF37"}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, innerBorderColor: e.target.value }))
+                        }
+                        className="text-xs font-mono"
+                        placeholder="#D4AF37"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Matting Thickness / Padding</label>
+                    <div className="flex items-center gap-1">
+                      {[0, 4, 8, 16, 24].map((pad) => {
+                        const current = typeof coverConfig.mattingPadding === "number" ? coverConfig.mattingPadding : 24;
+                        const isSelected = current === pad;
+                        return (
+                          <button
+                            key={pad}
+                            type="button"
+                            onClick={() => setCoverConfig((prev) => ({ ...prev, mattingPadding: pad }))}
+                            className={`flex-1 py-1 text-xs rounded-md border font-mono transition-all cursor-pointer ${
+                              isSelected
+                                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs ring-1 ring-primary"
+                                : "border-border/80 bg-background hover:bg-muted text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {pad}px
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Set 0px to eliminate the outer matting container and expand frame edge-to-edge.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-4 pt-4 border-t border-border/60">
@@ -1160,23 +1342,33 @@ export default function AdminCatalogStudioPage() {
                           { name: "Antique Raw Silk", bg: "#EFECE6", text: "#1C1814" },
                           { name: "Sacred Terracotta", bg: "#2A1810", text: "#FAF7F2" },
                           { name: "Temple Teak", bg: "#241E19", text: "#FAF7F2" },
-                        ].map((preset) => (
-                          <button
-                            key={preset.name}
-                            type="button"
-                            onClick={() =>
-                              setThemeConfig((prev) => ({
-                                ...prev,
-                                backgroundColor: preset.bg,
-                                textColor: preset.text,
-                              }))
-                            }
-                            className="text-xs px-2.5 py-1 rounded-md border border-border/80 hover:border-primary/50 flex items-center gap-1.5 bg-background transition-colors cursor-pointer"
-                          >
-                            <span className="w-2.5 h-2.5 rounded-full border border-border" style={{ backgroundColor: preset.bg }} />
-                            <span>{preset.name}</span>
-                          </button>
-                        ))}
+                        ].map((preset) => {
+                          const isSelected =
+                            themeConfig.backgroundColor?.toLowerCase() === preset.bg.toLowerCase() &&
+                            themeConfig.textColor?.toLowerCase() === preset.text.toLowerCase();
+                          return (
+                            <button
+                              key={preset.name}
+                              type="button"
+                              onClick={() =>
+                                setThemeConfig((prev) => ({
+                                  ...prev,
+                                  backgroundColor: preset.bg,
+                                  textColor: preset.text,
+                                }))
+                              }
+                              className={`text-xs px-2.5 py-1 rounded-md border flex items-center gap-1.5 transition-all cursor-pointer ${
+                                isSelected
+                                  ? "border-primary bg-primary/15 ring-2 ring-primary/60 font-bold text-foreground shadow-xs"
+                                  : "border-border/80 hover:border-primary/50 bg-background text-foreground"
+                              }`}
+                            >
+                              <span className="w-2.5 h-2.5 rounded-full border border-border" style={{ backgroundColor: preset.bg }} />
+                              <span>{preset.name}</span>
+                              {isSelected && <Check className="w-3 h-3 text-primary ml-0.5" />}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -1825,30 +2017,63 @@ export default function AdminCatalogStudioPage() {
 
         {/* Tab 4: Artwork Plates */}
         <TabsContent value="plates" className="space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-primary/20 bg-primary/5">
-            <div className="flex items-center gap-2.5">
-              <LayoutTemplate className="w-4 h-4 text-primary shrink-0" />
-              <div>
-                <div className="text-xs font-semibold text-foreground flex items-center gap-2">
-                  <span>Plate Display Presentation:</span>
-                  <Badge variant="outline" className="text-[10px] font-mono border-primary/40 text-primary bg-primary/10">
-                    {plateLayout === "SIDE_BY_SIDE" ? "Side-by-Side (55:45 Monograph)" : "Stacked (Top/Bottom)"}
-                  </Badge>
+          <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-primary/20 bg-primary/5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <LayoutTemplate className="w-4 h-4 text-primary shrink-0" />
+                <div>
+                  <div className="text-xs font-semibold text-foreground flex items-center gap-2">
+                    <span>Plate Display Presentation:</span>
+                    <Badge variant="outline" className="text-[10px] font-mono border-primary/40 text-primary bg-primary/10">
+                      {plateLayout === "SIDE_BY_SIDE" ? `Side-by-Side (${plateRatio})` : plateLayout === "TOP_LEFT_FLOW" ? "Top-Left Flow" : "Stacked"}
+                    </Badge>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Default layout for all plates. You can also override layout individually per masterwork below.
+                  </p>
                 </div>
-                <p className="text-[11px] text-muted-foreground">
-                  Default layout for all plates. You can also override layout individually per masterwork below.
-                </p>
               </div>
+              <Select value={plateLayout} onValueChange={(val: "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW") => setPlateLayout(val)}>
+                <SelectTrigger className="w-[240px] text-xs h-8 bg-background">
+                  <SelectValue placeholder="Select Plate Layout" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SIDE_BY_SIDE">Side-by-Side Split</SelectItem>
+                  <SelectItem value="STACKED">Stacked (Centered Image Above)</SelectItem>
+                  <SelectItem value="TOP_LEFT_FLOW">Top-Left Floated (Long Narrative Flow)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={plateLayout} onValueChange={(val: "SIDE_BY_SIDE" | "STACKED") => setPlateLayout(val)}>
-              <SelectTrigger className="w-[200px] text-xs h-8 bg-background">
-                <SelectValue placeholder="Select Plate Layout" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="SIDE_BY_SIDE">Side-by-Side (Recommended)</SelectItem>
-                <SelectItem value="STACKED">Stacked (Centered Image Above)</SelectItem>
-              </SelectContent>
-            </Select>
+
+            {plateLayout === "SIDE_BY_SIDE" && (
+              <div className="flex items-center justify-between pt-2 border-t border-primary/20 flex-wrap gap-2">
+                <span className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                  <Sliders className="w-3.5 h-3.5 text-primary" /> Column Ratio:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { ratio: "40:60", label: "40:60 (Expanded Text)" },
+                    { ratio: "45:55", label: "45:55" },
+                    { ratio: "50:50", label: "50:50" },
+                    { ratio: "55:45", label: "55:45 (Standard)" },
+                    { ratio: "60:40", label: "60:40 (Expanded Image)" },
+                  ].map((r) => (
+                    <button
+                      key={r.ratio}
+                      type="button"
+                      onClick={() => setPlateRatio(r.ratio as "40:60" | "45:55" | "50:50" | "55:45" | "60:40")}
+                      className={`px-2 py-0.5 text-[11px] rounded-md border font-medium cursor-pointer transition-all ${
+                        plateRatio === r.ratio
+                          ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs ring-1 ring-primary"
+                          : "border-border/80 bg-background hover:bg-muted text-foreground"
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between">
@@ -2053,7 +2278,7 @@ export default function AdminCatalogStudioPage() {
                         onValueChange={(val) => {
                           setPlates((prev) => {
                             const copy = [...prev];
-                            copy[index].plateLayout = val === "DEFAULT" ? null : (val as "SIDE_BY_SIDE" | "STACKED");
+                            copy[index].plateLayout = val === "DEFAULT" ? null : (val as "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW");
                             return copy;
                           });
                         }}
@@ -2062,9 +2287,12 @@ export default function AdminCatalogStudioPage() {
                           <SelectValue placeholder="Plate Layout" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="DEFAULT">Default ({plateLayout === "SIDE_BY_SIDE" ? "Side-by-Side" : "Stacked"})</SelectItem>
-                          <SelectItem value="SIDE_BY_SIDE">Side-by-Side (55:45)</SelectItem>
+                          <SelectItem value="DEFAULT">
+                            Default ({plateLayout === "SIDE_BY_SIDE" ? `Side-by-Side (${plateRatio})` : plateLayout === "TOP_LEFT_FLOW" ? "Top-Left Flow" : "Stacked"})
+                          </SelectItem>
+                          <SelectItem value="SIDE_BY_SIDE">Side-by-Side Split</SelectItem>
                           <SelectItem value="STACKED">Stacked (Top/Bottom)</SelectItem>
+                          <SelectItem value="TOP_LEFT_FLOW">Top-Left Floated (Flow)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

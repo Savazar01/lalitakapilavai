@@ -144,6 +144,7 @@ export async function POST(request: NextRequest) {
           contactName: contactName || null,
           contactEmail: contactEmail || null,
           contactPhone: contactPhone || null,
+          rsvpConfig: body.rsvpConfig !== undefined ? body.rsvpConfig : undefined,
           statusOverride: statusOverride || "AUTO",
           isArchived: isArchived !== undefined ? !!isArchived : false,
         },

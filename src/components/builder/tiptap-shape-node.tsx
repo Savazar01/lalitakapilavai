@@ -23,6 +23,11 @@ export interface ShapeNodeAttributes {
   borderWidth: number;
   shadow: "none" | "sm" | "md" | "lg";
   alignment: "left" | "center" | "right";
+  imageUrl?: string;
+  imageFit?: "cover" | "contain" | "fill";
+  imageOpacity?: number;
+  scrimOpacity?: number;
+  scrimColor?: string;
 }
 
 const SHAPES: { type: ShapeType; label: string }[] = [
@@ -60,6 +65,11 @@ function ShapeViewComponent(props: NodeViewProps) {
     borderWidth: Number(node.attrs.borderWidth) || 2,
     shadow: node.attrs.shadow || "sm",
     alignment: node.attrs.alignment || "center",
+    imageUrl: node.attrs.imageUrl || "",
+    imageFit: node.attrs.imageFit || "cover",
+    imageOpacity: typeof node.attrs.imageOpacity === "number" ? node.attrs.imageOpacity : 1,
+    scrimOpacity: typeof node.attrs.scrimOpacity === "number" ? node.attrs.scrimOpacity : 0.35,
+    scrimColor: node.attrs.scrimColor || "#000000",
   };
 
   const [popoverOpen, setPopoverOpen] = React.useState(false);
@@ -71,7 +81,7 @@ function ShapeViewComponent(props: NodeViewProps) {
     borderStyle: "solid",
   };
 
-  let containerClass = "p-5 my-6 relative group transition-all";
+  let containerClass = "p-5 my-6 relative group transition-all overflow-hidden";
 
   if (attrs.shapeType === "circle") {
     containerClass += " rounded-full aspect-square flex items-center justify-center text-center max-w-[340px] mx-auto";
@@ -110,7 +120,7 @@ function ShapeViewComponent(props: NodeViewProps) {
   return (
     <NodeViewWrapper className={`my-6 relative group ${alignClass} max-w-2xl`}>
       {/* Floating Toolbar Header */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center gap-1 bg-background/90 backdrop-blur-xs border border-border px-2 py-0.5 rounded-full shadow-xs">
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-30 flex items-center gap-1 bg-background/90 backdrop-blur-xs border border-border px-2 py-0.5 rounded-full shadow-xs">
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <button
@@ -121,10 +131,10 @@ function ShapeViewComponent(props: NodeViewProps) {
               <Shapes className="w-3.5 h-3.5" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-3 space-y-3 bg-card border-border shadow-2xl text-foreground text-xs" align="end">
+          <PopoverContent className="w-84 p-3 space-y-3 bg-card border-border shadow-2xl text-foreground text-xs max-h-[80vh] overflow-y-auto" align="end">
             <div className="flex items-center justify-between border-b border-border/60 pb-1.5 font-semibold">
               <span className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-primary">
-                <Shield className="w-3.5 h-3.5" /> Custom Shape Geometry
+                <Shield className="w-3.5 h-3.5" /> Shape Geometry &amp; Ingestion
               </span>
               <Button
                 type="button"
@@ -159,9 +169,63 @@ function ShapeViewComponent(props: NodeViewProps) {
               </div>
             </div>
 
+            {/* Shape Image Media Ingestion */}
+            <div className="space-y-2 border-t border-border/60 pt-2">
+              <label className="text-[10px] font-mono text-primary uppercase font-bold flex items-center justify-between">
+                <span>Shape Image Fill</span>
+                {attrs.imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => updateAttributes({ imageUrl: "" })}
+                    className="text-rose-500 hover:underline text-[9px] lowercase font-normal"
+                  >
+                    remove image
+                  </button>
+                )}
+              </label>
+              <input
+                type="text"
+                value={attrs.imageUrl}
+                onChange={(e) => updateAttributes({ imageUrl: e.target.value })}
+                className="w-full text-xs font-mono p-1.5 border border-border rounded bg-background text-foreground"
+                placeholder="https://... or /media/..."
+              />
+
+              {attrs.imageUrl && (
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div>
+                    <label className="text-[9px] font-mono text-muted-foreground uppercase block mb-0.5">Image Fit</label>
+                    <select
+                      value={attrs.imageFit}
+                      onChange={(e) => updateAttributes({ imageFit: e.target.value as "cover" | "contain" | "fill" })}
+                      className="w-full text-[11px] p-1 border border-border rounded bg-background"
+                    >
+                      <option value="cover">Cover (Fill &amp; Clip)</option>
+                      <option value="contain">Contain (Fit inside)</option>
+                      <option value="fill">Stretch to Fill</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-mono text-muted-foreground uppercase block mb-0.5">
+                      Contrast Scrim ({Math.round((attrs.scrimOpacity ?? 0.35) * 100)}%)
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={attrs.scrimOpacity ?? 0.35}
+                      onChange={(e) => updateAttributes({ scrimOpacity: parseFloat(e.target.value) })}
+                      className="w-full cursor-pointer h-2 accent-primary"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Fill Tone */}
-            <div className="space-y-1">
-              <label className="text-[10px] font-mono text-muted-foreground uppercase">Fill Color</label>
+            <div className="space-y-1 border-t border-border/60 pt-2">
+              <label className="text-[10px] font-mono text-muted-foreground uppercase">Background Fill Tone</label>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {PRESET_FILLS.map((f) => (
                   <button
@@ -272,7 +336,41 @@ function ShapeViewComponent(props: NodeViewProps) {
         className={`${containerClass} ${shadowClass}`}
         style={shapeStyle}
       >
-        <NodeViewContent className="min-h-[40px] focus:outline-none" />
+        {/* Background Image Fill Layer when present */}
+        {attrs.imageUrl && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+          >
+            <img
+              src={attrs.imageUrl}
+              alt=""
+              className={`w-full h-full ${
+                attrs.imageFit === "contain"
+                  ? "object-contain"
+                  : attrs.imageFit === "fill"
+                  ? "object-fill"
+                  : "object-cover"
+              }`}
+              style={{ opacity: attrs.imageOpacity ?? 1 }}
+            />
+            {/* Contrast Scrim */}
+            {(attrs.scrimOpacity ?? 0) > 0 && (
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundColor: attrs.scrimColor || "#000000",
+                  opacity: attrs.scrimOpacity ?? 0.35,
+                }}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Live Editable Text Content on Top */}
+        <div className="relative z-10 w-full h-full">
+          <NodeViewContent className="min-h-[40px] focus:outline-none" />
+        </div>
       </div>
     </NodeViewWrapper>
   );
@@ -293,6 +391,11 @@ export const CustomShapeNode = Node.create({
       borderWidth: { default: 2 },
       shadow: { default: "sm" },
       alignment: { default: "center" },
+      imageUrl: { default: "" },
+      imageFit: { default: "cover" },
+      imageOpacity: { default: 1 },
+      scrimOpacity: { default: 0.35 },
+      scrimColor: { default: "#000000" },
     };
   },
 
@@ -309,6 +412,11 @@ export const CustomShapeNode = Node.create({
             borderWidth: Number(el.getAttribute("data-border-width")) || 2,
             shadow: el.getAttribute("data-shadow") || "sm",
             alignment: el.getAttribute("data-alignment") || "center",
+            imageUrl: el.getAttribute("data-image-url") || "",
+            imageFit: el.getAttribute("data-image-fit") || "cover",
+            imageOpacity: Number(el.getAttribute("data-image-opacity")) || 1,
+            scrimOpacity: Number(el.getAttribute("data-scrim-opacity")) || 0.35,
+            scrimColor: el.getAttribute("data-scrim-color") || "#000000",
           };
         },
       },
@@ -322,6 +430,11 @@ export const CustomShapeNode = Node.create({
     const borderWidth = HTMLAttributes.borderWidth || 2;
     const shadow = HTMLAttributes.shadow || "sm";
     const alignment = HTMLAttributes.alignment || "center";
+    const imageUrl = HTMLAttributes.imageUrl || "";
+    const imageFit = HTMLAttributes.imageFit || "cover";
+    const imageOpacity = HTMLAttributes.imageOpacity ?? 1;
+    const scrimOpacity = HTMLAttributes.scrimOpacity ?? 0.35;
+    const scrimColor = HTMLAttributes.scrimColor || "#000000";
 
     let radius = "1rem";
     let borderStyle = "solid";
@@ -344,7 +457,12 @@ export const CustomShapeNode = Node.create({
         "data-border-width": borderWidth,
         "data-shadow": shadow,
         "data-alignment": alignment,
-        class: "my-6 p-6 border transition-all",
+        "data-image-url": imageUrl,
+        "data-image-fit": imageFit,
+        "data-image-opacity": imageOpacity,
+        "data-scrim-opacity": scrimOpacity,
+        "data-scrim-color": scrimColor,
+        class: "my-6 p-6 border transition-all relative overflow-hidden",
         style: `background-color: ${fillColor}; border-color: ${borderColor}; border-width: ${borderWidth}px; border-style: ${borderStyle}; border-radius: ${radius};`,
       }),
       0,

@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { eventId, attendeeName, attendeeEmail, attendeePhone, ticketCount } = body;
+    const { eventId, attendeeName, attendeeEmail, attendeePhone, ticketCount, customAnswers } = body;
 
     if (!eventId || !attendeeName || !attendeeEmail) {
       return NextResponse.json(
@@ -42,6 +42,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Format custom answers if provided
+    let customAnswersText = "";
+    if (customAnswers && typeof customAnswers === "object") {
+      customAnswersText = Object.entries(customAnswers)
+        .map(([k, v]) => `\n- ${k}: ${String(v)}`)
+        .join("");
+    }
+
     // Atomic creation of registration and lead record
     const result = await prisma.$transaction(async (tx) => {
       const reg = await tx.eventRegistration.create({
@@ -62,7 +70,7 @@ export async function POST(request: NextRequest) {
           email: attendeeEmail,
           phone: attendeePhone || null,
           subject: `RSVP: ${event.title}`,
-          message: `Registered for ${event.title} (${tickets} ticket(s)). Event date: ${event.startDate.toLocaleDateString()}`,
+          message: `Registered for ${event.title} (${tickets} ticket(s)). Event date: ${event.startDate.toLocaleDateString()}.${customAnswersText ? `\n\nCustom Intake Responses:${customAnswersText}` : ""}`,
           sourceEventId: eventId,
         },
       });

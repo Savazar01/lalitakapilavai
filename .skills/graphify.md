@@ -15,15 +15,21 @@ graph TD
     Artwork["Artwork (22k Gold Foil, Dimensions, Price)"]
     Raga["Carnatic Raga (Arohana/Avarohana, Rasa)"]
     Composition["Composition (Vocal: Lalita Kapilavai)"]
-    Event["Event (Exhibition, Concert, Workshop)"]
-    Lead["Lead (Inbound Inquiries & QR Scans)"]
+    Event["Event (Exhibition, Concert, Dynamic RSVP Builder)"]
+    ECatalog["e-Catalog (Monographs, Dynamic Ratios, QR Engine)"]
+    Lead["Lead (Inbound Inquiries, RSVP Registrations & QR Scans)"]
+    MediaVault["Media Vault (Archival Images, Shapes & Catalogs)"]
 
     Artwork -->|BELONGS_TO| Category
     Artwork -->|INSPIRED_BY_MOOD| Raga
     Composition -->|SET_TO_RAGA| Raga
     Artwork -->|EXHIBITED_AT| Event
+    Artwork -->|CURATED_INTO| ECatalog
     Lead -->|ORIGINATED_FROM| Artwork
     Lead -->|ATTENDED| Event
+    MediaVault -->|POWERS_MEDIA_FOR| Artwork
+    MediaVault -->|POWERS_MEDIA_FOR| Event
+    MediaVault -->|POWERS_MEDIA_FOR| ECatalog
 ```
 
 ### Relational Topology

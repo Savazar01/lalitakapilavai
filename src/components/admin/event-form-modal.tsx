@@ -56,6 +56,26 @@ export interface GalleryImageItem {
   linkTarget?: string;
 }
 
+export interface EventRsvpCustomField {
+  id: string;
+  label: string;
+  type: "text" | "select" | "checkbox";
+  options?: string[]; // for select
+  required: boolean;
+}
+
+export interface EventRsvpConfig {
+  enabled: boolean;
+  title?: string;
+  subtitle?: string;
+  requirePhone?: boolean;
+  allowGuestCount?: boolean;
+  maxGuestsPerRsvp?: number;
+  submitButtonLabel?: string;
+  successMessage?: string;
+  customFields?: EventRsvpCustomField[];
+}
+
 export interface EventFormData {
   id?: string;
   title: string;
@@ -95,6 +115,7 @@ export interface EventFormData {
   showOnHomepage?: boolean;
   sortOrder?: number;
   artworkIds?: string[];
+  rsvpConfig?: EventRsvpConfig | null;
 }
 
 interface ArtworkSummary {
@@ -225,6 +246,36 @@ function EventFormContent({
   );
   const [selectedArtworkIds, setSelectedArtworkIds] = React.useState<string[]>(
     initialEvent?.artworkIds || []
+  );
+
+  // RSVP Form Builder Settings
+  const initialRsvpConfig = initialEvent?.rsvpConfig || ({} as EventRsvpConfig);
+  const [rsvpEnabled, setRsvpEnabled] = React.useState<boolean>(
+    initialRsvpConfig.enabled !== false
+  );
+  const [rsvpTitle, setRsvpTitle] = React.useState<string>(
+    initialRsvpConfig.title || "Reserve Your Attendance"
+  );
+  const [rsvpSubtitle, setRsvpSubtitle] = React.useState<string>(
+    initialRsvpConfig.subtitle || "Strictly limited seating for patrons and invited connoisseurs."
+  );
+  const [rsvpRequirePhone, setRsvpRequirePhone] = React.useState<boolean>(
+    initialRsvpConfig.requirePhone === true
+  );
+  const [rsvpAllowGuestCount, setRsvpAllowGuestCount] = React.useState<boolean>(
+    initialRsvpConfig.allowGuestCount !== false
+  );
+  const [rsvpMaxGuests, setRsvpMaxGuests] = React.useState<number>(
+    initialRsvpConfig.maxGuestsPerRsvp || 4
+  );
+  const [rsvpButtonLabel, setRsvpButtonLabel] = React.useState<string>(
+    initialRsvpConfig.submitButtonLabel || "Confirm Attendance"
+  );
+  const [rsvpSuccessMessage, setRsvpSuccessMessage] = React.useState<string>(
+    initialRsvpConfig.successMessage || "We look forward to welcoming you. A confirmation has been registered with our desk."
+  );
+  const [rsvpCustomFields, setRsvpCustomFields] = React.useState<EventRsvpCustomField[]>(
+    initialRsvpConfig.customFields || []
   );
 
   // Helpers
@@ -453,6 +504,17 @@ function EventFormContent({
       contactEmail: contactEmail || null,
       contactPhone: contactPhone || null,
       artworkIds: selectedArtworkIds,
+      rsvpConfig: {
+        enabled: rsvpEnabled,
+        title: rsvpTitle,
+        subtitle: rsvpSubtitle,
+        requirePhone: rsvpRequirePhone,
+        allowGuestCount: rsvpAllowGuestCount,
+        maxGuestsPerRsvp: rsvpMaxGuests,
+        submitButtonLabel: rsvpButtonLabel,
+        successMessage: rsvpSuccessMessage,
+        customFields: rsvpCustomFields,
+      },
     };
 
     try {
@@ -506,12 +568,13 @@ function EventFormContent({
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-6 pt-3 border-b border-border/60 bg-card">
-            <TabsList className="grid grid-cols-7 h-9 bg-muted/40 p-1 text-xs">
+          <div className="px-6 pt-3 border-b border-border/60 bg-card overflow-x-auto">
+            <TabsList className="flex min-w-[700px] h-9 bg-muted/40 p-1 text-xs justify-between">
               <TabsTrigger value="general" className="text-xs">General</TabsTrigger>
               <TabsTrigger value="dates" className="text-xs">Dates &amp; Timezone</TabsTrigger>
               <TabsTrigger value="venue" className="text-xs">Venue &amp; Address</TabsTrigger>
               <TabsTrigger value="contacts" className="text-xs">Curator Contact</TabsTrigger>
+              <TabsTrigger value="rsvp" className="text-xs font-semibold text-primary">RSVP Builder</TabsTrigger>
               <TabsTrigger value="media" className="text-xs">Banner &amp; Gallery</TabsTrigger>
               <TabsTrigger value="brochure" className="text-xs">Brochure (PDF)</TabsTrigger>
               <TabsTrigger value="artworks" className="text-xs">Artworks ({selectedArtworkIds.length})</TabsTrigger>
@@ -925,6 +988,215 @@ function EventFormContent({
                   />
                 </div>
               </div>
+            </TabsContent>
+
+            {/* TAB: RSVP FORM BUILDER */}
+            <TabsContent value="rsvp" className="m-0 space-y-6">
+              <div className="space-y-1">
+                <h4 className="text-sm font-serif font-bold text-foreground flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-primary" />
+                  Custom RSVP Form Configuration
+                </h4>
+                <p className="text-xs text-muted-foreground">
+                  Control registration availability, field requirements, attendee capacity, and bespoke guest intake questions.
+                </p>
+              </div>
+
+              {/* Master RSVP Enablement */}
+              <div className="p-4 rounded-xl border border-border/80 bg-muted/20 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-foreground block">
+                    Enable Public RSVP Registration
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">
+                    When active, visitors can reserve their attendance from the event details page.
+                  </span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={rsvpEnabled}
+                  onChange={(e) => setRsvpEnabled(e.target.checked)}
+                  className="w-4 h-4 accent-primary rounded cursor-pointer"
+                />
+              </div>
+
+              {rsvpEnabled && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground">Form Header Title</label>
+                      <Input
+                        value={rsvpTitle}
+                        onChange={(e) => setRsvpTitle(e.target.value)}
+                        placeholder="Reserve Your Attendance"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground">Submit Button Label</label>
+                      <Input
+                        value={rsvpButtonLabel}
+                        onChange={(e) => setRsvpButtonLabel(e.target.value)}
+                        placeholder="Confirm Attendance"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Form Subtitle / Curatorial Notice</label>
+                    <Input
+                      value={rsvpSubtitle}
+                      onChange={(e) => setRsvpSubtitle(e.target.value)}
+                      placeholder="Strictly limited seating for patrons and invited connoisseurs."
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Post-Submission Success Message</label>
+                    <Input
+                      value={rsvpSuccessMessage}
+                      onChange={(e) => setRsvpSuccessMessage(e.target.value)}
+                      placeholder="We look forward to welcoming you..."
+                    />
+                  </div>
+
+                  {/* Attendance Controls */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl border border-border/80 bg-card/60">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-medium text-foreground block">Require Phone Number</span>
+                        <span className="text-[10px] text-muted-foreground">Mandatory WhatsApp/phone verification</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={rsvpRequirePhone}
+                        onChange={(e) => setRsvpRequirePhone(e.target.checked)}
+                        className="w-4 h-4 accent-primary rounded cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-medium text-foreground block">Allow Guest / Party Count</span>
+                        <span className="text-[10px] text-muted-foreground">Enable +1s or family party size</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={rsvpAllowGuestCount}
+                        onChange={(e) => setRsvpAllowGuestCount(e.target.checked)}
+                        className="w-4 h-4 accent-primary rounded cursor-pointer"
+                      />
+                    </div>
+
+                    {rsvpAllowGuestCount && (
+                      <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-border/60">
+                        <div>
+                          <span className="text-xs font-medium text-foreground block">Max Guests per RSVP</span>
+                          <span className="text-[10px] text-muted-foreground">Limit total tickets per submission</span>
+                        </div>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={rsvpMaxGuests}
+                          onChange={(e) => setRsvpMaxGuests(parseInt(e.target.value, 10) || 1)}
+                          className="w-24 h-8 text-xs text-right"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Custom Questions / Form Fields Builder */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-semibold text-foreground block">Bespoke Ingestion Fields</span>
+                        <span className="text-[10px] text-muted-foreground">Ask attendees about dietary needs, art interests, or seating preferences</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const newField: EventRsvpCustomField = {
+                            id: `field-${Date.now()}`,
+                            label: "Special Seating / Dietary Preference",
+                            type: "text",
+                            required: false,
+                          };
+                          setRsvpCustomFields([...rsvpCustomFields, newField]);
+                        }}
+                        className="h-7 text-xs px-2.5 cursor-pointer"
+                      >
+                        + Add Field
+                      </Button>
+                    </div>
+
+                    {rsvpCustomFields.length === 0 ? (
+                      <div className="p-4 rounded-lg border border-dashed border-border/70 text-center text-xs text-muted-foreground">
+                        Standard attendee name and email are always captured. Click &quot;+ Add Field&quot; to add custom questions.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {rsvpCustomFields.map((field, fIdx) => (
+                          <div
+                            key={field.id}
+                            className="p-3 rounded-lg border border-border bg-background/80 flex flex-col sm:flex-row items-start sm:items-center gap-2"
+                          >
+                            <Input
+                              value={field.label}
+                              onChange={(e) => {
+                                const updated = [...rsvpCustomFields];
+                                updated[fIdx].label = e.target.value;
+                                setRsvpCustomFields(updated);
+                              }}
+                              placeholder="Field Question / Label"
+                              className="flex-1 h-8 text-xs"
+                            />
+                            <select
+                              value={field.type}
+                              onChange={(e) => {
+                                const updated = [...rsvpCustomFields];
+                                updated[fIdx].type = e.target.value as "text" | "select" | "checkbox";
+                                setRsvpCustomFields(updated);
+                              }}
+                              className="h-8 text-xs border border-border rounded px-2 bg-background"
+                            >
+                              <option value="text">Text Answer</option>
+                              <option value="checkbox">Yes/No Checkbox</option>
+                            </select>
+                            <label className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={field.required}
+                                onChange={(e) => {
+                                  const updated = [...rsvpCustomFields];
+                                  updated[fIdx].required = e.target.checked;
+                                  setRsvpCustomFields(updated);
+                                }}
+                                className="w-3.5 h-3.5 accent-primary rounded"
+                              />
+                              Required
+                            </label>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setRsvpCustomFields(rsvpCustomFields.filter((_, idx) => idx !== fIdx));
+                              }}
+                              className="h-8 w-8 p-0 text-rose-500 hover:text-rose-700"
+                              title="Delete Field"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </TabsContent>
 
             {/* TAB 5: HERO BANNER & EVENT GALLERY */}

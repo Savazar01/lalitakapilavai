@@ -80,3 +80,22 @@ export async function generateQRCodeDataUrl(
     errorCorrectionLevel: "H",
   });
 }
+
+/**
+ * Generates a vector SVG string for e-Catalogs and high-resolution print.
+ */
+export async function generateQRCodeSvg(
+  targetUrl: string,
+  options?: QRCodeOptions
+): Promise<string> {
+  return await QRCode.toString(targetUrl, {
+    type: "svg",
+    margin: options?.margin || 2,
+    color: {
+      dark: options?.color?.dark || "#1C1814",
+      light: options?.color?.light || "#FFFFFF",
+    },
+    errorCorrectionLevel: "H",
+  });
+}
+

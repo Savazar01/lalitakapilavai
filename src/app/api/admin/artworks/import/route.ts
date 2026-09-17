@@ -95,12 +95,16 @@ export async function POST(request: NextRequest) {
       if (headerText.includes("id")) colMap["id"] = colNumber;
       else if (headerText.includes("slug")) colMap["slug"] = colNumber;
       else if (headerText.includes("title")) colMap["title"] = colNumber;
+      else if (headerText.includes("file name") || headerText.includes("filename")) colMap["originalFileName"] = colNumber;
       else if (headerText.includes("sub-category") || headerText.includes("subcategory")) colMap["subCategory"] = colNumber;
       else if (headerText.includes("parent") || headerText.includes("category")) colMap["parentCategory"] = colNumber;
       else if (headerText.includes("school")) colMap["traditionalSchool"] = colNumber;
       else if (headerText.includes("year")) colMap["yearCreated"] = colNumber;
       else if (headerText.includes("medium")) colMap["medium"] = colNumber;
       else if (headerText.includes("dimension")) colMap["dimensions"] = colNumber;
+      else if (headerText.includes("has gold") || headerText.includes("gold foil")) colMap["hasGoldFoil"] = colNumber;
+      else if (headerText.includes("purity") || headerText.includes("gold leaf")) colMap["goldPurity"] = colNumber;
+      else if (headerText.includes("earmark") || headerText.includes("foil label") || headerText.includes("custom foil")) colMap["customFoilLabel"] = colNumber;
       else if (headerText.includes("price")) colMap["price"] = colNumber;
       else if (headerText.includes("currency")) colMap["currency"] = colNumber;
       else if (headerText.includes("available") || headerText.includes("sale")) colMap["isAvailable"] = colNumber;
@@ -216,11 +220,12 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Clean & Sanitize Commentary
-        const sanitizedDescription = sanitizeAdaptiveThemeHtml(descriptionVal);
-        const hasGoldFoil = mediumVal.toLowerCase().includes("gold") || title.toLowerCase().includes("gold");
+        const originalFileNameVal = getCellValue(row, colMap["originalFileName"]);
+        const hasGoldFoilVal = colMap["hasGoldFoil"] ? parseBoolean(getCellValue(row, colMap["hasGoldFoil"])) : (mediumVal.toLowerCase().includes("gold") || title.toLowerCase().includes("gold"));
+        const goldPurityVal = getCellValue(row, colMap["goldPurity"]) || (hasGoldFoilVal ? "22 Karat" : null);
+        const customFoilLabelVal = getCellValue(row, colMap["customFoilLabel"]) || (hasGoldFoilVal ? "22k Gold Foil Relief" : null);
 
-        // Identify Existing Artwork by ID or Slug
+        // Identify Existing Artwork by ID, Slug, or Original File Name
         let existing = null;
 
         // Check ID first if it looks like a valid UUID
@@ -238,6 +243,19 @@ export async function POST(request: NextRequest) {
           });
         }
 
+        // If not found by slug, match by Original File Name if present
+        if (!existing && originalFileNameVal) {
+          existing = await prisma.artwork.findFirst({
+            where: {
+              OR: [
+                { protectedS3Key: { endsWith: originalFileNameVal } },
+                { primaryImageUrl: { contains: originalFileNameVal } },
+              ],
+              isDeleted: false,
+            },
+          });
+        }
+
         if (existing) {
           // Update Existing Record
           await prisma.artwork.update({
@@ -249,7 +267,9 @@ export async function POST(request: NextRequest) {
               dimensions: dimensionsVal,
               medium: mediumVal,
               yearCreated: yearCreatedVal,
-              hasGoldFoil,
+              hasGoldFoil: hasGoldFoilVal,
+              goldPurity: goldPurityVal,
+              customFoilLabel: customFoilLabelVal,
               price: priceVal !== null ? priceVal : undefined,
               currency: currencyVal,
               isAvailable: isAvailableVal,
@@ -258,7 +278,7 @@ export async function POST(request: NextRequest) {
               sortOrder: sortOrderVal,
               primaryImageUrl: primaryImageUrlVal,
               watermarkedWebpUrl: existing.watermarkedWebpUrl || primaryImageUrlVal,
-              description: sanitizedDescription || existing.description,
+              description: descriptionVal || existing.description,
             },
           });
 
@@ -291,8 +311,9 @@ export async function POST(request: NextRequest) {
               dimensions: dimensionsVal,
               medium: mediumVal,
               yearCreated: yearCreatedVal,
-              hasGoldFoil,
-              goldPurity: null,
+              hasGoldFoil: hasGoldFoilVal,
+              goldPurity: goldPurityVal,
+              customFoilLabel: customFoilLabelVal,
               price: priceVal,
               currency: currencyVal,
               isAvailable: isAvailableVal,
@@ -301,7 +322,7 @@ export async function POST(request: NextRequest) {
               sortOrder: sortOrderVal,
               primaryImageUrl: primaryImageUrlVal,
               watermarkedWebpUrl: primaryImageUrlVal,
-              description: sanitizedDescription,
+              description: descriptionVal,
             },
           });
 

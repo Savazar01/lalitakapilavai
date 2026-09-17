@@ -6,6 +6,7 @@ import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
 import { CatalogPrintButton } from "@/components/public/catalog-print-button";
+import { CatalogQrModal } from "@/components/public/catalog-qr-modal";
 import { getPatternById } from "@/lib/background-patterns";
 import {
   BookOpen,
@@ -19,6 +20,7 @@ import {
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
 import { cn } from "@/lib/utils";
 import { resolveContainerThemeScope, resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
+import { PlateRatio, PlateLayoutType } from "@/types/catalog";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -268,6 +270,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const endBgImage = (endPageConfig.backgroundImage as string) || undefined;
   const endOverlayOpacity = typeof endPageConfig.overlayOpacity === "number" ? endPageConfig.overlayOpacity : undefined;
 
+  // Dynamic print page orientation style
+  const printPageSize = orientation === "landscape" ? "A4 landscape" : "A4 portrait";
+
+  // Cover framing and matting config
+  const coverMattingColor = (coverConfig.coverMattingColor as string) || undefined;
+  const innerBorderColor = (coverConfig.innerBorderColor as string) || undefined;
+  const mattingPadding = typeof coverConfig.mattingPadding === "number" ? coverConfig.mattingPadding : 24; // 0 for full bleed
+
   return (
     <div
       style={{ backgroundColor: bgColor, color: textColor }}
@@ -275,12 +285,31 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         orientation === "landscape" ? "catalog-landscape" : "catalog-portrait"
       }`}
     >
+      {/* Dynamic Print Page Size Override */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media print {
+              @page {
+                size: ${printPageSize} !important;
+                margin: 0 !important;
+              }
+            }
+          `,
+        }}
+      />
+
       {/* Hide standard navbar when printing */}
       <div className="print-hidden">
         <Navbar />
       </div>
 
-      <main className="catalog-document flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-12 print:p-0 print:m-0 print:max-w-none print:space-y-0">
+      <main
+        className={cn(
+          "catalog-document flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-12 print:p-0 print:m-0 print:max-w-none print:space-y-0",
+          orientation === "landscape" ? "max-w-6xl" : "max-w-4xl"
+        )}
+      >
         {/* Navigation & Actions Top Bar */}
         <div
           data-catalog-toolbar="true"
@@ -295,6 +324,12 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           </Link>
 
           <div className="flex items-center gap-3">
+            <CatalogQrModal
+              catalogSlug={catalog.slug}
+              catalogTitle={catalog.title}
+              catalogSubtitle={catalog.subtitle || undefined}
+            />
+
             <CatalogPrintButton catalogTitle={catalog.title} />
 
             {catalog.downloadablePdfUrl ? (
@@ -360,12 +395,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         ) : coverDesignMode === "WYSIWYG" && coverContentHtml ? (
           <section
             className={cn(
-              "catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none",
+              "catalog-page cover-page relative rounded-3xl overflow-hidden text-center flex flex-col justify-between print:rounded-none",
               coverScope.wrapperClass
             )}
             style={{
               ...coverScope.wrapperStyle,
               ...(coverBgColor ? { backgroundColor: coverBgColor } : {}),
+              ...(coverMattingColor ? { backgroundColor: coverMattingColor } : {}),
+              padding: `${mattingPadding}px`,
             }}
           >
             <CatalogBackgroundLayer
@@ -382,6 +419,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             />
             <div
               className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+              style={{
+                ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
+              }}
             >
               {/* Bespoke WYSIWYG Front Cover Content with container contrast scoping */}
               <div className="w-full flex-1 flex flex-col justify-center my-auto">
@@ -409,12 +449,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         ) : (
           <section
             className={cn(
-              "catalog-page cover-page relative rounded-3xl overflow-hidden p-6 sm:p-12 text-center flex flex-col justify-between print:rounded-none",
+              "catalog-page cover-page relative rounded-3xl overflow-hidden text-center flex flex-col justify-between print:rounded-none",
               coverScope.wrapperClass
             )}
             style={{
               ...coverScope.wrapperStyle,
               ...(coverBgColor ? { backgroundColor: coverBgColor } : {}),
+              ...(coverMattingColor ? { backgroundColor: coverMattingColor } : {}),
+              padding: `${mattingPadding}px`,
             }}
           >
             <CatalogBackgroundLayer
@@ -429,7 +471,12 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               fallbackBgImage={bgImage}
               fallbackOverlayOpacity={overlayOpacity}
             />
-            <div className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+            <div
+              className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+              style={{
+                ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
+              }}
+            >
               {/* Header / Subtitle */}
               <div className="space-y-4 pt-2">
                 <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full">
@@ -703,24 +750,15 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 </div>
 
                 {/* Conditional Plate Layout */}
-                {layoutMode === "SIDE_BY_SIDE" ? (
-                  <div
-                    className="catalog-plate-body plate-body-grid flex-1 my-auto overflow-hidden w-full"
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "58% 38%",
-                      gap: "4%",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    {/* Left Column: Framed Masterwork Plate */}
-                    <div className="plate-image-col flex items-center justify-center max-h-[64vh] print:max-h-[60vh] w-full">
-                      <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group max-h-full">
+                {layoutMode === "TOP_LEFT_FLOW" ? (
+                  /* TOP-LEFT ARTWORK WITH WRAPPED TEXT ARCHETYPE (Eliminates text truncation) */
+                  <div className="plate-body-flow flex-1 my-auto w-full text-left overflow-y-auto print:overflow-visible">
+                    <div className="float-left mr-8 mb-4 max-w-[45%] w-auto max-h-[56vh] print:max-h-[50vh] plate-image-float">
+                      <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group">
                         <img
                           src={item.artwork.primaryImageUrl}
                           alt={displayTitle}
-                          className="max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
+                          className="max-h-[52vh] print:max-h-[46vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
                         />
                         <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
                           <ShieldCheck className="w-3 h-3 text-primary" />
@@ -731,10 +769,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       </div>
                     </div>
 
-                    {/* Right Column: Curatorial Details & Specifications */}
-                    <div className="plate-details-col flex flex-col justify-center space-y-3.5 text-left w-full overflow-hidden">
+                    <div className="space-y-3">
                       <div>
-                        <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-2 font-mono uppercase tracking-wider">
+                        <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-1.5 font-mono uppercase tracking-wider">
                           {item.artwork.category?.name || "Traditional Indian School"}
                         </span>
                         <h3 className="text-2xl sm:text-3xl font-serif text-foreground font-bold leading-tight">
@@ -746,7 +783,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                         </p>
                       </div>
 
-                      <div className="space-y-1.5 text-xs text-foreground/90 border-t border-primary/20 pt-3">
+                      <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-foreground/90 border-t border-primary/20 pt-2.5">
                         <p>
                           <strong className="text-muted-foreground font-mono text-[11px] uppercase mr-1">Medium:</strong>
                           <span>{item.artwork.medium || "Natural Mineral Pigments & Gold Foil"}</span>
@@ -768,18 +805,18 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       {(item.curatorialNote || item.artwork.description) && (
                         <div className="border-t border-primary/20 pt-3">
                           {item.curatorialNote ? (
-                            <p className="text-xs text-foreground/90 leading-relaxed italic bg-muted/20 p-3 rounded-lg border border-border/60">
+                            <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed italic bg-muted/20 p-3 rounded-lg border border-border/60">
                               &ldquo;{item.curatorialNote}&rdquo;
                             </p>
                           ) : (
-                            <div className="text-xs text-muted-foreground leading-relaxed">
+                            <div className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-serif text-justify">
                               <TiptapRenderer content={item.artwork.description!} />
                             </div>
                           )}
                         </div>
                       )}
 
-                      <div className="print-hidden pt-1">
+                      <div className="print-hidden pt-2 clear-both">
                         <Link
                           href={`/artwork/${item.artwork.slug}`}
                           target="_blank"
@@ -790,6 +827,114 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       </div>
                     </div>
                   </div>
+                ) : layoutMode === "SIDE_BY_SIDE" ? (
+                  (() => {
+                    const ratio = item.plateRatio || catalog.plateRatio || "55:45";
+                    let gridTemplateColumns = "53% 43%";
+                    let ratioClass = "plate-ratio-55-45";
+                    if (ratio === "40:60") {
+                      gridTemplateColumns = "38% 58%";
+                      ratioClass = "plate-ratio-40-60";
+                    } else if (ratio === "45:55") {
+                      gridTemplateColumns = "43% 53%";
+                      ratioClass = "plate-ratio-45-55";
+                    } else if (ratio === "50:50") {
+                      gridTemplateColumns = "48% 48%";
+                      ratioClass = "plate-ratio-50-50";
+                    } else if (ratio === "60:40") {
+                      gridTemplateColumns = "58% 38%";
+                      ratioClass = "plate-ratio-60-40";
+                    }
+
+                    return (
+                      <div
+                        className={cn("catalog-plate-body plate-body-grid flex-1 my-auto overflow-hidden w-full", ratioClass)}
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns,
+                          gap: "4%",
+                          alignItems: "center",
+                          width: "100%",
+                        }}
+                      >
+                        {/* Left Column: Framed Masterwork Plate */}
+                        <div className="plate-image-col flex items-center justify-center max-h-[64vh] print:max-h-[60vh] w-full">
+                          <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group max-h-full">
+                            <img
+                              src={item.artwork.primaryImageUrl}
+                              alt={displayTitle}
+                              className="max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
+                            />
+                            <div className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm">
+                              <ShieldCheck className="w-3 h-3 text-primary" />
+                              <span className="text-[9px] font-mono font-semibold text-primary">
+                                {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right Column: Curatorial Details & Specifications */}
+                        <div className="plate-details-col flex flex-col justify-center space-y-3 text-left w-full overflow-y-auto max-h-[64vh] print:max-h-[60vh]">
+                          <div>
+                            <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-2 font-mono uppercase tracking-wider">
+                              {item.artwork.category?.name || "Traditional Indian School"}
+                            </span>
+                            <h3 className="text-2xl sm:text-3xl font-serif text-foreground font-bold leading-tight">
+                              {displayTitle}
+                            </h3>
+                            <p className="text-sm text-stone-400 font-serif mt-1">
+                              {displaySubtitle}
+                              {item.artwork.yearCreated ? ` • ${item.artwork.yearCreated}` : ""}
+                            </p>
+                          </div>
+
+                          <div className="space-y-1.5 text-xs text-foreground/90 border-t border-primary/20 pt-3">
+                            <p>
+                              <strong className="text-muted-foreground font-mono text-[11px] uppercase mr-1">Medium:</strong>
+                              <span>{item.artwork.medium || "Natural Mineral Pigments & Gold Foil"}</span>
+                            </p>
+                            {item.artwork.dimensions && (
+                              <p>
+                                <strong className="text-muted-foreground font-mono text-[11px] uppercase mr-1">Dimensions:</strong>
+                                <span>{item.artwork.dimensions}</span>
+                              </p>
+                            )}
+                            {item.artwork.goldPurity && (
+                              <p>
+                                <strong className="text-muted-foreground font-mono text-[11px] uppercase mr-1">Gold Leaf:</strong>
+                                <span>{item.artwork.goldPurity}</span>
+                              </p>
+                            )}
+                          </div>
+
+                          {(item.curatorialNote || item.artwork.description) && (
+                            <div className="border-t border-primary/20 pt-3">
+                              {item.curatorialNote ? (
+                                <p className="text-xs text-foreground/90 leading-relaxed italic bg-muted/20 p-3 rounded-lg border border-border/60">
+                                  &ldquo;{item.curatorialNote}&rdquo;
+                                </p>
+                              ) : (
+                                <div className="text-xs text-foreground/90 leading-relaxed font-serif">
+                                  <TiptapRenderer content={item.artwork.description!} />
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="print-hidden pt-1">
+                            <Link
+                              href={`/artwork/${item.artwork.slug}`}
+                              target="_blank"
+                              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-semibold"
+                            >
+                              View Full Masterwork Archive <ExternalLink className="w-3 h-3" />
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()
                 ) : (
                   /* STACKED LAYOUT FALLBACK */
                   <div className="plate-body-stacked flex flex-col items-center justify-between flex-1 my-auto w-full">

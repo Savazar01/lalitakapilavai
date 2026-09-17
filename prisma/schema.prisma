@@ -453,6 +453,7 @@ model Event {
   isDeleted          Boolean             @default(false)
   showOnHomepage     Boolean             @default(false)
   sortOrder          Int                 @default(0)
+  rsvpConfig         Json?               // Dynamic RSVP Form Builder Settings (EventRsvpConfig)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
@@ -580,7 +581,8 @@ model ECatalog {
   downloadablePdfUrl String?
   themeColor         String         @default("gold")
   orientation        String         @default("portrait") // "portrait" | "landscape"
-  plateLayout        String         @default("SIDE_BY_SIDE") // "SIDE_BY_SIDE" | "STACKED"
+  plateLayout        String         @default("SIDE_BY_SIDE") // "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW"
+  plateRatio         String?        @default("55:45") // "40:60" | "45:55" | "50:50" | "55:45" | "60:40"
 
   // Global Catalog Theme & Framing
   // { backgroundColor, textColor, frameStyle: "none"|"gold-fillet"|"double-fillet"|"silk-border", accentColor }
@@ -704,7 +706,8 @@ model ECatalogItem {
   customNote     String?  @db.Text
   curatorialNote String?  @db.Text
   highlightPlate Boolean  @default(false)
-  plateLayout    String?  // Optional per-plate override: "SIDE_BY_SIDE" | "STACKED"
+  plateLayout    String?  // Optional per-plate override: "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW"
+  plateRatio     String?  // Optional per-plate ratio override: "40:60" | "45:55" | "50:50" | "55:45" | "60:40"
   customTitle    String?  // Custom page heading (defaults to artwork title)
   customSubtitle String?  // Custom subheading/tagline (defaults to category/school)
   showPlateNumber Boolean @default(true) // Toggle for "Plate X of Y" badge

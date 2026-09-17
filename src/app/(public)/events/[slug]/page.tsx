@@ -258,6 +258,7 @@ export default async function EventDetailPage({ params }: PageProps) {
               registrationFee={event.registrationFee ? Number(event.registrationFee) : null}
               currency={event.currency || "INR"}
               maxCapacity={event.maxCapacity}
+              rsvpConfig={event.rsvpConfig as unknown as import("@/components/public/event-rsvp-form").EventRsvpConfig}
             />
 
             <div className="p-3 rounded-xl border border-border/60 bg-muted/20 text-center text-xs text-muted-foreground">

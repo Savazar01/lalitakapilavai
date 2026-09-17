@@ -7,7 +7,28 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/formatters";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
+
+export interface EventRsvpCustomField {
+  id: string;
+  label: string;
+  type: "text" | "select" | "checkbox";
+  options?: string[];
+  required: boolean;
+}
+
+export interface EventRsvpConfig {
+  enabled: boolean;
+  title?: string;
+  subtitle?: string;
+  requirePhone?: boolean;
+  allowGuestCount?: boolean;
+  maxGuestsPerRsvp?: number;
+  submitButtonLabel?: string;
+  successMessage?: string;
+  customFields?: EventRsvpCustomField[];
+}
 
 interface EventRsvpFormProps {
   eventId: string;
@@ -16,6 +37,7 @@ interface EventRsvpFormProps {
   registrationFee: number | null;
   currency?: string;
   maxCapacity: number | null;
+  rsvpConfig?: EventRsvpConfig | null;
 }
 
 export function EventRsvpForm({
@@ -24,15 +46,19 @@ export function EventRsvpForm({
   isRegistrationOpen,
   registrationFee,
   currency = "INR",
+  rsvpConfig,
 }: EventRsvpFormProps) {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [tickets, setTickets] = React.useState("1");
+  const [customAnswers, setCustomAnswers] = React.useState<Record<string, string | boolean>>({});
   const [submitting, setSubmitting] = React.useState(false);
   const [registered, setRegistered] = React.useState(false);
 
-  if (!isRegistrationOpen) {
+  const isEnabled = rsvpConfig?.enabled !== false && isRegistrationOpen;
+
+  if (!isEnabled) {
     return (
       <Card className="p-6 text-center border-dashed">
         <Ticket className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
@@ -43,6 +69,15 @@ export function EventRsvpForm({
       </Card>
     );
   }
+
+  const title = rsvpConfig?.title || "Reserve Your Attendance";
+  const subtitle = rsvpConfig?.subtitle || "Complimentary exhibition catalog and reserved recital seating.";
+  const requirePhone = rsvpConfig?.requirePhone === true;
+  const allowGuestCount = rsvpConfig?.allowGuestCount !== false;
+  const maxGuests = rsvpConfig?.maxGuestsPerRsvp || 4;
+  const buttonLabel = rsvpConfig?.submitButtonLabel || "Confirm RSVP";
+  const successMsg = rsvpConfig?.successMessage || `We look forward to welcoming you to "${eventTitle}". A confirmation has been registered with our desk.`;
+  const customFields = rsvpConfig?.customFields || [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +92,8 @@ export function EventRsvpForm({
           attendeeName: name,
           attendeeEmail: email,
           attendeePhone: phone || undefined,
-          ticketCount: parseInt(tickets, 10) || 1,
+          ticketCount: allowGuestCount ? (parseInt(tickets, 10) || 1) : 1,
+          customAnswers: Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
         }),
       });
 
@@ -74,7 +110,6 @@ export function EventRsvpForm({
     } finally {
       setSubmitting(false);
     }
-
   };
 
   if (registered) {
@@ -85,7 +120,7 @@ export function EventRsvpForm({
           RSVP Confirmed
         </CardTitle>
         <CardDescription className="text-xs text-muted-foreground">
-          We look forward to welcoming you to &quot;{eventTitle}&quot;. A confirmation has been registered with our desk.
+          {successMsg}
         </CardDescription>
       </Card>
     );
@@ -96,7 +131,7 @@ export function EventRsvpForm({
       <CardHeader className="pb-3 text-left">
         <div className="flex items-center justify-between">
           <CardTitle className="font-serif font-bold text-lg text-foreground">
-            Reserve Your Attendance
+            {title}
           </CardTitle>
           <span className="text-xs font-mono font-bold text-primary">
             {registrationFee
@@ -105,7 +140,7 @@ export function EventRsvpForm({
           </span>
         </div>
         <CardDescription className="text-xs">
-          Complimentary exhibition catalog and reserved recital seating.
+          {subtitle}
         </CardDescription>
       </CardHeader>
 
@@ -134,32 +169,75 @@ export function EventRsvpForm({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className={cn("grid gap-2", allowGuestCount ? "grid-cols-2" : "grid-cols-1")}>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">Phone / WhatsApp</label>
+              <label className="text-xs font-semibold text-foreground">
+                Phone / WhatsApp {requirePhone && "*"}
+              </label>
               <Input
                 type="tel"
                 placeholder="+91 98450 00000"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="text-xs h-8"
+                required={requirePhone}
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">Attendees</label>
-              <select
-                value={tickets}
-                onChange={(e) => setTickets(e.target.value)}
-                className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="1">1 Person</option>
-                <option value="2">2 Persons</option>
-                <option value="3">3 Persons</option>
-                <option value="4">4 Persons</option>
-              </select>
-            </div>
+            {allowGuestCount && (
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Attendees</label>
+                <select
+                  value={tickets}
+                  onChange={(e) => setTickets(e.target.value)}
+                  className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  {Array.from({ length: Math.min(Math.max(maxGuests, 1), 10) }, (_, i) => (
+                    <option key={i + 1} value={String(i + 1)}>
+                      {i + 1} {i === 0 ? "Person" : "Persons"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
+
+          {/* Custom Fields */}
+          {customFields.map((field) => (
+            <div key={field.id} className="space-y-1">
+              {field.type === "checkbox" ? (
+                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer pt-1">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(customAnswers[field.id])}
+                    onChange={(e) =>
+                      setCustomAnswers({ ...customAnswers, [field.id]: e.target.checked })
+                    }
+                    className="w-4 h-4 accent-primary rounded"
+                    required={field.required}
+                  />
+                  <span>
+                    {field.label} {field.required && "*"}
+                  </span>
+                </label>
+              ) : (
+                <>
+                  <label className="text-xs font-semibold text-foreground">
+                    {field.label} {field.required && "*"}
+                  </label>
+                  <Input
+                    value={String(customAnswers[field.id] || "")}
+                    onChange={(e) =>
+                      setCustomAnswers({ ...customAnswers, [field.id]: e.target.value })
+                    }
+                    placeholder="Your answer..."
+                    className="text-xs h-8"
+                    required={field.required}
+                  />
+                </>
+              )}
+            </div>
+          ))}
 
           <Button
             type="submit"
@@ -175,7 +253,7 @@ export function EventRsvpForm({
             ) : (
               <>
                 <Sparkles className="w-3.5 h-3.5" />
-                Confirm RSVP
+                {buttonLabel}
               </>
             )}
           </Button>

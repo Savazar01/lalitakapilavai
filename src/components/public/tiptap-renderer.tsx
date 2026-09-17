@@ -310,6 +310,104 @@ function renderNode(
         />
       );
 
+    case "customShape": {
+      const attrs = node.attrs || {};
+      const shapeType = (attrs.shapeType as string) || "cartouche";
+      const fillColor = (attrs.fillColor as string) || "rgba(251, 248, 241, 0.7)";
+      const borderColor = (attrs.borderColor as string) || "#D4AF37";
+      const borderWidth = Number(attrs.borderWidth) || 2;
+      const shadow = (attrs.shadow as string) || "sm";
+      const alignment = (attrs.alignment as string) || "center";
+      const imageUrl = (attrs.imageUrl as string) || "";
+      const imageFit = (attrs.imageFit as string) || "cover";
+      const imageOpacity = typeof attrs.imageOpacity === "number" ? attrs.imageOpacity : 1;
+      const scrimOpacity = typeof attrs.scrimOpacity === "number" ? attrs.scrimOpacity : 0.35;
+      const scrimColor = (attrs.scrimColor as string) || "#000000";
+
+      let containerClass = "p-6 my-6 relative transition-all overflow-hidden";
+      const shapeStyle: React.CSSProperties = {
+        backgroundColor: fillColor,
+        borderColor: borderColor,
+        borderWidth: `${borderWidth}px`,
+        borderStyle: "solid",
+      };
+
+      if (shapeType === "circle") {
+        containerClass += " rounded-full aspect-square flex items-center justify-center text-center max-w-[340px] mx-auto";
+      } else if (shapeType === "pill") {
+        containerClass += " rounded-full px-8 py-4";
+      } else if (shapeType === "templeArch") {
+        containerClass += " rounded-t-[100px] rounded-b-xl pt-10 pb-6 px-6";
+      } else if (shapeType === "diamond") {
+        containerClass += " rounded-2xl";
+      } else if (shapeType === "cartouche") {
+        containerClass += " rounded-[32px] border-double px-8 py-6";
+        shapeStyle.borderStyle = "double";
+        shapeStyle.borderWidth = `${Math.max(borderWidth, 3)}px`;
+      } else if (shapeType === "rounded") {
+        containerClass += " rounded-2xl";
+      } else {
+        containerClass += " rounded-none";
+      }
+
+      const shadowClass =
+        shadow === "none"
+          ? ""
+          : shadow === "sm"
+          ? "shadow-sm"
+          : shadow === "md"
+          ? "shadow-md"
+          : "shadow-xl";
+
+      const alignClass =
+        alignment === "left"
+          ? "mr-auto ml-0"
+          : alignment === "right"
+          ? "ml-auto mr-0"
+          : "mx-auto";
+
+      return (
+        <div
+          key={key}
+          className={cn(containerClass, shadowClass, alignClass, "max-w-2xl")}
+          style={shapeStyle}
+          data-tiptap-shape="true"
+        >
+          {imageUrl && (
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+            >
+              <img
+                src={imageUrl}
+                alt=""
+                className={`w-full h-full ${
+                  imageFit === "contain"
+                    ? "object-contain"
+                    : imageFit === "fill"
+                    ? "object-fill"
+                    : "object-cover"
+                }`}
+                style={{ opacity: imageOpacity }}
+              />
+              {scrimOpacity > 0 && (
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundColor: scrimColor,
+                    opacity: scrimOpacity,
+                  }}
+                />
+              )}
+            </div>
+          )}
+          <div className="relative z-10 w-full h-full">
+            {children}
+          </div>
+        </div>
+      );
+    }
+
     default:
       if (children) {
         return <div key={key}>{children}</div>;

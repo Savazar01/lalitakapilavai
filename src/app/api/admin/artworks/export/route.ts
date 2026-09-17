@@ -86,18 +86,22 @@ export async function GET(request: NextRequest) {
       properties: { defaultRowHeight: 65 },
     });
 
-    // Configure 18 Archival Columns
+    // Configure 22 Archival Columns
     worksheet.columns = [
       { header: "Thumbnail", key: "thumbnail", width: 16 },
       { header: "ID", key: "id", width: 38 },
       { header: "Slug", key: "slug", width: 26 },
       { header: "Title", key: "title", width: 34 },
+      { header: "Original File Name", key: "originalFileName", width: 30 },
       { header: "Category (Parent)", key: "parentCategory", width: 24 },
       { header: "Sub-Category", key: "subCategory", width: 24 },
       { header: "Traditional School", key: "traditionalSchool", width: 22 },
       { header: "Creation Year", key: "yearCreated", width: 14 },
       { header: "Medium", key: "medium", width: 32 },
       { header: "Dimensions", key: "dimensions", width: 20 },
+      { header: "Has Gold Foil", key: "hasGoldFoil", width: 16 },
+      { header: "Gold Purity", key: "goldPurity", width: 18 },
+      { header: "Custom Foil Earmark", key: "customFoilLabel", width: 24 },
       { header: "Price", key: "price", width: 16 },
       { header: "Currency", key: "currency", width: 12 },
       { header: "Available for Sale", key: "isAvailable", width: 18 },
@@ -145,18 +149,26 @@ export async function GET(request: NextRequest) {
       const parentCatName = art.category.parent ? art.category.parent.name : art.category.name;
       const subCatName = art.category.parent ? art.category.name : "";
       const traditionalSchool = art.category.parent?.name || art.category.name;
+      const originalFileName =
+        (art.protectedS3Key ? art.protectedS3Key.split("/").pop() : "") ||
+        (art.primaryImageUrl ? art.primaryImageUrl.split("/").pop()?.split("?")[0] : "") ||
+        "";
 
       const row = worksheet.addRow({
         thumbnail: "", // Populated via image anchor
         id: art.id,
         slug: art.slug,
         title: art.title,
+        originalFileName,
         parentCategory: parentCatName,
         subCategory: subCatName,
         traditionalSchool: traditionalSchool,
         yearCreated: art.yearCreated,
         medium: art.medium,
         dimensions: art.dimensions,
+        hasGoldFoil: art.hasGoldFoil ? "TRUE" : "FALSE",
+        goldPurity: art.goldPurity || "22 Karat",
+        customFoilLabel: (art as { customFoilLabel?: string }).customFoilLabel || (art.hasGoldFoil ? "22k Gold Foil Relief" : ""),
         price: art.price ? Number(art.price) : null,
         currency: art.currency || "INR",
         isAvailable: art.isAvailable ? "TRUE" : "FALSE",
@@ -173,8 +185,15 @@ export async function GET(request: NextRequest) {
       row.eachCell((cell, colNumber) => {
         cell.alignment = {
           vertical: "middle",
-          horizontal: colNumber === 1 || colNumber === 8 || colNumber === 11 || (colNumber >= 13 && colNumber <= 16) ? "center" : "left",
-          wrapText: colNumber === 4 || colNumber === 9 || colNumber === 18,
+          horizontal:
+            colNumber === 1 ||
+            colNumber === 9 ||
+            colNumber === 12 ||
+            colNumber === 15 ||
+            (colNumber >= 17 && colNumber <= 20)
+              ? "center"
+              : "left",
+          wrapText: colNumber === 4 || colNumber === 5 || colNumber === 10 || colNumber === 22,
         };
         cell.font = {
           name: "Segoe UI",

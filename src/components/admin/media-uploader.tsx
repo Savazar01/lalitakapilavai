@@ -8,9 +8,11 @@ import {
   FileText,
   Link as LinkIcon,
   CheckCircle2,
+  Database,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MediaVaultDialog } from "@/components/admin/media-vault-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -40,12 +42,19 @@ export function MediaUploader({
   const [mode, setMode] = React.useState<"file" | "url">("file");
   const [urlInput, setUrlInput] = React.useState(value || "");
   const [prevValue, setPrevValue] = React.useState(value);
+  const [vaultOpen, setVaultOpen] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   if (value !== prevValue) {
     setPrevValue(value);
     setUrlInput(value || "");
   }
+
+  const handleSelectFromVault = (vaultUrl: string) => {
+    onUploadComplete(vaultUrl);
+    setUrlInput(vaultUrl);
+    toast.success("Media selected from Vault");
+  };
 
   const handleProcessFile = async (file: File) => {
     const isHeic =
@@ -159,6 +168,18 @@ export function MediaUploader({
               type="button"
               variant="outline"
               size="sm"
+              onClick={() => setVaultOpen(true)}
+              className="h-7 text-xs px-2 cursor-pointer flex items-center gap-1"
+              disabled={uploading}
+              title="Select from Server Media Vault"
+            >
+              <Database className="w-3 h-3 text-primary" />
+              Vault
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
               onClick={() => {
                 if (fileInputRef.current) fileInputRef.current.click();
               }}
@@ -193,7 +214,17 @@ export function MediaUploader({
         /* Empty Upload State */
         <div className="space-y-2">
           {/* Mode Switcher */}
-          <div className="flex items-center justify-end gap-1 text-[11px]">
+          <div className="flex items-center justify-end gap-1.5 text-[11px]">
+            <button
+              type="button"
+              onClick={() => setVaultOpen(true)}
+              className="px-2 py-0.5 rounded transition-colors cursor-pointer text-primary hover:bg-primary/10 font-semibold flex items-center gap-1 border border-primary/30"
+              title="Open Server Media Vault"
+            >
+              <Database className="w-3 h-3" />
+              Media Vault
+            </button>
+            <span className="text-muted-foreground/40">|</span>
             <button
               type="button"
               onClick={() => setMode("file")}
@@ -204,7 +235,7 @@ export function MediaUploader({
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Upload Local File
+              Upload File
             </button>
             <span className="text-muted-foreground/40">|</span>
             <button
@@ -217,7 +248,7 @@ export function MediaUploader({
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Paste Remote URL
+              Remote URL
             </button>
           </div>
 
@@ -305,6 +336,13 @@ export function MediaUploader({
           )}
         </div>
       )}
+
+      {/* Server Media Vault Modal */}
+      <MediaVaultDialog
+        open={vaultOpen}
+        onOpenChange={setVaultOpen}
+        onSelect={handleSelectFromVault}
+      />
     </div>
   );
 }

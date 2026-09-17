@@ -85,6 +85,7 @@ export async function PUT(
       themeColor,
       orientation,
       plateLayout,
+      plateRatio,
       themeConfig,
       coverConfig,
       essayConfig,
@@ -139,6 +140,7 @@ export async function PUT(
         themeColor: themeColor !== undefined ? themeColor : existing.themeColor,
         orientation: orientation !== undefined ? orientation : (existing.orientation || "portrait"),
         plateLayout: plateLayout !== undefined ? plateLayout : (existing.plateLayout || "SIDE_BY_SIDE"),
+        plateRatio: plateRatio !== undefined ? plateRatio : (existing.plateRatio || "55:45"),
         themeConfig: themeConfig !== undefined ? themeConfig : existing.themeConfig,
         coverConfig: coverConfig !== undefined ? coverConfig : existing.coverConfig,
         essayConfig: essayConfig !== undefined ? essayConfig : existing.essayConfig,
@@ -251,6 +253,7 @@ export async function PUT(
               curatorialNote?: string;
               highlightPlate?: boolean;
               plateLayout?: string;
+              plateRatio?: string;
               customTitle?: string;
               customSubtitle?: string;
               showPlateNumber?: boolean;
@@ -261,6 +264,7 @@ export async function PUT(
               curatorialNote: item.curatorialNote || null,
               highlightPlate: Boolean(item.highlightPlate),
               plateLayout: item.plateLayout || null,
+              plateRatio: item.plateRatio || null,
               customTitle: item.customTitle ? item.customTitle.trim() : null,
               customSubtitle: item.customSubtitle ? item.customSubtitle.trim() : null,
               showPlateNumber: item.showPlateNumber !== false,
