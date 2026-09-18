@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Sparkles, ExternalLink, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ProtectedImage } from "@/components/public/protected-image";
 
 export interface MediaGalleryItem {
   id: string;
@@ -60,6 +61,70 @@ function ItemLinkWrapper({
       {children}
     </Link>
   );
+}
+
+/**
+ * Computes responsive grid spans and heights for Curated Bento Collage
+ * dynamically supporting 1 to 12 items without awkward whitespace or truncation.
+ */
+export function getBentoItemClass(index: number, total: number): string {
+  if (total <= 1) {
+    return "col-span-12 h-[380px] sm:h-[480px]";
+  }
+  if (total === 2) {
+    return "col-span-12 sm:col-span-6 h-[300px] sm:h-[400px]";
+  }
+  if (total === 3) {
+    return index === 0
+      ? "col-span-12 md:col-span-8 md:row-span-2 h-[340px] sm:h-[440px]"
+      : "col-span-12 sm:col-span-6 md:col-span-4 h-[165px] sm:h-[212px]";
+  }
+  if (total === 4) {
+    return index === 0 || index === 3
+      ? "col-span-12 md:col-span-7 h-[260px] sm:h-[320px]"
+      : "col-span-12 md:col-span-5 h-[260px] sm:h-[320px]";
+  }
+  if (total === 5) {
+    if (index === 0) return "col-span-12 md:col-span-7 md:row-span-2 h-[380px] sm:h-[460px]";
+    if (index === 1 || index === 2) return "col-span-12 sm:col-span-6 md:col-span-5 h-[180px] sm:h-[222px]";
+    return "col-span-12 sm:col-span-6 md:col-span-6 h-[220px] sm:h-[280px]";
+  }
+  if (total === 6) {
+    if (index === 0) return "col-span-12 md:col-span-8 md:row-span-2 h-[380px] sm:h-[460px]";
+    if (index === 1 || index === 2) return "col-span-12 sm:col-span-6 md:col-span-4 h-[180px] sm:h-[222px]";
+    return "col-span-12 sm:col-span-4 md:col-span-4 h-[200px] sm:h-[240px]";
+  }
+  if (total === 7) {
+    if (index === 0) return "col-span-12 md:col-span-8 md:row-span-2 h-[380px] sm:h-[460px]";
+    if (index === 1 || index === 2) return "col-span-12 sm:col-span-6 md:col-span-4 h-[180px] sm:h-[222px]";
+    return "col-span-12 sm:col-span-6 md:col-span-6 h-[220px] sm:h-[260px]";
+  }
+  if (total === 8) {
+    if (index === 0) return "col-span-12 md:col-span-8 md:row-span-2 h-[380px] sm:h-[460px]";
+    if (index === 1 || index === 2) return "col-span-12 sm:col-span-6 md:col-span-4 h-[180px] sm:h-[222px]";
+    if (index >= 3 && index <= 5) return "col-span-12 sm:col-span-4 md:col-span-4 h-[190px] sm:h-[230px]";
+    return "col-span-12 sm:col-span-6 md:col-span-6 h-[210px] sm:h-[250px]";
+  }
+  if (total === 9) {
+    if (index === 0) return "col-span-12 md:col-span-8 md:row-span-2 h-[380px] sm:h-[460px]";
+    if (index === 1 || index === 2) return "col-span-12 sm:col-span-6 md:col-span-4 h-[180px] sm:h-[222px]";
+    return "col-span-12 sm:col-span-4 md:col-span-4 h-[190px] sm:h-[230px]";
+  }
+  if (total === 10) {
+    if (index === 0 || index === 1) return "col-span-12 sm:col-span-6 md:col-span-6 h-[260px] sm:h-[340px]";
+    return "col-span-12 sm:col-span-6 md:col-span-3 h-[180px] sm:h-[220px]";
+  }
+  if (total === 11) {
+    if (index === 0) return "col-span-12 md:col-span-8 md:row-span-2 h-[380px] sm:h-[460px]";
+    if (index === 1 || index === 2) return "col-span-12 sm:col-span-6 md:col-span-4 h-[180px] sm:h-[222px]";
+    return "col-span-12 sm:col-span-6 md:col-span-3 h-[180px] sm:h-[220px]";
+  }
+  // 12 or more items
+  if (index === 0) return "col-span-12 md:col-span-8 md:row-span-2 h-[380px] sm:h-[460px]";
+  if (index === 1 || index === 2) return "col-span-12 sm:col-span-6 md:col-span-4 h-[180px] sm:h-[222px]";
+  if (index === 3 || index === 4 || index === 5) return "col-span-12 sm:col-span-4 md:col-span-4 h-[200px] sm:h-[240px]";
+  if (index === 6 || index === 7) return "col-span-12 sm:col-span-6 md:col-span-6 h-[220px] sm:h-[270px]";
+  return "col-span-12 sm:col-span-6 md:col-span-3 h-[180px] sm:h-[220px]";
 }
 
 export function MediaGalleryBlock({
@@ -170,10 +235,12 @@ export function MediaGalleryBlock({
       >
         <div className={cn("relative w-full overflow-hidden bg-stone-950/40", aspectClass, frameClasses)}>
           <ItemLinkWrapper item={activeItem} className="w-full h-full relative">
-            <img
+            <ProtectedImage
               src={activeItem.url}
               alt={activeItem.alt || activeItem.title || "Gallery image"}
+              useImg={true}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              wrapperClassName="w-full h-full"
             />
 
             {/* Gradient Scrim for Captions */}
@@ -308,10 +375,12 @@ export function MediaGalleryBlock({
               >
                 <ItemLinkWrapper item={item} className="h-full flex flex-col">
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-950/40">
-                    <img
+                    <ProtectedImage
                       src={item.url}
                       alt={item.alt || item.title || `Gallery Item ${idx + 1}`}
+                      useImg={true}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      wrapperClassName="w-full h-full"
                     />
                     {isLinked && (
                       <div className="absolute top-2.5 right-2.5 bg-stone-950/70 backdrop-blur-md p-1.5 rounded-full text-amber-300 opacity-90 group-hover:opacity-100 transition-opacity">
@@ -343,187 +412,86 @@ export function MediaGalleryBlock({
   }
 
   /* -------------------------------------------------------------
-   * MODE C: CURATED BENTO COLLAGE (Up to 5 Photos)
+   * MODE C: CURATED BENTO COLLAGE (Up to 12 Photos)
    * ----------------------------------------------------------- */
-  const collageItems = validItems.slice(0, 5);
+  const collageItems = validItems.slice(0, 12);
+  const totalCollage = collageItems.length;
 
-  // If 1 item: full display
-  if (collageItems.length === 1) {
-    const single = collageItems[0];
-    return (
-      <div className={cn("w-full", className)}>
-        <ItemLinkWrapper item={single} className={cn("relative w-full aspect-[16/9]", frameClasses)}>
-          <img
-            src={single.url}
-            alt={single.alt || single.title || "Masterwork collage"}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          {(single.title || single.caption) && (
-            <div className="absolute bottom-4 left-4 right-4 bg-stone-950/80 backdrop-blur-md p-4 rounded-xl border border-amber-500/30">
-              {single.title && (
-                <h4 className="font-serif font-bold text-base text-white">{single.title}</h4>
-              )}
-              {single.caption && (
-                <p className="text-xs text-stone-200 mt-1">{single.caption}</p>
-              )}
-            </div>
-          )}
-        </ItemLinkWrapper>
-      </div>
-    );
-  }
-
-  // If 2 items: 2-column split
-  if (collageItems.length === 2) {
-    return (
-      <div className={cn("grid grid-cols-1 sm:grid-cols-2 gap-4 w-full", className)}>
-        {collageItems.map((item, idx) => (
-          <ItemLinkWrapper
-            key={item.id || idx}
-            item={item}
-            className={cn("relative aspect-[4/3] w-full group", frameClasses)}
-          >
-            <img
-              src={item.url}
-              alt={item.alt || item.title || `Collage Item ${idx + 1}`}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            {(item.title || item.caption) && (
-              <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-stone-950/90 via-stone-950/40 to-transparent">
-                {item.title && (
-                  <h4 className="font-serif font-bold text-sm text-white">{item.title}</h4>
-                )}
-                {item.caption && (
-                  <p className="text-xs text-stone-200 mt-0.5 line-clamp-1">{item.caption}</p>
-                )}
-              </div>
-            )}
-          </ItemLinkWrapper>
-        ))}
-      </div>
-    );
-  }
-
-  // If 3 items: 1 large left, 2 stacked right
-  if (collageItems.length === 3) {
-    return (
-      <div className={cn("grid grid-cols-1 md:grid-cols-12 gap-4 w-full", className)}>
-        {/* Large Feature Item */}
-        <div className="md:col-span-7">
-          <ItemLinkWrapper
-            item={collageItems[0]}
-            className={cn("relative w-full h-[320px] sm:h-[420px] group", frameClasses)}
-          >
-            <img
-              src={collageItems[0].url}
-              alt={collageItems[0].alt || collageItems[0].title || "Collage Feature"}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            {(collageItems[0].title || collageItems[0].caption) && (
-              <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-stone-950/90 to-transparent">
-                {collageItems[0].title && (
-                  <h4 className="font-serif font-bold text-base text-white">{collageItems[0].title}</h4>
-                )}
-                {collageItems[0].caption && (
-                  <p className="text-xs text-stone-200 mt-0.5">{collageItems[0].caption}</p>
-                )}
-              </div>
-            )}
-          </ItemLinkWrapper>
-        </div>
-
-        {/* Right Stacked 2 Items */}
-        <div className="md:col-span-5 flex flex-col gap-4">
-          {collageItems.slice(1, 3).map((item, idx) => (
-            <ItemLinkWrapper
-              key={item.id || idx}
-              item={item}
-              className={cn("relative w-full h-[152px] sm:h-[202px] group", frameClasses)}
-            >
-              <img
-                src={item.url}
-                alt={item.alt || item.title || `Collage Sub-item ${idx + 1}`}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              {(item.title || item.caption) && (
-                <div className="absolute bottom-0 inset-x-0 p-2.5 bg-gradient-to-t from-stone-950/90 to-transparent">
-                  {item.title && (
-                    <h4 className="font-serif font-bold text-xs text-white line-clamp-1">{item.title}</h4>
-                  )}
-                </div>
-              )}
-            </ItemLinkWrapper>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // 4 or 5 items: Luxury Curated Bento Grid (Feature plate + remaining 3 or 4)
   return (
     <div className={cn("grid grid-cols-1 md:grid-cols-12 gap-3.5 sm:gap-4 w-full", className)}>
-      {/* Primary Feature Plate (Left / Main) */}
-      <div className="md:col-span-7">
-        <ItemLinkWrapper
-          item={collageItems[0]}
-          className={cn("relative w-full h-[360px] sm:h-[460px] group", frameClasses)}
-        >
-          <img
-            src={collageItems[0].url}
-            alt={collageItems[0].alt || collageItems[0].title || "Principal Masterwork"}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/20 to-transparent pointer-events-none" />
-          <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 text-left z-10">
-            <div className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-300 uppercase tracking-wider mb-1 bg-stone-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-              <Sparkles className="w-2.5 h-2.5" /> Featured Plate
-            </div>
-            {collageItems[0].title && (
-              <h3 className="font-serif font-bold text-base sm:text-xl text-white drop-shadow-sm">
-                {collageItems[0].title}
-              </h3>
-            )}
-            {collageItems[0].caption && (
-              <p className="text-xs text-stone-200/90 leading-relaxed mt-1 line-clamp-2">
-                {collageItems[0].caption}
-              </p>
-            )}
-          </div>
-        </ItemLinkWrapper>
-      </div>
+      {collageItems.map((item, idx) => {
+        const itemClass = getBentoItemClass(idx, totalCollage);
+        const isFeatured = idx === 0 && totalCollage >= 3;
+        const isLinked = !!getItemHref(item);
 
-      {/* Grid for Remaining 3 to 4 Items (Right Column) */}
-      <div className="md:col-span-5 grid grid-cols-2 gap-3.5 sm:gap-4">
-        {collageItems.slice(1, 5).map((item, idx) => (
-          <ItemLinkWrapper
-            key={item.id || idx}
-            item={item}
-            className={cn(
-              "relative w-full h-[172px] sm:h-[222px] group overflow-hidden",
-              frameClasses
-            )}
-          >
-            <img
-              src={item.url}
-              alt={item.alt || item.title || `Atelier Detail ${idx + 1}`}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/20 to-transparent pointer-events-none" />
-            <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 text-left z-10">
-              {item.title && (
-                <h4 className="font-serif font-bold text-xs sm:text-sm text-white line-clamp-1 drop-shadow-sm">
-                  {item.title}
-                </h4>
+        return (
+          <div key={item.id || idx} className={itemClass}>
+            <ItemLinkWrapper
+              item={item}
+              className={cn(
+                "relative w-full h-full group overflow-hidden block",
+                frameClasses
               )}
-              {item.caption && (
-                <p className="text-[11px] text-stone-300 line-clamp-1 mt-0.5">
-                  {item.caption}
-                </p>
+            >
+              <ProtectedImage
+                src={item.url}
+                alt={item.alt || item.title || `Atelier Masterwork ${idx + 1}`}
+                useImg={true}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                wrapperClassName="w-full h-full"
+              />
+
+              {/* Gradient Scrim */}
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/25 to-transparent pointer-events-none" />
+
+              {/* External Link Pill (if applicable) */}
+              {isLinked && (
+                <div className="absolute top-2.5 right-2.5 bg-stone-950/70 backdrop-blur-md p-1.5 rounded-full text-amber-300 opacity-90 group-hover:opacity-100 transition-opacity z-10">
+                  <ExternalLink className="w-3 h-3" />
+                </div>
               )}
-            </div>
-          </ItemLinkWrapper>
-        ))}
-      </div>
+
+              {/* Overlay Metadata */}
+              <div
+                className={cn(
+                  "absolute left-3 right-3 text-left z-10 pointer-events-none",
+                  isFeatured
+                    ? "bottom-4 sm:bottom-6 sm:left-6 sm:right-6"
+                    : "bottom-2.5 sm:bottom-3"
+                )}
+              >
+                {isFeatured && (
+                  <div className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-300 uppercase tracking-wider mb-1 bg-stone-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                    <Sparkles className="w-2.5 h-2.5" /> Featured Plate
+                  </div>
+                )}
+                {item.title && (
+                  <h4
+                    className={cn(
+                      "font-serif font-bold text-white drop-shadow-sm line-clamp-1",
+                      isFeatured ? "text-base sm:text-xl" : "text-xs sm:text-sm"
+                    )}
+                  >
+                    {item.title}
+                  </h4>
+                )}
+                {item.caption && (
+                  <p
+                    className={cn(
+                      "text-stone-300 drop-shadow-xs line-clamp-1 mt-0.5",
+                      isFeatured
+                        ? "text-xs sm:text-sm text-stone-200/90 line-clamp-2 mt-1"
+                        : "text-[11px]"
+                    )}
+                  >
+                    {item.caption}
+                  </p>
+                )}
+              </div>
+            </ItemLinkWrapper>
+          </div>
+        );
+      })}
     </div>
   );
 }

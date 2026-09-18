@@ -7,6 +7,7 @@ import {
   ArrowUp,
   ArrowDown,
   Image as ImageIcon,
+  ImagePlus,
   Sparkles,
   Link as LinkIcon,
   UploadCloud,
@@ -15,6 +16,7 @@ import {
   Square,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { UniversalMediaDialog } from "@/components/admin/universal-media-dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -52,6 +54,10 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const [activeItemIndex, setActiveItemIndex] = React.useState<number>(0);
   const [uploading, setUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Universal Media Dialog state
+  const [isMediaDialogOpen, setIsMediaDialogOpen] = React.useState(false);
+  const [mediaDialogTargetIndex, setMediaDialogTargetIndex] = React.useState<number | null>(null);
 
   // Cached artworks and categories for item linking
   const [artworksList, setArtworksList] = React.useState<{ id: string; title: string; slug: string }[]>([]);
@@ -107,17 +113,17 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     });
   };
 
-  const handleAddItem = (newUrl = "") => {
+  const handleAddItem = (newUrl = "", newTitle = "", newAlt = "") => {
     const newItem: MediaGalleryItem = {
       id: `mg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       url: newUrl || "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=1200",
-      title: "Classical Masterwork Detail",
+      title: newTitle || "Classical Masterwork Detail",
       caption: "Sacred iconographic panel rendered in authentic 22k gold foil.",
-      alt: "Sacred painting plate",
+      alt: newAlt || "Sacred painting plate",
       linkType: "none",
       linkTarget: "",
     };
-    const updated = [...items, newItem];
+    const updated = [...items, newItem].slice(0, 12);
     onChange({
       ...data,
       items: updated,
@@ -253,7 +259,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               <span className="font-semibold text-xs">C. Curated Bento</span>
             </div>
             <p className="text-[10px] text-muted-foreground leading-tight">
-              Asymmetrical fine-art masonry collage supporting up to 5 photos.
+              Asymmetrical fine-art masonry collage dynamically adapting up to 12 photos.
             </p>
           </button>
         </div>
@@ -318,9 +324,9 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             <h4 className="font-serif font-bold text-sm text-foreground">
               Gallery Media Items ({items.length})
             </h4>
-            {displayMode === "collage" && items.length > 5 && (
+            {displayMode === "collage" && items.length > 12 && (
               <Badge variant="outline" className="text-[10px] border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400">
-                Notice: Bento mode displays first 5 items
+                Notice: Bento mode displays up to 12 items
               </Badge>
             )}
           </div>
@@ -336,12 +342,25 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               type="button"
               variant="outline"
               size="sm"
+              onClick={() => {
+                setMediaDialogTargetIndex(null);
+                setIsMediaDialogOpen(true);
+              }}
+              className="text-xs h-7 gap-1.5 border-amber-500/50 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer font-medium"
+            >
+              <ImagePlus className="w-3.5 h-3.5 text-amber-500" />
+              <span>Add Media / Vault</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
               disabled={uploading}
               onClick={() => fileInputRef.current?.click()}
               className="text-xs h-7 gap-1 border-primary/50 text-primary hover:bg-primary/10 cursor-pointer"
             >
               <UploadCloud className="w-3 h-3" />
-              {uploading ? "Uploading..." : "Upload Photo"}
+              {uploading ? "Uploading..." : "Upload Local"}
             </Button>
             <Button
               type="button"
@@ -434,13 +453,27 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
 
                 <div className="space-y-1">
                   <Label className="text-xs font-semibold text-foreground">Image URL</Label>
-                  <Input
-                    type="url"
-                    value={activeItem.url}
-                    onChange={(e) => handleUpdateItem(activeItemIndex, { url: e.target.value })}
-                    placeholder="https://..."
-                    className="h-8 text-xs font-mono"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      type="url"
+                      value={activeItem.url}
+                      onChange={(e) => handleUpdateItem(activeItemIndex, { url: e.target.value })}
+                      placeholder="https://... or /media/public/..."
+                      className="h-8 text-xs font-mono flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        setMediaDialogTargetIndex(activeItemIndex);
+                        setIsMediaDialogOpen(true);
+                      }}
+                      className="text-xs h-8 px-3 shrink-0 cursor-pointer font-medium"
+                    >
+                      Browse Vault
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -570,6 +603,54 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           </div>
         )}
       </div>
+
+      {/* Universal Media Dialog for Batch Insertion or Single Item Swapping */}
+      <UniversalMediaDialog
+        open={isMediaDialogOpen}
+        onOpenChange={setIsMediaDialogOpen}
+        acceptedTypes="image"
+        allowMultiple={mediaDialogTargetIndex === null}
+        title={
+          mediaDialogTargetIndex !== null
+            ? `Select Image for Photo #${mediaDialogTargetIndex + 1}`
+            : "Select Media for Gallery"
+        }
+        onSelect={(media) => {
+          if (mediaDialogTargetIndex !== null) {
+            handleUpdateItem(mediaDialogTargetIndex, {
+              url: media.url,
+              title: media.title || items[mediaDialogTargetIndex]?.title || "Classical Masterwork Detail",
+              alt: media.originalFileName || items[mediaDialogTargetIndex]?.alt || "Sacred painting plate",
+            });
+            toast.success("Image updated from vault!");
+          } else {
+            handleAddItem(
+              media.url,
+              media.title || "Classical Masterwork Detail",
+              media.originalFileName || "Sacred painting plate"
+            );
+            toast.success("Photo added to gallery!");
+          }
+        }}
+        onSelectMultiple={(mediaList) => {
+          const newItems: MediaGalleryItem[] = mediaList.map((m, idx) => ({
+            id: `mg-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
+            url: m.url,
+            title: m.title || "Classical Masterwork Detail",
+            caption: "Sacred iconographic panel rendered in authentic 22k gold foil.",
+            alt: m.originalFileName || "Sacred painting plate",
+            linkType: "none",
+            linkTarget: "",
+          }));
+          const updated = [...items, ...newItems].slice(0, 12);
+          onChange({
+            ...data,
+            items: updated,
+          });
+          setActiveItemIndex(updated.length - 1);
+          toast.success(`Added ${newItems.length} photos from vault!`);
+        }}
+      />
     </div>
   );
 }
