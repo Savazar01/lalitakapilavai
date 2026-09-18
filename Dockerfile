@@ -86,14 +86,11 @@ RUN mkdir -p .next && chown -R nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy pre-bundled seeder and Prisma CLI & native tools for entrypoint migrations
+# Copy full node_modules to guarantee prisma CLI, effect, sharp, and all entrypoint lifecycle tools are available
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Copy pre-bundled seeder
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/seed.js* ./prisma/
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/sharp ./node_modules/sharp
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@img ./node_modules/@img
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/heic-convert ./node_modules/heic-convert
 
 # Copy automated container lifecycle entrypoint hook
 COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh

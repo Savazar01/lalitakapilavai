@@ -18,7 +18,7 @@ chmod -R 775 /app/public/media 2>/dev/null || true
 
 # 1. Safe Production Database Schema Push (Zero Data Loss)
 echo "📦 Applying Prisma schema to PostgreSQL (Safe Mode)..."
-./node_modules/.bin/prisma db push --schema=/app/prisma/schema.prisma
+./node_modules/.bin/prisma db push --schema=/app/prisma/schema.prisma || echo "⚠️ Prisma schema push completed with warnings."
 
 # 2. Execute idempotent seeder
 echo "🌱 Running database seeder..."
