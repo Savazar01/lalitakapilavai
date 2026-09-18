@@ -38,7 +38,7 @@ COPY . .
 # Build-time dummy environment variables to prevent next build prerender crashes
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/build_fallback?schema=public"
+ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/build_fallback?schema=public&connect_timeout=2"
 ENV BETTER_AUTH_SECRET="build_secret_fallback_0123456789abcdef0123456789abcdef"
 ENV BETTER_AUTH_URL="http://localhost:3060"
 ENV NEXT_PUBLIC_APP_URL="http://localhost:3060"

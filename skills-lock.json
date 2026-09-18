@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "cloudflare-security-audit-skill": {
+      "source": "reason-machines/security-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloudflare-security-audit-skill/SKILL.md",
+      "computedHash": "155577feff9417541d4f730c35707480287cf02c99281202f5992b7e1014d396"
+    }
+  }
+}

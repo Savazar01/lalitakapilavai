@@ -37,6 +37,12 @@ export async function GET(
       return new NextResponse("Forbidden Path", { status: 403 });
     }
 
+    // STRICT ACCESS CONTROL: Completely block unauthenticated access to the master vault
+    // Protected master assets are strictly restricted to authenticated /api/admin/media/vault
+    if (cleanSegments.some((s) => s.toLowerCase() === "vault" || s.toLowerCase() === "masters")) {
+      return new NextResponse("Forbidden Vault Access", { status: 403 });
+    }
+
     const baseMediaDir = path.join(process.cwd(), "public", "media");
 
     // Attempt multiple candidate paths to support both /media/public/file.webp and /media/file.webp
@@ -64,6 +70,12 @@ export async function GET(
 
     if (!targetFilePath) {
       return new NextResponse("Media File Not Found", { status: 404 });
+    }
+
+    const resolvedTarget = path.resolve(/*turbopackIgnore: true*/ targetFilePath);
+    const resolvedVaultDir = path.resolve(/*turbopackIgnore: true*/ path.join(process.cwd(), "public", "media", "vault"));
+    if (resolvedTarget.startsWith(resolvedVaultDir)) {
+      return new NextResponse("Forbidden Vault Access", { status: 403 });
     }
 
     const ext = path.extname(targetFilePath).toLowerCase();

@@ -27,7 +27,6 @@ import {
   EyeOff,
   Home,
   UploadCloud,
-  FileSpreadsheet,
   FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -95,6 +94,8 @@ interface Artwork {
   primaryImageUrl: string;
   watermarkedWebpUrl: string;
   originalFileName?: string | null;
+  watermarkOverride?: boolean;
+  customWatermark?: { text?: string; opacity?: number; style?: string } | null;
   category: Category;
   categoryId: string;
   createdAt: string;
@@ -142,6 +143,40 @@ export default function ArtworksAdminPage() {
   const [originalFileName, setOriginalFileName] = React.useState("");
   const [protectedS3Key, setProtectedS3Key] = React.useState("");
   const [mediaVaultPickerOpen, setMediaVaultPickerOpen] = React.useState(false);
+
+  // Watermark Customization State
+  const [watermarkOverride, setWatermarkOverride] = React.useState(false);
+  const [customWatermarkText, setCustomWatermarkText] = React.useState("");
+  const [customWatermarkOpacity, setCustomWatermarkOpacity] = React.useState(85);
+  const [customWatermarkStyle, setCustomWatermarkStyle] = React.useState<"REPEAT_DIAGONAL" | "BANNER" | "CORNER" | "BOTH">("REPEAT_DIAGONAL");
+  const [regeneratingWatermark, setRegeneratingWatermark] = React.useState(false);
+
+  const handleRegenerateSingleWatermark = async () => {
+    if (!editingArtwork?.id) {
+      toast.info("Please save the artwork before regenerating the watermark.");
+      return;
+    }
+    setRegeneratingWatermark(true);
+    try {
+      const res = await fetch("/api/admin/artworks/re-watermark", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artworkId: editingArtwork.id }),
+      });
+      const data = await res.json();
+      if (res.ok && data.results?.[0]?.success) {
+        setWatermarkedWebpUrl(data.results[0].url);
+        toast.success("Artwork watermark regenerated successfully!");
+        reloadData();
+      } else {
+        toast.error(data.results?.[0]?.error || data.error || "Failed to regenerate watermark");
+      }
+    } catch {
+      toast.error("Network error regenerating watermark");
+    } finally {
+      setRegeneratingWatermark(false);
+    }
+  };
 
   // QR Preview Modal
   const [qrModalOpen, setQrModalOpen] = React.useState(false);
@@ -264,6 +299,10 @@ export default function ArtworksAdminPage() {
     setWatermarkedWebpUrl("");
     setOriginalFileName("");
     setProtectedS3Key("");
+    setWatermarkOverride(false);
+    setCustomWatermarkText("");
+    setCustomWatermarkOpacity(85);
+    setCustomWatermarkStyle("REPEAT_DIAGONAL");
     setDialogOpen(true);
   };
 
@@ -290,6 +329,13 @@ export default function ArtworksAdminPage() {
     setPrimaryImageUrl(art.primaryImageUrl);
     setWatermarkedWebpUrl(art.watermarkedWebpUrl);
     setOriginalFileName(art.originalFileName || "");
+    setWatermarkOverride(art.watermarkOverride || false);
+    const cw = art.customWatermark as { text?: string; opacity?: number; style?: string } | undefined;
+    setCustomWatermarkText(cw?.text || "");
+    setCustomWatermarkOpacity(cw?.opacity !== undefined ? Math.round(cw.opacity * 100) : 85);
+    setCustomWatermarkStyle(
+      (cw?.style as "REPEAT_DIAGONAL" | "BANNER" | "CORNER" | "BOTH") || "REPEAT_DIAGONAL"
+    );
     setDialogOpen(true);
   };
 
@@ -321,6 +367,11 @@ export default function ArtworksAdminPage() {
     formData.append("file", file);
     formData.append("mediaType", "artwork");
     formData.append("isArtwork", "true");
+    if (watermarkOverride) {
+      if (customWatermarkText.trim()) formData.append("watermarkText", customWatermarkText.trim());
+      formData.append("watermarkOpacity", String(customWatermarkOpacity / 100));
+      formData.append("watermarkStyle", customWatermarkStyle);
+    }
 
     try {
       const res = await fetch("/api/admin/media/upload", {
@@ -428,6 +479,14 @@ export default function ArtworksAdminPage() {
       watermarkedWebpUrl: watermarkedWebpUrl || primaryImageUrl,
       protectedS3Key,
       originalFileName: originalFileName || null,
+      watermarkOverride,
+      customWatermark: watermarkOverride
+        ? {
+            text: customWatermarkText.trim() || undefined,
+            opacity: customWatermarkOpacity / 100,
+            style: customWatermarkStyle,
+          }
+        : null,
     };
 
     try {
@@ -1386,6 +1445,90 @@ export default function ArtworksAdminPage() {
                 </div>
               </div>
 
+              {/* Watermark & Anti-Theft Protection Overrides */}
+              <div className="p-3 rounded-lg border border-border bg-card/60 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="watermarkOverrideCheckbox"
+                      checked={watermarkOverride}
+                      onChange={(e) => setWatermarkOverride(e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <label htmlFor="watermarkOverrideCheckbox" className="text-xs font-semibold text-foreground cursor-pointer">
+                      Override Global Watermark for this Artwork
+                    </label>
+                  </div>
+                  {editingArtwork?.id && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRegenerateSingleWatermark}
+                      disabled={regeneratingWatermark}
+                      className="h-7 text-xs gap-1.5"
+                    >
+                      {regeneratingWatermark ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      )}
+                      Re-generate Watermark
+                    </Button>
+                  )}
+                </div>
+
+                {watermarkOverride && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/50">
+                    <div className="sm:col-span-1 space-y-1">
+                      <label className="text-[11px] font-medium text-muted-foreground">Watermark Text</label>
+                      <Input
+                        value={customWatermarkText}
+                        onChange={(e) => setCustomWatermarkText(e.target.value)}
+                        placeholder="© Lalita Kapilavai"
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium text-muted-foreground">Placement Style</label>
+                      <Select
+                        value={customWatermarkStyle}
+                        onValueChange={(val: string) =>
+                          setCustomWatermarkStyle(
+                            val as "REPEAT_DIAGONAL" | "BANNER" | "CORNER" | "BOTH"
+                          )
+                        }
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="REPEAT_DIAGONAL">Diagonal Repeat (Full Anti-Theft)</SelectItem>
+                          <SelectItem value="BANNER">Bottom Banner</SelectItem>
+                          <SelectItem value="CORNER">Bottom-Right Corner</SelectItem>
+                          <SelectItem value="BOTH">Corner + Diagonal Repeat</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center text-[11px] font-medium text-muted-foreground">
+                        <span>Opacity</span>
+                        <span className="font-mono">{customWatermarkOpacity}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="100"
+                        value={customWatermarkOpacity}
+                        onChange={(e) => setCustomWatermarkOpacity(parseInt(e.target.value, 10))}
+                        className="w-full accent-primary h-2 mt-1 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Description WYSIWYG */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
@@ -1575,6 +1718,8 @@ export default function ArtworksAdminPage() {
         title="Select Masterwork Image Asset"
         acceptedTypes="image"
         allowMultiple={false}
+        isArtwork={true}
+        mediaType="artwork"
         onSelect={(item) => {
           setPrimaryImageUrl(item.url);
           setWatermarkedWebpUrl(item.url);

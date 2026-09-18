@@ -2,10 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import { getServerBaseUrl } from "@/lib/get-base-url";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  // Enforce IP rate limiting (5 submissions per 60s per IP)
+  const rateLimit = checkRateLimit(req, {
+    limit: 5,
+    windowMs: 60 * 1000,
+    identifier: "forms-submit",
+  });
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "Too many inquiries submitted. Please wait a moment before trying again." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.resetSeconds) },
+      }
+    );
+  }
+
   try {
     const body = await req.json();
     const {
@@ -18,7 +36,6 @@ export async function POST(req: NextRequest) {
       formTitle,
       pageSlug,
       notifyEmail,
-      recipientEmails,
       emailSubjectTemplate,
       customFields,
     } = body;
@@ -58,23 +75,10 @@ export async function POST(req: NextRequest) {
         const settings = await prisma.systemSetting.findFirst();
         const emailConfig = (settings?.emailConfig as Record<string, unknown> | null) || {};
         
-        // Determine recipient list: custom per-form recipients or system fallback
-        let targetRecipients: string[] = [];
-        if (typeof recipientEmails === "string" && recipientEmails.trim()) {
-          targetRecipients = recipientEmails
-            .split(",")
-            .map((e) => e.trim())
-            .filter((e) => e.length > 0 && e.includes("@"));
-        } else if (Array.isArray(recipientEmails) && recipientEmails.length > 0) {
-          targetRecipients = recipientEmails
-            .map((e) => String(e).trim())
-            .filter((e) => e.length > 0 && e.includes("@"));
-        }
-
-        if (targetRecipients.length === 0) {
-          const defaultAdmin = settings?.adminAlertEmail || (emailConfig.fromEmail as string) || "contact@lalitakapilavai.com";
-          targetRecipients = [defaultAdmin];
-        }
+        // Security Remediation (VULN-002): Client-supplied recipient emails are strictly forbidden
+        // Recipient is locked down strictly to the verified administrative alert inbox
+        const defaultAdmin = settings?.adminAlertEmail || (emailConfig.fromEmail as string) || "contact@lalitakapilavai.com";
+        const targetRecipients = [defaultAdmin];
 
         const host = (emailConfig.smtpHost as string) || "smtp.gmail.com";
         const port = Number(emailConfig.smtpPort) || 587;
@@ -93,7 +97,9 @@ export async function POST(req: NextRequest) {
               pass,
             },
             tls: {
-              rejectUnauthorized: false,
+              // Security Remediation (VULN-007): Enforce strict TLS certificate verification
+              rejectUnauthorized: true,
+              minVersion: "TLSv1.2",
             },
           });
 

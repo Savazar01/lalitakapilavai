@@ -194,7 +194,7 @@ export function ArtCanvasViewer({
               alt={title}
               onDragStart={handleDragStart}
               onContextMenu={handleContextMenu}
-              className="pointer-events-none select-none max-h-[75vh] w-auto object-contain transition-all duration-200"
+              className="protect-image pointer-events-none select-none max-h-[75vh] w-auto object-contain transition-all duration-200"
               draggable={false}
             />
 
@@ -203,7 +203,7 @@ export function ArtCanvasViewer({
             <div
               onContextMenu={handleContextMenu}
               onDragStart={handleDragStart}
-              className="absolute inset-0 z-20 bg-transparent cursor-default pointer-events-auto"
+              className="protect-image-scrim absolute inset-0 z-20 bg-transparent cursor-default pointer-events-auto"
               aria-hidden="true"
             />
           </div>

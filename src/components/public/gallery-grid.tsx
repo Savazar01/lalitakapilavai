@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ProtectedImage } from "@/components/public/protected-image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Palette, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -74,7 +75,7 @@ export function GalleryGrid({
                     className="relative aspect-[4/5] bg-muted/30 overflow-hidden select-none"
                     onContextMenu={(e) => e.preventDefault()}
                   >
-                    <Image
+                    <ProtectedImage
                       src={art.watermarkedWebpUrl}
                       alt={art.title}
                       fill

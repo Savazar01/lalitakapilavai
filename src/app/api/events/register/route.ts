@@ -1,7 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  // Enforce IP rate limiting (10 registrations per 60s per IP)
+  const rateLimit = checkRateLimit(request, {
+    limit: 10,
+    windowMs: 60 * 1000,
+    identifier: "events-register",
+  });
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "Too many registration attempts. Please wait a moment before trying again." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.resetSeconds) },
+      }
+    );
+  }
+
   try {
     const body = await request.json();
     const { eventId, attendeeName, attendeeEmail, attendeePhone, ticketCount, customAnswers } = body;

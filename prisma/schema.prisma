@@ -313,6 +313,8 @@ model Artwork {
   originalFileName   String?              // Authentic uploaded client file name
   protectedS3Key     String?              // Protected original master S3 key
   qrCodeUrl          String?              // Generated high-res Exhibition Floor QR code URL
+  watermarkOverride  Boolean              @default(false)
+  customWatermark    Json?
   
   // 1536-dimensional embedding for pgvector visual similarity
   embedding          Unsupported("vector(1536)")?

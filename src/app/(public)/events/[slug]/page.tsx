@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { EventRsvpForm } from "@/components/public/event-rsvp-form";
+import { ProtectedImage } from "@/components/public/protected-image";
 import { formatEventSchedule } from "@/lib/geo-timezone";
 import { Badge } from "@/components/ui/badge";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
@@ -349,7 +350,7 @@ export default async function EventDetailPage({ params }: PageProps) {
                   className="group block rounded-xl overflow-hidden border border-border bg-card hover:border-primary/60 transition-all shadow-sm flex flex-col justify-between"
                 >
                   <div className="relative aspect-[4/5] bg-muted/40 overflow-hidden">
-                    <Image
+                    <ProtectedImage
                       src={artwork.watermarkedWebpUrl}
                       alt={artwork.title}
                       fill

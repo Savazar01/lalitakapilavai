@@ -40,6 +40,8 @@ export interface UniversalMediaDialogProps {
   title?: string;
   acceptedTypes?: "image" | "pdf" | "all";
   allowMultiple?: boolean;
+  isArtwork?: boolean;
+  mediaType?: "artwork" | "general" | "document";
 }
 
 interface VaultItem {
@@ -61,6 +63,8 @@ export function UniversalMediaDialog({
   title = "Universal Media Ingestion Suite",
   acceptedTypes = "all",
   allowMultiple = false,
+  isArtwork = false,
+  mediaType,
 }: UniversalMediaDialogProps) {
   const [activeTab, setActiveTab] = React.useState<"vault" | "upload" | "url">("vault");
 
@@ -178,8 +182,10 @@ export function UniversalMediaDialog({
 
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("mediaType", file.type.includes("pdf") ? "document" : "general");
-        formData.append("isArtwork", "false");
+        const effectiveMediaType = mediaType ?? (file.type.includes("pdf") ? "document" : isArtwork ? "artwork" : "general");
+        const effectiveIsArtwork = isArtwork || effectiveMediaType === "artwork";
+        formData.append("mediaType", effectiveMediaType);
+        formData.append("isArtwork", String(effectiveIsArtwork));
 
         const res = await fetch("/api/admin/media/upload", {
           method: "POST",

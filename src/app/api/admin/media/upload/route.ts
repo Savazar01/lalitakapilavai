@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
     // 2. Parse Multipart Form Data
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
-    const customWatermark = formData.get("watermarkText") as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -189,13 +188,26 @@ export async function POST(request: NextRequest) {
       true // isProtected (writes to local vault or protected cloud storage)
     );
 
-    // 6. Query Watermark Settings from DB or Default
+    // 6. Query Watermark Settings from DB or Default with custom override support
+    const customWatermark = (formData.get("watermarkText") as string) || (formData.get("customWatermark") as string) || null;
+    const customOpacityRaw = formData.get("watermarkOpacity") as string | null;
+    const customOpacity = customOpacityRaw ? parseFloat(customOpacityRaw) : null;
+    const customStyle = (formData.get("watermarkStyle") as string) || (formData.get("watermarkPlacement") as string) || null;
+
     const systemSettings = await prisma.systemSetting.findFirst().catch(() => null);
     const watermarkText =
       customWatermark ||
       systemSettings?.watermarkText ||
       "© Lalita Kapilavai | lalitakapilavai.com";
-    const opacity = systemSettings?.watermarkOpacity || 0.85;
+    const opacity =
+      customOpacity !== null && !isNaN(customOpacity)
+        ? customOpacity
+        : (systemSettings?.watermarkOpacity ?? 0.85);
+    const style = (customStyle || systemSettings?.watermarkStyle || "REPEAT_DIAGONAL") as
+      | "REPEAT_DIAGONAL"
+      | "BANNER"
+      | "CORNER"
+      | "BOTH";
 
     // Generate Clean Cross-Platform SVG Overlay
     const svgOverlay = generateWatermarkSvg({
@@ -204,7 +216,7 @@ export async function POST(request: NextRequest) {
       text: watermarkText,
       opacity,
       fontSize: systemSettings?.watermarkFontSize || undefined,
-      style: systemSettings?.watermarkStyle || "REPEAT_DIAGONAL",
+      style,
     });
 
     // 7. Generate Watermarked WebP Derivative directly from processingBuffer

@@ -789,4 +789,23 @@ body {
   color: #64748B !important;
 }
 
+/* Masterwork Asset Protection: Anti-Theft & Right-Click Disabling */
+.protect-image {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+  pointer-events: none !important;
+}
+
+.protect-image-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  user-select: none;
+  background-color: transparent;
+  pointer-events: auto;
+}
+
+
 

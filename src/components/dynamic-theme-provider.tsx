@@ -11,6 +11,14 @@ import { sanitizeDetailedThemeConfig, generateUnifiedThemeCSS } from "@/lib/them
  * renders nothing, preserving globals.css defaults.
  */
 export async function DynamicThemeProvider() {
+  const isBuilding =
+    process.env.NEXT_PHASE === "phase-production-build" ||
+    process.env.BUILDING === "1";
+
+  if (isBuilding) {
+    return null;
+  }
+
   const settings = await prisma.systemSetting
     .findFirst({ select: { themeConfig: true } })
     .catch(() => null);

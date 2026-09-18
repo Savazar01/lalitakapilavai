@@ -84,6 +84,8 @@ export async function PUT(
       watermarkedWebpUrl,
       protectedS3Key,
       originalFileName,
+      watermarkOverride,
+      customWatermark,
     } = body;
 
     if (categoryId !== undefined && (!categoryId || typeof categoryId !== "string" || !categoryId.trim())) {
@@ -117,6 +119,8 @@ export async function PUT(
         watermarkedWebpUrl,
         protectedS3Key,
         originalFileName: originalFileName !== undefined ? (originalFileName || null) : undefined,
+        watermarkOverride: watermarkOverride !== undefined ? !!watermarkOverride : undefined,
+        customWatermark: customWatermark !== undefined ? customWatermark : undefined,
       },
       include: {
         category: true,

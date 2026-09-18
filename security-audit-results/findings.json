@@ -1,0 +1,188 @@
+{
+  "audit_metadata": {
+    "audit_date": "2026-09-18T10:00:00Z",
+    "target_repository": "Savazar01/lalitakapilavai",
+    "skill_version": "1.0.0",
+    "run_number": 1
+  },
+  "confirmed_findings": [
+    {
+      "id": "VULN-003",
+      "title": "Unauthenticated Direct Access to Protected Master Vault via Public Media Proxy",
+      "severity": "CRITICAL",
+      "category": "Access Control",
+      "description": "Public media streaming endpoint at /api/media/[...path] permits traversal into the protected vault directory (public/media/vault/), exposing high-resolution raw master artwork scans without watermark or authentication.",
+      "location": {
+        "file": "src/app/api/media/[...path]/route.ts",
+        "line_start": 40,
+        "line_end": 64,
+        "function": "GET"
+      },
+      "exploit_scenario": {
+        "attack_vector": "GET /media/vault/masters/asset-id.jpg",
+        "preconditions": ["None (Unauthenticated)"],
+        "impact": "Unwatermarked high-value master art scans are downloaded directly, bypassing asset protection policies."
+      },
+      "evidence": {
+        "vulnerable_code": "const candidatePaths = [\n  path.join(baseMediaDir, ...cleanSegments),\n  path.join(baseMediaDir, 'public', ...cleanSegments),\n  path.join(process.cwd(), 'public', ...cleanSegments),\n];",
+        "proof_of_concept": "curl -i https://target/media/vault/masters/test.jpg"
+      },
+      "remediation": "Explicitly block any request with segment starting with 'vault' and ensure targetFilePath does not resolve inside public/media/vault.",
+      "cwe_ids": ["CWE-200", "CWE-552"],
+      "verification_status": "independently_verified"
+    },
+    {
+      "id": "VULN-001",
+      "title": "Missing Root Next.js Middleware Guard due to Filename Misconfiguration",
+      "severity": "HIGH",
+      "category": "Access Control",
+      "description": "The edge authentication proxy guard is named src/proxy.ts rather than src/middleware.ts. Next.js App Router ignores proxy.ts entirely, resulting in zero middleware execution on incoming requests.",
+      "location": {
+        "file": "src/proxy.ts",
+        "line_start": 4,
+        "line_end": 35,
+        "function": "proxy"
+      },
+      "exploit_scenario": {
+        "attack_vector": "GET /admin/* without session cookie",
+        "preconditions": ["Unauthenticated attacker"],
+        "impact": "Route-level edge redirection is bypassed, relying solely on client-side or per-page guards."
+      },
+      "evidence": {
+        "vulnerable_code": "export function proxy(request: NextRequest) { ... } export const config = { matcher: ['/admin/:path*'] };",
+        "proof_of_concept": "Direct HTTP request to /admin bypasses edge filter when middleware.ts is absent."
+      },
+      "remediation": "Create src/middleware.ts exporting middleware() with route guards for /admin/:path* and /api/admin/:path*.",
+      "cwe_ids": ["CWE-306", "CWE-693"],
+      "verification_status": "independently_verified"
+    },
+    {
+      "id": "VULN-002",
+      "title": "Arbitrary Outbound Email Relay via Unsanitized recipientEmails Parameter",
+      "severity": "HIGH",
+      "category": "Feature Abuse",
+      "description": "The public contact/commission submission endpoint accepts client-supplied recipientEmails parameter, allowing an attacker to specify arbitrary recipient addresses and utilize the server as an open mail relay.",
+      "location": {
+        "file": "src/app/api/forms/submit/route.ts",
+        "line_start": 63,
+        "line_end": 77,
+        "function": "POST"
+      },
+      "exploit_scenario": {
+        "attack_vector": "POST /api/forms/submit with payload { recipientEmails: 'victim@target.com', message: 'spam' }",
+        "preconditions": ["None (Unauthenticated)"],
+        "impact": "Attacker uses the atelier SMTP server to send spam or phishing emails, harming domain reputation and risking IP blacklisting."
+      },
+      "evidence": {
+        "vulnerable_code": "if (typeof recipientEmails === 'string') { targetRecipients = recipientEmails.split(',').filter(...) }",
+        "proof_of_concept": "curl -X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"name\":\"bot\",\"recipientEmails\":\"victim@spam.com\"}' /api/forms/submit"
+      },
+      "remediation": "Do not accept arbitrary recipient emails from unauthenticated client requests; route all form inquiries solely to pre-configured administrative inboxes.",
+      "cwe_ids": ["CWE-640", "CWE-943"],
+      "verification_status": "independently_verified"
+    },
+    {
+      "id": "VULN-004",
+      "title": "Missing Enterprise HTTP Security Headers",
+      "severity": "HIGH",
+      "category": "Configuration",
+      "description": "next.config.ts lacks HTTP security headers configuration, leaving responses without HSTS, CSP, X-Frame-Options, X-Content-Type-Options, or Permissions-Policy.",
+      "location": {
+        "file": "next.config.ts",
+        "line_start": 4,
+        "line_end": 62,
+        "function": "nextConfig"
+      },
+      "exploit_scenario": {
+        "attack_vector": "Clickjacking or MIME sniffing against visitor sessions.",
+        "preconditions": ["None"],
+        "impact": "Vulnerability to clickjacking in iframes, MIME confusion, and lack of strict TLS enforcement."
+      },
+      "evidence": {
+        "vulnerable_code": "const nextConfig: NextConfig = { output: 'standalone', ... } // No headers() defined",
+        "proof_of_concept": "curl -I https://target/ (Missing Content-Security-Policy, Strict-Transport-Security, X-Frame-Options)"
+      },
+      "remediation": "Add headers() function to next.config.ts specifying HSTS, CSP, X-Frame-Options, X-Content-Type-Options: nosniff, Referrer-Policy, and Permissions-Policy.",
+      "cwe_ids": ["CWE-693", "CWE-1021"],
+      "verification_status": "independently_verified"
+    },
+    {
+      "id": "VULN-005",
+      "title": "Absence of Rate Limiting on Inbound Lead & Registration Endpoints",
+      "severity": "HIGH",
+      "category": "Business Logic",
+      "description": "Public endpoints /api/events/register, /api/forms/submit, and /api/leads/submit lack rate limiting, allowing automated scripts to flood the database with fake registrations and exhaust event ticket capacity.",
+      "location": {
+        "file": "src/app/api/events/register/route.ts",
+        "line_start": 4,
+        "line_end": 45,
+        "function": "POST"
+      },
+      "exploit_scenario": {
+        "attack_vector": "Looping automated POST requests to /api/events/register",
+        "preconditions": ["None"],
+        "impact": "Denial of service for legitimate event attendees, database row flooding, and SMTP queue starvation."
+      },
+      "evidence": {
+        "vulnerable_code": "export async function POST(request: NextRequest) { // No rate check }",
+        "proof_of_concept": "for i in {1..1000}; do curl -X POST /api/events/register ...; done"
+      },
+      "remediation": "Implement an IP-based sliding window rate limiter (e.g. 5 req/min) using Cloudflare CF-Connecting-IP header.",
+      "cwe_ids": ["CWE-770"],
+      "verification_status": "independently_verified"
+    },
+    {
+      "id": "VULN-006",
+      "title": "Missing Cross-Origin Request Validation (CSRF/CORS) on State-Mutating APIs",
+      "severity": "MEDIUM",
+      "category": "Access Control",
+      "description": "State-mutating endpoints do not enforce Origin / Referer validation against allowed domains, permitting cross-site forged POST submissions.",
+      "location": {
+        "file": "src/app/api/forms/submit/route.ts",
+        "line_start": 8,
+        "line_end": 35,
+        "function": "POST"
+      },
+      "exploit_scenario": {
+        "attack_vector": "Cross-site submission from malicious external origin.",
+        "preconditions": ["Visitor browsing attacker site"],
+        "impact": "Automated submission of inquiries on behalf of the victim."
+      },
+      "evidence": {
+        "vulnerable_code": "No origin header verification performed prior to mutation.",
+        "proof_of_concept": "fetch('https://target/api/forms/submit', { method: 'POST', mode: 'cors' })"
+      },
+      "remediation": "Enforce Origin validation in middleware or API routes against configured trusted origins.",
+      "cwe_ids": ["CWE-352"],
+      "verification_status": "independently_verified"
+    },
+    {
+      "id": "VULN-007",
+      "title": "Insecure TLS Certificate Verification in Outbound SMTP Transport",
+      "severity": "MEDIUM",
+      "category": "Cryptography",
+      "description": "Nodemailer transport configuration explicitly sets rejectUnauthorized: false, disabling TLS certificate chain verification during SMTP transmission.",
+      "location": {
+        "file": "src/app/api/forms/submit/route.ts",
+        "line_start": 95,
+        "line_end": 97,
+        "function": "POST"
+      },
+      "exploit_scenario": {
+        "attack_vector": "Man-in-the-middle attack on upstream SMTP traffic.",
+        "preconditions": ["Network adversary on outbound path"],
+        "impact": "Interception or tampering of lead contact details and emails."
+      },
+      "evidence": {
+        "vulnerable_code": "tls: { rejectUnauthorized: false }",
+        "proof_of_concept": "Nodemailer accepts self-signed or fraudulent upstream certificates."
+      },
+      "remediation": "Remove rejectUnauthorized: false and enforce standard TLS certificate verification.",
+      "cwe_ids": ["CWE-295"],
+      "verification_status": "independently_verified"
+    }
+  ],
+  "rejected_findings": [],
+  "coverage_notes": "Full audit covering App Router pages, API endpoints, media pipelines, authentication, and Docker build configuration.",
+  "prior_runs_reviewed": []
+}

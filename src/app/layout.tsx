@@ -18,7 +18,13 @@ const geistMono = Geist_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await prisma.systemSetting.findFirst().catch(() => null);
+  const isBuilding =
+    process.env.NEXT_PHASE === "phase-production-build" ||
+    process.env.BUILDING === "1";
+
+  const settings = isBuilding
+    ? null
+    : await prisma.systemSetting.findFirst().catch(() => null);
   const title = settings?.siteName || "Lalita Kapilavai — Sacred Art & Carnatic Music Archive";
   const description =
     settings?.siteDescription ||

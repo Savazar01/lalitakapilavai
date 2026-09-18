@@ -96,6 +96,8 @@ export async function POST(request: NextRequest) {
       watermarkedWebpUrl,
       protectedS3Key,
       originalFileName,
+      watermarkOverride,
+      customWatermark,
     } = body;
 
     if (!title || !slug || !categoryId || !primaryImageUrl) {
@@ -151,6 +153,8 @@ export async function POST(request: NextRequest) {
         watermarkedWebpUrl: watermarkedWebpUrl || primaryImageUrl,
         protectedS3Key: protectedS3Key || null,
         originalFileName: originalFileName || null,
+        watermarkOverride: !!watermarkOverride,
+        customWatermark: customWatermark || null,
       },
       include: {
         category: true,

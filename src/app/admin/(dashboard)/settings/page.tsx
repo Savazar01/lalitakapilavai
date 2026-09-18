@@ -240,6 +240,37 @@ export default function AdminSettingsPage() {
     temperature: 0.7,
   });
 
+  const [batchWatermarking, setBatchWatermarking] = React.useState(false);
+
+  const handleBatchRewatermark = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to re-render watermarks for all artworks in the catalog? This will generate high-fidelity SVG watermark overlays according to your current settings."
+    );
+    if (!confirmed) return;
+
+    setBatchWatermarking(true);
+    toast.info("Re-applying watermarks across all artworks...");
+    try {
+      const res = await fetch("/api/admin/artworks/re-watermark", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(
+          `Successfully re-watermarked ${data.succeeded} of ${data.processed} artworks!`
+        );
+      } else {
+        toast.error(data.error || "Failed to batch re-watermark artworks");
+      }
+    } catch {
+      toast.error("Network error during batch watermarking");
+    } finally {
+      setBatchWatermarking(false);
+    }
+  };
+
   React.useEffect(() => {
     fetch("/api/admin/settings")
       .then((res) => res.json())
@@ -1181,6 +1212,36 @@ export default function AdminSettingsPage() {
                           When checked, artworks with gold or silver foil work display a gold badge in gallery grids and the detail canvas.
                         </p>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Re-apply Watermarks to All Artworks */}
+                  <div className="pt-4 border-t border-border/60">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-lg border border-amber-500/30 bg-amber-500/5">
+                      <div>
+                        <h4 className="font-serif font-bold text-sm text-foreground flex items-center gap-1.5">
+                          <Sparkles className="w-4 h-4 text-amber-500" />
+                          Batch Synchronize Masterwork Watermarks
+                        </h4>
+                        <p className="text-muted-foreground text-xs">
+                          Re-renders the SVG watermark overlay across all cataloged artworks using current global or custom settings.
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleBatchRewatermark}
+                        disabled={batchWatermarking}
+                        className="text-xs font-semibold whitespace-nowrap gap-1.5 border border-amber-500/40 hover:bg-amber-500/10"
+                      >
+                        {batchWatermarking ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                        )}
+                        Re-apply Watermarks to All Artworks
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
