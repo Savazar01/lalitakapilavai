@@ -17,6 +17,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
+import { ProtectedImage } from "@/components/public/protected-image";
 import { cn } from "@/lib/utils";
 import { resolveContainerThemeScope, resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
 import { PlateRatio, PlateLayoutType } from "@/types/catalog";
@@ -748,25 +749,19 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   <div className="plate-body-flow flex-1 my-auto w-full text-left overflow-y-auto print:overflow-visible">
                     <div className="float-left mr-8 mb-4 max-w-[45%] w-auto max-h-[56vh] print:max-h-[50vh] plate-image-float">
                       <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group">
-                        <img
+                        <ProtectedImage
+                          useImg={true}
                           src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                           alt={displayTitle}
-                          className="protect-image max-h-[52vh] print:max-h-[46vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
-                          draggable={false}
-                          onContextMenu={(e) => e.preventDefault()}
-                        />
-                        <div
-                          className="protect-image-scrim"
-                          onContextMenu={(e) => e.preventDefault()}
-                          onDragStart={(e) => e.preventDefault()}
-                          aria-hidden="true"
-                        />
-                        <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
-                          <ShieldCheck className="w-3 h-3 text-primary" />
-                          <span className="text-[9px] font-mono font-semibold text-primary">
-                            {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
-                          </span>
-                        </div>
+                          className="max-h-[52vh] print:max-h-[46vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
+                        >
+                          <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
+                            <ShieldCheck className="w-3 h-3 text-primary" />
+                            <span className="text-[9px] font-mono font-semibold text-primary">
+                              {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
+                            </span>
+                          </div>
+                        </ProtectedImage>
                       </div>
                     </div>
 
@@ -861,25 +856,19 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                         {/* Left Column: Framed Masterwork Plate */}
                         <div className="plate-image-col flex items-center justify-center max-h-[64vh] print:max-h-[60vh] w-full">
                           <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group max-h-full">
-                            <img
+                            <ProtectedImage
+                              useImg={true}
                               src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                               alt={displayTitle}
-                              className="protect-image max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
-                              draggable={false}
-                              onContextMenu={(e) => e.preventDefault()}
-                            />
-                            <div
-                              className="protect-image-scrim"
-                              onContextMenu={(e) => e.preventDefault()}
-                              onDragStart={(e) => e.preventDefault()}
-                              aria-hidden="true"
-                            />
-                            <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
-                              <ShieldCheck className="w-3 h-3 text-primary" />
-                              <span className="text-[9px] font-mono font-semibold text-primary">
-                                {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
-                              </span>
-                            </div>
+                              className="max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
+                            >
+                              <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
+                                <ShieldCheck className="w-3 h-3 text-primary" />
+                                <span className="text-[9px] font-mono font-semibold text-primary">
+                                  {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
+                                </span>
+                              </div>
+                            </ProtectedImage>
                           </div>
                         </div>
 
@@ -950,25 +939,19 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                     {/* Centered Visual Container */}
                     <div className="plate-image-container py-2 flex-1 flex items-center justify-center">
                       <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-md group max-h-[50vh] print:max-h-[52vh]">
-                        <img
+                        <ProtectedImage
+                          useImg={true}
                           src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                           alt={displayTitle}
-                          className="protect-image w-full h-auto object-contain max-h-[48vh] print:max-h-[52vh] mx-auto group-hover:scale-101 transition-transform duration-500"
-                          draggable={false}
-                          onContextMenu={(e) => e.preventDefault()}
-                        />
-                        <div
-                          className="protect-image-scrim"
-                          onContextMenu={(e) => e.preventDefault()}
-                          onDragStart={(e) => e.preventDefault()}
-                          aria-hidden="true"
-                        />
-                        <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
-                          <ShieldCheck className="w-3 h-3 text-primary" />
-                          <span className="text-[9px] font-mono font-semibold text-primary">
-                            {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
-                          </span>
-                        </div>
+                          className="w-full h-auto object-contain max-h-[48vh] print:max-h-[52vh] mx-auto group-hover:scale-101 transition-transform duration-500"
+                        >
+                          <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
+                            <ShieldCheck className="w-3 h-3 text-primary" />
+                            <span className="text-[9px] font-mono font-semibold text-primary">
+                              {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
+                            </span>
+                          </div>
+                        </ProtectedImage>
                       </div>
                     </div>
 
