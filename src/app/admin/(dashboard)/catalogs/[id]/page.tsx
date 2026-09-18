@@ -193,6 +193,11 @@ interface ECatalogCoverConfig extends CatalogBackgroundConfig {
   mattingPadding?: number;
   coverBgColor?: string;
   coverTextColor?: string;
+  titleColor?: string;
+  titleFont?: string;
+  subtitleColor?: string;
+  subtitleFont?: string;
+  eyebrowColor?: string;
 }
 
 interface ECatalogEssayConfig extends CatalogBackgroundConfig {
@@ -207,6 +212,9 @@ interface ECatalogEndPageConfig extends CatalogBackgroundConfig {
   contactDetails?: string;
   useMatrixLayout?: boolean;
   matrixConfig?: CatalogMatrixConfig;
+  endPageBgColor?: string;
+  colophonTitleColor?: string;
+  colophonTextColor?: string;
 }
 
 interface ECatalogCustomPageItem extends CatalogBackgroundConfig {
@@ -306,6 +314,11 @@ export default function AdminCatalogStudioPage() {
     frameStyle: "gold-fillet",
     showDate: true,
     showCurator: true,
+    titleColor: "#0F172A",
+    titleFont: "var(--font-cinzel), serif",
+    subtitleColor: "#334155",
+    subtitleFont: "var(--font-cinzel), serif",
+    eyebrowColor: "#B45309",
   });
 
   const [readerThemeMode, setReaderThemeMode] = React.useState<"light" | "dark">("light");
@@ -322,7 +335,10 @@ export default function AdminCatalogStudioPage() {
     title: "Colophon & Atelier Heritage",
     contentHtml: "<p>Published by the Atelier of Lalita Kapilavai. Specializing in classical Tanjore 22k gold leaf iconography and Carnatic musicianship.</p><p>For acquisitions, private viewing recitals, or scholarly monograph requests, contact the studio directly.</p>",
     backgroundImage: "",
-    backgroundColor: "#1C1814",
+    backgroundColor: "#FAF7F2",
+    endPageBgColor: "#FAF7F2",
+    colophonTitleColor: "#0F172A",
+    colophonTextColor: "#334155",
     frameStyle: "gold-fillet",
     contactDetails: "Email: contact@lalitakapilavai.com | Web: lalitakapilavai.com",
   });
@@ -1306,6 +1322,127 @@ export default function AdminCatalogStudioPage() {
                     <p className="text-[10px] text-muted-foreground">
                       Set 0px to eliminate the outer matting container and expand frame edge-to-edge.
                     </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cover Typography & Editorial Colors */}
+              <div className="space-y-4 pt-4 border-t border-border/60">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" /> 🖋️ Cover Typography &amp; Editorial Colors
+                    </label>
+                    <p className="text-[11px] text-muted-foreground">
+                      Ensure crisp, readable contrast across title, subtitle, badges, and metadata on light or custom cover canvases.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setCoverConfig((prev) => ({
+                        ...prev,
+                        titleColor: "#0F172A",
+                        titleFont: "var(--font-cinzel), serif",
+                        subtitleColor: "#334155",
+                        subtitleFont: "var(--font-cinzel), serif",
+                        eyebrowColor: "#B45309",
+                      }))
+                    }
+                    className="h-7 text-[11px] border-primary/40 text-primary hover:bg-primary/10 gap-1"
+                  >
+                    <RotateCcw className="w-3 h-3" /> Reset to High-Contrast Editorial Defaults
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 rounded-xl border border-border/80 bg-muted/20">
+                  {/* Title Color */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Cover Title Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={coverConfig.titleColor || "#0F172A"}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, titleColor: e.target.value }))
+                        }
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                      />
+                      <Input
+                        value={coverConfig.titleColor || ""}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, titleColor: e.target.value }))
+                        }
+                        className="text-xs font-mono"
+                        placeholder="#0F172A"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Title Font Family */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Cover Title Font</label>
+                    <select
+                      value={coverConfig.titleFont || "var(--font-cinzel), serif"}
+                      onChange={(e) =>
+                        setCoverConfig((prev) => ({ ...prev, titleFont: e.target.value }))
+                      }
+                      className="w-full h-8 px-2 text-xs rounded-md border border-input bg-background text-foreground font-medium focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="var(--font-cinzel), serif">Cinzel (Classical Serif)</option>
+                      <option value="var(--font-cinzel-decorative), serif">Cinzel Decorative</option>
+                      <option value="var(--font-playfair), serif">Playfair Display</option>
+                      <option value="var(--font-cormorant), serif">Cormorant Garamond</option>
+                      <option value="var(--font-inter), sans-serif">Inter (Modern Sans)</option>
+                    </select>
+                  </div>
+
+                  {/* Subtitle Color */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Subtitle / Metadata Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={coverConfig.subtitleColor || "#334155"}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, subtitleColor: e.target.value }))
+                        }
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                      />
+                      <Input
+                        value={coverConfig.subtitleColor || ""}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, subtitleColor: e.target.value }))
+                        }
+                        className="text-xs font-mono"
+                        placeholder="#334155"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Eyebrow Badge Color */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Eyebrow / Badge Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={coverConfig.eyebrowColor || "#B45309"}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, eyebrowColor: e.target.value }))
+                        }
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                      />
+                      <Input
+                        value={coverConfig.eyebrowColor || ""}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, eyebrowColor: e.target.value }))
+                        }
+                        className="text-xs font-mono"
+                        placeholder="#B45309"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2636,6 +2773,81 @@ export default function AdminCatalogStudioPage() {
                     title="Colophon & End Page Background & Framing"
                     description="Customize canvas backdrop, sacred pattern, and framing specifically for this closing page."
                   />
+                </div>
+
+                {/* Colophon Typography & Colors */}
+                <div className="space-y-4 pt-4 border-t border-border/60">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-primary" /> 🖋️ Colophon Typography &amp; Text Colors
+                      </label>
+                      <p className="text-[11px] text-muted-foreground">
+                        Configure high-contrast text and title colors for concluding remarks and atelier credentials.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setEndPageConfig((prev) => ({
+                          ...prev,
+                          colophonTitleColor: "#0F172A",
+                          colophonTextColor: "#334155",
+                        }))
+                      }
+                      className="h-7 text-[11px] border-primary/40 text-primary hover:bg-primary/10 gap-1"
+                    >
+                      <RotateCcw className="w-3 h-3" /> Reset to Defaults
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl border border-border/80 bg-muted/20">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground">Colophon Title Color</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={endPageConfig.colophonTitleColor || "#0F172A"}
+                          onChange={(e) =>
+                            setEndPageConfig((prev) => ({ ...prev, colophonTitleColor: e.target.value }))
+                          }
+                          className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                        />
+                        <Input
+                          value={endPageConfig.colophonTitleColor || ""}
+                          onChange={(e) =>
+                            setEndPageConfig((prev) => ({ ...prev, colophonTitleColor: e.target.value }))
+                          }
+                          className="text-xs font-mono"
+                          placeholder="#0F172A"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground">Colophon Body Text Color</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={endPageConfig.colophonTextColor || "#334155"}
+                          onChange={(e) =>
+                            setEndPageConfig((prev) => ({ ...prev, colophonTextColor: e.target.value }))
+                          }
+                          className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                        />
+                        <Input
+                          value={endPageConfig.colophonTextColor || ""}
+                          onChange={(e) =>
+                            setEndPageConfig((prev) => ({ ...prev, colophonTextColor: e.target.value }))
+                          }
+                          className="text-xs font-mono"
+                          placeholder="#334155"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5 pt-2">

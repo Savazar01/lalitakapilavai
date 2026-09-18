@@ -298,8 +298,11 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   return (
     <div
       data-catalog-reader="true"
-      style={catalogThemeStyles}
-      className={`min-h-screen flex flex-col selection:bg-primary selection:text-primary-foreground ${
+      style={{
+        ...catalogThemeStyles,
+        colorScheme: "light",
+      }}
+      className={`light bg-[#FAF7F2] text-slate-900 min-h-screen flex flex-col selection:bg-amber-200 selection:text-slate-900 ${
         orientation === "landscape" ? "catalog-landscape" : "catalog-portrait"
       }`}
     >
@@ -491,24 +494,52 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             >
               {/* Header / Subtitle */}
               <div className="space-y-4 pt-2">
-                <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full">
+                <div
+                  className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-xs"
+                  style={{
+                    color: (coverConfig.eyebrowColor as string) || "#B45309",
+                    borderColor: (coverConfig.innerBorderColor as string) || (coverConfig.eyebrowColor as string) || "#D4AF37",
+                    backgroundColor: `${(coverConfig.eyebrowColor as string) || "#B45309"}15`,
+                  }}
+                >
                   <Sparkles className="w-3.5 h-3.5" />
-                  Exhibition Monograph &amp; Archival Collection
+                  {((catalog as unknown as { eyebrow?: string }).eyebrow) || "Exhibition Monograph & Archival Collection"}
                 </div>
 
-                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-md">
+                <h1
+                  className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-xs"
+                  style={{
+                    color: (coverConfig.titleColor as string) || "#0F172A",
+                    fontFamily: (coverConfig.titleFont as string) || "var(--font-cinzel), serif",
+                  }}
+                >
                   {catalog.title}
                 </h1>
 
                 {catalog.subtitle && (
-                  <p className="text-sm sm:text-base font-serif italic text-muted-foreground max-w-xl mx-auto">
+                  <p
+                    className="text-sm sm:text-base italic max-w-xl mx-auto font-medium"
+                    style={{
+                      color: (coverConfig.subtitleColor as string) || "#334155",
+                      fontFamily: (coverConfig.subtitleFont as string) || "var(--font-cinzel), serif",
+                    }}
+                  >
                     {catalog.subtitle}
                   </p>
                 )}
 
                 {catalog.forewordBy && (
-                  <div className="pt-2 text-xs uppercase tracking-widest text-foreground/80 font-mono">
-                    Curated by <span className="text-primary font-bold">{catalog.forewordBy}</span>
+                  <div
+                    className="pt-2 text-xs uppercase tracking-widest font-mono"
+                    style={{ color: (coverConfig.subtitleColor as string) || "#334155" }}
+                  >
+                    Curated by{" "}
+                    <span
+                      className="font-bold"
+                      style={{ color: (coverConfig.eyebrowColor as string) || "#B45309" }}
+                    >
+                      {catalog.forewordBy}
+                    </span>
                   </div>
                 )}
               </div>
@@ -1089,15 +1120,34 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 />
                 <div className={`catalog-frame relative z-10 ${endFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
                   <div className="space-y-3 pt-4">
-                    <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+                    <span
+                      className="text-xs font-mono uppercase tracking-widest font-bold"
+                      style={{ color: (coverConfig.eyebrowColor as string) || "#B45309" }}
+                    >
                       Colophon &amp; Publication Details
                     </span>
-                    <h2 className="text-2xl sm:text-3xl font-serif font-bold">
+                    <h2
+                      className="text-2xl sm:text-3xl font-serif font-bold"
+                      style={{
+                        color:
+                          (endPageConfig.colophonTitleColor as string) ||
+                          (coverConfig.titleColor as string) ||
+                          "#0F172A",
+                      }}
+                    >
                       {(endPageConfig.title as string) || "Colophon & Atelier Heritage"}
                     </h2>
                   </div>
 
-                  <div className={cn("font-serif leading-relaxed max-w-xl mx-auto flex-1 flex flex-col justify-center", endScope.typographyClass)}>
+                  <div
+                    className={cn("font-serif leading-relaxed max-w-xl mx-auto flex-1 flex flex-col justify-center", endScope.typographyClass)}
+                    style={{
+                      color:
+                        (endPageConfig.colophonTextColor as string) ||
+                        (coverConfig.subtitleColor as string) ||
+                        "#334155",
+                    }}
+                  >
                     {endPageConfig.contentHtml ? (
                       <TiptapRenderer content={endPageConfig.contentHtml as string} contrast={endScope.contrastMode} />
                     ) : (
@@ -1107,12 +1157,20 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                     )}
                   </div>
 
-                <div className="pt-6 border-t border-primary/20 space-y-2 text-xs text-muted-foreground font-mono">
+                <div
+                  className="pt-6 border-t border-primary/20 space-y-2 text-xs font-mono"
+                  style={{
+                    color:
+                      (endPageConfig.colophonTextColor as string) ||
+                      (coverConfig.subtitleColor as string) ||
+                      "#334155",
+                  }}
+                >
                   <p>
                     {(endPageConfig.contactDetails as string) ||
                       "Atelier of Lalita Kapilavai • contact@lalitakapilavai.com • All rights reserved."}
                   </p>
-                  <p className="text-[10px] text-muted-foreground/60">
+                  <p className="text-[10px] opacity-75">
                     Reproduction of sacred iconography and Tanjore masterworks strictly prohibited without written consent.
                   </p>
                 </div>

@@ -22,6 +22,18 @@ export interface CoverFramingConfig {
   mattingPadding?: number;    // e.g. 0, 4, 8, 16, 24
   coverBgColor?: string;      // Dedicated Cover Canvas Background Color (Default: "#FAF7F2" or inherits base canvas)
   coverTextColor?: string;
+  titleColor?: string;        // Default: "#0F172A"
+  titleFont?: string;         // Default: "var(--font-cinzel), serif"
+  subtitleColor?: string;     // Default: "#334155"
+  subtitleFont?: string;      // Default: "var(--font-cinzel), serif"
+  eyebrowColor?: string;      // Default: "#B45309"
+}
+
+export interface EndPageConfig {
+  bgColor?: string;
+  colophonTitleColor?: string; // Default: "#0F172A"
+  colophonTextColor?: string;  // Default: "#334155"
+  borderColor?: string;
 }
 
 export interface ECatalogThemeTokens {
