@@ -14,13 +14,12 @@ import {
   Sparkles,
   Download,
   ExternalLink,
-  ShieldCheck,
 } from "lucide-react";
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
 import { ProtectedImage } from "@/components/public/protected-image";
 import { cn } from "@/lib/utils";
 import { resolveContainerThemeScope, resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
-import { PlateRatio, PlateLayoutType } from "@/types/catalog";
+import { PlateRatio, PlateLayoutType, ECatalogThemeTokens, DEFAULT_CATALOG_THEME_TOKENS } from "@/types/catalog";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -220,6 +219,24 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const frameStyle = (themeConfig.frameStyle as string) || "gold-fillet";
   const frameClass = getFrameClass(frameStyle);
 
+  // Dual-Theme Reader Palette
+  const readerTheme = (themeConfig.readerTheme as ECatalogThemeTokens | null) || DEFAULT_CATALOG_THEME_TOKENS;
+  const catalogThemeStyles = {
+    "--cat-light-canvas-bg": readerTheme?.light?.canvasBg || "#FAF7F2",
+    "--cat-light-card-bg": readerTheme?.light?.cardBg || "#FFFFFF",
+    "--cat-light-heading-color": readerTheme?.light?.headingColor || "#0F172A",
+    "--cat-light-text-color": readerTheme?.light?.textColor || "#334155",
+    "--cat-light-accent-gold": readerTheme?.light?.accentGold || "#B45309",
+    "--cat-light-border-color": readerTheme?.light?.borderColor || "#E2E8F0",
+
+    "--cat-dark-canvas-bg": readerTheme?.dark?.canvasBg || "#0B0F17",
+    "--cat-dark-card-bg": readerTheme?.dark?.cardBg || "#151B26",
+    "--cat-dark-heading-color": readerTheme?.dark?.headingColor || "#F8FAFC",
+    "--cat-dark-text-color": readerTheme?.dark?.textColor || "#CBD5E1",
+    "--cat-dark-accent-gold": readerTheme?.dark?.accentGold || "#F59E0B",
+    "--cat-dark-border-color": readerTheme?.dark?.borderColor || "#334155",
+  } as React.CSSProperties;
+
   const bgColor = (themeConfig.backgroundColor as string) || "#1C1814";
   const textColor = (themeConfig.textColor as string) || "#FAF7F2";
 
@@ -234,7 +251,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
 
   // Cover Page configuration
   const coverFrameClass = getFrameClass((coverConfig.frameStyle as string) || frameStyle);
-  const coverBgColor = (coverConfig.backgroundColor as string) || undefined;
+  const coverBgColor = (coverConfig.coverBgColor as string) || (coverConfig.backgroundColor as string) || undefined;
   const coverBgType = (coverConfig.backgroundType as string) || (coverConfig.backgroundImage ? "IMAGE" : undefined);
   const coverBgPattern = coverConfig.backgroundPattern as string | undefined;
   const coverPatternOpacity = typeof coverConfig.patternOpacity === "number" ? coverConfig.patternOpacity : undefined;
@@ -280,7 +297,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
 
   return (
     <div
-      style={{ backgroundColor: bgColor, color: textColor }}
+      data-catalog-reader="true"
+      style={catalogThemeStyles}
       className={`min-h-screen flex flex-col selection:bg-primary selection:text-primary-foreground ${
         orientation === "landscape" ? "catalog-landscape" : "catalog-portrait"
       }`}
@@ -394,7 +412,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             )}
             style={{
               ...coverScope.wrapperStyle,
-              ...(coverBgColor ? { backgroundColor: coverBgColor } : {}),
+              backgroundColor: coverBgColor || "var(--cat-canvas-bg)",
               ...(coverMattingColor ? { backgroundColor: coverMattingColor } : {}),
               padding: `${mattingPadding}px`,
             }}
@@ -448,7 +466,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             )}
             style={{
               ...coverScope.wrapperStyle,
-              ...(coverBgColor ? { backgroundColor: coverBgColor } : {}),
+              backgroundColor: coverBgColor || "var(--cat-canvas-bg)",
               ...(coverMattingColor ? { backgroundColor: coverMattingColor } : {}),
               padding: `${mattingPadding}px`,
             }}
@@ -499,7 +517,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               {catalog.coverImageUrl && (
                 <div className="plate-image-container py-4 flex-1 flex items-center justify-center">
                   <div className="rounded-xl overflow-hidden border border-primary/30 shadow-2xl max-h-[44vh] print:max-h-[50vh]">
-                    <img
+                    <ProtectedImage
+                      useImg={true}
                       src={catalog.coverImageUrl}
                       alt={catalog.title}
                       className="w-full h-auto object-contain max-h-[44vh] print:max-h-[50vh] mx-auto"
@@ -754,14 +773,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                           src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                           alt={displayTitle}
                           className="max-h-[52vh] print:max-h-[46vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
-                        >
-                          <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
-                            <ShieldCheck className="w-3 h-3 text-primary" />
-                            <span className="text-[9px] font-mono font-semibold text-primary">
-                              {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
-                            </span>
-                          </div>
-                        </ProtectedImage>
+                        />
                       </div>
                     </div>
 
@@ -861,14 +873,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                               src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                               alt={displayTitle}
                               className="max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
-                            >
-                              <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
-                                <ShieldCheck className="w-3 h-3 text-primary" />
-                                <span className="text-[9px] font-mono font-semibold text-primary">
-                                  {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
-                                </span>
-                              </div>
-                            </ProtectedImage>
+                            />
                           </div>
                         </div>
 
@@ -944,14 +949,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                           src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                           alt={displayTitle}
                           className="w-full h-auto object-contain max-h-[48vh] print:max-h-[52vh] mx-auto group-hover:scale-101 transition-transform duration-500"
-                        >
-                          <div className="absolute top-2.5 left-2.5 z-20 bg-background/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 shadow-sm pointer-events-none">
-                            <ShieldCheck className="w-3 h-3 text-primary" />
-                            <span className="text-[9px] font-mono font-semibold text-primary">
-                              {item.artwork.hasGoldFoil ? ((item.artwork as { customFoilLabel?: string }).customFoilLabel || "Gold Foil Masterwork") : "Traditional Classical Masterwork"}
-                            </span>
-                          </div>
-                        </ProtectedImage>
+                        />
                       </div>
                     </div>
 

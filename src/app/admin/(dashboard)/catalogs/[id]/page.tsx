@@ -28,7 +28,11 @@ import {
   Download,
   ChevronDown,
   Sliders,
+  Sun,
+  Moon,
+  RotateCcw,
 } from "lucide-react";
+import { ECatalogThemeTokens, DEFAULT_CATALOG_THEME_TOKENS } from "@/types/catalog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -174,6 +178,7 @@ interface ECatalogThemeConfig {
   textColor?: string;
   frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
   accentColor?: string;
+  readerTheme?: ECatalogThemeTokens;
 }
 
 interface ECatalogCoverConfig extends CatalogBackgroundConfig {
@@ -186,6 +191,8 @@ interface ECatalogCoverConfig extends CatalogBackgroundConfig {
   coverMattingColor?: string;
   innerBorderColor?: string;
   mattingPadding?: number;
+  coverBgColor?: string;
+  coverTextColor?: string;
 }
 
 interface ECatalogEssayConfig extends CatalogBackgroundConfig {
@@ -289,15 +296,19 @@ export default function AdminCatalogStudioPage() {
     textColor: "#FAF7F2",
     frameStyle: "gold-fillet",
     accentColor: "#D4AF37",
+    readerTheme: DEFAULT_CATALOG_THEME_TOKENS,
   });
 
   const [coverConfig, setCoverConfig] = React.useState<ECatalogCoverConfig>({
     backgroundColor: "#1C1814",
+    coverBgColor: "#FAF7F2",
     backgroundImage: "",
     frameStyle: "gold-fillet",
     showDate: true,
     showCurator: true,
   });
+
+  const [readerThemeMode, setReaderThemeMode] = React.useState<"light" | "dark">("light");
 
   const [essayConfig, setEssayConfig] = React.useState<ECatalogEssayConfig>({
     title: "Curatorial Monograph & Scholarly Statement",
@@ -1162,7 +1173,68 @@ export default function AdminCatalogStudioPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Cover Canvas Background Color */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-foreground">Cover Canvas Background</label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverBgColor: themeConfig.backgroundColor || "#FAF7F2",
+                          }))
+                        }
+                        className="text-[10px] text-primary hover:underline cursor-pointer font-medium"
+                      >
+                        Match Base
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={coverConfig.coverBgColor || "#FAF7F2"}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, coverBgColor: e.target.value }))
+                        }
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                      />
+                      <Input
+                        value={coverConfig.coverBgColor || ""}
+                        onChange={(e) =>
+                          setCoverConfig((prev) => ({ ...prev, coverBgColor: e.target.value }))
+                        }
+                        className="text-xs font-mono"
+                        placeholder="#FAF7F2"
+                      />
+                    </div>
+                    {/* Swatch Presets */}
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {[
+                        { name: "Parchment", hex: "#FAF7F2" },
+                        { name: "Obsidian", hex: "#0B0F17" },
+                        { name: "Deep Teak", hex: "#1C130D" },
+                        { name: "Raw Silk", hex: "#F4EFEA" },
+                        { name: "Charcoal", hex: "#151B26" },
+                      ].map((preset) => (
+                        <button
+                          key={preset.hex}
+                          type="button"
+                          onClick={() => setCoverConfig((prev) => ({ ...prev, coverBgColor: preset.hex }))}
+                          className="px-1.5 py-0.5 text-[9px] rounded border border-border/80 bg-background hover:bg-muted font-mono flex items-center gap-1 cursor-pointer transition-colors"
+                          title={preset.name}
+                        >
+                          <span
+                            className="w-2 h-2 rounded-full border border-black/20"
+                            style={{ backgroundColor: preset.hex }}
+                          />
+                          {preset.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-foreground">Outer Matting / Border Color</label>
                     <div className="flex items-center gap-2">
@@ -1172,7 +1244,7 @@ export default function AdminCatalogStudioPage() {
                         onChange={(e) =>
                           setCoverConfig((prev) => ({ ...prev, coverMattingColor: e.target.value }))
                         }
-                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
                       />
                       <Input
                         value={coverConfig.coverMattingColor || ""}
@@ -1183,6 +1255,7 @@ export default function AdminCatalogStudioPage() {
                         placeholder="Inherit / #1C1814"
                       />
                     </div>
+                    <p className="text-[10px] text-muted-foreground pt-1">Surrounds the framed cover art</p>
                   </div>
 
                   <div className="space-y-1.5">
@@ -1194,7 +1267,7 @@ export default function AdminCatalogStudioPage() {
                         onChange={(e) =>
                           setCoverConfig((prev) => ({ ...prev, innerBorderColor: e.target.value }))
                         }
-                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent"
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
                       />
                       <Input
                         value={coverConfig.innerBorderColor || "#D4AF37"}
@@ -1205,6 +1278,7 @@ export default function AdminCatalogStudioPage() {
                         placeholder="#D4AF37"
                       />
                     </div>
+                    <p className="text-[10px] text-muted-foreground pt-1">Inner gold fillet or decorative accent</p>
                   </div>
 
                   <div className="space-y-1.5">
@@ -1501,6 +1575,194 @@ export default function AdminCatalogStudioPage() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Reader Dual-Theme Color System */}
+              <div className="p-4 rounded-xl border border-border/80 bg-muted/10 space-y-4 pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" /> Reader Dual-Theme Color System
+                    </label>
+                    <p className="text-[11px] text-muted-foreground">
+                      Configure independent Light and Dark mode palettes for the public reader to guarantee crisp cultural contrast.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setThemeConfig((prev) => ({
+                          ...prev,
+                          readerTheme: DEFAULT_CATALOG_THEME_TOKENS,
+                        }))
+                      }
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-md border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer font-mono transition-colors"
+                      title="Reset both Light and Dark palettes to cultural gold defaults"
+                    >
+                      <RotateCcw className="w-3 h-3" /> Reset Defaults
+                    </button>
+                    <div className="flex items-center gap-1 p-0.5 rounded-lg border border-border bg-muted/30">
+                      <button
+                        type="button"
+                        onClick={() => setReaderThemeMode("light")}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                          readerThemeMode === "light"
+                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Sun className="w-3.5 h-3.5" /> Light Mode
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setReaderThemeMode("dark")}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                          readerThemeMode === "dark"
+                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Moon className="w-3.5 h-3.5" /> Dark Mode
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Active Palette Configurator */}
+                {(() => {
+                  const currentTokens = themeConfig.readerTheme || DEFAULT_CATALOG_THEME_TOKENS;
+                  const activeMode = readerThemeMode;
+                  const palette = currentTokens[activeMode];
+
+                  const updateField = (field: keyof typeof palette, value: string) => {
+                    setThemeConfig((prev) => {
+                      const base = prev.readerTheme || DEFAULT_CATALOG_THEME_TOKENS;
+                      return {
+                        ...prev,
+                        readerTheme: {
+                          ...base,
+                          [activeMode]: {
+                            ...base[activeMode],
+                            [field]: value,
+                          },
+                        },
+                      };
+                    });
+                  };
+
+                  return (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-2">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-foreground">Canvas Background Fill</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={palette.canvasBg}
+                            onChange={(e) => updateField("canvasBg", e.target.value)}
+                            className="w-7 h-7 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                          />
+                          <Input
+                            value={palette.canvasBg}
+                            onChange={(e) => updateField("canvasBg", e.target.value)}
+                            className="text-xs font-mono h-8"
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Main document background</p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-foreground">Plate Card Surface Fill</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={palette.cardBg}
+                            onChange={(e) => updateField("cardBg", e.target.value)}
+                            className="w-7 h-7 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                          />
+                          <Input
+                            value={palette.cardBg}
+                            onChange={(e) => updateField("cardBg", e.target.value)}
+                            className="text-xs font-mono h-8"
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Surface color for plate & editorial frames</p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-foreground">Primary Heading Color</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={palette.headingColor}
+                            onChange={(e) => updateField("headingColor", e.target.value)}
+                            className="w-7 h-7 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                          />
+                          <Input
+                            value={palette.headingColor}
+                            onChange={(e) => updateField("headingColor", e.target.value)}
+                            className="text-xs font-mono h-8"
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Titles (H1, H2, H3)</p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-foreground">Curatorial Body Text Color</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={palette.textColor}
+                            onChange={(e) => updateField("textColor", e.target.value)}
+                            className="w-7 h-7 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                          />
+                          <Input
+                            value={palette.textColor}
+                            onChange={(e) => updateField("textColor", e.target.value)}
+                            className="text-xs font-mono h-8"
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Essays, metadata & paragraphs</p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-foreground">Ornamental Gold Accent</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={palette.accentGold}
+                            onChange={(e) => updateField("accentGold", e.target.value)}
+                            className="w-7 h-7 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                          />
+                          <Input
+                            value={palette.accentGold}
+                            onChange={(e) => updateField("accentGold", e.target.value)}
+                            className="text-xs font-mono h-8"
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Badges, links & decorative ornaments</p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-foreground">Card Structural Border</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={palette.borderColor}
+                            onChange={(e) => updateField("borderColor", e.target.value)}
+                            className="w-7 h-7 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                          />
+                          <Input
+                            value={palette.borderColor}
+                            onChange={(e) => updateField("borderColor", e.target.value)}
+                            className="text-xs font-mono h-8"
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Frame borders and divider rules</p>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
                 {/* Cover Presentation & Layout Engine (Image Plate vs. WYSIWYG vs. Matrix) */}

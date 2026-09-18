@@ -13,7 +13,7 @@ RUN apt-get update && \
 # Stage 1: Install dependencies with npm cache mount
 FROM base AS deps
 COPY package.json package-lock.json .npmrc* ./
-RUN --mount=type=cache,target=/root/.npm npm ci --loglevel=error
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --loglevel=error
 
 # Development stage for local multi-container live-reloading (inherits deps)
 FROM deps AS dev
@@ -38,6 +38,7 @@ COPY . .
 # Build-time dummy environment variables to prevent next build prerender crashes
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/build_fallback?schema=public&connect_timeout=2"
 ENV BETTER_AUTH_SECRET="build_secret_fallback_0123456789abcdef0123456789abcdef"
 ENV BETTER_AUTH_URL="http://localhost:3060"
@@ -48,6 +49,11 @@ RUN if [ -f "./prisma/schema.prisma" ]; then ./node_modules/.bin/prisma generate
 
 # Fast Next.js production compilation with cache mount
 RUN --mount=type=cache,target=/app/.next/cache npm run build
+
+# Pre-bundle seed script for lightning-fast container startup and minimal runner footprint
+RUN if [ -f "./prisma/seed.ts" ]; then \
+      npx esbuild prisma/seed.ts --bundle --platform=node --target=node22 --outfile=prisma/seed.js --external:@prisma/client; \
+    fi
 
 # Stage 3: Minimal production runner
 FROM base AS runner
@@ -80,8 +86,14 @@ RUN mkdir -p .next && chown -R nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy full node_modules from deps for automated entrypoint migrations and seeding
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+# Copy pre-bundled seeder and Prisma CLI & native tools for entrypoint migrations
+COPY --from=builder --chown=nextjs:nodejs /app/prisma/seed.js* ./prisma/
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/sharp ./node_modules/sharp
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@img ./node_modules/@img
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/heic-convert ./node_modules/heic-convert
 
 # Copy automated container lifecycle entrypoint hook
 COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh

@@ -22,7 +22,13 @@ echo "📦 Applying Prisma schema to PostgreSQL (Safe Mode)..."
 
 # 2. Execute idempotent seeder
 echo "🌱 Running database seeder..."
-./node_modules/.bin/tsx prisma/seed.ts || echo "⚠️ Seed script completed with warnings."
+if [ -f "./prisma/seed.js" ]; then
+  node prisma/seed.js || echo "⚠️ Seed script completed with warnings."
+elif [ -f "./node_modules/.bin/tsx" ]; then
+  ./node_modules/.bin/tsx prisma/seed.ts || echo "⚠️ Seed script completed with warnings."
+else
+  echo "⚠️ No seeder found or runnable."
+fi
 
 echo "✨ Database initialized and seeded successfully. Launching server on port ${PORT:-3060}..."
 exec node server.js
