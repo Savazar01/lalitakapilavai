@@ -65,6 +65,8 @@ import { CustomDividerNode } from "@/components/builder/tiptap-divider-node";
 import { CustomShapeNode } from "@/components/builder/tiptap-shape-node";
 import { CustomImageNode } from "@/components/builder/tiptap-image-node";
 import { TextOrientationExtension, type TextOrientationType } from "@/components/builder/tiptap-text-orientation-extension";
+import { type CatalogPageSize, type CatalogOrientation } from "@/lib/catalog-geometry";
+import { CatalogEditorContext } from "@/lib/catalog-editor-context";
 
 export { CustomImageNode };
 
@@ -179,6 +181,8 @@ export interface TiptapEditorProps {
   isLight?: boolean;
   contrast?: ContrastMode;
   onEditorReady?: (editor: import("@tiptap/react").Editor) => void;
+  catalogPageSize?: CatalogPageSize;
+  catalogOrientation?: CatalogOrientation;
 }
 
 export function TiptapEditor({
@@ -190,6 +194,8 @@ export function TiptapEditor({
   isLight = false,
   contrast,
   onEditorReady,
+  catalogPageSize = "A4",
+  catalogOrientation = "portrait",
 }: TiptapEditorProps) {
   const effectiveContrast: ContrastMode = contrast
     ? contrast
@@ -1585,11 +1591,17 @@ export function TiptapEditor({
     </div>
   );
 
+  const wrappedContent = (
+    <CatalogEditorContext.Provider value={{ pageSize: catalogPageSize, orientation: catalogOrientation }}>
+      {editorContent}
+    </CatalogEditorContext.Provider>
+  );
+
   if (isFullscreen && mounted && typeof document !== "undefined") {
-    return createPortal(editorContent, document.body);
+    return createPortal(wrappedContent, document.body);
   }
 
-  return editorContent;
+  return wrappedContent;
 }
 
 // Universal Standardized WYSIWYG Suite Alias

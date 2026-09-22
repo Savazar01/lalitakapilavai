@@ -29,6 +29,12 @@ import {
   computeRelativeLuminance,
   getColorSaturation,
 } from "@/lib/theme-contrast";
+import {
+  getCatalogDimensions,
+  type CatalogPageSize,
+  type CatalogOrientation,
+  type CatalogGeometry,
+} from "@/lib/catalog-geometry";
 
 interface TiptapMark {
   type: string;
@@ -63,6 +69,8 @@ export interface TiptapRendererProps {
   content: Record<string, unknown> | string | null | undefined;
   className?: string;
   contrast?: ContrastMode | DynamicContrastScope;
+  catalogPageSize?: CatalogPageSize;
+  catalogOrientation?: CatalogOrientation;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -241,9 +249,10 @@ function getTextOrientationStyle(orientation?: string): React.CSSProperties {
 function renderNode(
   node: TiptapNode,
   key: React.Key,
-  contrast: ContrastMode | DynamicContrastScope = "auto"
+  contrast: ContrastMode | DynamicContrastScope = "auto",
+  geometry?: CatalogGeometry
 ): React.ReactNode {
-  const children = node.content?.map((child, i) => renderNode(child, `${String(key)}-c${i}`, contrast));
+  const children = node.content?.map((child, i) => renderNode(child, `${String(key)}-c${i}`, contrast, geometry));
 
   const textAlign = node.attrs?.textAlign as string | undefined;
   const alignClass =
@@ -333,6 +342,7 @@ function renderNode(
       const layoutMode = (node.attrs?.layoutMode as string) || "centered";
       const aspectRatio = (node.attrs?.aspectRatio as string) || "auto";
       const maxHeight = (node.attrs?.maxHeight as string) || "550px";
+      const focalPosition = (node.attrs?.focalPosition as string) || "center center";
       if (!src) return null;
 
       let containerClass = "my-6 relative transition-all clear-both";
@@ -354,11 +364,23 @@ function renderNode(
       }
 
       let ratioClass = "";
+      const imgStyle: React.CSSProperties = {
+        maxHeight: layoutMode === "cover-column" ? undefined : maxHeight,
+        objectPosition: focalPosition,
+      };
+
       if (aspectRatio === "1/1") ratioClass = "aspect-square object-cover";
       else if (aspectRatio === "4/3") ratioClass = "aspect-[4/3] object-cover";
       else if (aspectRatio === "16/9") ratioClass = "aspect-video object-cover";
       else if (aspectRatio === "21/9") ratioClass = "aspect-[21/9] object-cover";
-      else if (layoutMode !== "cover-column") ratioClass = "object-contain";
+      else if (aspectRatio === "catalog" || layoutMode === "cover-column") {
+        ratioClass = "object-cover w-full h-full";
+        if (geometry?.ratio) {
+          imgStyle.aspectRatio = `${geometry.ratio}`;
+        }
+      } else if (layoutMode !== "cover-column") {
+        ratioClass = "object-contain";
+      }
 
       return (
         <figure key={key} className={containerClass}>
@@ -366,7 +388,7 @@ function renderNode(
             src={src}
             alt={alt}
             className={cn(imgClass, ratioClass)}
-            style={{ maxHeight: layoutMode === "cover-column" ? undefined : maxHeight }}
+            style={imgStyle}
             loading="lazy"
           />
           {title && (
@@ -713,7 +735,11 @@ export interface ColumnBlock {
   galleryItems?: MediaGalleryItem[];
 }
 
-export function renderColumnBlock(block: ColumnBlock, contrast: ContrastMode = "auto"): React.ReactNode {
+export function renderColumnBlock(
+  block: ColumnBlock,
+  contrast: ContrastMode = "auto",
+  geometry?: CatalogGeometry
+): React.ReactNode {
   if (block.type === "IMAGE") {
     return (
       <div key={block.id}>
@@ -859,7 +885,7 @@ export function renderColumnBlock(block: ColumnBlock, contrast: ContrastMode = "
     const typographyClasses = getContrastTypographyClasses(contrast);
     return (
       <div key={block.id} className={cn(typographyClasses, "max-w-none")}>
-        {doc.type === "doc" ? renderNode(doc, block.id, contrast) : null}
+        {doc.type === "doc" ? renderNode(doc, block.id, contrast, geometry) : null}
       </div>
     );
   }
@@ -867,7 +893,13 @@ export function renderColumnBlock(block: ColumnBlock, contrast: ContrastMode = "
   return null;
 }
 
-export function TiptapRenderer({ content, className = "", contrast = "auto" }: TiptapRendererProps) {
+export function TiptapRenderer({
+  content,
+  className = "",
+  contrast = "auto",
+  catalogPageSize,
+  catalogOrientation,
+}: TiptapRendererProps) {
   if (!content) return null;
   const legacyContrast: ContrastMode =
     contrast === "light-surface" || contrast === "light-bg"
@@ -876,6 +908,10 @@ export function TiptapRenderer({ content, className = "", contrast = "auto" }: T
       ? "dark-bg"
       : "auto";
   const contrastClasses = getContrastTypographyClasses(contrast);
+
+  const effectivePageSize = catalogPageSize || "A4";
+  const effectiveOrientation = catalogOrientation || "portrait";
+  const geometry = getCatalogDimensions(effectivePageSize, effectiveOrientation);
 
   if (typeof content === "string") {
     let parsedObj: Record<string, unknown> | null = null;
@@ -907,7 +943,15 @@ export function TiptapRenderer({ content, className = "", contrast = "auto" }: T
     }
 
     if (parsedObj) {
-      return <TiptapRenderer content={parsedObj} className={className} contrast={contrast} />;
+      return (
+        <TiptapRenderer
+          content={parsedObj}
+          className={className}
+          contrast={contrast}
+          catalogPageSize={effectivePageSize}
+          catalogOrientation={effectiveOrientation}
+        />
+      );
     }
 
     // If string contains HTML tags, render safely as HTML so tags like <p> do not appear literally
@@ -934,7 +978,7 @@ export function TiptapRenderer({ content, className = "", contrast = "auto" }: T
   if (Array.isArray(rawObj.blocks) && rawObj.blocks.length > 0) {
     return (
       <div className={cn(contrastClasses, "space-y-4", className)}>
-        {rawObj.blocks.map((block: ColumnBlock) => renderColumnBlock(block, legacyContrast))}
+        {rawObj.blocks.map((block: ColumnBlock) => renderColumnBlock(block, legacyContrast, geometry))}
       </div>
     );
   }
@@ -946,7 +990,7 @@ export function TiptapRenderer({ content, className = "", contrast = "auto" }: T
   return (
     <div className={cn(contrastClasses, "max-w-none leading-relaxed", className)}>
       {mediaConfig && renderMediaBlock(mediaConfig)}
-      {doc.type === "doc" && renderNode(doc, "root", legacyContrast)}
+      {doc.type === "doc" && renderNode(doc, "root", legacyContrast, geometry)}
     </div>
   );
 }

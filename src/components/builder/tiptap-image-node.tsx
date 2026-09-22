@@ -15,9 +15,11 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getCatalogDimensions } from "@/lib/catalog-geometry";
+import { useCatalogEditorContext } from "@/lib/catalog-editor-context";
 
 export type ImageLayoutMode = "centered" | "full-width" | "cover-column" | "float-left" | "float-right";
-export type ImageAspectRatio = "auto" | "1/1" | "16/9" | "4/3" | "21/9";
+export type ImageAspectRatio = "auto" | "catalog" | "1/1" | "16/9" | "4/3" | "21/9";
 
 export interface CustomImageAttributes {
   src: string;
@@ -26,6 +28,7 @@ export interface CustomImageAttributes {
   layoutMode?: ImageLayoutMode;
   aspectRatio?: ImageAspectRatio;
   maxHeight?: string;
+  focalPosition?: string;
 }
 
 const LAYOUT_MODES: { mode: ImageLayoutMode; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
@@ -38,6 +41,7 @@ const LAYOUT_MODES: { mode: ImageLayoutMode; label: string; icon: React.Componen
 
 const ASPECT_RATIOS: { ratio: ImageAspectRatio; label: string }[] = [
   { ratio: "auto", label: "Auto Aspect" },
+  { ratio: "catalog", label: "Catalog Canvas" },
   { ratio: "1/1", label: "1:1 Square" },
   { ratio: "4/3", label: "4:3 Classical" },
   { ratio: "16/9", label: "16:9 Cinema" },
@@ -50,8 +54,15 @@ function ImageViewComponent(props: NodeViewProps) {
   const layoutMode = attrs.layoutMode || "centered";
   const aspectRatio = attrs.aspectRatio || "auto";
   const maxHeight = attrs.maxHeight || "500px";
+  const focalPosition = attrs.focalPosition || "center";
+
+  const { pageSize, orientation } = useCatalogEditorContext();
+  const geometry = getCatalogDimensions(pageSize, orientation);
 
   const [popoverOpen, setPopoverOpen] = React.useState(false);
+
+  const isCover = layoutMode === "cover-column";
+  const isCatalogAspect = aspectRatio === "catalog" || isCover;
 
   let containerClass = "my-6 relative group transition-all clear-both";
   let imgClass = "rounded-xl border border-border/80 shadow-md transition-all";
@@ -62,9 +73,9 @@ function ImageViewComponent(props: NodeViewProps) {
   } else if (layoutMode === "float-right") {
     containerClass = "float-right ml-6 mb-4 max-w-[50%] relative group";
     imgClass += " w-full object-cover";
-  } else if (layoutMode === "cover-column") {
-    containerClass = "my-6 w-full relative group clear-both";
-    imgClass += " w-full h-full min-h-[320px] object-cover";
+  } else if (isCover) {
+    containerClass = "my-4 w-full relative group clear-both overflow-hidden rounded-2xl";
+    imgClass += " w-full h-full object-cover";
   } else if (layoutMode === "full-width") {
     containerClass = "my-6 w-full text-center relative group clear-both";
     imgClass += " w-full object-contain mx-auto";
@@ -80,6 +91,18 @@ function ImageViewComponent(props: NodeViewProps) {
   else if (aspectRatio === "16/9") imgClass += " aspect-video";
   else if (aspectRatio === "21/9") imgClass += " aspect-[21/9]";
 
+  const imageStyle: React.CSSProperties = {
+    objectPosition: focalPosition,
+  };
+
+  if (isCatalogAspect) {
+    imageStyle.aspectRatio = `${geometry.ratio}`;
+    imageStyle.width = "100%";
+    imageStyle.objectFit = "cover";
+  } else {
+    imageStyle.maxHeight = maxHeight;
+  }
+
   return (
     <NodeViewWrapper className={containerClass}>
       {/* Floating Toolbar on Hover */}
@@ -94,7 +117,7 @@ function ImageViewComponent(props: NodeViewProps) {
               <Settings2 className="w-3.5 h-3.5" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-3 space-y-3 bg-card border-border shadow-2xl text-foreground text-xs" align="end">
+          <PopoverContent className="w-84 p-3 space-y-3 bg-card border-border shadow-2xl text-foreground text-xs" align="end">
             <div className="flex items-center justify-between border-b border-border/60 pb-1.5 font-semibold">
               <span className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-primary">
                 <ImageIcon className="w-3.5 h-3.5" /> Image Layout &amp; Coverage
@@ -155,6 +178,55 @@ function ImageViewComponent(props: NodeViewProps) {
                   </button>
                 ))}
               </div>
+
+              {/* Match Catalog Canvas Quick Action */}
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => updateAttributes({ aspectRatio: "catalog" })}
+                  className={`w-full py-1 px-2 text-[10px] rounded border font-mono flex items-center justify-between transition-all cursor-pointer ${
+                    aspectRatio === "catalog"
+                      ? "bg-primary text-primary-foreground font-bold border-primary shadow-xs"
+                      : "border-border bg-muted/30 hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <span>📐 Match Catalog Canvas ({geometry.size})</span>
+                  <span className="font-bold">
+                    {geometry.isSquare
+                      ? "1:1 Square"
+                      : geometry.isLandscape
+                      ? `Landscape (${geometry.ratio.toFixed(2)}:1)`
+                      : `Portrait (${geometry.ratio.toFixed(2)}:1)`}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Focal Position Selector */}
+            <div className="space-y-1.5 border-t border-border/60 pt-2">
+              <label className="text-[10px] font-mono text-muted-foreground uppercase">Focal Point Alignment</label>
+              <div className="grid grid-cols-5 gap-1">
+                {[
+                  { pos: "center", label: "Center" },
+                  { pos: "top", label: "Top" },
+                  { pos: "bottom", label: "Bottom" },
+                  { pos: "left", label: "Left" },
+                  { pos: "right", label: "Right" },
+                ].map((fp) => (
+                  <button
+                    key={fp.pos}
+                    type="button"
+                    onClick={() => updateAttributes({ focalPosition: fp.pos })}
+                    className={`px-1 py-1 text-[9px] rounded border text-center transition-all cursor-pointer ${
+                      focalPosition === fp.pos
+                        ? "bg-primary text-primary-foreground font-bold border-primary shadow-xs"
+                        : "border-border bg-muted/30 hover:bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {fp.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Caption Input */}
@@ -182,14 +254,12 @@ function ImageViewComponent(props: NodeViewProps) {
       </div>
 
       {/* Image Element */}
-      <figure className="m-0 p-0">
+      <figure className="m-0 p-0 w-full h-full">
         <img
           src={attrs.src}
           alt={attrs.alt || "Heritage artwork illustration"}
           className={imgClass}
-          style={{
-            maxHeight: layoutMode === "cover-column" ? undefined : maxHeight,
-          }}
+          style={imageStyle}
           loading="lazy"
         />
         {attrs.title && (
@@ -215,6 +285,7 @@ export const CustomImageNode = Node.create({
       layoutMode: { default: "centered" },
       aspectRatio: { default: "auto" },
       maxHeight: { default: "500px" },
+      focalPosition: { default: "center" },
     };
   },
 

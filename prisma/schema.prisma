@@ -584,6 +584,7 @@ model ECatalog {
   downloadablePdfUrl String?
   themeColor         String         @default("gold")
   orientation        String         @default("portrait") // "portrait" | "landscape"
+  pageSize           String?        @default("A4") // "A4" | "A3" | "A5" | "LETTER" | "TABLOID" | "SQUARE"
   plateLayout        String         @default("SIDE_BY_SIDE") // "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW"
   plateRatio         String?        @default("55:45") // "40:60" | "45:55" | "50:50" | "55:45" | "60:40"
 

@@ -33,6 +33,12 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { ECatalogThemeTokens, DEFAULT_CATALOG_THEME_TOKENS } from "@/types/catalog";
+import {
+  PAGE_SIZE_OPTIONS,
+  getCatalogDimensions,
+  type CatalogPageSize,
+  type CatalogOrientation,
+} from "@/lib/catalog-geometry";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -203,6 +209,8 @@ interface ECatalogCoverConfig extends CatalogBackgroundConfig {
   hideCoverEyebrow?: boolean;
   coverFooterNote?: string;
   hideCoverFooter?: boolean;
+  imagePlatePresentation?: "contained" | "full-bleed";
+  imageFocalPosition?: string;
 }
 
 interface ECatalogEssayConfig extends CatalogBackgroundConfig {
@@ -258,6 +266,7 @@ interface ECatalogDetail {
   coverImageUrl: string | null;
   themeColor: string;
   orientation?: string;
+  pageSize?: string;
   plateLayout?: "SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW";
   plateRatio?: "40:60" | "45:55" | "50:50" | "55:45" | "60:40";
   themeConfig?: ECatalogThemeConfig | null;
@@ -294,6 +303,7 @@ export default function AdminCatalogStudioPage() {
   const [forewordBy, setForewordBy] = React.useState("");
   const [coverImageUrl, setCoverImageUrl] = React.useState("");
   const [themeColor, setThemeColor] = React.useState("gold");
+  const [pageSize, setPageSize] = React.useState<CatalogPageSize>("A4");
   const [orientation, setOrientation] = React.useState<"portrait" | "landscape">("portrait");
   const [plateLayout, setPlateLayout] = React.useState<"SIDE_BY_SIDE" | "STACKED" | "TOP_LEFT_FLOW">("SIDE_BY_SIDE");
   const [plateRatio, setPlateRatio] = React.useState<"40:60" | "45:55" | "50:50" | "55:45" | "60:40">("55:45");
@@ -384,6 +394,7 @@ export default function AdminCatalogStudioPage() {
           setForewordBy(catData.forewordBy || "");
           setCoverImageUrl(catData.coverImageUrl || "");
           setThemeColor(catData.themeColor || "gold");
+          setPageSize((catData.pageSize as CatalogPageSize) || "A4");
           setOrientation(catData.orientation === "landscape" ? "landscape" : "portrait");
           setPlateLayout(
             catData.plateLayout === "STACKED"
@@ -543,6 +554,7 @@ export default function AdminCatalogStudioPage() {
         forewordBy: forewordBy.trim() || null,
         coverImageUrl: coverImageUrl || null,
         themeColor,
+        pageSize,
         orientation,
         plateLayout,
         plateRatio,
@@ -1071,23 +1083,55 @@ export default function AdminCatalogStudioPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/60">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-border/60">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Publication Layout &amp; Orientation</label>
+                  <label className="text-xs font-semibold text-foreground">Page Dimension Format</label>
+                  <Select
+                    value={pageSize}
+                    onValueChange={(val: CatalogPageSize) => setPageSize(val)}
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Select Page Size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAGE_SIZE_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.id} value={opt.id}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground">
+                    Standardizes all editorial &amp; print sheet dimensions.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground">Publication Orientation</label>
+                    {pageSize === "SQUARE" && (
+                      <Badge variant="outline" className="text-[9px] px-1 py-0 text-amber-600 dark:text-amber-400 border-amber-500/30">
+                        1:1 Square
+                      </Badge>
+                    )}
+                  </div>
                   <Select
                     value={orientation}
+                    disabled={pageSize === "SQUARE"}
                     onValueChange={(val: "portrait" | "landscape") => setOrientation(val)}
                   >
                     <SelectTrigger className="text-xs">
                       <SelectValue placeholder="Select Print Orientation" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="portrait">A4 Portrait (Classical Monograph)</SelectItem>
-                      <SelectItem value="landscape">A4 Landscape (Panoramic Gallery Album)</SelectItem>
+                      <SelectItem value="portrait">Portrait (Classical Monograph)</SelectItem>
+                      <SelectItem value="landscape">Landscape (Panoramic Gallery Album)</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-[10px] text-muted-foreground">
-                    Determines viewport ratio and strict browser print sheet dimensions.
+                    {pageSize === "SQUARE"
+                      ? "Square format enforces equal 1:1 width and height."
+                      : "Determines viewport ratio and print sheet dimensions."}
                   </p>
                 </div>
 
@@ -1140,7 +1184,7 @@ export default function AdminCatalogStudioPage() {
                 </div>
 
                 {plateLayout === "SIDE_BY_SIDE" && (
-                  <div className="space-y-1.5 pt-2 border-t border-border/40 sm:col-span-3">
+                  <div className="space-y-1.5 pt-2 border-t border-border/40 sm:col-span-2 lg:col-span-4">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                         <Sliders className="w-3.5 h-3.5 text-primary" /> Column Split Ratio (Artwork : Curatorial Text)
@@ -1184,6 +1228,92 @@ export default function AdminCatalogStudioPage() {
                   mediaType="general"
                   description="High-resolution visual representing the front cover of the digital book."
                 />
+              </div>
+
+              {/* Cover Plate Presentation Controls */}
+              <div className="p-3.5 rounded-xl border border-border/80 bg-background/60 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-primary" /> Cover Plate Presentation
+                    </label>
+                    <p className="text-[11px] text-muted-foreground">
+                      Control how the front cover image formats within the catalog sheet geometry.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg border border-border/50">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCoverConfig((prev) => ({
+                          ...prev,
+                          imagePlatePresentation: "contained",
+                        }))
+                      }
+                      className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                        (coverConfig.imagePlatePresentation || "contained") === "contained"
+                          ? "bg-card text-foreground shadow-xs font-semibold"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Contained with Matting
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCoverConfig((prev) => ({
+                          ...prev,
+                          imagePlatePresentation: "full-bleed",
+                        }))
+                      }
+                      className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
+                        coverConfig.imagePlatePresentation === "full-bleed"
+                          ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Full Bleed Cover / Fill Page
+                    </button>
+                  </div>
+                </div>
+
+                {coverConfig.imagePlatePresentation === "full-bleed" && (
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/40 text-xs">
+                    <span className="text-xs font-medium text-foreground">Focal Position:</span>
+                    {[
+                      { label: "Center", value: "center center" },
+                      { label: "Top", value: "center top" },
+                      { label: "Bottom", value: "center bottom" },
+                      { label: "Left", value: "left center" },
+                      { label: "Right", value: "right center" },
+                    ].map((pos) => {
+                      const current = coverConfig.imageFocalPosition || "center center";
+                      const active = current === pos.value;
+                      return (
+                        <button
+                          key={pos.value}
+                          type="button"
+                          onClick={() =>
+                            setCoverConfig((prev) => ({
+                              ...prev,
+                              imageFocalPosition: pos.value,
+                            }))
+                          }
+                          className={`px-2 py-0.5 rounded text-[11px] border font-mono transition-all cursor-pointer ${
+                            active
+                              ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
+                              : "border-border/80 bg-background hover:bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {pos.label}
+                        </button>
+                      );
+                    })}
+                    <span className="text-[10px] text-muted-foreground">
+                      Scales edge-to-edge with protective text scrim overlay.
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Cover Matting & Framing Customization */}
@@ -2075,6 +2205,8 @@ export default function AdminCatalogStudioPage() {
                             }))
                           }
                           contrast={themeConfig.backgroundMode === "IMAGE" ? "dark-bg" : undefined}
+                          catalogPageSize={pageSize}
+                          catalogOrientation={orientation}
                           className="min-h-[380px]"
                         />
                       </div>
@@ -2208,6 +2340,8 @@ export default function AdminCatalogStudioPage() {
                     content={curatorialEssay}
                     onChange={(_, html) => setCuratorialEssay(html)}
                     placeholder="Compose the scholastic curatorial statement, historical lineage of the paintings, and thematic spiritual symbolism..."
+                    catalogPageSize={pageSize}
+                    catalogOrientation={orientation}
                     className="min-h-[280px]"
                   />
                 </div>
@@ -2499,6 +2633,8 @@ export default function AdminCatalogStudioPage() {
                                     content={seg.contentHtml}
                                     onChange={(_, html) => updateCustomPageSegment(pIdx, sIdx, html)}
                                     placeholder={`Compose text, drop caps, or insert photos for Column ${sIdx + 1}...`}
+                                    catalogPageSize={pageSize}
+                                    catalogOrientation={orientation}
                                     className="min-h-[200px]"
                                   />
                                 </div>
@@ -2874,6 +3010,8 @@ export default function AdminCatalogStudioPage() {
                         setEndPageConfig((prev) => ({ ...prev, contentHtml: html }))
                       }
                       placeholder="Compose concluding scholarly remarks, artist background, technique provenance, or exhibition credits..."
+                      catalogPageSize={pageSize}
+                      catalogOrientation={orientation}
                       className="min-h-[220px]"
                     />
                   </div>

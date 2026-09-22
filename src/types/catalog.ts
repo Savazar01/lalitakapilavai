@@ -16,6 +16,8 @@ export interface ArtworkPlateSettings {
   imageMaxHeight?: string; // e.g. "60vh", "450px"
 }
 
+export type { CatalogPageSize, CatalogOrientation, CatalogGeometry } from "@/lib/catalog-geometry";
+
 export interface CoverFramingConfig {
   coverMattingColor?: string; // e.g. "transparent" or hex code
   innerBorderColor?: string;  // e.g. "#D4AF37"
@@ -32,6 +34,8 @@ export interface CoverFramingConfig {
   hideCoverEyebrow?: boolean; // Whether to suppress eyebrow pill
   coverFooterNote?: string;   // Footer credit / studio publication note
   hideCoverFooter?: boolean;  // Whether to suppress cover footer note
+  imagePlatePresentation?: "contained" | "full-bleed"; // Single Image Plate presentation mode
+  imageFocalPosition?: string; // e.g. "center", "top", "bottom"
 }
 
 export interface EssayConfig {

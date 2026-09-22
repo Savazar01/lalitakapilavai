@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1790083939.2799704,
+    "mtime": 1790088117.6177354,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\tiptap-editor.tsx": {
-    "mtime": 1790083827.1124372,
-    "ast_hash": "8a48f93a8fdc2b194dda854347e85d01",
+    "mtime": 1790087909.867047,
+    "ast_hash": "7f065e92518dc0ba1fada20847f9cbf8",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\viewport-switcher.tsx": {
@@ -160,8 +160,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\tiptap-renderer.tsx": {
-    "mtime": 1790083730.7338402,
-    "ast_hash": "c9d32cfdf7d8156186d621fdfa3687f7",
+    "mtime": 1790088018.2252104,
+    "ast_hash": "e2d9604bc2ee75372c7625755ce09609",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\ui\\badge.tsx": {
@@ -675,8 +675,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\(public)\\catalogs\\[slug]\\page.tsx": {
-    "mtime": 1790083699.0560684,
-    "ast_hash": "370fb2a155260db6ed349c3519b41094",
+    "mtime": 1790087637.3930092,
+    "ast_hash": "13e127dff68610bdd7f564a8c75685ea",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\catalogs\\page.tsx": {
@@ -685,18 +685,18 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\catalogs\\[id]\\page.tsx": {
-    "mtime": 1790083283.7739687,
-    "ast_hash": "bd4093cfa3c7452049dd1ad6863588ed",
+    "mtime": 1790087250.5339763,
+    "ast_hash": "98e73a88d2dc2b3eedb307c84e35ccd5",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\admin\\catalogs\\route.ts": {
-    "mtime": 1789102628.8999977,
-    "ast_hash": "05361f1ef88ab69762d14b4f0a6b100a",
+    "mtime": 1790086638.0205867,
+    "ast_hash": "eeea494965ecfff04d221b6f3806e5b0",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\admin\\catalogs\\[id]\\route.ts": {
-    "mtime": 1789620698.9149847,
-    "ast_hash": "3e06f0197166531cd9d265f3ded41d9e",
+    "mtime": 1790086612.6938193,
+    "ast_hash": "c73bb166dd9254448fa8e50c34b75ea2",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\media-uploader.tsx": {
@@ -775,8 +775,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\catalog-matrix-page.tsx": {
-    "mtime": 1789184835.8314607,
-    "ast_hash": "65f45453346655eb4787e64985f60d8f",
+    "mtime": 1790087367.2462094,
+    "ast_hash": "2e3045ae1b5389003d4d7f6a7e6248fe",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\admin\\settings\\copy\\route.ts": {
@@ -940,8 +940,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\types\\catalog.ts": {
-    "mtime": 1790083174.9592764,
-    "ast_hash": "baee30869019d84ff329d53b30d1579f",
+    "mtime": 1790086526.650176,
+    "ast_hash": "108fe7ac2082ac7bf12da2faa22b9e85",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\.agents\\skills\\cloudflare-security-audit-skill\\SKILL.md": {
@@ -975,8 +975,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\tiptap-image-node.tsx": {
-    "mtime": 1790083453.0951538,
-    "ast_hash": "51f5c2d6d1de0f006c22518741c5220b",
+    "mtime": 1790087929.5597734,
+    "ast_hash": "95bdd7b89d4a6a5a2d9036af2334b3c7",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\tiptap-text-orientation-extension.ts": {
@@ -987,6 +987,16 @@
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\shapes\\shape-definitions.ts": {
     "mtime": 1790083407.654555,
     "ast_hash": "a5d3db12437a379eba74fdd62f1f6841",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\catalog-editor-context.tsx": {
+    "mtime": 1790087877.6229718,
+    "ast_hash": "eae21857fd4d894b23000195bc9f2f56",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\catalog-geometry.ts": {
+    "mtime": 1790087884.0026681,
+    "ast_hash": "51dd167c6cdad42efc6f4dea2d26b265",
     "semantic_hash": ""
   }
 }

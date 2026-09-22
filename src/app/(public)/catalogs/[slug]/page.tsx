@@ -26,6 +26,11 @@ import {
   parseColorToRgb,
   computeRelativeLuminance,
 } from "@/lib/theme-contrast";
+import {
+  getCatalogDimensions,
+  type CatalogPageSize,
+  type CatalogOrientation,
+} from "@/lib/catalog-geometry";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -332,8 +337,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const colophonTitle = (endPageConfig.title as string) || "Colophon & Atelier Heritage";
   const colophonLegalNotice = (endPageConfig.legalNotice as string) || "Reproduction of sacred iconography and Tanjore masterworks strictly prohibited without written consent.";
 
-  // Dynamic print page orientation style
-  const printPageSize = orientation === "landscape" ? "A4 landscape" : "A4 portrait";
+  // Dynamic print page geometry and aspect ratio calculation
+  const pageSize = ((catalog as unknown as { pageSize?: string }).pageSize as CatalogPageSize) || "A4";
+  const geometry = getCatalogDimensions(pageSize, orientation);
 
   // Cover framing and matting config
   const coverMattingColor = (coverConfig.coverMattingColor as string) || undefined;
@@ -348,7 +354,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         colorScheme: "light",
       }}
       className={`light bg-[#FAF7F2] text-slate-900 min-h-screen flex flex-col selection:bg-amber-200 selection:text-slate-900 ${
-        orientation === "landscape" ? "catalog-landscape" : "catalog-portrait"
+        geometry.isLandscape ? "catalog-landscape" : "catalog-portrait"
       }`}
     >
       {/* Dynamic Print Page Size Override */}
@@ -357,7 +363,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           __html: `
             @media print {
               @page {
-                size: ${printPageSize} !important;
+                size: ${geometry.cssSize} !important;
                 margin: 0 !important;
               }
             }
@@ -371,10 +377,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
       </div>
 
       <main
-        className={cn(
-          "catalog-document flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-12 print:p-0 print:m-0 print:max-w-none print:space-y-0",
-          orientation === "landscape" ? "max-w-6xl" : "max-w-4xl"
-        )}
+        className="catalog-document flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-12 print:p-0 print:m-0 print:max-w-none print:space-y-0"
+        style={{ maxWidth: `${geometry.maxWidthPx}px` }}
       >
         {/* Navigation & Actions Top Bar */}
         <div
@@ -449,6 +453,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   />
                 }
                 catalogTitle={catalog.title}
+                aspectRatio={geometry.ratio}
               />
             );
           })()
@@ -460,6 +465,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             )}
             style={{
               ...coverScope.wrapperStyle,
+              aspectRatio: `${geometry.ratio}`,
               backgroundColor: (mattingPadding > 0 && coverMattingColor) ? coverMattingColor : (coverBgColor || "var(--cat-canvas-bg)"),
               padding: `${mattingPadding}px`,
             }}
@@ -508,6 +514,89 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               </div>
             </div>
           </section>
+        ) : (coverConfig.imagePlatePresentation === "full-bleed" && catalog.coverImageUrl) ? (
+          <section
+            className="catalog-page cover-page relative rounded-3xl overflow-hidden text-center flex flex-col justify-between print:rounded-none min-h-[640px] text-white"
+            style={{
+              aspectRatio: `${geometry.ratio}`,
+            }}
+          >
+            {/* Full Bleed Background Image */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+              <ProtectedImage
+                useImg={true}
+                src={catalog.coverImageUrl}
+                alt={catalog.title}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: (coverConfig.imageFocalPosition as string) || "center center" }}
+              />
+              {/* Protective Dark Scrim Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/65 pointer-events-none" />
+            </div>
+
+            <div
+              className={`catalog-frame relative z-10 ${coverFrameClass} m-4 sm:m-8 p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full border-white/20`}
+            >
+              {/* Header / Subtitle */}
+              <div className="space-y-4 pt-4">
+                {!coverConfig.hideCoverEyebrow && (
+                  <div
+                    className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-1.5 rounded-full border border-amber-300/40 bg-black/40 text-amber-200 backdrop-blur-md shadow-lg"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    {coverEyebrowText}
+                  </div>
+                )}
+
+                <h1
+                  className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-lg text-white"
+                  style={{
+                    fontFamily: (coverConfig.titleFont as string) || "var(--font-cinzel), serif",
+                  }}
+                >
+                  {catalog.title}
+                </h1>
+
+                {catalog.subtitle && (
+                  <p
+                    className="text-sm sm:text-base italic max-w-xl mx-auto font-medium text-amber-100/90 drop-shadow-md"
+                    style={{
+                      fontFamily: (coverConfig.subtitleFont as string) || "var(--font-cinzel), serif",
+                    }}
+                  >
+                    {catalog.subtitle}
+                  </p>
+                )}
+
+                {catalog.forewordBy && (
+                  <div className="pt-2 text-xs uppercase tracking-widest font-mono text-white/80">
+                    Curated by{" "}
+                    <span className="font-bold text-amber-300">
+                      {catalog.forewordBy}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Visual Spacer */}
+              <div className="flex-1" />
+
+              {/* Footer Notice */}
+              <div className="pt-4 border-t border-white/20 space-y-1">
+                {catalog.event && (
+                  <div className="inline-flex items-center gap-2 text-xs text-white/80 font-mono">
+                    <Calendar className="w-3 h-3 text-amber-300" />
+                    <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
+                  </div>
+                )}
+                {!coverConfig.hideCoverFooter && (
+                  <p className="text-[11px] font-mono text-white/70">
+                    {coverFooterNote}
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
         ) : (
           <section
             className={cn(
@@ -516,6 +605,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             )}
             style={{
               ...coverScope.wrapperStyle,
+              aspectRatio: `${geometry.ratio}`,
               backgroundColor: (mattingPadding > 0 && coverMattingColor) ? coverMattingColor : (coverBgColor || "var(--cat-canvas-bg)"),
               padding: `${mattingPadding}px`,
             }}
@@ -631,7 +721,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {catalog.curatorialEssay && (
           <section
             className="catalog-page essay-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
-            style={essayBgColor ? { backgroundColor: essayBgColor } : undefined}
+            style={{
+              aspectRatio: `${geometry.ratio}`,
+              ...(essayBgColor ? { backgroundColor: essayBgColor } : {}),
+            }}
           >
             <CatalogBackgroundLayer
               bgType={essayBgType}
@@ -654,7 +747,11 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               </div>
 
               <div className="prose prose-sm sm:prose-base dark:prose-invert font-serif leading-relaxed text-foreground/90 max-w-none flex-1 overflow-y-auto print:overflow-visible py-4 text-justify">
-                <TiptapRenderer content={catalog.curatorialEssay} />
+                <TiptapRenderer
+                  content={catalog.curatorialEssay}
+                  catalogPageSize={geometry.size}
+                  catalogOrientation={geometry.orientation}
+                />
               </div>
 
               <div className="pt-3 border-t border-primary/20 flex items-center justify-between text-[11px] font-mono text-muted-foreground">
@@ -715,6 +812,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 backgroundLayer={bgLayerNode}
                 catalogTitle={catalog.title}
                 fallbackContentHtml={page.contentHtml}
+                aspectRatio={geometry.ratio}
               />
             );
           }
@@ -739,6 +837,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               )}
               style={{
                 ...pageScope.wrapperStyle,
+                aspectRatio: `${geometry.ratio}`,
                 ...(page.backgroundColor ? { backgroundColor: page.backgroundColor } : {}),
               }}
             >
@@ -774,12 +873,22 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                         key={seg.id || sIdx}
                         className={cn("magazine-col font-serif leading-relaxed overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}
                       >
-                        <TiptapRenderer content={seg.contentHtml} contrast={pageScope.contrastMode} />
+                        <TiptapRenderer
+                          content={seg.contentHtml}
+                          contrast={pageScope.contrastMode}
+                          catalogPageSize={geometry.size}
+                          catalogOrientation={geometry.orientation}
+                        />
                       </div>
                     ))
                   ) : page.contentHtml ? (
                     <div className={cn("magazine-col font-serif leading-relaxed overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}>
-                      <TiptapRenderer content={page.contentHtml} contrast={pageScope.contrastMode} />
+                      <TiptapRenderer
+                        content={page.contentHtml}
+                        contrast={pageScope.contrastMode}
+                        catalogPageSize={geometry.size}
+                        catalogOrientation={geometry.orientation}
+                      />
                     </div>
                   ) : (
                     <p className="italic text-muted-foreground">No editorial content compiled for this page.</p>
@@ -812,6 +921,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             <section
               key={item.id}
               className="catalog-page plate-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none"
+              style={{
+                aspectRatio: `${geometry.ratio}`,
+              }}
             >
               <CatalogBackgroundLayer
                 fallbackBgMode={bgMode}
@@ -899,9 +1011,13 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                               &ldquo;{item.curatorialNote}&rdquo;
                             </p>
                           ) : (
-                            <div className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-serif text-justify">
-                              <TiptapRenderer content={item.artwork.description!} />
-                            </div>
+                              <div className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-serif text-justify">
+                                <TiptapRenderer
+                                  content={item.artwork.description!}
+                                  catalogPageSize={geometry.size}
+                                  catalogOrientation={geometry.orientation}
+                                />
+                              </div>
                           )}
                         </div>
                       )}
@@ -1000,9 +1116,13 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                                   &ldquo;{item.curatorialNote}&rdquo;
                                 </p>
                               ) : (
-                                <div className="text-xs text-foreground/90 leading-relaxed font-serif">
-                                  <TiptapRenderer content={item.artwork.description!} />
-                                </div>
+                                  <div className="text-xs text-foreground/90 leading-relaxed font-serif">
+                                    <TiptapRenderer
+                                      content={item.artwork.description!}
+                                      catalogPageSize={geometry.size}
+                                      catalogOrientation={geometry.orientation}
+                                    />
+                                  </div>
                               )}
                             </div>
                           )}
@@ -1065,7 +1185,11 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                         </p>
                       ) : item.artwork.description ? (
                         <div className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                          <TiptapRenderer content={item.artwork.description} />
+                          <TiptapRenderer
+                            content={item.artwork.description}
+                            catalogPageSize={geometry.size}
+                            catalogOrientation={geometry.orientation}
+                          />
                         </div>
                       ) : null}
                     </div>
@@ -1135,6 +1259,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   }
                   catalogTitle={catalog.title}
                   fallbackContentHtml={endPageConfig.contentHtml as string}
+                  aspectRatio={geometry.ratio}
                 />
               );
             })()
@@ -1153,6 +1278,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   endScope.wrapperClass
                 )}
                 style={{
+                  aspectRatio: `${geometry.ratio}`,
                   ...(endBgColor ? { backgroundColor: endBgColor } : {}),
                   ...endScope.wrapperStyle,
                 }}
@@ -1200,7 +1326,12 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                     }}
                   >
                     {endPageConfig.contentHtml ? (
-                      <TiptapRenderer content={endPageConfig.contentHtml as string} contrast={endScope.contrastMode} />
+                      <TiptapRenderer
+                        content={endPageConfig.contentHtml as string}
+                        contrast={endScope.contrastMode}
+                        catalogPageSize={geometry.size}
+                        catalogOrientation={geometry.orientation}
+                      />
                     ) : (
                       <p>
                         Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic gold foil Thanjavur art and classical Carnatic musicianship.

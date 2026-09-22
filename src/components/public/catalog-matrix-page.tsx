@@ -35,6 +35,7 @@ interface CatalogMatrixPageProps {
   backgroundLayer?: React.ReactNode;
   catalogTitle: string;
   fallbackContentHtml?: string | null;
+  aspectRatio?: string | number;
 }
 
 export function CatalogMatrixPage({
@@ -58,6 +59,7 @@ export function CatalogMatrixPage({
   backgroundLayer,
   catalogTitle,
   fallbackContentHtml,
+  aspectRatio,
 }: CatalogMatrixPageProps) {
   const contrast = resolveContainerContrast({
     backgroundColor,
@@ -94,7 +96,10 @@ export function CatalogMatrixPage({
         "catalog-page catalog-matrix-page-wrapper editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none",
         typographyClasses
       )}
-      style={backgroundColor ? { backgroundColor } : undefined}
+      style={{
+        ...(backgroundColor ? { backgroundColor } : {}),
+        ...(aspectRatio ? { aspectRatio: `${aspectRatio}` } : {}),
+      }}
     >
       {backgroundLayer}
 
