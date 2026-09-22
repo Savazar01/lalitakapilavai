@@ -20,6 +20,7 @@ import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/tim
 import { DynamicFormBlock, FormFieldConfig, DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
 import { cn } from "@/lib/utils";
+import { getShapeDefinition } from "@/components/builder/shapes/shape-definitions";
 import {
   type ContrastMode,
   type DynamicContrastScope,
@@ -195,6 +196,48 @@ function renderMarks(
   }, text);
 }
 
+function getTextOrientationStyle(orientation?: string): React.CSSProperties {
+  if (!orientation || orientation === "horizontal") return {};
+  if (orientation === "vertical-rl") {
+    return {
+      writingMode: "vertical-rl",
+      textOrientation: "upright",
+      display: "inline-block",
+      letterSpacing: "0.1em",
+    };
+  }
+  if (orientation === "vertical-lr") {
+    return {
+      writingMode: "vertical-lr",
+      textOrientation: "upright",
+      display: "inline-block",
+      letterSpacing: "0.1em",
+    };
+  }
+  if (orientation === "rotate-90") {
+    return {
+      transform: "rotate(90deg)",
+      transformOrigin: "center",
+      display: "inline-block",
+    };
+  }
+  if (orientation === "rotate-270") {
+    return {
+      transform: "rotate(270deg)",
+      transformOrigin: "center",
+      display: "inline-block",
+    };
+  }
+  if (orientation === "diagonal-neg45") {
+    return {
+      transform: "rotate(-45deg)",
+      transformOrigin: "center",
+      display: "inline-block",
+    };
+  }
+  return {};
+}
+
 function renderNode(
   node: TiptapNode,
   key: React.Key,
@@ -212,6 +255,9 @@ function renderNode(
       ? "text-justify"
       : "";
 
+  const textOrientation = node.attrs?.textOrientation as string | undefined;
+  const orientationStyle = getTextOrientationStyle(textOrientation);
+
   switch (node.type) {
     case "doc":
       return <div key={key}>{children}</div>;
@@ -228,20 +274,20 @@ function renderNode(
           : "text-lg sm:text-xl font-serif font-semibold mb-2";
 
       if (level === 1) {
-        return <h1 key={key} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h1>;
+        return <h1 key={key} style={orientationStyle} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h1>;
       }
       if (level === 2) {
-        return <h2 key={key} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h2>;
+        return <h2 key={key} style={orientationStyle} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h2>;
       }
       if (level === 3) {
-        return <h3 key={key} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h3>;
+        return <h3 key={key} style={orientationStyle} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h3>;
       }
-      return <h4 key={key} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h4>;
+      return <h4 key={key} style={orientationStyle} className={`${sizeClasses} ${alignClass} text-inherit`}>{children}</h4>;
     }
 
     case "paragraph":
       return (
-        <p key={key} className={`text-base leading-relaxed mb-4 text-inherit ${alignClass}`}>
+        <p key={key} style={orientationStyle} className={`text-base leading-relaxed mb-4 text-inherit ${alignClass}`}>
           {children && children.length > 0 ? children : "\u00A0"}
         </p>
       );
@@ -284,17 +330,47 @@ function renderNode(
       const src = (node.attrs?.src as string) || "";
       const alt = (node.attrs?.alt as string) || "Heritage artwork illustration";
       const title = (node.attrs?.title as string) || "";
+      const layoutMode = (node.attrs?.layoutMode as string) || "centered";
+      const aspectRatio = (node.attrs?.aspectRatio as string) || "auto";
+      const maxHeight = (node.attrs?.maxHeight as string) || "550px";
       if (!src) return null;
+
+      let containerClass = "my-6 relative transition-all clear-both";
+      let imgClass = "rounded-xl border border-border/80 shadow-md transition-all";
+
+      if (layoutMode === "float-left") {
+        containerClass = "float-left mr-6 mb-4 max-w-[50%] relative clear-left";
+      } else if (layoutMode === "float-right") {
+        containerClass = "float-right ml-6 mb-4 max-w-[50%] relative clear-right";
+      } else if (layoutMode === "full-width") {
+        containerClass = "w-full my-6 text-center clear-both";
+        imgClass += " w-full";
+      } else if (layoutMode === "cover-column") {
+        containerClass = "w-full h-full min-h-[280px] my-4 clear-both";
+        imgClass += " w-full h-full object-cover";
+      } else {
+        containerClass = "my-6 text-center clear-both";
+        imgClass += " mx-auto";
+      }
+
+      let ratioClass = "";
+      if (aspectRatio === "1/1") ratioClass = "aspect-square object-cover";
+      else if (aspectRatio === "4/3") ratioClass = "aspect-[4/3] object-cover";
+      else if (aspectRatio === "16/9") ratioClass = "aspect-video object-cover";
+      else if (aspectRatio === "21/9") ratioClass = "aspect-[21/9] object-cover";
+      else if (layoutMode !== "cover-column") ratioClass = "object-contain";
+
       return (
-        <figure key={key} className="my-6 text-center">
+        <figure key={key} className={containerClass}>
           <img
             src={src}
             alt={alt}
-            className="w-full max-h-[550px] object-contain rounded-xl border border-border/80 mx-auto shadow-md"
+            className={cn(imgClass, ratioClass)}
+            style={{ maxHeight: layoutMode === "cover-column" ? undefined : maxHeight }}
             loading="lazy"
           />
           {title && (
-            <figcaption className="mt-2 text-xs font-serif italic text-muted-foreground">
+            <figcaption className="mt-2 text-xs font-serif italic text-muted-foreground text-center">
               {title}
             </figcaption>
           )}
@@ -313,12 +389,14 @@ function renderNode(
     case "customShape": {
       const attrs = node.attrs || {};
       const shapeType = (attrs.shapeType as string) || "cartouche";
+      const fillType = (attrs.fillType as string) || "solid";
       const fillColor = (attrs.fillColor as string) || "rgba(251, 248, 241, 0.7)";
+      const gradient = (attrs.gradient as string) || "";
       const borderColor = (attrs.borderColor as string) || "#D4AF37";
       const borderWidth = Number(attrs.borderWidth) || 2;
+      const borderStyle = (attrs.borderStyle as string) || "solid";
       const shadow = (attrs.shadow as string) || "sm";
       const alignment = (attrs.alignment as string) || "center";
-      const size = (attrs.size as string) || "md";
       const imageUrl = (attrs.imageUrl as string) || "";
       const imageFit = (attrs.imageFit as string) || "cover";
       const imageOpacity = typeof attrs.imageOpacity === "number" ? attrs.imageOpacity : 1;
@@ -326,34 +404,24 @@ function renderNode(
       const scrimColor = (attrs.scrimColor as string) || "#000000";
       const focalPosition = (attrs.focalPosition as string) || "center center";
 
-      let containerClass = "p-6 my-6 relative transition-all overflow-hidden";
-      const shapeStyle: React.CSSProperties = {
-        backgroundColor: fillColor,
-        borderColor: borderColor,
-        borderWidth: `${borderWidth}px`,
-        borderStyle: "solid",
-      };
+      const def = getShapeDefinition(shapeType);
 
-      if (shapeType === "circle") {
-        containerClass += " rounded-full aspect-square flex items-center justify-center text-center max-w-[340px] mx-auto";
-      } else if (shapeType === "oval") {
-        containerClass += " rounded-[50%/35%] aspect-[16/10] flex items-center justify-center text-center p-8";
-        shapeStyle.borderRadius = "50% / 35%";
-      } else if (shapeType === "pill") {
-        containerClass += " rounded-full px-8 py-4";
-      } else if (shapeType === "templeArch") {
-        containerClass += " rounded-t-[100px] rounded-b-xl pt-10 pb-6 px-6";
-      } else if (shapeType === "diamond") {
-        containerClass += " rounded-2xl";
-      } else if (shapeType === "cartouche") {
-        containerClass += " rounded-[32px] border-double px-8 py-6";
-        shapeStyle.borderStyle = "double";
-        shapeStyle.borderWidth = `${Math.max(borderWidth, 3)}px`;
-      } else if (shapeType === "rounded") {
-        containerClass += " rounded-2xl";
-      } else {
-        containerClass += " rounded-none";
+      // Width calculation: custom px/% or legacy size
+      let widthStyle = attrs.width as string | undefined;
+      if (!widthStyle) {
+        const size = attrs.size as string | undefined;
+        widthStyle = size === "sm" ? "280px" : size === "lg" ? "680px" : size === "full" ? "100%" : "440px";
       }
+
+      const minHeightStyle = (attrs.minHeight as string) || "120px";
+      const paddingStyle = (attrs.padding as string) || "24px";
+
+      const alignClass =
+        alignment === "left"
+          ? "mr-auto ml-0"
+          : alignment === "right"
+          ? "ml-auto mr-0"
+          : "mx-auto";
 
       const shadowClass =
         shadow === "none"
@@ -364,34 +432,60 @@ function renderNode(
           ? "shadow-md"
           : "shadow-xl";
 
-      const alignClass =
-        alignment === "left"
-          ? "mr-auto ml-0"
-          : alignment === "right"
-          ? "ml-auto mr-0"
-          : "mx-auto";
+      const containerStyle: React.CSSProperties = {
+        width: widthStyle,
+        minHeight: minHeightStyle,
+        padding: paddingStyle,
+      };
 
-      const sizeClass =
-        size === "sm"
-          ? "max-w-[280px]"
-          : size === "lg"
-          ? "max-w-[680px]"
-          : size === "full"
-          ? "w-full max-w-full"
-          : "max-w-[440px]";
+      if (def.clipPath) {
+        containerStyle.clipPath = def.clipPath;
+      } else {
+        containerStyle.borderRadius = def.borderRadius || "0px";
+        if (borderWidth > 0) {
+          containerStyle.border = `${borderWidth}px ${borderStyle} ${borderColor}`;
+        }
+      }
+
+      if (fillType === "gradient" && gradient) {
+        containerStyle.background = gradient;
+      } else if (fillType === "image") {
+        containerStyle.backgroundColor = fillColor || "transparent";
+      } else {
+        containerStyle.backgroundColor = fillColor;
+      }
 
       return (
         <div
           key={key}
-          className={cn(containerClass, shadowClass, alignClass, sizeClass, "w-full")}
-          style={shapeStyle}
+          className={cn("my-6 relative transition-all overflow-hidden flex flex-col justify-center", alignClass, shadowClass)}
+          style={containerStyle}
           data-tiptap-shape="true"
         >
-          {imageUrl && (
-            <div
+          {/* SVG Non-scaling Border Stroke for clipped shapes */}
+          {def.clipPath && def.polygonPoints && borderWidth > 0 && (
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none z-20"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
               aria-hidden="true"
-              className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
             >
+              <polygon
+                points={def.polygonPoints}
+                fill="none"
+                stroke={borderColor}
+                strokeWidth={borderWidth}
+                strokeDasharray={
+                  borderStyle === "dashed" ? "6,4" : borderStyle === "dotted" ? "3,3" : undefined
+                }
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+          )}
+
+          {/* Background Image & Scrim (Media Vault Fill) */}
+          {fillType === "image" && imageUrl && (
+            <div aria-hidden="true" className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
               <img
                 src={imageUrl}
                 alt=""
@@ -418,7 +512,9 @@ function renderNode(
               )}
             </div>
           )}
-          <div className="relative z-10 w-full h-full">
+
+          {/* Render embedded typography / children */}
+          <div className="relative z-10 w-full h-full flex flex-col justify-center">
             {children}
           </div>
         </div>

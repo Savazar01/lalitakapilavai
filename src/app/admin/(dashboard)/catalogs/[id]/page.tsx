@@ -198,18 +198,26 @@ interface ECatalogCoverConfig extends CatalogBackgroundConfig {
   subtitleColor?: string;
   subtitleFont?: string;
   eyebrowColor?: string;
+  eyebrowText?: string;
+  coverEyebrowText?: string;
+  hideCoverEyebrow?: boolean;
+  coverFooterNote?: string;
+  hideCoverFooter?: boolean;
 }
 
 interface ECatalogEssayConfig extends CatalogBackgroundConfig {
   title?: string;
+  footerLabel?: string;
   contentHtml?: string;
 }
 
 interface ECatalogEndPageConfig extends CatalogBackgroundConfig {
   isEnabled?: boolean;
   title?: string;
+  eyebrowText?: string;
   contentHtml?: string;
   contactDetails?: string;
+  legalNotice?: string;
   useMatrixLayout?: boolean;
   matrixConfig?: CatalogMatrixConfig;
   endPageBgColor?: string;
@@ -400,9 +408,9 @@ export default function AdminCatalogStudioPage() {
               accentColor: catData.themeConfig.accentColor || "#D4AF37",
             });
           }
-          if (catData.coverConfig) setCoverConfig(catData.coverConfig);
-          if (catData.essayConfig) setEssayConfig(catData.essayConfig);
-          if (catData.endPageConfig) setEndPageConfig(catData.endPageConfig);
+          if (catData.coverConfig) setCoverConfig((prev) => ({ ...prev, ...catData.coverConfig }));
+          if (catData.essayConfig) setEssayConfig((prev) => ({ ...prev, ...catData.essayConfig }));
+          if (catData.endPageConfig) setEndPageConfig((prev) => ({ ...prev, ...catData.endPageConfig }));
           setIsPublished(Boolean(catData.isPublished));
           setDownloadablePdfUrl(catData.downloadablePdfUrl || "");
           setEventId(catData.eventId || "none");
@@ -1445,6 +1453,71 @@ export default function AdminCatalogStudioPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Editorial Verbiage & Dynamic Labels */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-border/60">
+                  {/* Eyebrow Badge Text */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-foreground">Eyebrow Badge Text</label>
+                      <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={coverConfig.hideCoverEyebrow ?? false}
+                          onChange={(e) =>
+                            setCoverConfig((prev) => ({ ...prev, hideCoverEyebrow: e.target.checked }))
+                          }
+                          className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                        />
+                        <span>Hide Badge</span>
+                      </label>
+                    </div>
+                    <Input
+                      value={coverConfig.coverEyebrowText ?? coverConfig.eyebrowText ?? ""}
+                      onChange={(e) =>
+                        setCoverConfig((prev) => ({
+                          ...prev,
+                          coverEyebrowText: e.target.value,
+                          eyebrowText: e.target.value,
+                        }))
+                      }
+                      placeholder="e.g. Exhibition Monograph & Archival Collection"
+                      className="text-xs"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Displays above the monograph title in the gold-accented pill.
+                    </p>
+                  </div>
+
+                  {/* Cover Footer Note */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-foreground">Cover Footer / Publisher Note</label>
+                      <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={coverConfig.hideCoverFooter ?? false}
+                          onChange={(e) =>
+                            setCoverConfig((prev) => ({ ...prev, hideCoverFooter: e.target.checked }))
+                          }
+                          className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                        />
+                        <span>Hide Footer</span>
+                      </label>
+                    </div>
+                    <Input
+                      value={coverConfig.coverFooterNote ?? ""}
+                      onChange={(e) =>
+                        setCoverConfig((prev) => ({ ...prev, coverFooterNote: e.target.value }))
+                      }
+                      placeholder="e.g. Published by the Atelier of Lalita Kapilavai • Sacred Art & Heritage"
+                      className="text-xs"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Colophon/curator publisher credit displayed at the bottom of the cover plate.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-4 pt-4 border-t border-border/60">
@@ -2090,12 +2163,40 @@ export default function AdminCatalogStudioPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Section Heading</label>
+                  <Input
+                    value={essayConfig.title || ""}
+                    onChange={(e) => setEssayConfig((prev) => ({ ...prev, title: e.target.value }))}
+                    placeholder="e.g. Curatorial Monograph & Scholarly Statement"
+                    className="text-xs"
+                  />
+                  <p className="text-[10px] text-muted-foreground">
+                    Header title displayed above the curatorial statement.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Curatorial Footer Tag</label>
+                  <Input
+                    value={essayConfig.footerLabel || ""}
+                    onChange={(e) => setEssayConfig((prev) => ({ ...prev, footerLabel: e.target.value }))}
+                    placeholder="e.g. Curatorial Preface"
+                    className="text-xs"
+                  />
+                  <p className="text-[10px] text-muted-foreground">
+                    Bottom right label on the curatorial essay sheet.
+                  </p>
+                </div>
+              </div>
+
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-foreground">Foreword / Curated By</label>
                 <Input
                   value={forewordBy}
                   onChange={(e) => setForewordBy(e.target.value)}
-                  placeholder="e.g. Lalita Kapilavai &amp; Dr. R. Swaminathan (Art Historian)"
+                  placeholder="e.g. Lalita Kapilavai & Dr. R. Swaminathan (Art Historian)"
                   className="text-xs"
                 />
               </div>
@@ -2732,16 +2833,36 @@ export default function AdminCatalogStudioPage() {
 
             {endPageConfig.isEnabled !== false && (
               <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Colophon Title</label>
-                  <Input
-                    value={endPageConfig.title || ""}
-                    onChange={(e) =>
-                      setEndPageConfig((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                    placeholder="e.g. Colophon & Atelier Heritage"
-                    className="text-xs"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Colophon Eyebrow Badge</label>
+                    <Input
+                      value={endPageConfig.eyebrowText || ""}
+                      onChange={(e) =>
+                        setEndPageConfig((prev) => ({ ...prev, eyebrowText: e.target.value }))
+                      }
+                      placeholder="e.g. Colophon & Publication Details"
+                      className="text-xs"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Header pill displayed above the colophon title.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Colophon Title</label>
+                    <Input
+                      value={endPageConfig.title || ""}
+                      onChange={(e) =>
+                        setEndPageConfig((prev) => ({ ...prev, title: e.target.value }))
+                      }
+                      placeholder="e.g. Colophon & Atelier Heritage"
+                      className="text-xs"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Main title for the concluding page.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
@@ -2860,6 +2981,21 @@ export default function AdminCatalogStudioPage() {
                     placeholder="e.g. Atelier of Lalita Kapilavai | contact@lalitakapilavai.com | All rights reserved."
                     className="text-xs font-mono"
                   />
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs font-semibold text-foreground">Legal &amp; Reproduction Prohibition Notice</label>
+                  <Input
+                    value={endPageConfig.legalNotice || ""}
+                    onChange={(e) =>
+                      setEndPageConfig((prev) => ({ ...prev, legalNotice: e.target.value }))
+                    }
+                    placeholder="e.g. Reproduction of sacred iconography and Tanjore masterworks strictly prohibited without written consent."
+                    className="text-xs"
+                  />
+                  <p className="text-[10px] text-muted-foreground">
+                    Displayed at the very bottom of the closing colophon page.
+                  </p>
                 </div>
                 {/* Advanced Matrix Colophon Layout Engine */}
                 <div className="pt-4 border-t border-border/60 space-y-3">

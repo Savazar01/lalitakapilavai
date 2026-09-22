@@ -27,6 +27,20 @@ export interface CoverFramingConfig {
   subtitleColor?: string;     // Default: "#334155"
   subtitleFont?: string;      // Default: "var(--font-cinzel), serif"
   eyebrowColor?: string;      // Default: "#B45309"
+  eyebrowText?: string;       // Custom Eyebrow text
+  coverEyebrowText?: string;  // Alias for eyebrowText
+  hideCoverEyebrow?: boolean; // Whether to suppress eyebrow pill
+  coverFooterNote?: string;   // Footer credit / studio publication note
+  hideCoverFooter?: boolean;  // Whether to suppress cover footer note
+}
+
+export interface EssayConfig {
+  title?: string;             // Curatorial Statement / Essay Title
+  footerLabel?: string;       // Footer tag (e.g. "Curatorial Preface")
+  backgroundColor?: string;
+  backgroundImage?: string;
+  backgroundType?: string;
+  frameStyle?: string;
 }
 
 export interface EndPageConfig {
@@ -34,6 +48,25 @@ export interface EndPageConfig {
   colophonTitleColor?: string; // Default: "#0F172A"
   colophonTextColor?: string;  // Default: "#334155"
   borderColor?: string;
+  eyebrowText?: string;        // e.g. "Colophon & Publication Details"
+  title?: string;              // e.g. "Colophon & Atelier Heritage"
+  contentHtml?: string;        // Colophon rich text copy
+  contactDetails?: string;     // Atelier contact details
+  legalNotice?: string;        // Legal / copyright notice
+  isEnabled?: boolean;
+}
+
+export interface ECatalogCustomTextConfig {
+  coverEyebrowText?: string;
+  curatorPrefaceTitle?: string;
+  coverFooterNote?: string;
+  colophonHeader?: string;
+  colophonText?: string;
+  artworkSectionTitle?: string;
+  hideCoverEyebrow?: boolean;
+  hideCoverFooter?: boolean;
+  provenanceLabel?: string;
+  archiveStampText?: string;
 }
 
 export interface ECatalogThemeTokens {

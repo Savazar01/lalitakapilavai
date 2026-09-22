@@ -6,6 +6,8 @@ import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
 import { CatalogPrintButton } from "@/components/public/catalog-print-button";
+import { cn } from "@/lib/utils";
+import { ECatalogThemeTokens, DEFAULT_CATALOG_THEME_TOKENS } from "@/types/catalog";
 import { getPatternById } from "@/lib/background-patterns";
 import {
   BookOpen,
@@ -17,9 +19,13 @@ import {
 } from "lucide-react";
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
 import { ProtectedImage } from "@/components/public/protected-image";
-import { cn } from "@/lib/utils";
-import { resolveContainerThemeScope, resolveContainerContrast, getContrastTypographyClasses } from "@/lib/theme-contrast";
-import { PlateRatio, PlateLayoutType, ECatalogThemeTokens, DEFAULT_CATALOG_THEME_TOKENS } from "@/types/catalog";
+import {
+  resolveContainerThemeScope,
+  resolveContainerContrast,
+  getContrastTypographyClasses,
+  parseColorToRgb,
+  computeRelativeLuminance,
+} from "@/lib/theme-contrast";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -260,6 +266,41 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const coverDesignMode = (coverConfig.coverDesignMode as string) || (coverConfig.useMatrixLayout ? "MATRIX" : coverConfig.contentHtml ? "WYSIWYG" : "IMAGE_PLATE");
   const coverContentHtml = coverConfig.contentHtml as string | undefined;
 
+  // Dynamic Luminance & Contrast Resolution for Cover Plate
+  const coverRgb = parseColorToRgb(coverBgColor || "#FAF7F2");
+  const isCoverDark = coverRgb ? computeRelativeLuminance(coverRgb) <= 0.45 : false;
+
+  const resolvedTitleColor =
+    (coverConfig.titleColor as string) && (coverConfig.titleColor !== "#0F172A" || !isCoverDark)
+      ? (coverConfig.titleColor as string)
+      : isCoverDark
+      ? "#FFFFFF"
+      : "#0F172A";
+
+  const resolvedSubtitleColor =
+    (coverConfig.subtitleColor as string) && (coverConfig.subtitleColor !== "#334155" || !isCoverDark)
+      ? (coverConfig.subtitleColor as string)
+      : isCoverDark
+      ? "#E2E8F0"
+      : "#334155";
+
+  const resolvedEyebrowColor =
+    (coverConfig.eyebrowColor as string) && (coverConfig.eyebrowColor !== "#B45309" || !isCoverDark)
+      ? (coverConfig.eyebrowColor as string)
+      : isCoverDark
+      ? "#F59E0B"
+      : "#B45309";
+
+  const coverEyebrowText =
+    (coverConfig.coverEyebrowText as string) ||
+    (coverConfig.eyebrowText as string) ||
+    ((catalog as unknown as { eyebrow?: string }).eyebrow) ||
+    "Exhibition Monograph & Archival Collection";
+
+  const coverFooterNote =
+    (coverConfig.coverFooterNote as string) ||
+    "Published by the Atelier of Lalita Kapilavai • Sacred Art & Heritage";
+
   const coverScope = resolveContainerThemeScope({
     backgroundType: coverBgType,
     backgroundColor: coverBgColor || bgColor,
@@ -276,7 +317,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const essayPatternOpacity = typeof essayConfig.patternOpacity === "number" ? essayConfig.patternOpacity : undefined;
   const essayBgImage = (essayConfig.backgroundImage as string) || undefined;
   const essayOverlayOpacity = typeof essayConfig.overlayOpacity === "number" ? essayConfig.overlayOpacity : undefined;
-  const essayTitle = (essayConfig.title as string) || "Curatorial Statement & Scholarly Monograph";
+  const essayTitle = (essayConfig.title as string) || (catalog as unknown as { curatorPrefaceTitle?: string }).curatorPrefaceTitle || "Curatorial Monograph & Scholarly Statement";
+  const essayFooterLabel = (essayConfig.footerLabel as string) || "Curatorial Preface";
 
   // End Page configuration
   const endFrameClass = getFrameClass((endPageConfig.frameStyle as string) || frameStyle);
@@ -286,6 +328,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const endPatternOpacity = typeof endPageConfig.patternOpacity === "number" ? endPageConfig.patternOpacity : undefined;
   const endBgImage = (endPageConfig.backgroundImage as string) || undefined;
   const endOverlayOpacity = typeof endPageConfig.overlayOpacity === "number" ? endPageConfig.overlayOpacity : undefined;
+  const colophonEyebrow = (endPageConfig.eyebrowText as string) || "Colophon & Publication Details";
+  const colophonTitle = (endPageConfig.title as string) || "Colophon & Atelier Heritage";
+  const colophonLegalNotice = (endPageConfig.legalNotice as string) || "Reproduction of sacred iconography and Tanjore masterworks strictly prohibited without written consent.";
 
   // Dynamic print page orientation style
   const printPageSize = orientation === "landscape" ? "A4 landscape" : "A4 portrait";
@@ -415,8 +460,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             )}
             style={{
               ...coverScope.wrapperStyle,
-              backgroundColor: coverBgColor || "var(--cat-canvas-bg)",
-              ...(coverMattingColor ? { backgroundColor: coverMattingColor } : {}),
+              backgroundColor: (mattingPadding > 0 && coverMattingColor) ? coverMattingColor : (coverBgColor || "var(--cat-canvas-bg)"),
               padding: `${mattingPadding}px`,
             }}
           >
@@ -433,8 +477,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               fallbackOverlayOpacity={overlayOpacity}
             />
             <div
-              className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+              className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full transition-colors`}
               style={{
+                backgroundColor: coverBgColor || "var(--cat-canvas-bg)",
                 ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
               }}
             >
@@ -455,9 +500,11 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                     <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
                   </div>
                 )}
-                <p className="text-[11px] font-mono text-muted-foreground/70">
-                  Published by the Atelier of Lalita Kapilavai • Sacred Art &amp; Heritage
-                </p>
+                {!coverConfig.hideCoverFooter && (
+                  <p className="text-[11px] font-mono text-muted-foreground/70">
+                    {coverFooterNote}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -469,8 +516,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             )}
             style={{
               ...coverScope.wrapperStyle,
-              backgroundColor: coverBgColor || "var(--cat-canvas-bg)",
-              ...(coverMattingColor ? { backgroundColor: coverMattingColor } : {}),
+              backgroundColor: (mattingPadding > 0 && coverMattingColor) ? coverMattingColor : (coverBgColor || "var(--cat-canvas-bg)"),
               padding: `${mattingPadding}px`,
             }}
           >
@@ -487,29 +533,32 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               fallbackOverlayOpacity={overlayOpacity}
             />
             <div
-              className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+              className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full transition-colors`}
               style={{
+                backgroundColor: coverBgColor || "var(--cat-canvas-bg)",
                 ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
               }}
             >
               {/* Header / Subtitle */}
               <div className="space-y-4 pt-2">
-                <div
-                  className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-xs"
-                  style={{
-                    color: (coverConfig.eyebrowColor as string) || "#B45309",
-                    borderColor: (coverConfig.innerBorderColor as string) || (coverConfig.eyebrowColor as string) || "#D4AF37",
-                    backgroundColor: `${(coverConfig.eyebrowColor as string) || "#B45309"}15`,
-                  }}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  {((catalog as unknown as { eyebrow?: string }).eyebrow) || "Exhibition Monograph & Archival Collection"}
-                </div>
+                {!coverConfig.hideCoverEyebrow && (
+                  <div
+                    className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-xs"
+                    style={{
+                      color: resolvedEyebrowColor,
+                      borderColor: (coverConfig.innerBorderColor as string) || resolvedEyebrowColor || "#D4AF37",
+                      backgroundColor: `${resolvedEyebrowColor}15`,
+                    }}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {coverEyebrowText}
+                  </div>
+                )}
 
                 <h1
                   className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-xs"
                   style={{
-                    color: (coverConfig.titleColor as string) || "#0F172A",
+                    color: resolvedTitleColor,
                     fontFamily: (coverConfig.titleFont as string) || "var(--font-cinzel), serif",
                   }}
                 >
@@ -520,7 +569,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   <p
                     className="text-sm sm:text-base italic max-w-xl mx-auto font-medium"
                     style={{
-                      color: (coverConfig.subtitleColor as string) || "#334155",
+                      color: resolvedSubtitleColor,
                       fontFamily: (coverConfig.subtitleFont as string) || "var(--font-cinzel), serif",
                     }}
                   >
@@ -531,12 +580,12 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 {catalog.forewordBy && (
                   <div
                     className="pt-2 text-xs uppercase tracking-widest font-mono"
-                    style={{ color: (coverConfig.subtitleColor as string) || "#334155" }}
+                    style={{ color: resolvedSubtitleColor }}
                   >
                     Curated by{" "}
                     <span
                       className="font-bold"
-                      style={{ color: (coverConfig.eyebrowColor as string) || "#B45309" }}
+                      style={{ color: resolvedEyebrowColor }}
                     >
                       {catalog.forewordBy}
                     </span>
@@ -566,9 +615,11 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                     <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
                   </div>
                 )}
-                <p className="text-[11px] font-mono text-muted-foreground/70">
-                  Published by the Atelier of Lalita Kapilavai • Sacred Art &amp; Heritage
-                </p>
+                {!coverConfig.hideCoverFooter && (
+                  <p className="text-[11px] font-mono text-muted-foreground/70">
+                    {coverFooterNote}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -608,7 +659,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
 
               <div className="pt-3 border-t border-primary/20 flex items-center justify-between text-[11px] font-mono text-muted-foreground">
                 <span>{catalog.title}</span>
-                <span>Curatorial Preface</span>
+                <span>{essayFooterLabel}</span>
               </div>
             </div>
           </section>
@@ -1003,7 +1054,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                             target="_blank"
                             className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold"
                           >
-                            Archive Provenance <ExternalLink className="w-2.5 h-2.5" />
+                            {(catalog as unknown as { provenanceLabel?: string }).provenanceLabel || "Archive Provenance"} <ExternalLink className="w-2.5 h-2.5" />
                           </Link>
                         </div>
                       </div>
@@ -1023,7 +1074,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
 
                 {/* Bottom Footer Stamp */}
                 <div className="text-[10px] text-muted-foreground/70 text-center border-t border-primary/20 pt-2 mt-auto flex items-center justify-between">
-                  <span>© {catalog.title} • Lalita Kapilavai Sacred Art Archive</span>
+                  <span>{(catalog as unknown as { archiveStampText?: string }).archiveStampText || `© ${catalog.title} • Lalita Kapilavai Sacred Art Archive`}</span>
                   {showPlateNumber ? (
                     <span className="font-mono text-[9px] uppercase tracking-wider">
                       Plate {item.pageNumber || idx + 1}
@@ -1124,7 +1175,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       className="text-xs font-mono uppercase tracking-widest font-bold"
                       style={{ color: (coverConfig.eyebrowColor as string) || "#B45309" }}
                     >
-                      Colophon &amp; Publication Details
+                      {colophonEyebrow}
                     </span>
                     <h2
                       className="text-2xl sm:text-3xl font-serif font-bold"
@@ -1135,7 +1186,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                           "#0F172A",
                       }}
                     >
-                      {(endPageConfig.title as string) || "Colophon & Atelier Heritage"}
+                      {colophonTitle}
                     </h2>
                   </div>
 
@@ -1171,7 +1222,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       "Atelier of Lalita Kapilavai • contact@lalitakapilavai.com • All rights reserved."}
                   </p>
                   <p className="text-[10px] opacity-75">
-                    Reproduction of sacred iconography and Tanjore masterworks strictly prohibited without written consent.
+                    {colophonLegalNotice}
                   </p>
                 </div>
               </div>

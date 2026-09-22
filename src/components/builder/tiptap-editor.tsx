@@ -7,7 +7,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
-import { Mark, Node, mergeAttributes } from "@tiptap/core";
+import { Mark, mergeAttributes } from "@tiptap/core";
 import {
   Bold,
   Italic,
@@ -63,42 +63,10 @@ import { cn } from "@/lib/utils";
 import { type ContrastMode, getContrastTypographyClasses } from "@/lib/theme-contrast";
 import { CustomDividerNode } from "@/components/builder/tiptap-divider-node";
 import { CustomShapeNode } from "@/components/builder/tiptap-shape-node";
+import { CustomImageNode } from "@/components/builder/tiptap-image-node";
+import { TextOrientationExtension, type TextOrientationType } from "@/components/builder/tiptap-text-orientation-extension";
 
-export const CustomImageNode = Node.create({
-  name: "image",
-  group: "block",
-  draggable: true,
-  addAttributes() {
-    return {
-      src: { default: null },
-      alt: { default: null },
-      title: { default: null },
-    };
-  },
-  parseHTML() {
-    return [{ tag: "img[src]" }];
-  },
-  renderHTML({ HTMLAttributes }) {
-    return [
-      "figure",
-      { class: "my-4 text-center" },
-      [
-        "img",
-        mergeAttributes(HTMLAttributes, {
-          class:
-            "rounded-xl border border-border max-h-[500px] object-contain mx-auto shadow-md",
-        }),
-      ],
-      HTMLAttributes.title
-        ? [
-            "figcaption",
-            { class: "text-xs font-serif italic text-muted-foreground mt-1.5" },
-            HTMLAttributes.title,
-          ]
-        : "",
-    ];
-  },
-});
+export { CustomImageNode };
 
 export const TextStyleMark = Mark.create({
   name: "textStyle",
@@ -269,6 +237,7 @@ export function TiptapEditor({
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
+      TextOrientationExtension,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -829,6 +798,30 @@ export function TiptapEditor({
             <AlignJustify className="h-3.5 w-3.5" />
           </Button>
 
+          {/* Text Orientation Selector */}
+          <div className="flex items-center gap-1">
+            <select
+              value={
+                (editor.getAttributes("heading").textOrientation as string) ||
+                (editor.getAttributes("paragraph").textOrientation as string) ||
+                "horizontal"
+              }
+              onChange={(e) => {
+                const val = e.target.value as TextOrientationType;
+                editor.chain().focus().setTextOrientation(val).run();
+              }}
+              className="h-7 text-[11px] font-medium px-1.5 rounded border border-slate-400 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 hover:border-slate-500 cursor-pointer outline-none max-w-[130px]"
+              title="Text Orientation (Horizontal, Vertical, Rotated, Diagonal)"
+            >
+              <option value="horizontal">Orientation: Normal</option>
+              <option value="vertical-rl">Vertical (Top-Down)</option>
+              <option value="vertical-lr">Vertical (Bottom-Up)</option>
+              <option value="rotate-90">Rotate 90°</option>
+              <option value="rotate-270">Rotate 270°</option>
+              <option value="diagonal-neg45">Diagonal (-45°)</option>
+            </select>
+          </div>
+
           <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
 
           {/* Links */}
@@ -911,12 +904,17 @@ export function TiptapEditor({
                 .insertContent({
                   type: "customShape",
                   attrs: {
-                    shapeType: "cartouche",
-                    fillColor: "rgba(251, 248, 241, 0.7)",
+                    shapeType: "temple-arch",
+                    fillType: "solid",
+                    fillColor: "rgba(251, 248, 241, 0.9)",
                     borderColor: "#D4AF37",
                     borderWidth: 2,
-                    shadow: "sm",
+                    borderStyle: "solid",
+                    shadow: "md",
                     alignment: "center",
+                    width: "100%",
+                    minHeight: "160px",
+                    padding: "32px 24px",
                   },
                   content: [
                     {
