@@ -5,6 +5,7 @@ import { getPatternById } from "@/lib/background-patterns";
 import type { PageMatrixConfig } from "@/components/builder/page-matrix-studio";
 import { cn } from "@/lib/utils";
 import { resolveContainerThemeScope, getContrastTypographyClasses } from "@/lib/theme-contrast";
+import { CatalogScrollEngine, type ScrollTransitionMode } from "@/components/public/catalog-scroll-engine";
 
 export interface DynamicSubSectionItem {
   id?: string;
@@ -35,11 +36,13 @@ export interface DynamicSectionItem {
 interface DynamicPageSectionsProps {
   sections?: DynamicSectionItem[] | null;
   className?: string;
+  scrollTransition?: ScrollTransitionMode;
 }
 
 export function DynamicPageSections({
   sections,
   className = "",
+  scrollTransition = "parallax-float",
 }: DynamicPageSectionsProps) {
   if (!sections || sections.length === 0) return null;
 
@@ -93,11 +96,15 @@ export function DynamicPageSections({
         };
 
         return (
-          <AnimatedSection
+          <CatalogScrollEngine
             key={section.id}
-            className={cn("w-full relative overflow-hidden", sectionScope.wrapperClass, sectionTypographyClasses, section.customCssClass)}
-            style={sectionStyle}
+            mode={scrollTransition}
+            className="w-full"
           >
+            <AnimatedSection
+              className={cn("w-full relative overflow-hidden", sectionScope.wrapperClass, sectionTypographyClasses, section.customCssClass)}
+              style={sectionStyle}
+            >
             {/* Background Image Dark Overlay */}
             {isImageBg && (
               <div
@@ -358,7 +365,8 @@ export function DynamicPageSections({
               )}
             </div>
           </AnimatedSection>
-        );
+        </CatalogScrollEngine>
+      );
       })}
     </div>
   );

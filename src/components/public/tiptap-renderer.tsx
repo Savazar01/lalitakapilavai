@@ -18,7 +18,8 @@ import { BlogGridEmbed } from "@/components/public/blog-grid-embed";
 import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
 import { DynamicFormBlock, FormFieldConfig, DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
-import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
+import { MediaGalleryBlock, MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
+import { HeroShowcaseBlock, type HeroArchetype, type HotspotPin } from "@/components/public/blocks/hero-showcase-block";
 import { cn } from "@/lib/utils";
 import { getShapeDefinition } from "@/components/builder/shapes/shape-definitions";
 import {
@@ -721,7 +722,8 @@ export interface ColumnBlock {
     | "PDF_VIEWER"
     | "ARTIST_TIMELINE"
     | "FORM_BLOCK"
-    | "MEDIA_GALLERY";
+    | "MEDIA_GALLERY"
+    | "HERO_SHOWCASE";
   content?: Record<string, unknown>;
   mediaUrl?: string;
   mediaAlt?: string;
@@ -769,11 +771,24 @@ export interface ColumnBlock {
   formConfig?: DynamicFormConfig;
   pageSlug?: string;
   // Media Gallery Block Properties
-  galleryDisplayMode?: "carousel" | "scroll" | "collage";
+  galleryDisplayMode?: MediaGalleryDisplayMode;
   galleryAutoplayTimer?: number;
   galleryAspectRatio?: "landscape" | "portrait" | "square" | "natural";
   galleryFrameStyle?: "heritage" | "minimal" | "floating" | "none";
   galleryItems?: MediaGalleryItem[];
+  // Hero Showcase Properties
+  heroArchetype?: HeroArchetype;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroEyebrow?: string;
+  heroCuratorialQuote?: string;
+  heroImageUrl?: string;
+  heroPrimaryCtaText?: string;
+  heroPrimaryCtaUrl?: string;
+  heroSecondaryCtaText?: string;
+  heroSecondaryCtaUrl?: string;
+  heroBadges?: string[];
+  heroHotspots?: HotspotPin[];
 }
 
 export function renderColumnBlock(
@@ -916,6 +931,28 @@ export function renderColumnBlock(
           autoplayTimer={block.galleryAutoplayTimer}
           aspectRatio={block.galleryAspectRatio}
           frameStyle={block.galleryFrameStyle}
+        />
+      </div>
+    );
+  }
+
+  if (block.type === "HERO_SHOWCASE") {
+    return (
+      <div key={block.id} className="py-4 w-full">
+        <HeroShowcaseBlock
+          archetype={block.heroArchetype}
+          title={block.heroTitle || block.title}
+          subtitle={block.heroSubtitle || block.subtitle}
+          eyebrow={block.heroEyebrow}
+          curatorialQuote={block.heroCuratorialQuote}
+          imageUrl={block.heroImageUrl || block.mediaUrl}
+          primaryCtaText={block.heroPrimaryCtaText || block.buttonText}
+          primaryCtaUrl={block.heroPrimaryCtaUrl || block.buttonUrl}
+          secondaryCtaText={block.heroSecondaryCtaText}
+          secondaryCtaUrl={block.heroSecondaryCtaUrl}
+          badges={block.heroBadges}
+          hotspots={block.heroHotspots}
+          contrast={contrast}
         />
       </div>
     );

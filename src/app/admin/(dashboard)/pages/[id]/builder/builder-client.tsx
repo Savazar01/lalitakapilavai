@@ -60,7 +60,9 @@ import { TimelineGranularity, TimelineLayout, TimelineItem } from "@/types/timel
 import { FormBlockInspector, FormFieldConfig } from "@/components/builder/form-block-inspector";
 import { DynamicFormBlock, DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryInspector } from "@/components/builder/media-gallery-inspector";
-import { MediaGalleryBlock, MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
+import { MediaGalleryBlock, MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
+import { HeroBlockInspector, HeroBlockData } from "@/components/builder/hero-block-inspector";
+import { HeroShowcaseBlock } from "@/components/public/blocks/hero-showcase-block";
 import {
   PageMatrixStudio,
   type PageMatrixConfig,
@@ -111,6 +113,7 @@ interface PageData {
   slug: string;
   metaDescription?: string;
   isPublished: boolean;
+  config?: Record<string, unknown> | null;
   sections: SectionData[];
 }
 
@@ -407,6 +410,31 @@ function SortableSection({
             ],
           }
         : {}),
+      ...(type === "HERO_SHOWCASE"
+        ? {
+            heroArchetype: "split-showcase" as const,
+            heroEyebrow: "Sacred Classical Iconography",
+            heroTitle: "Tanjore Gold & Carnatic Heritage",
+            heroSubtitle: "Embossed 22k Gold Foil Masterworks & Melodic Devotion",
+            heroCuratorialQuote: "Every brushstroke is a silent prayer; every 22k gold embellishment vibrates in unison with sacred Carnatic ragas.",
+            heroPrimaryCtaText: "Explore Collection",
+            heroPrimaryCtaUrl: "/gallery",
+            heroSecondaryCtaText: "Commission Work",
+            heroSecondaryCtaUrl: "/commission",
+            heroBadges: ["Masterwork Monograph", "Kalyani Raga"],
+            heroImageUrl: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=1200",
+            heroHotspots: [
+              {
+                id: "spot-1",
+                x: 48,
+                y: 35,
+                title: "22k Gold Leaf Mukuta",
+                description: "Embossed traditional crown gilded with authentic 22-carat gold leaf on gesso relief.",
+                ragaName: "Sri Ragam",
+              },
+            ],
+          }
+        : {}),
     };
 
     currentBlocks.push(newBlock);
@@ -533,11 +561,17 @@ function SortableSection({
   const [activeGalleryModal, setActiveGalleryModal] = React.useState<{
     colIdx: number;
     blockId: string;
-    displayMode?: "carousel" | "scroll" | "collage";
+    displayMode?: MediaGalleryDisplayMode;
     autoplayTimer?: number;
     aspectRatio?: "landscape" | "portrait" | "square" | "natural";
     frameStyle?: "heritage" | "minimal" | "floating" | "none";
     items?: MediaGalleryItem[];
+  } | null>(null);
+
+  const [activeHeroModal, setActiveHeroModal] = React.useState<{
+    colIdx: number;
+    blockId: string;
+    data: HeroBlockData;
   } | null>(null);
 
   return (
@@ -1415,6 +1449,62 @@ function SortableSection({
                           </div>
                         </div>
                       )}
+
+                      {block.type === "HERO_SHOWCASE" && (
+                        <div className="p-3.5 rounded-xl border border-amber-600/40 bg-card space-y-3 shadow-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                              <Sparkles className="w-4 h-4 text-amber-600" /> Hero Showcase ({block.heroArchetype === "monograph-bleed" ? "Full-Bleed Monograph" : block.heroArchetype === "heritage-hotspots" ? "Heritage Hotspots" : "Split Showcase"})
+                            </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                setActiveHeroModal({
+                                  colIdx,
+                                  blockId: block.id,
+                                  data: {
+                                    archetype: block.heroArchetype,
+                                    eyebrow: block.heroEyebrow,
+                                    title: block.heroTitle || block.title,
+                                    subtitle: block.heroSubtitle || block.subtitle,
+                                    curatorialQuote: block.heroCuratorialQuote,
+                                    primaryCtaText: block.heroPrimaryCtaText || block.buttonText,
+                                    primaryCtaUrl: block.heroPrimaryCtaUrl || block.buttonUrl,
+                                    secondaryCtaText: block.heroSecondaryCtaText,
+                                    secondaryCtaUrl: block.heroSecondaryCtaUrl,
+                                    badges: block.heroBadges,
+                                    imageUrl: block.heroImageUrl || block.mediaUrl,
+                                    hotspots: block.heroHotspots,
+                                  },
+                                })
+                              }
+                              className="text-xs h-7 border-amber-600/40 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 gap-1 cursor-pointer"
+                            >
+                              <Sliders className="w-3 h-3" /> Configure Hero Showcase
+                            </Button>
+                          </div>
+
+                          {/* Interactive Preview of the Hero Showcase Block */}
+                          <div className="pt-2 border-t border-border/40 rounded bg-background/40 p-2 overflow-hidden">
+                            <HeroShowcaseBlock
+                              archetype={block.heroArchetype}
+                              title={block.heroTitle || block.title}
+                              subtitle={block.heroSubtitle || block.subtitle}
+                              eyebrow={block.heroEyebrow}
+                              curatorialQuote={block.heroCuratorialQuote}
+                              primaryCtaText={block.heroPrimaryCtaText || block.buttonText}
+                              primaryCtaUrl={block.heroPrimaryCtaUrl || block.buttonUrl}
+                              secondaryCtaText={block.heroSecondaryCtaText}
+                              secondaryCtaUrl={block.heroSecondaryCtaUrl}
+                              badges={block.heroBadges}
+                              imageUrl={block.heroImageUrl || block.mediaUrl}
+                              hotspots={block.heroHotspots}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1638,6 +1728,20 @@ function SortableSection({
                 >
                   <Images className="w-2.5 h-2.5 text-slate-500 dark:text-slate-400" /> + Media Gallery (Carousel/Collage)
                 </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBlockToCol(colIdx, "HERO_SHOWCASE");
+                  }}
+                  className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer font-semibold flex items-center gap-1 ${
+                    isSectionLight
+                      ? "border-amber-400/70 bg-amber-50 hover:bg-amber-100 text-amber-900 shadow-2xs"
+                      : "border-amber-600/70 bg-amber-950/40 hover:bg-amber-900/60 text-amber-200 shadow-2xs"
+                  }`}
+                >
+                  <Sparkles className="w-2.5 h-2.5 text-amber-600" /> + Hero Showcase (Split/Hotspots)
+                </button>
               </div>
             </div>
           );
@@ -1805,6 +1909,55 @@ function SortableSection({
                         aspectRatio: updated.aspectRatio,
                         frameStyle: updated.frameStyle,
                         items: updated.items,
+                      }
+                    : null
+                );
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Hero Showcase Configuration Dialog */}
+      {activeHeroModal && (
+        <Dialog
+          open={!!activeHeroModal}
+          onOpenChange={(open) => {
+            if (!open) setActiveHeroModal(null);
+          }}
+        >
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-xl text-primary flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-amber-600" /> Configure Hero Showcase Block
+              </DialogTitle>
+              <DialogDescription>
+                Customize layout archetype, curatorial typography, interactive hotspots, 22k gold frames, and call-to-action triggers.
+              </DialogDescription>
+            </DialogHeader>
+
+            <HeroBlockInspector
+              data={activeHeroModal.data}
+              onChange={(updated) => {
+                updateBlock(activeHeroModal.colIdx, activeHeroModal.blockId, {
+                  heroArchetype: updated.archetype,
+                  heroTitle: updated.title,
+                  heroSubtitle: updated.subtitle,
+                  heroEyebrow: updated.eyebrow,
+                  heroCuratorialQuote: updated.curatorialQuote,
+                  heroImageUrl: updated.imageUrl,
+                  heroPrimaryCtaText: updated.primaryCtaText,
+                  heroPrimaryCtaUrl: updated.primaryCtaUrl,
+                  heroSecondaryCtaText: updated.secondaryCtaText,
+                  heroSecondaryCtaUrl: updated.secondaryCtaUrl,
+                  heroBadges: updated.badges,
+                  heroHotspots: updated.hotspots,
+                });
+                setActiveHeroModal((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        data: updated,
                       }
                     : null
                 );
@@ -2108,6 +2261,7 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
           metaDescription: page.metaDescription,
           isPublished,
           sections: page.sections,
+          config: page.config,
         }),
       });
 
@@ -2168,6 +2322,32 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
 
         {/* Viewport Frame Switcher */}
         <ViewportSwitcher mode={viewport} onChange={setViewport} />
+
+        {/* Scroll Motion Selector */}
+        <div className="hidden lg:flex items-center gap-1.5 bg-muted/60 px-2.5 py-1 rounded-md border border-border/60">
+          <span className="text-[11px] font-mono text-muted-foreground">Scroll Motion:</span>
+          <select
+            value={((page.config as Record<string, unknown> | undefined)?.scrollTransition as string) || "parallax-float"}
+            onChange={(e) => {
+              const val = e.target.value;
+              setPage({
+                ...page,
+                config: {
+                  ...((page.config as Record<string, unknown>) || {}),
+                  scrollTransition: val,
+                },
+              });
+              toast.info(`Page scroll motion set to "${val}"`);
+            }}
+            className="text-xs bg-transparent border-0 font-medium text-foreground cursor-pointer focus:outline-none"
+          >
+            <option value="parallax-float">Inertia Parallax</option>
+            <option value="book-turn">3D Book Flip</option>
+            <option value="stagger-reveal">Staggered Plates</option>
+            <option value="soft-fade">Soft Fade</option>
+            <option value="none">Standard Scroll</option>
+          </select>
+        </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">

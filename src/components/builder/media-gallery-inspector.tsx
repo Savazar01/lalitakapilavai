@@ -14,7 +14,12 @@ import {
   Clock,
   Layers,
   Square,
+  Box,
+  Waves,
+  Compass,
+  Film,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UniversalMediaDialog } from "@/components/admin/universal-media-dialog";
 import { Input } from "@/components/ui/input";
@@ -28,11 +33,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { MediaGalleryItem } from "@/components/public/blocks/media-gallery-block";
+import { MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
 
 export interface MediaGalleryBlockData {
-  displayMode?: "carousel" | "scroll" | "collage";
+  displayMode?: MediaGalleryDisplayMode;
   autoplayTimer?: number;
   aspectRatio?: "landscape" | "portrait" | "square" | "natural";
   frameStyle?: "heritage" | "minimal" | "floating" | "none";
@@ -85,7 +89,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       .catch(() => {});
   }, []);
 
-  const handleModeChange = (mode: "carousel" | "scroll" | "collage") => {
+  const handleModeChange = (mode: MediaGalleryDisplayMode) => {
     onChange({
       ...data,
       displayMode: mode,
@@ -208,22 +212,22 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
         <Label className="text-xs font-bold text-primary flex items-center gap-1.5 uppercase tracking-wider">
           <Sparkles className="w-3.5 h-3.5" /> Gallery Presentation Engine
         </Label>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
           <button
             type="button"
             onClick={() => handleModeChange("carousel")}
             className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
               displayMode === "carousel"
-                ? "border-[#D4AF37] bg-stone-900 text-[#D4AF37] shadow-sm ring-1 ring-[#D4AF37]/50"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
                 : "border-border bg-card/60 hover:bg-card text-foreground"
             }`}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className="w-4 h-4 text-primary shrink-0" />
-              <span className="font-semibold text-xs">A. Carousel</span>
+            <div className="flex items-center gap-1.5 mb-1">
+              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">Carousel</span>
             </div>
             <p className="text-[10px] text-muted-foreground leading-tight">
-              Auto-playing slide reel with pause-on-hover and gold chevron arrows.
+              Auto-playing slide reel with pause-on-hover & chevrons.
             </p>
           </button>
 
@@ -232,16 +236,16 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             onClick={() => handleModeChange("scroll")}
             className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
               displayMode === "scroll"
-                ? "border-[#D4AF37] bg-stone-900 text-[#D4AF37] shadow-sm ring-1 ring-[#D4AF37]/50"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
                 : "border-border bg-card/60 hover:bg-card text-foreground"
             }`}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <Layers className="w-4 h-4 text-primary shrink-0" />
-              <span className="font-semibold text-xs">B. Horizontal Scroll</span>
+            <div className="flex items-center gap-1.5 mb-1">
+              <Layers className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">Snap Scroll</span>
             </div>
             <p className="text-[10px] text-muted-foreground leading-tight">
-              Swipeable snap-point reel for exhibition plates or series flows.
+              Swipeable horizontal snap-point reel for series.
             </p>
           </button>
 
@@ -250,16 +254,88 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             onClick={() => handleModeChange("collage")}
             className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
               displayMode === "collage"
-                ? "border-[#D4AF37] bg-stone-900 text-[#D4AF37] shadow-sm ring-1 ring-[#D4AF37]/50"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
                 : "border-border bg-card/60 hover:bg-card text-foreground"
             }`}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <Square className="w-4 h-4 text-primary shrink-0" />
-              <span className="font-semibold text-xs">C. Curated Bento</span>
+            <div className="flex items-center gap-1.5 mb-1">
+              <Square className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">Curated Bento</span>
             </div>
             <p className="text-[10px] text-muted-foreground leading-tight">
-              Asymmetrical fine-art masonry collage dynamically adapting up to 12 photos.
+              Asymmetric fine-art masonry masonry collage.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleModeChange("cylinder-3d")}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+              displayMode === "cylinder-3d"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
+                : "border-border bg-card/60 hover:bg-card text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <Box className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">3D Cylinder</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              WebGL 3D cylindrical carousel with drag inertia.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleModeChange("liquid-warp")}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+              displayMode === "liquid-warp"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
+                : "border-border bg-card/60 hover:bg-card text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <Waves className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">Liquid Warp</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              GLSL fluid wave displacement shader crossfade.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleModeChange("depth-card")}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+              displayMode === "depth-card"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
+                : "border-border bg-card/60 hover:bg-card text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <Compass className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">3D Depth Tilt</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              Gyro/cursor parallax tilt with 22k gold sheen.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleModeChange("ken-burns")}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+              displayMode === "ken-burns"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
+                : "border-border bg-card/60 hover:bg-card text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <Film className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">Ken Burns</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              Cinematic slow drift with ethereal gold particles.
             </p>
           </button>
         </div>
@@ -267,7 +343,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
 
       {/* 2. Mode Settings (Timer, Aspect Ratio, Frame) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl border border-border/70 bg-card/40">
-        {displayMode === "carousel" && (
+        {(displayMode === "carousel" || displayMode === "liquid-warp" || displayMode === "ken-burns") && (
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
               <span>Autoplay Duration</span>

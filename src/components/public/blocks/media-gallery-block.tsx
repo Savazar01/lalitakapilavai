@@ -6,6 +6,11 @@ import { ChevronLeft, ChevronRight, Sparkles, ExternalLink, Image as ImageIcon }
 import { cn } from "@/lib/utils";
 import { ProtectedImage } from "@/components/public/protected-image";
 
+import { ThreeCylinderCarousel } from "./gallery-3d/three-cylinder-carousel";
+import { ThreeLiquidWarp } from "./gallery-3d/three-liquid-warp";
+import { InteractiveDepthCard } from "./gallery-3d/interactive-depth-card";
+import { KenBurnsCanvas } from "./gallery-3d/ken-burns-canvas";
+
 export interface MediaGalleryItem {
   id: string;
   url: string;
@@ -16,9 +21,18 @@ export interface MediaGalleryItem {
   linkTarget?: string; // slug for artwork/category, or full url
 }
 
+export type MediaGalleryDisplayMode =
+  | "carousel"
+  | "scroll"
+  | "collage"
+  | "cylinder-3d"
+  | "liquid-warp"
+  | "depth-card"
+  | "ken-burns";
+
 export interface MediaGalleryBlockProps {
   items?: MediaGalleryItem[];
-  displayMode?: "carousel" | "scroll" | "collage";
+  displayMode?: MediaGalleryDisplayMode;
   autoplayTimer?: number; // in seconds (2 to 10)
   aspectRatio?: "landscape" | "portrait" | "square" | "natural";
   frameStyle?: "heritage" | "minimal" | "floating" | "none";
@@ -217,6 +231,56 @@ export function MediaGalleryBlock({
           Configure images, captions, and links in the builder inspector.
         </p>
       </div>
+    );
+  }
+
+  /* -------------------------------------------------------------
+   * 3D WEBGL SUITE MODES
+   * ----------------------------------------------------------- */
+  if (displayMode === "cylinder-3d") {
+    return (
+      <ThreeCylinderCarousel
+        items={validItems}
+        autoplayTimer={autoplayTimer}
+        aspectRatio={aspectRatio}
+        frameStyle={frameStyle}
+        className={className}
+      />
+    );
+  }
+
+  if (displayMode === "liquid-warp") {
+    return (
+      <ThreeLiquidWarp
+        items={validItems}
+        autoplayTimer={autoplayTimer}
+        aspectRatio={aspectRatio}
+        frameStyle={frameStyle}
+        className={className}
+      />
+    );
+  }
+
+  if (displayMode === "depth-card") {
+    return (
+      <InteractiveDepthCard
+        items={validItems}
+        aspectRatio={aspectRatio}
+        frameStyle={frameStyle}
+        className={className}
+      />
+    );
+  }
+
+  if (displayMode === "ken-burns") {
+    return (
+      <KenBurnsCanvas
+        items={validItems}
+        autoplayTimer={autoplayTimer}
+        aspectRatio={aspectRatio}
+        frameStyle={frameStyle}
+        className={className}
+      />
     );
   }
 
