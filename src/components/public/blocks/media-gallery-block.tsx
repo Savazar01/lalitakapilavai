@@ -5,11 +5,63 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Sparkles, ExternalLink, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProtectedImage } from "@/components/public/protected-image";
+import dynamic from "next/dynamic";
 
-import { ThreeCylinderCarousel } from "./gallery-3d/three-cylinder-carousel";
-import { ThreeLiquidWarp } from "./gallery-3d/three-liquid-warp";
-import { InteractiveDepthCard } from "./gallery-3d/interactive-depth-card";
-import { KenBurnsCanvas } from "./gallery-3d/ken-burns-canvas";
+const ThreeCylinderCarousel = dynamic(
+  () =>
+    import("./gallery-3d/three-cylinder-carousel").then(
+      (mod) => mod.ThreeCylinderCarousel
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[450px] flex items-center justify-center rounded-2xl bg-neutral-900/40 border border-amber-500/20 text-amber-300 text-sm font-serif">
+        Loading 3D Exhibition Canvas...
+      </div>
+    ),
+  }
+);
+
+const ThreeLiquidWarp = dynamic(
+  () =>
+    import("./gallery-3d/three-liquid-warp").then((mod) => mod.ThreeLiquidWarp),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[450px] flex items-center justify-center rounded-2xl bg-neutral-900/40 border border-amber-500/20 text-amber-300 text-sm font-serif">
+        Loading Liquid Shader...
+      </div>
+    ),
+  }
+);
+
+const InteractiveDepthCard = dynamic(
+  () =>
+    import("./gallery-3d/interactive-depth-card").then(
+      (mod) => mod.InteractiveDepthCard
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[450px] flex items-center justify-center rounded-2xl bg-neutral-900/40 border border-amber-500/20 text-amber-300 text-sm font-serif">
+        Loading Interactive Canvas...
+      </div>
+    ),
+  }
+);
+
+const KenBurnsCanvas = dynamic(
+  () =>
+    import("./gallery-3d/ken-burns-canvas").then((mod) => mod.KenBurnsCanvas),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[450px] flex items-center justify-center rounded-2xl bg-neutral-900/40 border border-amber-500/20 text-amber-300 text-sm font-serif">
+        Loading Archival Motion...
+      </div>
+    ),
+  }
+);
 
 export interface MediaGalleryItem {
   id: string;
