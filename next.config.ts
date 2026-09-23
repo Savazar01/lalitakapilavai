@@ -21,6 +21,24 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.s3.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "**.amazonaws.com",
+      },
+      // Unsplash curated stock & fine-art media
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
+      },
+      // Coolify & VPS domains
+      {
+        protocol: "https",
+        hostname: "**.coollabs.io",
+      },
       // Deployment domain distributions
       {
         protocol: "https",
@@ -33,6 +51,15 @@ const nextConfig: NextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
+      },
+      // Universal fallback for user-entered and external CDN images
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "**",
       },
     ],
   },

@@ -52,6 +52,8 @@ export function ProtectedImage({
     e.preventDefault();
   };
 
+  const isExternal = typeof src === "string" && (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("//"));
+  const shouldUseNativeImg = useImg || isExternal;
   const effectiveWrapperClass = wrapperClassName || containerClassName;
 
   return (
@@ -63,12 +65,14 @@ export function ProtectedImage({
       )}
       onContextMenu={handleContextMenu}
     >
-      {useImg ? (
+      {shouldUseNativeImg ? (
         <img
           src={src}
           alt={alt}
+          loading={priority ? undefined : "lazy"}
           className={cn(
             "protect-image select-none pointer-events-none transition-all duration-300",
+            fill && "absolute inset-0 w-full h-full object-cover",
             className
           )}
           draggable={false}
@@ -87,7 +91,7 @@ export function ProtectedImage({
           sizes={sizes}
           quality={quality}
           style={style}
-          unoptimized={unoptimized}
+          unoptimized={unoptimized || isExternal}
           className={cn(
             "protect-image select-none pointer-events-none transition-all duration-300",
             className

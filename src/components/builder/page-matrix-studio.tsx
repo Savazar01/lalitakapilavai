@@ -1384,6 +1384,9 @@ export function PageMatrixStudio({
                             displayMode={block.galleryDisplayMode}
                             aspectRatio={block.galleryAspectRatio}
                             frameStyle={block.galleryFrameStyle}
+                            kenBurnsOverlayTheme={block.galleryKenBurnsOverlayTheme}
+                            overlayTitleColor={block.galleryOverlayTitleColor}
+                            overlayTextColor={block.galleryOverlayTextColor}
                           />
                         </div>
                       )}
@@ -1907,6 +1910,9 @@ export function PageMatrixStudio({
                 autoplayTimer: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryAutoplayTimer,
                 aspectRatio: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryAspectRatio,
                 frameStyle: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryFrameStyle,
+                kenBurnsOverlayTheme: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryKenBurnsOverlayTheme,
+                overlayTitleColor: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryOverlayTitleColor,
+                overlayTextColor: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryOverlayTextColor,
                 items: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryItems,
               }}
               onChange={(updated) => {
@@ -1920,6 +1926,9 @@ export function PageMatrixStudio({
                     galleryAutoplayTimer: updated.autoplayTimer,
                     galleryAspectRatio: updated.aspectRatio,
                     galleryFrameStyle: updated.frameStyle,
+                    galleryKenBurnsOverlayTheme: updated.kenBurnsOverlayTheme,
+                    galleryOverlayTitleColor: updated.overlayTitleColor,
+                    galleryOverlayTextColor: updated.overlayTextColor,
                   }
                 );
               }}

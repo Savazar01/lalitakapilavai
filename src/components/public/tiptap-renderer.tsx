@@ -775,6 +775,9 @@ export interface ColumnBlock {
   galleryAutoplayTimer?: number;
   galleryAspectRatio?: "landscape" | "portrait" | "square" | "natural";
   galleryFrameStyle?: "heritage" | "minimal" | "floating" | "none";
+  galleryKenBurnsOverlayTheme?: "dark-velvet" | "parchment-gold" | "minimal-subtle";
+  galleryOverlayTitleColor?: string;
+  galleryOverlayTextColor?: string;
   galleryItems?: MediaGalleryItem[];
   // Hero Showcase Properties
   heroArchetype?: HeroArchetype;
@@ -931,6 +934,9 @@ export function renderColumnBlock(
           autoplayTimer={block.galleryAutoplayTimer}
           aspectRatio={block.galleryAspectRatio}
           frameStyle={block.galleryFrameStyle}
+          kenBurnsOverlayTheme={block.galleryKenBurnsOverlayTheme}
+          overlayTitleColor={block.galleryOverlayTitleColor}
+          overlayTextColor={block.galleryOverlayTextColor}
         />
       </div>
     );

@@ -11,6 +11,9 @@ interface KenBurnsCanvasProps {
   autoplayTimer?: number;
   aspectRatio?: string;
   frameStyle?: string;
+  kenBurnsOverlayTheme?: "dark-velvet" | "parchment-gold" | "minimal-subtle";
+  overlayTitleColor?: string;
+  overlayTextColor?: string;
   className?: string;
 }
 
@@ -28,6 +31,9 @@ export function KenBurnsCanvas({
   items,
   autoplayTimer = 6,
   aspectRatio = "landscape",
+  kenBurnsOverlayTheme = "dark-velvet",
+  overlayTitleColor,
+  overlayTextColor,
   className = "",
 }: KenBurnsCanvasProps) {
   const [activeIndex, setActiveIndex] = React.useState<number>(0);
@@ -187,29 +193,89 @@ export function KenBurnsCanvas({
       {/* Caption Placard */}
       {activeItem && (
         <div className="absolute bottom-4 inset-x-4 sm:inset-x-12 z-20 pointer-events-none">
-          <div className="p-4 sm:p-5 rounded-xl bg-stone-950/85 backdrop-blur-md border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold">
-                Cinematic Feature • Plate {activeIndex + 1} of {totalItems}
-              </span>
-              <h4 className="text-base sm:text-lg font-serif font-bold text-white leading-tight">
-                {activeItem.title || activeItem.alt || "Fine Art Composition"}
-              </h4>
-              {activeItem.caption && (
-                <p className="text-xs text-stone-300 line-clamp-1 max-w-xl">{activeItem.caption}</p>
+          {kenBurnsOverlayTheme === "minimal-subtle" ? (
+            <div className="p-3 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 flex items-center justify-between gap-3 shadow-lg">
+              <div className="space-y-0.5">
+                <h4
+                  className="text-sm font-serif font-bold leading-tight"
+                  style={{ color: overlayTitleColor || "#FFFFFF" }}
+                >
+                  {activeItem.title || activeItem.alt || "Fine Art Composition"}
+                </h4>
+                {activeItem.caption && (
+                  <p
+                    className="text-[11px] line-clamp-1 max-w-xl"
+                    style={{ color: overlayTextColor || "#D1D5DB" }}
+                  >
+                    {activeItem.caption}
+                  </p>
+                )}
+              </div>
+              {activeItem.linkTarget && (
+                <a
+                  href={activeItem.linkTarget.startsWith("/") ? activeItem.linkTarget : `/artwork/${activeItem.linkTarget}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold pointer-events-auto transition-colors"
+                >
+                  <span>View</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               )}
             </div>
+          ) : (
+            (() => {
+              const isParchment = kenBurnsOverlayTheme === "parchment-gold";
+              const titleColor = overlayTitleColor || (isParchment ? "#0F172A" : "#F8FAFC");
+              const captionColor = overlayTextColor || (isParchment ? "#334155" : "#E2E8F0");
+              return (
+                <div
+                  className={cn(
+                    "p-4 sm:p-5 rounded-xl backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xl transition-all duration-300",
+                    isParchment
+                      ? "bg-[#FAF7F2]/95 border-2 border-amber-600/50 shadow-amber-950/15"
+                      : "bg-[#0B0F17]/90 border border-amber-500/40 shadow-black/60"
+                  )}
+                >
+                  <div className="space-y-1">
+                    <span
+                      className="text-[10px] font-mono uppercase tracking-widest font-bold"
+                      style={{ color: isParchment ? "#B45309" : "#FBBF24" }}
+                    >
+                      Cinematic Feature • Plate {activeIndex + 1} of {totalItems}
+                    </span>
+                    <h4
+                      className="text-base sm:text-lg font-serif font-bold leading-tight"
+                      style={{ color: titleColor }}
+                    >
+                      {activeItem.title || activeItem.alt || "Fine Art Composition"}
+                    </h4>
+                    {activeItem.caption && (
+                      <p
+                        className="text-xs line-clamp-1 max-w-xl"
+                        style={{ color: captionColor }}
+                      >
+                        {activeItem.caption}
+                      </p>
+                    )}
+                  </div>
 
-            {activeItem.linkTarget && (
-              <a
-                href={activeItem.linkTarget.startsWith("/") ? activeItem.linkTarget : `/artwork/${activeItem.linkTarget}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold pointer-events-auto transition-colors self-start sm:self-auto"
-              >
-                <span>View Masterwork</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
-          </div>
+                  {activeItem.linkTarget && (
+                    <a
+                      href={activeItem.linkTarget.startsWith("/") ? activeItem.linkTarget : `/artwork/${activeItem.linkTarget}`}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold pointer-events-auto transition-colors self-start sm:self-auto shadow-xs",
+                        isParchment
+                          ? "bg-amber-600 text-white hover:bg-amber-700 border border-amber-700/40"
+                          : "bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40"
+                      )}
+                    >
+                      <span>View Masterwork</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+              );
+            })()
+          )}
         </div>
       )}
     </div>

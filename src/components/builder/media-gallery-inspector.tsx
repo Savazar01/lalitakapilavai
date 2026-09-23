@@ -14,10 +14,10 @@ import {
   Clock,
   Layers,
   Square,
-  Box,
-  Waves,
-  Compass,
   Film,
+  Eye,
+  Palette,
+  Sliders,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,9 @@ export interface MediaGalleryBlockData {
   autoplayTimer?: number;
   aspectRatio?: "landscape" | "portrait" | "square" | "natural";
   frameStyle?: "heritage" | "minimal" | "floating" | "none";
+  kenBurnsOverlayTheme?: "dark-velvet" | "parchment-gold" | "minimal-subtle";
+  overlayTitleColor?: string;
+  overlayTextColor?: string;
   items?: MediaGalleryItem[];
 }
 
@@ -53,6 +56,9 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const autoplayTimer = data.autoplayTimer ?? 5;
   const aspectRatio = data.aspectRatio ?? "landscape";
   const frameStyle = data.frameStyle ?? "heritage";
+  const kenBurnsOverlayTheme = data.kenBurnsOverlayTheme ?? "dark-velvet";
+  const overlayTitleColor = data.overlayTitleColor ?? "";
+  const overlayTextColor = data.overlayTextColor ?? "";
   const items = data.items ?? [];
 
   const [activeItemIndex, setActiveItemIndex] = React.useState<number>(0);
@@ -114,6 +120,27 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       frameStyle: style,
+    });
+  };
+
+  const handleOverlayThemeChange = (theme: "dark-velvet" | "parchment-gold" | "minimal-subtle") => {
+    onChange({
+      ...data,
+      kenBurnsOverlayTheme: theme,
+    });
+  };
+
+  const handleTitleColorChange = (color: string) => {
+    onChange({
+      ...data,
+      overlayTitleColor: color,
+    });
+  };
+
+  const handleTextColorChange = (color: string) => {
+    onChange({
+      ...data,
+      overlayTextColor: color,
     });
   };
 
@@ -269,60 +296,6 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
 
           <button
             type="button"
-            onClick={() => handleModeChange("cylinder-3d")}
-            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
-              displayMode === "cylinder-3d"
-                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
-                : "border-border bg-card/60 hover:bg-card text-foreground"
-            }`}
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <Box className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span className="font-semibold text-xs">3D Cylinder</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground leading-tight">
-              WebGL 3D cylindrical carousel with drag inertia.
-            </p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleModeChange("liquid-warp")}
-            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
-              displayMode === "liquid-warp"
-                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
-                : "border-border bg-card/60 hover:bg-card text-foreground"
-            }`}
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <Waves className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span className="font-semibold text-xs">Liquid Warp</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground leading-tight">
-              GLSL fluid wave displacement shader crossfade.
-            </p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleModeChange("depth-card")}
-            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
-              displayMode === "depth-card"
-                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
-                : "border-border bg-card/60 hover:bg-card text-foreground"
-            }`}
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <Compass className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span className="font-semibold text-xs">3D Depth Tilt</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground leading-tight">
-              Gyro/cursor parallax tilt with 22k gold sheen.
-            </p>
-          </button>
-
-          <button
-            type="button"
             onClick={() => handleModeChange("ken-burns")}
             className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
               displayMode === "ken-burns"
@@ -338,12 +311,48 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               Cinematic slow drift with ethereal gold particles.
             </p>
           </button>
+
+          <button
+            type="button"
+            onClick={() => handleModeChange("soft-crossfade")}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+              displayMode === "soft-crossfade"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
+                : "border-border bg-card/60 hover:bg-card text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">Soft Crossfade</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              1.2s fine-art dissolve with gentle zoom &amp; placard.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleModeChange("filmstrip")}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+              displayMode === "filmstrip"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
+                : "border-border bg-card/60 hover:bg-card text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <Layers className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">Filmstrip Reel</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              Continuous panoramic filmstrip with vintage mounts.
+            </p>
+          </button>
         </div>
       </div>
 
       {/* 2. Mode Settings (Timer, Aspect Ratio, Frame) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl border border-border/70 bg-card/40">
-        {(displayMode === "carousel" || displayMode === "liquid-warp" || displayMode === "ken-burns") && (
+        {(displayMode === "carousel" || displayMode === "ken-burns" || displayMode === "soft-crossfade") && (
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
               <span>Autoplay Duration</span>
@@ -392,6 +401,135 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           </Select>
         </div>
       </div>
+
+      {/* 2B. Placard Contrast & Typography Studio (Ken Burns & Soft Crossfade) */}
+      {(displayMode === "ken-burns" || displayMode === "soft-crossfade") && (
+        <div className="p-4 rounded-xl border border-amber-600/40 bg-amber-500/5 space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
+              <Palette className="w-3.5 h-3.5 text-amber-600" /> Placard Contrast &amp; Typography Studio
+            </Label>
+            <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-800 dark:text-amber-300">
+              WCAG AAA Contrast
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Placard Theme Preset */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">Placard Theme Preset</Label>
+              <Select
+                value={kenBurnsOverlayTheme}
+                onValueChange={(val: "dark-velvet" | "parchment-gold" | "minimal-subtle") =>
+                  handleOverlayThemeChange(val)
+                }
+              >
+                <SelectTrigger className="h-8 text-xs bg-card">
+                  <SelectValue placeholder="Select Theme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="dark-velvet">Dark Velvet (Obsidian &amp; Ivory)</SelectItem>
+                  <SelectItem value="parchment-gold">Parchment Gold (Warm Ivory &amp; Deep Slate)</SelectItem>
+                  <SelectItem value="minimal-subtle">Minimal Subtle (Translucent Glass)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Title Color Override */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Title Color</span>
+                <span className="font-mono text-[10px] text-muted-foreground">{overlayTitleColor || "Theme Default"}</span>
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={overlayTitleColor || (kenBurnsOverlayTheme === "parchment-gold" ? "#0F172A" : "#F8FAFC")}
+                  onChange={(e) => handleTitleColorChange(e.target.value)}
+                  className="w-8 h-8 rounded border border-border cursor-pointer p-0.5 bg-card shrink-0"
+                />
+                <Input
+                  type="text"
+                  placeholder={kenBurnsOverlayTheme === "parchment-gold" ? "#0F172A" : "#F8FAFC"}
+                  value={overlayTitleColor}
+                  onChange={(e) => handleTitleColorChange(e.target.value)}
+                  className="h-8 text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Caption / Text Color Override */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Caption Color</span>
+                <span className="font-mono text-[10px] text-muted-foreground">{overlayTextColor || "Theme Default"}</span>
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={overlayTextColor || (kenBurnsOverlayTheme === "parchment-gold" ? "#334155" : "#E2E8F0")}
+                  onChange={(e) => handleTextColorChange(e.target.value)}
+                  className="w-8 h-8 rounded border border-border cursor-pointer p-0.5 bg-card shrink-0"
+                />
+                <Input
+                  type="text"
+                  placeholder={kenBurnsOverlayTheme === "parchment-gold" ? "#334155" : "#E2E8F0"}
+                  value={overlayTextColor}
+                  onChange={(e) => handleTextColorChange(e.target.value)}
+                  className="h-8 text-xs font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Preset Buttons */}
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-[10px] text-muted-foreground">Quick Palette:</span>
+            <button
+              type="button"
+              onClick={() => {
+                onChange({
+                  ...data,
+                  kenBurnsOverlayTheme: "dark-velvet",
+                  overlayTitleColor: "#F8FAFC",
+                  overlayTextColor: "#E2E8F0",
+                });
+              }}
+              className="px-2 py-0.5 rounded text-[10px] font-semibold bg-stone-900 text-stone-100 border border-stone-700 hover:bg-black cursor-pointer"
+            >
+              🌙 Dark Velvet Standard
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onChange({
+                  ...data,
+                  kenBurnsOverlayTheme: "parchment-gold",
+                  overlayTitleColor: "#0F172A",
+                  overlayTextColor: "#334155",
+                });
+              }}
+              className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-950 border border-amber-300 hover:bg-amber-200 cursor-pointer"
+            >
+              ☀️ Parchment Gold Standard
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onChange({
+                  ...data,
+                  kenBurnsOverlayTheme: "minimal-subtle",
+                  overlayTitleColor: "#FFFFFF",
+                  overlayTextColor: "#CBD5E1",
+                });
+              }}
+              className="px-2 py-0.5 rounded text-[10px] font-semibold bg-stone-800 text-stone-200 border border-stone-600 hover:bg-stone-700 cursor-pointer"
+            >
+              💎 Minimal Subtle
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 3. Media Items Manager */}
       <div className="space-y-3">

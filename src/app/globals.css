@@ -902,6 +902,19 @@ body {
   }
 }
 
+/* =============================================================================
+ * Sonner Toaster Non-Blocking Viewport Architecture
+ * Prevents the toaster container from blocking clicks on header action buttons.
+ * ============================================================================= */
+[data-sonner-toaster] {
+  pointer-events: none !important;
+}
+
+[data-sonner-toast] {
+  pointer-events: auto !important;
+}
+
+
 
 
 

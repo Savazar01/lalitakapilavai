@@ -565,6 +565,9 @@ function SortableSection({
     autoplayTimer?: number;
     aspectRatio?: "landscape" | "portrait" | "square" | "natural";
     frameStyle?: "heritage" | "minimal" | "floating" | "none";
+    kenBurnsOverlayTheme?: "dark-velvet" | "parchment-gold" | "minimal-subtle";
+    overlayTitleColor?: string;
+    overlayTextColor?: string;
     items?: MediaGalleryItem[];
   } | null>(null);
 
@@ -1428,6 +1431,9 @@ function SortableSection({
                                   autoplayTimer: block.galleryAutoplayTimer,
                                   aspectRatio: block.galleryAspectRatio,
                                   frameStyle: block.galleryFrameStyle,
+                                  kenBurnsOverlayTheme: block.galleryKenBurnsOverlayTheme,
+                                  overlayTitleColor: block.galleryOverlayTitleColor,
+                                  overlayTextColor: block.galleryOverlayTextColor,
                                   items: block.galleryItems,
                                 })
                               }
@@ -1445,6 +1451,9 @@ function SortableSection({
                               autoplayTimer={block.galleryAutoplayTimer}
                               aspectRatio={block.galleryAspectRatio}
                               frameStyle={block.galleryFrameStyle}
+                              kenBurnsOverlayTheme={block.galleryKenBurnsOverlayTheme}
+                              overlayTitleColor={block.galleryOverlayTitleColor}
+                              overlayTextColor={block.galleryOverlayTextColor}
                             />
                           </div>
                         </div>
@@ -1890,6 +1899,9 @@ function SortableSection({
                 autoplayTimer: activeGalleryModal.autoplayTimer,
                 aspectRatio: activeGalleryModal.aspectRatio,
                 frameStyle: activeGalleryModal.frameStyle,
+                kenBurnsOverlayTheme: activeGalleryModal.kenBurnsOverlayTheme,
+                overlayTitleColor: activeGalleryModal.overlayTitleColor,
+                overlayTextColor: activeGalleryModal.overlayTextColor,
                 items: activeGalleryModal.items,
               }}
               onChange={(updated) => {
@@ -1898,6 +1910,9 @@ function SortableSection({
                   galleryAutoplayTimer: updated.autoplayTimer,
                   galleryAspectRatio: updated.aspectRatio,
                   galleryFrameStyle: updated.frameStyle,
+                  galleryKenBurnsOverlayTheme: updated.kenBurnsOverlayTheme,
+                  galleryOverlayTitleColor: updated.overlayTitleColor,
+                  galleryOverlayTextColor: updated.overlayTextColor,
                   galleryItems: updated.items,
                 });
                 setActiveGalleryModal((prev) =>
@@ -1908,6 +1923,9 @@ function SortableSection({
                         autoplayTimer: updated.autoplayTimer,
                         aspectRatio: updated.aspectRatio,
                         frameStyle: updated.frameStyle,
+                        kenBurnsOverlayTheme: updated.kenBurnsOverlayTheme,
+                        overlayTitleColor: updated.overlayTitleColor,
+                        overlayTextColor: updated.overlayTextColor,
                         items: updated.items,
                       }
                     : null
