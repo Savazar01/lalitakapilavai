@@ -18,6 +18,46 @@ export interface ArtworkPlateSettings {
 
 export type { CatalogPageSize, CatalogOrientation, CatalogGeometry } from "@/lib/catalog-geometry";
 
+export type EditorialPageMode = "SINGLE_PLATE" | "WYSIWYG" | "MATRIX";
+
+export interface SpineDecoratorSlot {
+  imageUrl?: string;
+  patternId?: string;
+  imageMode?: "repeat-pattern" | "contain-center" | "cover";
+  opacity?: number;
+  text?: string;
+  textColor?: string;
+  bgColor?: string;
+  widthPx?: number;
+  heightPx?: number;
+  visible?: boolean;
+}
+
+export interface UniversalPageConfig {
+  mode: EditorialPageMode;
+  singlePlateConfig?: {
+    primaryImageUrl?: string;
+    presentation: "contained" | "full-bleed";
+    mattingBgColor?: string;
+    outerBorderColor?: string;
+    innerBorderColor?: string;
+    borderWidth?: number;
+    headerSlot?: SpineDecoratorSlot;
+    footerSlot?: SpineDecoratorSlot;
+    leftSpineSlot?: SpineDecoratorSlot;
+    rightSpineSlot?: SpineDecoratorSlot;
+  };
+  wysiwygContent?: unknown;
+  matrixConfig?: unknown;
+  borderConfig?: {
+    outerColor?: string;
+    innerColor?: string;
+    thicknessPx?: number;
+    mattingBgColor?: string;
+    syncGlobal?: boolean;
+  };
+}
+
 export interface CoverFramingConfig {
   coverMattingColor?: string; // e.g. "transparent" or hex code
   innerBorderColor?: string;  // e.g. "#D4AF37"

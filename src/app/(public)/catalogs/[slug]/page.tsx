@@ -7,7 +7,11 @@ import { Footer } from "@/components/public/footer";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
 import { CatalogPrintButton } from "@/components/public/catalog-print-button";
 import { cn } from "@/lib/utils";
-import { ECatalogThemeTokens, DEFAULT_CATALOG_THEME_TOKENS } from "@/types/catalog";
+import {
+  ECatalogThemeTokens,
+  DEFAULT_CATALOG_THEME_TOKENS,
+  type SpineDecoratorSlot,
+} from "@/types/catalog";
 import { getPatternById } from "@/lib/background-patterns";
 import {
   BookOpen,
@@ -71,6 +75,210 @@ function getMagazineGridClass(layoutType?: string | null, fallbackLayout?: strin
     default:
       return "grid grid-cols-1 md:grid-cols-2 gap-8 magazine-grid-2col";
   }
+}
+
+function SpineDecoratorSlotView({
+  slot,
+  position,
+}: {
+  slot?: SpineDecoratorSlot | null;
+  position: "top" | "bottom" | "left" | "right";
+}) {
+  if (!slot || slot.visible === false) return null;
+  if (!slot.text?.trim() && !slot.imageUrl?.trim()) return null;
+
+  const isVertical = position === "left" || position === "right";
+  const isRepeat =
+    slot.imageMode === "repeat-pattern" ||
+    (!slot.imageMode && (Boolean(slot.patternId) || slot.imageUrl?.startsWith("data:image/svg+xml")));
+
+  return (
+    <div
+      className={cn(
+        "z-20 relative flex items-center justify-center shrink-0 transition-all font-mono overflow-hidden",
+        isVertical
+          ? "h-full py-4 px-2 [writing-mode:vertical-rl] select-none text-center"
+          : "w-full px-6 py-2 select-none text-center",
+        position === "left" ? "rotate-180 border-r border-primary/20" : "",
+        position === "right" ? "border-l border-primary/20" : "",
+        position === "top" ? "border-b border-primary/20" : "",
+        position === "bottom" ? "border-t border-primary/20" : ""
+      )}
+      style={{
+        backgroundColor: slot.bgColor || "transparent",
+        color: slot.textColor || "#D4AF37",
+        height: isVertical ? undefined : slot.heightPx ? `${slot.heightPx}px` : undefined,
+        width: isVertical && slot.widthPx ? `${slot.widthPx}px` : undefined,
+        fontSize: "11px",
+        letterSpacing: "0.15em",
+        textTransform: "uppercase",
+      }}
+    >
+      {/* Decorative Ribbon Pattern Background Layer */}
+      {slot.imageUrl && isRepeat && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: `url("${slot.imageUrl}")`,
+            backgroundRepeat: isVertical ? "repeat-y" : "repeat-x",
+            backgroundPosition: "center center",
+            opacity: typeof slot.opacity === "number" ? slot.opacity : 1.0,
+          }}
+        />
+      )}
+
+      {/* Contained Ornamental Crest / Image */}
+      {slot.imageUrl && !isRepeat && (
+        <img
+          src={slot.imageUrl}
+          alt={slot.text || "Spine Ornament"}
+          className={cn(
+            "object-contain max-h-full inline-block relative z-10",
+            isVertical ? "max-w-[28px]" : "max-h-[28px]"
+          )}
+          style={{ opacity: typeof slot.opacity === "number" ? slot.opacity : 1.0 }}
+        />
+      )}
+
+      {/* Text with backdrop contrast pill if ribbon pattern is present */}
+      {slot.text ? (
+        <span
+          className={cn(
+            "relative z-10 font-bold",
+            slot.imageUrl && isRepeat
+              ? "px-2.5 py-0.5 rounded bg-black/60 backdrop-blur-xs shadow-xs"
+              : ""
+          )}
+        >
+          {slot.text}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+function CatalogSinglePlateView({
+  primaryImageUrl,
+  presentation = "contained",
+  mattingBgColor,
+  outerMattingColor,
+  focalPosition = "center center",
+  headerSlot,
+  footerSlot,
+  leftSpineSlot,
+  rightSpineSlot,
+  frameClass,
+  aspectRatio,
+  children,
+  innerBorderColor,
+  mattingPadding = 24,
+  backgroundLayer,
+  imageMaxHeightClass = "max-h-[44vh] print:max-h-[50vh]",
+}: {
+  primaryImageUrl?: string;
+  presentation?: "contained" | "full-bleed";
+  mattingBgColor?: string;
+  outerMattingColor?: string;
+  focalPosition?: string;
+  headerSlot?: SpineDecoratorSlot;
+  footerSlot?: SpineDecoratorSlot;
+  leftSpineSlot?: SpineDecoratorSlot;
+  rightSpineSlot?: SpineDecoratorSlot;
+  frameClass?: string;
+  aspectRatio: number;
+  children?: React.ReactNode;
+  innerBorderColor?: string;
+  mattingPadding?: number;
+  backgroundLayer?: React.ReactNode;
+  imageMaxHeightClass?: string;
+}) {
+  const isFullBleed = presentation === "full-bleed";
+
+  if (isFullBleed && primaryImageUrl) {
+    return (
+      <div
+        className="catalog-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none min-h-[640px] text-white"
+        style={{ aspectRatio: `${aspectRatio}` }}
+      >
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <ProtectedImage
+            useImg={true}
+            src={primaryImageUrl}
+            alt="Masterwork Plate"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: focalPosition || "center center" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/65 pointer-events-none" />
+        </div>
+
+        {headerSlot && <SpineDecoratorSlotView slot={headerSlot} position="top" />}
+
+        <div className="flex-1 flex flex-row items-stretch relative z-10 w-full overflow-hidden">
+          {leftSpineSlot && <SpineDecoratorSlotView slot={leftSpineSlot} position="left" />}
+
+          <div className={cn("flex-1 flex flex-col justify-between p-6 sm:p-10", frameClass)}>
+            {children}
+          </div>
+
+          {rightSpineSlot && <SpineDecoratorSlotView slot={rightSpineSlot} position="right" />}
+        </div>
+
+        {footerSlot && <SpineDecoratorSlotView slot={footerSlot} position="bottom" />}
+      </div>
+    );
+  }
+
+  // Contained with Matting & Spines
+  return (
+    <div
+      className="catalog-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none"
+      style={{
+        aspectRatio: `${aspectRatio}`,
+        backgroundColor: (mattingPadding > 0 && outerMattingColor) ? outerMattingColor : (mattingBgColor || "var(--cat-canvas-bg)"),
+        padding: `${mattingPadding}px`,
+      }}
+    >
+      {backgroundLayer}
+      <div
+        className={cn(
+          "relative z-10 flex flex-col justify-between h-full w-full rounded-2xl overflow-hidden transition-colors border",
+          frameClass
+        )}
+        style={{
+          backgroundColor: mattingBgColor || "var(--cat-canvas-bg)",
+          ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
+        }}
+      >
+        {headerSlot && <SpineDecoratorSlotView slot={headerSlot} position="top" />}
+
+        <div className="flex-1 flex flex-row items-stretch overflow-hidden w-full">
+          {leftSpineSlot && <SpineDecoratorSlotView slot={leftSpineSlot} position="left" />}
+
+          <div className="flex-1 flex flex-col justify-between p-4 sm:p-8 overflow-y-auto w-full">
+            {children}
+
+            {primaryImageUrl && (
+              <div className="plate-image-container py-3 flex-1 flex items-center justify-center">
+                <div className={cn("rounded-xl overflow-hidden border border-primary/30 shadow-2xl", imageMaxHeightClass)}>
+                  <ProtectedImage
+                    useImg={true}
+                    src={primaryImageUrl}
+                    alt="Masterwork Plate"
+                    className={cn("w-full h-auto object-contain mx-auto", imageMaxHeightClass)}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {rightSpineSlot && <SpineDecoratorSlotView slot={rightSpineSlot} position="right" />}
+        </div>
+
+        {footerSlot && <SpineDecoratorSlotView slot={footerSlot} position="bottom" />}
+      </div>
+    </div>
+  );
 }
 
 function CatalogBackgroundLayer({
@@ -341,10 +549,52 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const pageSize = ((catalog as unknown as { pageSize?: string }).pageSize as CatalogPageSize) || "A4";
   const geometry = getCatalogDimensions(pageSize, orientation);
 
-  // Cover framing and matting config
-  const coverMattingColor = (coverConfig.coverMattingColor as string) || undefined;
-  const innerBorderColor = (coverConfig.innerBorderColor as string) || undefined;
-  const mattingPadding = typeof coverConfig.mattingPadding === "number" ? coverConfig.mattingPadding : 24; // 0 for full bleed
+  // Dedicated Cover Canvas Background Color (Primary source of truth for Cover)
+  const activeCoverCanvasBg =
+    (coverConfig.coverBgColor as string) ||
+    (coverConfig.mattingBgColor as string) ||
+    ((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.mattingBgColor as string) ||
+    (coverConfig.backgroundColor as string) ||
+    (themeConfig.backgroundColor as string) ||
+    "#FAF7F2";
+
+  // Dedicated Cover Matting Padding (0px eliminates outer matting for full edge-to-edge frame)
+  const coverMattingPadding =
+    typeof coverConfig.mattingPadding === "number"
+      ? coverConfig.mattingPadding
+      : (typeof (coverConfig.borderConfig as Record<string, unknown> | undefined)?.thicknessPx === "number"
+      ? ((coverConfig.borderConfig as Record<string, unknown>).thicknessPx as number)
+      : 24);
+
+  // Dedicated Outer Matting / Border Color
+  const coverOuterBorderColor =
+    (coverConfig.coverMattingColor as string) ||
+    ((coverConfig.borderConfig as Record<string, unknown> | undefined)?.outerColor as string) ||
+    (themeConfig.backgroundColor as string) ||
+    "#1C1814";
+
+  // Dedicated Inner Border Fillet
+  const coverInnerBorderColor =
+    (coverConfig.innerBorderColor as string) ||
+    ((coverConfig.borderConfig as Record<string, unknown> | undefined)?.innerColor as string) ||
+    "#D4AF37";
+
+  // Universal Framing Synchronization across all pages
+  const coverBorderConfig = (coverConfig.borderConfig as Record<string, unknown> | undefined) || {};
+  const isUniversalSync = Boolean(coverBorderConfig.syncGlobal ?? coverConfig.syncGlobal);
+  const universalOuterBorder = isUniversalSync ? coverOuterBorderColor : undefined;
+  const universalInnerBorder = isUniversalSync ? coverInnerBorderColor : undefined;
+  const universalThickness = isUniversalSync ? coverMattingPadding : undefined;
+  const universalMattingBgColor = isUniversalSync ? activeCoverCanvasBg : undefined;
+
+  // Curatorial Section Configuration & Multi-Mode Parity
+  const curatorialConfig = ((catalog.curatorialConfig || catalog.essayConfig) as Record<string, unknown> | null) || {};
+  const curatorialSinglePlateConfig = (curatorialConfig.singlePlateConfig as Record<string, unknown> | undefined) || {};
+  const essayMode = (curatorialConfig.mode as string) || (curatorialConfig.useMatrixLayout ? "MATRIX" : curatorialSinglePlateConfig.primaryImageUrl ? "SINGLE_PLATE" : "WYSIWYG");
+
+  // End Page Configuration & Multi-Mode Parity
+  const endSinglePlateConfig = (endPageConfig.singlePlateConfig as Record<string, unknown> | undefined) || {};
+  const endMode = (endPageConfig.mode as string) || (endPageConfig.useMatrixLayout ? "MATRIX" : endSinglePlateConfig.primaryImageUrl ? "SINGLE_PLATE" : "WYSIWYG");
 
   return (
     <div
@@ -437,7 +687,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 verticalSpineWidth={mc.verticalSpineWidth as string | undefined}
                 segments={matrixSegments}
                 frameClass={coverFrameClass}
-                backgroundColor={coverBgColor}
+                backgroundColor={activeCoverCanvasBg}
                 backgroundLayer={
                   <CatalogBackgroundLayer
                     bgType={coverBgType}
@@ -466,8 +716,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             style={{
               ...coverScope.wrapperStyle,
               aspectRatio: `${geometry.ratio}`,
-              backgroundColor: (mattingPadding > 0 && coverMattingColor) ? coverMattingColor : (coverBgColor || "var(--cat-canvas-bg)"),
-              padding: `${mattingPadding}px`,
+              backgroundColor: (coverMattingPadding > 0 && coverOuterBorderColor) ? coverOuterBorderColor : activeCoverCanvasBg,
+              padding: `${coverMattingPadding}px`,
             }}
           >
             <CatalogBackgroundLayer
@@ -485,8 +735,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             <div
               className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full transition-colors`}
               style={{
-                backgroundColor: coverBgColor || "var(--cat-canvas-bg)",
-                ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
+                backgroundColor: activeCoverCanvasBg,
+                ...(coverInnerBorderColor ? { borderColor: coverInnerBorderColor } : {}),
               }}
             >
               {/* Bespoke WYSIWYG Front Cover Content with container contrast scoping */}
@@ -514,216 +764,208 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               </div>
             </div>
           </section>
-        ) : (coverConfig.imagePlatePresentation === "full-bleed" && catalog.coverImageUrl) ? (
-          <section
-            className="catalog-page cover-page relative rounded-3xl overflow-hidden text-center flex flex-col justify-between print:rounded-none min-h-[640px] text-white"
-            style={{
-              aspectRatio: `${geometry.ratio}`,
-            }}
-          >
-            {/* Full Bleed Background Image */}
-            <div className="absolute inset-0 z-0 overflow-hidden">
-              <ProtectedImage
-                useImg={true}
-                src={catalog.coverImageUrl}
-                alt={catalog.title}
-                className="w-full h-full object-cover"
-                style={{ objectPosition: (coverConfig.imageFocalPosition as string) || "center center" }}
-              />
-              {/* Protective Dark Scrim Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/65 pointer-events-none" />
-            </div>
-
-            <div
-              className={`catalog-frame relative z-10 ${coverFrameClass} m-4 sm:m-8 p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full border-white/20`}
-            >
-              {/* Header / Subtitle */}
-              <div className="space-y-4 pt-4">
-                {!coverConfig.hideCoverEyebrow && (
-                  <div
-                    className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-1.5 rounded-full border border-amber-300/40 bg-black/40 text-amber-200 backdrop-blur-md shadow-lg"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    {coverEyebrowText}
-                  </div>
-                )}
-
-                <h1
-                  className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-lg text-white"
-                  style={{
-                    fontFamily: (coverConfig.titleFont as string) || "var(--font-cinzel), serif",
-                  }}
-                >
-                  {catalog.title}
-                </h1>
-
-                {catalog.subtitle && (
-                  <p
-                    className="text-sm sm:text-base italic max-w-xl mx-auto font-medium text-amber-100/90 drop-shadow-md"
-                    style={{
-                      fontFamily: (coverConfig.subtitleFont as string) || "var(--font-cinzel), serif",
-                    }}
-                  >
-                    {catalog.subtitle}
-                  </p>
-                )}
-
-                {catalog.forewordBy && (
-                  <div className="pt-2 text-xs uppercase tracking-widest font-mono text-white/80">
-                    Curated by{" "}
-                    <span className="font-bold text-amber-300">
-                      {catalog.forewordBy}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Visual Spacer */}
-              <div className="flex-1" />
-
-              {/* Footer Notice */}
-              <div className="pt-4 border-t border-white/20 space-y-1">
-                {catalog.event && (
-                  <div className="inline-flex items-center gap-2 text-xs text-white/80 font-mono">
-                    <Calendar className="w-3 h-3 text-amber-300" />
-                    <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
-                  </div>
-                )}
-                {!coverConfig.hideCoverFooter && (
-                  <p className="text-[11px] font-mono text-white/70">
-                    {coverFooterNote}
-                  </p>
-                )}
-              </div>
-            </div>
-          </section>
         ) : (
-          <section
-            className={cn(
-              "catalog-page cover-page relative rounded-3xl overflow-hidden text-center flex flex-col justify-between print:rounded-none",
-              coverScope.wrapperClass
-            )}
-            style={{
-              ...coverScope.wrapperStyle,
-              aspectRatio: `${geometry.ratio}`,
-              backgroundColor: (mattingPadding > 0 && coverMattingColor) ? coverMattingColor : (coverBgColor || "var(--cat-canvas-bg)"),
-              padding: `${mattingPadding}px`,
-            }}
+          <CatalogSinglePlateView
+            primaryImageUrl={catalog.coverImageUrl || undefined}
+            presentation={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.presentation as "contained" | "full-bleed") || coverConfig.imagePlatePresentation || "contained"}
+            mattingBgColor={activeCoverCanvasBg}
+            outerMattingColor={coverOuterBorderColor}
+            focalPosition={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.focalPosition as string) || (coverConfig.imageFocalPosition as string)}
+            headerSlot={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.headerSlot as SpineDecoratorSlot) || (coverConfig.headerSlot as SpineDecoratorSlot)}
+            footerSlot={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.footerSlot as SpineDecoratorSlot) || (coverConfig.footerSlot as SpineDecoratorSlot)}
+            leftSpineSlot={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.leftSpineSlot as SpineDecoratorSlot) || (coverConfig.leftSpineSlot as SpineDecoratorSlot)}
+            rightSpineSlot={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.rightSpineSlot as SpineDecoratorSlot) || (coverConfig.rightSpineSlot as SpineDecoratorSlot)}
+            frameClass={coverFrameClass}
+            aspectRatio={geometry.ratio}
+            innerBorderColor={coverInnerBorderColor}
+            mattingPadding={coverMattingPadding}
+            backgroundLayer={
+              <CatalogBackgroundLayer
+                bgType={coverBgType}
+                patternId={coverBgPattern}
+                patternOpacity={coverPatternOpacity}
+                bgImage={coverBgImage}
+                overlayOpacity={coverOverlayOpacity}
+                fallbackBgMode={bgMode}
+                fallbackPattern={pattern}
+                fallbackPatternOpacity={patternOpacity}
+                fallbackBgImage={bgImage}
+                fallbackOverlayOpacity={overlayOpacity}
+              />
+            }
           >
-            <CatalogBackgroundLayer
-              bgType={coverBgType}
-              patternId={coverBgPattern}
-              patternOpacity={coverPatternOpacity}
-              bgImage={coverBgImage}
-              overlayOpacity={coverOverlayOpacity}
-              fallbackBgMode={bgMode}
-              fallbackPattern={pattern}
-              fallbackPatternOpacity={patternOpacity}
-              fallbackBgImage={bgImage}
-              fallbackOverlayOpacity={overlayOpacity}
-            />
-            <div
-              className={`catalog-frame relative z-10 ${coverFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full transition-colors`}
-              style={{
-                backgroundColor: coverBgColor || "var(--cat-canvas-bg)",
-                ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
-              }}
-            >
-              {/* Header / Subtitle */}
-              <div className="space-y-4 pt-2">
-                {!coverConfig.hideCoverEyebrow && (
-                  <div
-                    className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-xs"
-                    style={{
-                      color: resolvedEyebrowColor,
-                      borderColor: (coverConfig.innerBorderColor as string) || resolvedEyebrowColor || "#D4AF37",
-                      backgroundColor: `${resolvedEyebrowColor}15`,
-                    }}
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    {coverEyebrowText}
-                  </div>
-                )}
-
-                <h1
-                  className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-xs"
+            {/* Header / Subtitle */}
+            <div className="space-y-4 pt-2 text-center">
+              {!coverConfig.hideCoverEyebrow && (
+                <div
+                  className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-xs mx-auto"
                   style={{
-                    color: resolvedTitleColor,
-                    fontFamily: (coverConfig.titleFont as string) || "var(--font-cinzel), serif",
+                    color: resolvedEyebrowColor,
+                    borderColor: (coverConfig.innerBorderColor as string) || resolvedEyebrowColor || "#D4AF37",
+                    backgroundColor: `${resolvedEyebrowColor}15`,
                   }}
                 >
-                  {catalog.title}
-                </h1>
-
-                {catalog.subtitle && (
-                  <p
-                    className="text-sm sm:text-base italic max-w-xl mx-auto font-medium"
-                    style={{
-                      color: resolvedSubtitleColor,
-                      fontFamily: (coverConfig.subtitleFont as string) || "var(--font-cinzel), serif",
-                    }}
-                  >
-                    {catalog.subtitle}
-                  </p>
-                )}
-
-                {catalog.forewordBy && (
-                  <div
-                    className="pt-2 text-xs uppercase tracking-widest font-mono"
-                    style={{ color: resolvedSubtitleColor }}
-                  >
-                    Curated by{" "}
-                    <span
-                      className="font-bold"
-                      style={{ color: resolvedEyebrowColor }}
-                    >
-                      {catalog.forewordBy}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Visual Cover Plate */}
-              {catalog.coverImageUrl && (
-                <div className="plate-image-container py-4 flex-1 flex items-center justify-center">
-                  <div className="rounded-xl overflow-hidden border border-primary/30 shadow-2xl max-h-[44vh] print:max-h-[50vh]">
-                    <ProtectedImage
-                      useImg={true}
-                      src={catalog.coverImageUrl}
-                      alt={catalog.title}
-                      className="w-full h-auto object-contain max-h-[44vh] print:max-h-[50vh] mx-auto"
-                    />
-                  </div>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {coverEyebrowText}
                 </div>
               )}
 
-              {/* Footer Notice */}
-              <div className="pt-4 border-t border-primary/20 space-y-1">
-                {catalog.event && (
-                  <div className="inline-flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                    <Calendar className="w-3 h-3 text-primary" />
-                    <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
-                  </div>
-                )}
-                {!coverConfig.hideCoverFooter && (
-                  <p className="text-[11px] font-mono text-muted-foreground/70">
-                    {coverFooterNote}
-                  </p>
-                )}
-              </div>
+              <h1
+                className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight max-w-3xl mx-auto drop-shadow-xs"
+                style={{
+                  color: resolvedTitleColor,
+                  fontFamily: (coverConfig.titleFont as string) || "var(--font-cinzel), serif",
+                }}
+              >
+                {catalog.title}
+              </h1>
+
+              {catalog.subtitle && (
+                <p
+                  className="text-sm sm:text-base italic max-w-xl mx-auto font-medium"
+                  style={{
+                    color: resolvedSubtitleColor,
+                    fontFamily: (coverConfig.subtitleFont as string) || "var(--font-cinzel), serif",
+                  }}
+                >
+                  {catalog.subtitle}
+                </p>
+              )}
+
+              {catalog.forewordBy && (
+                <div
+                  className="pt-2 text-xs uppercase tracking-widest font-mono"
+                  style={{ color: resolvedSubtitleColor }}
+                >
+                  Curated by{" "}
+                  <span
+                    className="font-bold"
+                    style={{ color: resolvedEyebrowColor }}
+                  >
+                    {catalog.forewordBy}
+                  </span>
+                </div>
+              )}
             </div>
-          </section>
+
+            {/* Footer Notice */}
+            <div className="pt-4 border-t border-primary/20 space-y-1 text-center mt-auto">
+              {catalog.event && (
+                <div className="inline-flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                  <Calendar className="w-3 h-3 text-primary" />
+                  <span>Official Monograph of {catalog.event.title} • {catalog.event.venue}</span>
+                </div>
+              )}
+              {!coverConfig.hideCoverFooter && (
+                <p className="text-[11px] font-mono text-muted-foreground/70">
+                  {coverFooterNote}
+                </p>
+              )}
+            </div>
+          </CatalogSinglePlateView>
         )}
 
         {/* ------------------------------------------------------------------ */}
-        {/* PAGE 2: CURATORIAL ESSAY (If Present, Strict Single Page on Print) */}
+        {/* PAGE 2: CURATORIAL FOREWORD & ESSAY (Multi-Mode Parity)            */}
         {/* ------------------------------------------------------------------ */}
-        {catalog.curatorialEssay && (
+        {essayMode === "MATRIX" && curatorialConfig.matrixConfig ? (
+          (() => {
+            const mc = curatorialConfig.matrixConfig as Record<string, unknown>;
+            const matrixSegments = Array.isArray(mc.segments)
+              ? (mc.segments as unknown as { id: string; row: number; col: number; rowSpan?: number; colSpan?: number; title?: string; contentHtml: string }[])
+              : [];
+            return (
+              <CatalogMatrixPage
+                pageNumber="2"
+                pageTitle={essayTitle}
+                pageSubtitle={catalog.title}
+                matrixRows={(mc.matrixRows as number) || 2}
+                matrixCols={(mc.matrixCols as number) || 2}
+                rowHeights={mc.rowHeights as string | undefined}
+                colWidths={mc.colWidths as string | undefined}
+                hasHeader={Boolean(mc.hasHeader)}
+                headerHtml={mc.headerHtml as string | undefined}
+                hasFooter={Boolean(mc.hasFooter)}
+                footerHtml={mc.footerHtml as string | undefined}
+                verticalSpineMode={(mc.verticalSpineMode as string) || "NONE"}
+                verticalSpineHtml={mc.verticalSpineHtml as string | undefined}
+                verticalSpineWidth={mc.verticalSpineWidth as string | undefined}
+                segments={matrixSegments}
+                frameClass={essayFrameClass}
+                backgroundColor={isUniversalSync ? universalMattingBgColor || essayBgColor : essayBgColor}
+                backgroundLayer={
+                  <CatalogBackgroundLayer
+                    bgType={essayBgType}
+                    patternId={essayBgPattern}
+                    patternOpacity={essayPatternOpacity}
+                    bgImage={essayBgImage}
+                    overlayOpacity={essayOverlayOpacity}
+                    fallbackBgMode={bgMode}
+                    fallbackPattern={pattern}
+                    fallbackPatternOpacity={patternOpacity}
+                    fallbackBgImage={bgImage}
+                    fallbackOverlayOpacity={overlayOpacity}
+                  />
+                }
+                catalogTitle={catalog.title}
+                fallbackContentHtml={catalog.curatorialEssay || (curatorialConfig.contentHtml as string)}
+                aspectRatio={geometry.ratio}
+              />
+            );
+          })()
+        ) : essayMode === "SINGLE_PLATE" && (curatorialSinglePlateConfig.primaryImageUrl || curatorialConfig.primaryImageUrl) ? (
+          <CatalogSinglePlateView
+            primaryImageUrl={(curatorialSinglePlateConfig.primaryImageUrl as string) || (curatorialConfig.primaryImageUrl as string)}
+            presentation={(curatorialSinglePlateConfig.presentation as "contained" | "full-bleed") || "contained"}
+            mattingBgColor={isUniversalSync ? universalMattingBgColor || essayBgColor : (curatorialSinglePlateConfig.mattingBgColor as string) || essayBgColor}
+            focalPosition={curatorialSinglePlateConfig.focalPosition as string}
+            headerSlot={curatorialSinglePlateConfig.headerSlot as SpineDecoratorSlot}
+            footerSlot={curatorialSinglePlateConfig.footerSlot as SpineDecoratorSlot}
+            leftSpineSlot={curatorialSinglePlateConfig.leftSpineSlot as SpineDecoratorSlot}
+            rightSpineSlot={curatorialSinglePlateConfig.rightSpineSlot as SpineDecoratorSlot}
+            frameClass={essayFrameClass}
+            aspectRatio={geometry.ratio}
+            innerBorderColor={isUniversalSync ? universalInnerBorder : (curatorialSinglePlateConfig.innerBorderColor as string)}
+            mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : 24}
+            backgroundLayer={
+              <CatalogBackgroundLayer
+                bgType={essayBgType}
+                patternId={essayBgPattern}
+                patternOpacity={essayPatternOpacity}
+                bgImage={essayBgImage}
+                overlayOpacity={essayOverlayOpacity}
+                fallbackBgMode={bgMode}
+                fallbackPattern={pattern}
+                fallbackPatternOpacity={patternOpacity}
+                fallbackBgImage={bgImage}
+                fallbackOverlayOpacity={overlayOpacity}
+              />
+            }
+          >
+            <div className="border-b border-primary/20 pb-3 flex items-center justify-between">
+              <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+                {essayTitle}
+              </span>
+              <BookOpen className="w-4 h-4 text-primary" />
+            </div>
+
+            {catalog.forewordBy && (
+              <div className="py-2 text-xs font-serif italic text-muted-foreground">
+                Foreword &amp; scholarly notes by <span className="font-semibold text-foreground">{catalog.forewordBy}</span>
+              </div>
+            )}
+
+            <div className="pt-3 border-t border-primary/20 flex items-center justify-between text-[11px] font-mono text-muted-foreground mt-auto">
+              <span>{catalog.title}</span>
+              <span>{essayFooterLabel}</span>
+            </div>
+          </CatalogSinglePlateView>
+        ) : catalog.curatorialEssay ? (
           <section
             className="catalog-page essay-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
             style={{
               aspectRatio: `${geometry.ratio}`,
-              ...(essayBgColor ? { backgroundColor: essayBgColor } : {}),
+              ...((isUniversalSync ? universalMattingBgColor || essayBgColor : essayBgColor) ? { backgroundColor: isUniversalSync ? universalMattingBgColor || essayBgColor : essayBgColor } : {}),
             }}
           >
             <CatalogBackgroundLayer
@@ -738,7 +980,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               fallbackBgImage={bgImage}
               fallbackOverlayOpacity={overlayOpacity}
             />
-            <div className={`catalog-frame relative z-10 ${essayFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+            <div
+              className={`catalog-frame relative z-10 ${essayFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+              style={isUniversalSync && universalInnerBorder ? { borderColor: universalInnerBorder } : undefined}
+            >
               <div className="border-b border-primary/20 pb-3 flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
                   {essayTitle}
@@ -760,12 +1005,15 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               </div>
             </div>
           </section>
-        )}
+        ) : null}
 
         {/* ------------------------------------------------------------------ */}
         {/* EDITORIAL & MAGAZINE PAGES: (Multi-Segment Layouts & Per-Page BG)  */}
         {/* ------------------------------------------------------------------ */}
         {catalog.customPages && catalog.customPages.map((page, pIdx) => {
+          const pageCustomConfig = (page.pageConfig as Record<string, unknown> | null) || {};
+          const pageSinglePlate = (pageCustomConfig.singlePlateConfig as Record<string, unknown> | undefined) || ((page as unknown as { singlePlateConfig?: Record<string, unknown> }).singlePlateConfig);
+          const effectivePageMode = (pageCustomConfig.mode as string) || (page as unknown as { mode?: string }).mode || (page.layoutType === "MATRIX" ? "MATRIX" : pageSinglePlate?.primaryImageUrl ? "SINGLE_PLATE" : "WYSIWYG");
           const pageFrameClass = getFrameClass(page.frameStyle || frameStyle);
 
           const bgLayerNode = (
@@ -783,8 +1031,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             />
           );
 
-          // InDesign Matrix Grid Engine Page
-          if (page.layoutType === "MATRIX") {
+          // Mode C: InDesign Matrix Grid Engine Page
+          if (effectivePageMode === "MATRIX") {
             const matrixSegments = Array.isArray(page.segments)
               ? (page.segments as unknown as { id: string; row: number; col: number; rowSpan?: number; colSpan?: number; title?: string; contentHtml: string }[])
               : [];
@@ -808,7 +1056,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 verticalSpineWidth={page.verticalSpineWidth}
                 segments={matrixSegments}
                 frameClass={pageFrameClass}
-                backgroundColor={page.backgroundColor}
+                backgroundColor={(isUniversalSync ? universalMattingBgColor || page.backgroundColor : page.backgroundColor) ?? undefined}
                 backgroundLayer={bgLayerNode}
                 catalogTitle={catalog.title}
                 fallbackContentHtml={page.contentHtml}
@@ -817,13 +1065,63 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             );
           }
 
+          // Mode A: Single Image Plate with Spine Embellishments
+          if (effectivePageMode === "SINGLE_PLATE" && pageSinglePlate?.primaryImageUrl) {
+            return (
+              <CatalogSinglePlateView
+                key={page.id}
+                primaryImageUrl={pageSinglePlate.primaryImageUrl as string}
+                presentation={(pageSinglePlate.presentation as "contained" | "full-bleed") || "contained"}
+                mattingBgColor={(isUniversalSync ? universalMattingBgColor || page.backgroundColor : (pageSinglePlate.mattingBgColor as string) || page.backgroundColor) ?? undefined}
+                focalPosition={pageSinglePlate.focalPosition as string}
+                headerSlot={pageSinglePlate.headerSlot as SpineDecoratorSlot}
+                footerSlot={pageSinglePlate.footerSlot as SpineDecoratorSlot}
+                leftSpineSlot={pageSinglePlate.leftSpineSlot as SpineDecoratorSlot}
+                rightSpineSlot={pageSinglePlate.rightSpineSlot as SpineDecoratorSlot}
+                frameClass={pageFrameClass}
+                aspectRatio={geometry.ratio}
+                innerBorderColor={isUniversalSync ? universalInnerBorder : (pageSinglePlate.innerBorderColor as string)}
+                mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : 24}
+                backgroundLayer={bgLayerNode}
+              >
+                {(page.title || page.subtitle) && (
+                  <div className="border-b border-primary/20 pb-3 mb-2">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+                        Editorial Monograph • Page {page.pageNumber || pIdx + 1}
+                      </span>
+                      <BookOpen className="w-4 h-4 text-primary shrink-0" />
+                    </div>
+                    {page.title && (
+                      <h2 className="text-xl sm:text-2xl font-serif font-bold leading-tight">
+                        {page.title}
+                      </h2>
+                    )}
+                    {page.subtitle && (
+                      <p className="text-xs font-serif italic text-muted-foreground mt-0.5">
+                        {page.subtitle}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div className="pt-3 border-t border-primary/20 flex items-center justify-between text-[11px] font-mono text-muted-foreground mt-auto">
+                  <span>{catalog.title} • Atelier Monograph</span>
+                  <span>Page {page.pageNumber || pIdx + 1}</span>
+                </div>
+              </CatalogSinglePlateView>
+            );
+          }
+
+          // Mode B: Multi-Segment Column Studio
           const gridClass = getMagazineGridClass(page.layoutType, page.pageLayout);
           const segments = Array.isArray(page.segments)
             ? (page.segments as unknown as { id: string; colSpan: number; contentHtml: string }[])
             : [];
+          const resolvedPageBg = (isUniversalSync ? universalMattingBgColor || page.backgroundColor : page.backgroundColor) ?? undefined;
           const pageScope = resolveContainerThemeScope({
-            backgroundColor: page.backgroundColor,
-            backgroundMode: page.backgroundColor ? "color" : "none",
+            backgroundColor: resolvedPageBg,
+            backgroundMode: resolvedPageBg ? "color" : "none",
           });
           const pageTypographyClasses = getContrastTypographyClasses(pageScope.contrastMode);
 
@@ -838,11 +1136,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               style={{
                 ...pageScope.wrapperStyle,
                 aspectRatio: `${geometry.ratio}`,
-                ...(page.backgroundColor ? { backgroundColor: page.backgroundColor } : {}),
+                ...(resolvedPageBg ? { backgroundColor: resolvedPageBg } : {}),
               }}
             >
               {bgLayerNode}
-              <div className={`catalog-frame relative z-10 ${pageFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}>
+              <div
+                className={`catalog-frame relative z-10 ${pageFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+                style={isUniversalSync && universalInnerBorder ? { borderColor: universalInnerBorder } : undefined}
+              >
                 {/* Editorial Page Header */}
                 {(page.title || page.subtitle) && (
                   <div className="border-b border-primary/20 pb-4 mb-4">
@@ -1215,10 +1516,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         })}
 
         {/* ------------------------------------------------------------------ */}
-        {/* FINAL PAGE: COLOPHON & ATELIER HERITAGE (When Enabled)             */}
+        {/* FINAL PAGE: COLOPHON & ATELIER HERITAGE (Multi-Mode Parity)        */}
         {/* ------------------------------------------------------------------ */}
         {endPageConfig.isEnabled !== false && (
-          endPageConfig.useMatrixLayout && endPageConfig.matrixConfig ? (
+          endMode === "MATRIX" && endPageConfig.matrixConfig ? (
             (() => {
               const mc = endPageConfig.matrixConfig as Record<string, unknown>;
               const matrixSegments = Array.isArray(mc.segments)
@@ -1242,7 +1543,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   verticalSpineWidth={mc.verticalSpineWidth as string | undefined}
                   segments={matrixSegments}
                   frameClass={endFrameClass}
-                  backgroundColor={endBgColor}
+                  backgroundColor={isUniversalSync ? universalMattingBgColor || endBgColor : endBgColor}
                   backgroundLayer={
                     <CatalogBackgroundLayer
                       bgType={endBgType}
@@ -1263,9 +1564,76 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 />
               );
             })()
+          ) : endMode === "SINGLE_PLATE" && (endSinglePlateConfig.primaryImageUrl || (endPageConfig.primaryImageUrl as string)) ? (
+            <CatalogSinglePlateView
+              primaryImageUrl={(endSinglePlateConfig.primaryImageUrl as string) || (endPageConfig.primaryImageUrl as string)}
+              presentation={(endSinglePlateConfig.presentation as "contained" | "full-bleed") || "contained"}
+              mattingBgColor={isUniversalSync ? universalMattingBgColor || endBgColor : (endSinglePlateConfig.mattingBgColor as string) || endBgColor}
+              focalPosition={endSinglePlateConfig.focalPosition as string}
+              headerSlot={endSinglePlateConfig.headerSlot as SpineDecoratorSlot}
+              footerSlot={endSinglePlateConfig.footerSlot as SpineDecoratorSlot}
+              leftSpineSlot={endSinglePlateConfig.leftSpineSlot as SpineDecoratorSlot}
+              rightSpineSlot={endSinglePlateConfig.rightSpineSlot as SpineDecoratorSlot}
+              frameClass={endFrameClass}
+              aspectRatio={geometry.ratio}
+              innerBorderColor={isUniversalSync ? universalInnerBorder : (endSinglePlateConfig.innerBorderColor as string)}
+              mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : 24}
+              backgroundLayer={
+                <CatalogBackgroundLayer
+                  bgType={endBgType}
+                  patternId={endBgPattern}
+                  patternOpacity={endPatternOpacity}
+                  bgImage={endBgImage}
+                  overlayOpacity={endOverlayOpacity}
+                  fallbackBgMode={bgMode}
+                  fallbackPattern={pattern}
+                  fallbackPatternOpacity={patternOpacity}
+                  fallbackBgImage={bgImage}
+                  fallbackOverlayOpacity={overlayOpacity}
+                />
+              }
+            >
+              <div className="space-y-3 pt-4 text-center">
+                <span
+                  className="text-xs font-mono uppercase tracking-widest font-bold"
+                  style={{ color: (coverConfig.eyebrowColor as string) || "#B45309" }}
+                >
+                  {colophonEyebrow}
+                </span>
+                <h2
+                  className="text-2xl sm:text-3xl font-serif font-bold"
+                  style={{
+                    color:
+                      (endPageConfig.colophonTitleColor as string) ||
+                      (coverConfig.titleColor as string) ||
+                      "#0F172A",
+                  }}
+                >
+                  {colophonTitle}
+                </h2>
+              </div>
+
+              <div
+                className="pt-6 border-t border-primary/20 space-y-2 text-xs font-mono text-center mt-auto"
+                style={{
+                  color:
+                    (endPageConfig.colophonTextColor as string) ||
+                    (coverConfig.subtitleColor as string) ||
+                    "#334155",
+                }}
+              >
+                <p>
+                  {(endPageConfig.contactDetails as string) ||
+                    "Atelier of Lalita Kapilavai • contact@lalitakapilavai.com • All rights reserved."}
+                </p>
+                <p className="text-[10px] opacity-75">
+                  {colophonLegalNotice}
+                </p>
+              </div>
+            </CatalogSinglePlateView>
           ) : (() => {
             const endScope = resolveContainerThemeScope({
-              backgroundColor: endBgColor,
+              backgroundColor: isUniversalSync ? universalMattingBgColor || endBgColor : endBgColor,
               backgroundImage: endBgImage,
               backgroundType: endBgType,
               overlayOpacity: endOverlayOpacity,
@@ -1279,7 +1647,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 )}
                 style={{
                   aspectRatio: `${geometry.ratio}`,
-                  ...(endBgColor ? { backgroundColor: endBgColor } : {}),
+                  ...((isUniversalSync ? universalMattingBgColor || endBgColor : endBgColor) ? { backgroundColor: isUniversalSync ? universalMattingBgColor || endBgColor : endBgColor } : {}),
                   ...endScope.wrapperStyle,
                 }}
               >
@@ -1295,7 +1663,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   fallbackBgImage={bgImage}
                   fallbackOverlayOpacity={overlayOpacity}
                 />
-                <div className={`catalog-frame relative z-10 ${endFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}>
+                <div
+                  className={`catalog-frame relative z-10 ${endFrameClass} p-6 sm:p-10 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs text-center space-y-6`}
+                  style={isUniversalSync && universalInnerBorder ? { borderColor: universalInnerBorder } : undefined}
+                >
                   <div className="space-y-3 pt-4">
                     <span
                       className="text-xs font-mono uppercase tracking-widest font-bold"

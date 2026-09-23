@@ -597,6 +597,8 @@ model ECatalog {
   coverConfig        Json?
   // { title, contentHtml, backgroundImage, backgroundColor, frameStyle }
   essayConfig        Json?
+  curatorialConfig   Json?
+  magazineConfig     Json?
   // { isEnabled: boolean, title, contentHtml, backgroundImage, backgroundColor, frameStyle, contactDetails }
   endPageConfig      Json?
 
@@ -662,6 +664,9 @@ model ECatalogCustomPage {
   backgroundImage   String?
   overlayOpacity    Float?    @default(0.2)
   frameStyle        String?   @default("gold-fillet")
+
+  // Unified Page Config (Single Plate, WYSIWYG, Matrix, Framing)
+  pageConfig        Json?
 
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt

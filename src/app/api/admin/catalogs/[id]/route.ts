@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { headers } from "next/headers";
@@ -90,6 +91,8 @@ export async function PUT(
       themeConfig,
       coverConfig,
       essayConfig,
+      curatorialConfig,
+      magazineConfig,
       endPageConfig,
       isPublished,
       downloadablePdfUrl,
@@ -146,6 +149,8 @@ export async function PUT(
         themeConfig: themeConfig !== undefined ? themeConfig : existing.themeConfig,
         coverConfig: coverConfig !== undefined ? coverConfig : existing.coverConfig,
         essayConfig: essayConfig !== undefined ? essayConfig : existing.essayConfig,
+        curatorialConfig: curatorialConfig !== undefined ? curatorialConfig : existing.curatorialConfig,
+        magazineConfig: magazineConfig !== undefined ? magazineConfig : existing.magazineConfig,
         endPageConfig: endPageConfig !== undefined ? endPageConfig : existing.endPageConfig,
         isPublished: isPublished !== undefined ? Boolean(isPublished) : existing.isPublished,
         isActive: isActive !== undefined ? Boolean(isActive) : existing.isActive,
@@ -192,6 +197,7 @@ export async function PUT(
               backgroundImage?: string;
               overlayOpacity?: number;
               frameStyle?: string;
+              pageConfig?: unknown;
             }, idx: number) => {
               const layoutType = page.layoutType || page.pageLayout || "2_COL";
               let contentHtml = page.contentHtml || null;
@@ -230,6 +236,7 @@ export async function PUT(
                 backgroundImage: page.backgroundImage || null,
                 overlayOpacity: typeof page.overlayOpacity === "number" ? page.overlayOpacity : 0.2,
                 frameStyle: page.frameStyle || "gold-fillet",
+                pageConfig: page.pageConfig !== undefined ? (page.pageConfig as unknown as Prisma.InputJsonValue) : undefined,
               };
             }),
           });
@@ -294,6 +301,20 @@ export async function PUT(
         },
       },
     });
+
+    if (updated?.slug) {
+      try {
+        revalidatePath(`/catalogs/${updated.slug}`);
+      } catch (revErr) {
+        console.warn("[REVALIDATE_PATH_CATALOG_ERROR]:", revErr);
+      }
+    }
+    try {
+      revalidatePath("/catalogs");
+      revalidatePath("/");
+    } catch {
+      // ignore
+    }
 
     return NextResponse.json(updated);
   } catch (error: unknown) {

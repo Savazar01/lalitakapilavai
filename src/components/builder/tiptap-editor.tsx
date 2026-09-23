@@ -46,6 +46,7 @@ import {
   FolderOpen,
   Search,
   Check,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,6 +64,7 @@ import { cn } from "@/lib/utils";
 import { type ContrastMode, getContrastTypographyClasses } from "@/lib/theme-contrast";
 import { CustomDividerNode } from "@/components/builder/tiptap-divider-node";
 import { CustomShapeNode } from "@/components/builder/tiptap-shape-node";
+import { FloatingLayerNode } from "@/components/builder/tiptap-floating-layer-node";
 import { CustomImageNode } from "@/components/builder/tiptap-image-node";
 import { TextOrientationExtension, type TextOrientationType } from "@/components/builder/tiptap-text-orientation-extension";
 import { type CatalogPageSize, type CatalogOrientation } from "@/lib/catalog-geometry";
@@ -254,6 +256,7 @@ export function TiptapEditor({
       CustomImageNode,
       CustomDividerNode,
       CustomShapeNode,
+      FloatingLayerNode,
     ],
     content: parsedContent || "<p>Click to compose devotional verses or artwork narrative...</p>",
     editable: !readOnly,
@@ -1125,6 +1128,49 @@ export function TiptapEditor({
           >
             <Shapes className="w-3 h-3 text-primary" />
             Shape Block
+          </button>
+
+          {/* 5b. Freeform Draggable Z-Layer */}
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "floatingLayer",
+                  attrs: {
+                    x: 20,
+                    y: 20,
+                    width: "320px",
+                    height: "auto",
+                    zIndex: 10,
+                    isDraggable: true,
+                    opacity: 1.0,
+                    blendMode: "normal",
+                    backgroundColor: "rgba(255, 255, 255, 0.92)",
+                    borderColor: "#D4AF37",
+                    borderWidth: 1,
+                  },
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        {
+                          type: "text",
+                          text: "Floating Callout / Caption Overlay (Drag to reposition freely)",
+                        },
+                      ],
+                    },
+                  ],
+                })
+                .run()
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium border border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary transition-all cursor-pointer shadow-2xs font-semibold"
+            title="Insert Freeform Draggable Z-Index Layer"
+          >
+            <Layers className="w-3 h-3 text-primary" />
+            Floating Z-Layer
           </button>
 
           {/* 6. High-Res Image Block */}

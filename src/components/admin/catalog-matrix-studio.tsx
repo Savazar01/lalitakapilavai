@@ -102,7 +102,7 @@ interface CatalogMatrixStudioProps {
   config: CatalogMatrixConfig;
   onChange: (updated: Partial<CatalogMatrixConfig>) => void;
   pageTitle?: string;
-  pageType?: "COVER" | "MAGAZINE" | "END_PAGE";
+  pageType?: "COVER" | "MAGAZINE" | "END_PAGE" | "ESSAY";
   contrast?: ContrastMode;
   backgroundColor?: string | null;
 }

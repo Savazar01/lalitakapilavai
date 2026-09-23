@@ -32,7 +32,18 @@ import {
   Moon,
   RotateCcw,
 } from "lucide-react";
-import { ECatalogThemeTokens, DEFAULT_CATALOG_THEME_TOKENS } from "@/types/catalog";
+import {
+  ECatalogThemeTokens,
+  DEFAULT_CATALOG_THEME_TOKENS,
+  type EditorialPageMode,
+  type SpineDecoratorSlot,
+  type UniversalPageConfig,
+} from "@/types/catalog";
+import {
+  CatalogSinglePlateEditor,
+  EditorialModeSwitcher,
+  type SinglePlateConfigState,
+} from "@/components/admin/catalog-single-plate-editor";
 import {
   PAGE_SIZE_OPTIONS,
   getCatalogDimensions,
@@ -188,13 +199,28 @@ interface ECatalogThemeConfig {
 }
 
 interface ECatalogCoverConfig extends CatalogBackgroundConfig {
+  mode?: EditorialPageMode;
   showDate?: boolean;
   showCurator?: boolean;
   coverDesignMode?: "IMAGE_PLATE" | "WYSIWYG" | "MATRIX";
   contentHtml?: string;
   useMatrixLayout?: boolean;
   matrixConfig?: CatalogMatrixConfig;
+  singlePlateConfig?: SinglePlateConfigState;
+  borderConfig?: {
+    outerColor?: string;
+    innerColor?: string;
+    thicknessPx?: number;
+    mattingBgColor?: string;
+    syncGlobal?: boolean;
+  };
+  syncGlobal?: boolean;
+  headerSlot?: SpineDecoratorSlot;
+  footerSlot?: SpineDecoratorSlot;
+  leftSpineSlot?: SpineDecoratorSlot;
+  rightSpineSlot?: SpineDecoratorSlot;
   coverMattingColor?: string;
+  mattingBgColor?: string;
   innerBorderColor?: string;
   mattingPadding?: number;
   coverBgColor?: string;
@@ -214,12 +240,24 @@ interface ECatalogCoverConfig extends CatalogBackgroundConfig {
 }
 
 interface ECatalogEssayConfig extends CatalogBackgroundConfig {
+  mode?: EditorialPageMode;
   title?: string;
   footerLabel?: string;
   contentHtml?: string;
+  useMatrixLayout?: boolean;
+  matrixConfig?: CatalogMatrixConfig;
+  singlePlateConfig?: SinglePlateConfigState;
+  borderConfig?: {
+    outerColor?: string;
+    innerColor?: string;
+    thicknessPx?: number;
+    mattingBgColor?: string;
+    syncGlobal?: boolean;
+  };
 }
 
 interface ECatalogEndPageConfig extends CatalogBackgroundConfig {
+  mode?: EditorialPageMode;
   isEnabled?: boolean;
   title?: string;
   eyebrowText?: string;
@@ -228,6 +266,14 @@ interface ECatalogEndPageConfig extends CatalogBackgroundConfig {
   legalNotice?: string;
   useMatrixLayout?: boolean;
   matrixConfig?: CatalogMatrixConfig;
+  singlePlateConfig?: SinglePlateConfigState;
+  borderConfig?: {
+    outerColor?: string;
+    innerColor?: string;
+    thicknessPx?: number;
+    mattingBgColor?: string;
+    syncGlobal?: boolean;
+  };
   endPageBgColor?: string;
   colophonTitleColor?: string;
   colophonTextColor?: string;
@@ -238,9 +284,19 @@ interface ECatalogCustomPageItem extends CatalogBackgroundConfig {
   pageNumber: number;
   title: string;
   subtitle: string;
+  mode?: EditorialPageMode;
   layoutType: MagazineLayoutType;
   pageLayout?: string;
   contentHtml?: string;
+  singlePlateConfig?: SinglePlateConfigState;
+  pageConfig?: UniversalPageConfig;
+  borderConfig?: {
+    outerColor?: string;
+    innerColor?: string;
+    thicknessPx?: number;
+    mattingBgColor?: string;
+    syncGlobal?: boolean;
+  };
   segments: CustomPageSegment[];
   matrixRows?: number;
   matrixCols?: number;
@@ -420,7 +476,13 @@ export default function AdminCatalogStudioPage() {
             });
           }
           if (catData.coverConfig) setCoverConfig((prev) => ({ ...prev, ...catData.coverConfig }));
-          if (catData.essayConfig) setEssayConfig((prev) => ({ ...prev, ...catData.essayConfig }));
+          if (catData.essayConfig || catData.curatorialConfig) {
+            setEssayConfig((prev) => ({
+              ...prev,
+              ...catData.essayConfig,
+              ...catData.curatorialConfig,
+            }));
+          }
           if (catData.endPageConfig) setEndPageConfig((prev) => ({ ...prev, ...catData.endPageConfig }));
           setIsPublished(Boolean(catData.isPublished));
           setDownloadablePdfUrl(catData.downloadablePdfUrl || "");
@@ -454,9 +516,11 @@ export default function AdminCatalogStudioPage() {
               backgroundImage?: string;
               overlayOpacity?: number;
               frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
+              pageConfig?: UniversalPageConfig;
             }) => {
+              const pageCfg = cp.pageConfig as UniversalPageConfig | undefined;
               const layout = (cp.layoutType || cp.pageLayout || "2_COL") as MagazineLayoutType;
-              const isMatrix = layout === "MATRIX";
+              const isMatrix = layout === "MATRIX" || pageCfg?.mode === "MATRIX";
               const matrixRows = cp.matrixRows || 2;
               const matrixCols = cp.matrixCols || 2;
 
@@ -484,9 +548,12 @@ export default function AdminCatalogStudioPage() {
                 pageNumber: cp.pageNumber,
                 title: cp.title || "",
                 subtitle: cp.subtitle || "",
+                mode: pageCfg?.mode || (isMatrix ? "MATRIX" : pageCfg?.singlePlateConfig?.primaryImageUrl ? "SINGLE_PLATE" : "WYSIWYG"),
                 layoutType: layout,
                 pageLayout: layout,
                 contentHtml: cp.contentHtml || "",
+                singlePlateConfig: pageCfg?.singlePlateConfig,
+                borderConfig: pageCfg?.borderConfig,
                 segments,
                 matrixRows,
                 matrixCols,
@@ -559,39 +626,98 @@ export default function AdminCatalogStudioPage() {
         plateLayout,
         plateRatio,
         themeConfig,
-        coverConfig,
-        essayConfig,
-        endPageConfig,
+        coverConfig: (() => {
+          const activeCoverBg = coverConfig.coverBgColor || coverConfig.mattingBgColor || "#FAF7F2";
+          const activeCoverPadding = typeof coverConfig.mattingPadding === "number" ? coverConfig.mattingPadding : 0;
+          const activeOuterColor = coverConfig.coverMattingColor || themeConfig.backgroundColor || "#1C1814";
+          const activeInnerColor = coverConfig.innerBorderColor || "#D4AF37";
+          const isUniversalSyncActive = Boolean(coverConfig.borderConfig?.syncGlobal ?? coverConfig.syncGlobal);
+
+          return {
+            ...coverConfig,
+            coverBgColor: activeCoverBg,
+            mattingBgColor: activeCoverBg,
+            mattingPadding: activeCoverPadding,
+            coverMattingColor: activeOuterColor,
+            innerBorderColor: activeInnerColor,
+            singlePlateConfig: {
+              ...(coverConfig.singlePlateConfig || {}),
+              primaryImageUrl: coverImageUrl || undefined,
+              presentation: coverConfig.imagePlatePresentation || "contained",
+              mattingBgColor: activeCoverBg,
+              focalPosition: coverConfig.imageFocalPosition,
+              headerSlot: coverConfig.headerSlot,
+              footerSlot: coverConfig.footerSlot,
+              leftSpineSlot: coverConfig.leftSpineSlot,
+              rightSpineSlot: coverConfig.rightSpineSlot,
+            },
+            borderConfig: {
+              ...(coverConfig.borderConfig || {}),
+              syncGlobal: isUniversalSyncActive,
+              outerColor: activeOuterColor,
+              innerColor: activeInnerColor,
+              thicknessPx: activeCoverPadding,
+              mattingBgColor: activeCoverBg,
+            },
+            mode: coverConfig.mode || (coverConfig.coverDesignMode === "WYSIWYG" ? "WYSIWYG" : coverConfig.coverDesignMode === "MATRIX" || coverConfig.useMatrixLayout ? "MATRIX" : "SINGLE_PLATE"),
+          };
+        })(),
+        essayConfig: {
+          ...essayConfig,
+          contentHtml: curatorialEssay,
+          mode: essayConfig.mode || (essayConfig.useMatrixLayout ? "MATRIX" : "WYSIWYG"),
+        },
+        curatorialConfig: {
+          ...essayConfig,
+          contentHtml: curatorialEssay,
+          mode: essayConfig.mode || (essayConfig.useMatrixLayout ? "MATRIX" : "WYSIWYG"),
+        },
+        magazineConfig: {
+          customPagesCount: customPages.length,
+        },
+        endPageConfig: {
+          ...endPageConfig,
+          mode: endPageConfig.mode || (endPageConfig.useMatrixLayout ? "MATRIX" : "WYSIWYG"),
+        },
         isPublished,
         downloadablePdfUrl: downloadablePdfUrl.trim() || null,
         eventId: eventId === "none" ? null : eventId,
-        customPages: customPages.map((cp, idx) => ({
-          pageNumber: idx + 1,
-          title: cp.title.trim() || null,
-          subtitle: cp.subtitle.trim() || null,
-          layoutType: cp.layoutType || "2_COL",
-          pageLayout: cp.layoutType || "2_COL",
-          contentHtml: cp.contentHtml || null,
-          segments: cp.layoutType === "MATRIX" ? (cp.matrixSegments || cp.segments || []) : (cp.segments || []),
-          matrixRows: cp.matrixRows || 2,
-          matrixCols: cp.matrixCols || 2,
-          rowHeights: cp.rowHeights || null,
-          colWidths: cp.colWidths || null,
-          hasHeader: Boolean(cp.hasHeader),
-          headerHtml: cp.headerHtml || null,
-          hasFooter: Boolean(cp.hasFooter),
-          footerHtml: cp.footerHtml || null,
-          verticalSpineMode: cp.verticalSpineMode || "NONE",
-          verticalSpineHtml: cp.verticalSpineHtml || null,
-          verticalSpineWidth: cp.verticalSpineWidth || "25%",
-          backgroundType: cp.backgroundType || "COLOR",
-          backgroundColor: cp.backgroundColor || "#FAF7F2",
-          backgroundPattern: cp.backgroundPattern || null,
-          patternOpacity: cp.patternOpacity ?? 0.15,
-          backgroundImage: cp.backgroundImage || null,
-          overlayOpacity: cp.overlayOpacity ?? 0.2,
-          frameStyle: cp.frameStyle || "gold-fillet",
-        })),
+        customPages: customPages.map((cp, idx) => {
+          const effectiveMode = cp.mode || (cp.layoutType === "MATRIX" ? "MATRIX" : cp.singlePlateConfig?.primaryImageUrl ? "SINGLE_PLATE" : "WYSIWYG");
+          return {
+            pageNumber: idx + 1,
+            title: cp.title.trim() || null,
+            subtitle: cp.subtitle.trim() || null,
+            layoutType: effectiveMode === "MATRIX" ? "MATRIX" : cp.layoutType || "2_COL",
+            pageLayout: effectiveMode === "MATRIX" ? "MATRIX" : cp.layoutType || "2_COL",
+            contentHtml: cp.contentHtml || null,
+            segments: (effectiveMode === "MATRIX" || cp.layoutType === "MATRIX") ? (cp.matrixSegments || cp.segments || []) : (cp.segments || []),
+            matrixRows: cp.matrixRows || 2,
+            matrixCols: cp.matrixCols || 2,
+            rowHeights: cp.rowHeights || null,
+            colWidths: cp.colWidths || null,
+            hasHeader: Boolean(cp.hasHeader),
+            headerHtml: cp.headerHtml || null,
+            hasFooter: Boolean(cp.hasFooter),
+            footerHtml: cp.footerHtml || null,
+            verticalSpineMode: cp.verticalSpineMode || "NONE",
+            verticalSpineHtml: cp.verticalSpineHtml || null,
+            verticalSpineWidth: cp.verticalSpineWidth || "25%",
+            backgroundType: cp.backgroundType || "COLOR",
+            backgroundColor: cp.backgroundColor || "#FAF7F2",
+            backgroundPattern: cp.backgroundPattern || null,
+            patternOpacity: cp.patternOpacity ?? 0.15,
+            backgroundImage: cp.backgroundImage || null,
+            overlayOpacity: cp.overlayOpacity ?? 0.2,
+            frameStyle: cp.frameStyle || "gold-fillet",
+            pageConfig: {
+              mode: effectiveMode,
+              singlePlateConfig: cp.singlePlateConfig,
+              wysiwygContent: cp.contentHtml,
+              borderConfig: cp.borderConfig,
+            },
+          };
+        }),
         items: plates.map((p, idx) => ({
           artworkId: p.artworkId,
           pageNumber: idx + 1,
@@ -1349,16 +1475,42 @@ export default function AdminCatalogStudioPage() {
                       <input
                         type="color"
                         value={coverConfig.coverBgColor || "#FAF7F2"}
-                        onChange={(e) =>
-                          setCoverConfig((prev) => ({ ...prev, coverBgColor: e.target.value }))
-                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverBgColor: val,
+                            mattingBgColor: val,
+                            singlePlateConfig: {
+                              ...(prev.singlePlateConfig || {}),
+                              mattingBgColor: val,
+                            },
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              mattingBgColor: val,
+                            },
+                          }));
+                        }}
                         className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
                       />
                       <Input
                         value={coverConfig.coverBgColor || ""}
-                        onChange={(e) =>
-                          setCoverConfig((prev) => ({ ...prev, coverBgColor: e.target.value }))
-                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverBgColor: val,
+                            mattingBgColor: val,
+                            singlePlateConfig: {
+                              ...(prev.singlePlateConfig || {}),
+                              mattingBgColor: val,
+                            },
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              mattingBgColor: val,
+                            },
+                          }));
+                        }}
                         className="text-xs font-mono"
                         placeholder="#FAF7F2"
                       />
@@ -1375,7 +1527,21 @@ export default function AdminCatalogStudioPage() {
                         <button
                           key={preset.hex}
                           type="button"
-                          onClick={() => setCoverConfig((prev) => ({ ...prev, coverBgColor: preset.hex }))}
+                          onClick={() => {
+                            setCoverConfig((prev) => ({
+                              ...prev,
+                              coverBgColor: preset.hex,
+                              mattingBgColor: preset.hex,
+                              singlePlateConfig: {
+                                ...(prev.singlePlateConfig || {}),
+                                mattingBgColor: preset.hex,
+                              },
+                              borderConfig: {
+                                ...(prev.borderConfig || {}),
+                                mattingBgColor: preset.hex,
+                              },
+                            }));
+                          }}
                           className="px-1.5 py-0.5 text-[9px] rounded border border-border/80 bg-background hover:bg-muted font-mono flex items-center gap-1 cursor-pointer transition-colors"
                           title={preset.name}
                         >
@@ -1395,16 +1561,32 @@ export default function AdminCatalogStudioPage() {
                       <input
                         type="color"
                         value={coverConfig.coverMattingColor || themeConfig.backgroundColor || "#1C1814"}
-                        onChange={(e) =>
-                          setCoverConfig((prev) => ({ ...prev, coverMattingColor: e.target.value }))
-                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverMattingColor: val,
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              outerColor: val,
+                            },
+                          }));
+                        }}
                         className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
                       />
                       <Input
                         value={coverConfig.coverMattingColor || ""}
-                        onChange={(e) =>
-                          setCoverConfig((prev) => ({ ...prev, coverMattingColor: e.target.value }))
-                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverMattingColor: val,
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              outerColor: val,
+                            },
+                          }));
+                        }}
                         className="text-xs font-mono"
                         placeholder="Inherit / #1C1814"
                       />
@@ -1418,16 +1600,32 @@ export default function AdminCatalogStudioPage() {
                       <input
                         type="color"
                         value={coverConfig.innerBorderColor || "#D4AF37"}
-                        onChange={(e) =>
-                          setCoverConfig((prev) => ({ ...prev, innerBorderColor: e.target.value }))
-                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            innerBorderColor: val,
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              innerColor: val,
+                            },
+                          }));
+                        }}
                         className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
                       />
                       <Input
                         value={coverConfig.innerBorderColor || "#D4AF37"}
-                        onChange={(e) =>
-                          setCoverConfig((prev) => ({ ...prev, innerBorderColor: e.target.value }))
-                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            innerBorderColor: val,
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              innerColor: val,
+                            },
+                          }));
+                        }}
                         className="text-xs font-mono"
                         placeholder="#D4AF37"
                       />
@@ -1445,7 +1643,16 @@ export default function AdminCatalogStudioPage() {
                           <button
                             key={pad}
                             type="button"
-                            onClick={() => setCoverConfig((prev) => ({ ...prev, mattingPadding: pad }))}
+                            onClick={() => {
+                              setCoverConfig((prev) => ({
+                                ...prev,
+                                mattingPadding: pad,
+                                borderConfig: {
+                                  ...(prev.borderConfig || {}),
+                                  thicknessPx: pad,
+                                },
+                              }));
+                            }}
                             className={`flex-1 py-1 text-xs rounded-md border font-mono transition-all cursor-pointer ${
                               isSelected
                                 ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs ring-1 ring-primary"
@@ -1460,6 +1667,41 @@ export default function AdminCatalogStudioPage() {
                     <p className="text-[10px] text-muted-foreground">
                       Set 0px to eliminate the outer matting container and expand frame edge-to-edge.
                     </p>
+                  </div>
+
+                  {/* Universal Framing Sync Toggle */}
+                  <div className="pt-3 border-t border-border/60 sm:col-span-2 lg:col-span-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-primary" /> Universal Exhibition Framing Sync
+                      </span>
+                      <p className="text-[10px] text-muted-foreground">
+                        Synchronize matting canvas color, outer border, inner framing fillet, and padding universally across Curatorial, Magazine, and End Pages.
+                      </p>
+                    </div>
+                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/30 shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={coverConfig.borderConfig?.syncGlobal ?? coverConfig.syncGlobal ?? false}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            syncGlobal: checked,
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              syncGlobal: checked,
+                              outerColor: prev.coverMattingColor || "#1C1814",
+                              innerColor: prev.innerBorderColor || "#D4AF37",
+                              thicknessPx: typeof prev.mattingPadding === "number" ? prev.mattingPadding : 24,
+                              mattingBgColor: prev.coverBgColor || "#FAF7F2",
+                            },
+                          }));
+                        }}
+                        className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                      />
+                      <span className="text-primary font-bold">Apply Universally to All Pages</span>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -2107,79 +2349,71 @@ export default function AdminCatalogStudioPage() {
 
                 {/* Cover Presentation & Layout Engine (Image Plate vs. WYSIWYG vs. Matrix) */}
                 <div className="pt-4 border-t border-border/60 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <h4 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-primary" /> Front Cover Presentation Engine
-                      </h4>
-                      <p className="text-[11px] text-muted-foreground">
-                        Choose between a classical single-image monograph plate, a bespoke rich-text WYSIWYG cover, or an InDesign-grade multi-cell visual matrix.
-                      </p>
+                  <EditorialModeSwitcher
+                    label="Front Cover Presentation Engine"
+                    mode={
+                      coverConfig.mode ||
+                      (coverConfig.coverDesignMode === "WYSIWYG"
+                        ? "WYSIWYG"
+                        : coverConfig.coverDesignMode === "MATRIX" || coverConfig.useMatrixLayout
+                        ? "MATRIX"
+                        : "SINGLE_PLATE")
+                    }
+                    onChange={(newMode) => {
+                      setCoverConfig((prev) => ({
+                        ...prev,
+                        mode: newMode,
+                        coverDesignMode: newMode === "SINGLE_PLATE" ? "IMAGE_PLATE" : newMode,
+                        useMatrixLayout: newMode === "MATRIX",
+                      }));
+                    }}
+                  />
+
+                  {/* Mode 1: Single Image Plate with Spine Embellishments */}
+                  {(coverConfig.mode === "SINGLE_PLATE" || (!coverConfig.mode && coverConfig.coverDesignMode !== "WYSIWYG" && !coverConfig.useMatrixLayout && coverConfig.coverDesignMode !== "MATRIX")) && (
+                    <div className="pt-2">
+                      <CatalogSinglePlateEditor
+                        sectionLabel="Front Cover"
+                        config={{
+                          primaryImageUrl: coverImageUrl,
+                          presentation: coverConfig.imagePlatePresentation || "contained",
+                          mattingBgColor: coverConfig.coverBgColor || coverConfig.mattingBgColor || "#FAF7F2",
+                          focalPosition: coverConfig.imageFocalPosition,
+                          headerSlot: coverConfig.headerSlot,
+                          footerSlot: coverConfig.footerSlot,
+                          leftSpineSlot: coverConfig.leftSpineSlot,
+                          rightSpineSlot: coverConfig.rightSpineSlot,
+                        }}
+                        onChange={(upd) => {
+                          if (upd.primaryImageUrl !== undefined) {
+                            setCoverImageUrl(upd.primaryImageUrl);
+                          }
+                          setCoverConfig((prev) => {
+                            const nextMatting = upd.mattingBgColor !== undefined ? upd.mattingBgColor : (prev.coverBgColor || prev.mattingBgColor);
+                            return {
+                              ...prev,
+                              ...(upd.presentation ? { imagePlatePresentation: upd.presentation } : {}),
+                              ...(upd.mattingBgColor !== undefined ? { coverBgColor: upd.mattingBgColor, mattingBgColor: upd.mattingBgColor } : {}),
+                              ...(upd.focalPosition ? { imageFocalPosition: upd.focalPosition } : {}),
+                              ...(upd.headerSlot ? { headerSlot: upd.headerSlot } : {}),
+                              ...(upd.footerSlot ? { footerSlot: upd.footerSlot } : {}),
+                              ...(upd.leftSpineSlot ? { leftSpineSlot: upd.leftSpineSlot } : {}),
+                              ...(upd.rightSpineSlot ? { rightSpineSlot: upd.rightSpineSlot } : {}),
+                              singlePlateConfig: {
+                                ...(prev.singlePlateConfig || {}),
+                                ...upd,
+                                mattingBgColor: nextMatting,
+                              },
+                              borderConfig: {
+                                ...(prev.borderConfig || {}),
+                                mattingBgColor: nextMatting,
+                              },
+                            };
+                          });
+                        }}
+                      />
                     </div>
-                    <div className="flex items-center gap-1 p-0.5 rounded-lg border border-border bg-muted/30">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCoverConfig((prev) => ({
-                            ...prev,
-                            coverDesignMode: "IMAGE_PLATE",
-                            useMatrixLayout: false,
-                          }))
-                        }
-                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
-                          (coverConfig.coverDesignMode === "IMAGE_PLATE" || (!coverConfig.coverDesignMode && !coverConfig.useMatrixLayout))
-                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        Single Image Plate
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCoverConfig((prev) => ({
-                            ...prev,
-                            coverDesignMode: "WYSIWYG",
-                            useMatrixLayout: false,
-                          }))
-                        }
-                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
-                          coverConfig.coverDesignMode === "WYSIWYG"
-                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        Bespoke WYSIWYG
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCoverConfig((prev) => ({
-                            ...prev,
-                            coverDesignMode: "MATRIX",
-                            useMatrixLayout: true,
-                            matrixConfig: prev.matrixConfig || {
-                              matrixRows: 2,
-                              matrixCols: 2,
-                              rowHeights: "1fr 1fr",
-                              colWidths: "1fr 1fr",
-                              hasHeader: false,
-                              hasFooter: false,
-                              verticalSpineMode: "NONE",
-                              segments: reconcileMatrixCells(2, 2, []),
-                            },
-                          }))
-                        }
-                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
-                          coverConfig.coverDesignMode === "MATRIX" || (coverConfig.useMatrixLayout && coverConfig.coverDesignMode !== "WYSIWYG")
-                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        Matrix Studio
-                      </button>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Mode 2: Bespoke WYSIWYG Cover Editor */}
                   {coverConfig.coverDesignMode === "WYSIWYG" && (
@@ -2333,18 +2567,120 @@ export default function AdminCatalogStudioPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Curatorial Monograph Body</label>
-                <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
-                  <TiptapEditor
-                    content={curatorialEssay}
-                    onChange={(_, html) => setCuratorialEssay(html)}
-                    placeholder="Compose the scholastic curatorial statement, historical lineage of the paintings, and thematic spiritual symbolism..."
-                    catalogPageSize={pageSize}
-                    catalogOrientation={orientation}
-                    className="min-h-[280px]"
-                  />
-                </div>
+              {/* Curatorial Page Presentation Engine */}
+              <div className="pt-2 border-t border-border/60 space-y-4">
+                <EditorialModeSwitcher
+                  label="Curatorial Page Presentation Engine"
+                  mode={
+                    essayConfig.mode ||
+                    (essayConfig.useMatrixLayout ? "MATRIX" : "WYSIWYG")
+                  }
+                  onChange={(newMode) => {
+                    setEssayConfig((prev) => ({
+                      ...prev,
+                      mode: newMode,
+                      useMatrixLayout: newMode === "MATRIX",
+                    }));
+                  }}
+                />
+
+                {/* Mode A: Single Image Plate */}
+                {essayConfig.mode === "SINGLE_PLATE" && (
+                  <div className="pt-2">
+                    <CatalogSinglePlateEditor
+                      sectionLabel="Curatorial Foreword Plate"
+                      config={{
+                        primaryImageUrl: essayConfig.singlePlateConfig?.primaryImageUrl || "",
+                        presentation: essayConfig.singlePlateConfig?.presentation || "contained",
+                        mattingBgColor: essayConfig.singlePlateConfig?.mattingBgColor || essayConfig.backgroundColor || "#FAF7F2",
+                        focalPosition: essayConfig.singlePlateConfig?.focalPosition,
+                        headerSlot: essayConfig.singlePlateConfig?.headerSlot,
+                        footerSlot: essayConfig.singlePlateConfig?.footerSlot,
+                        leftSpineSlot: essayConfig.singlePlateConfig?.leftSpineSlot,
+                        rightSpineSlot: essayConfig.singlePlateConfig?.rightSpineSlot,
+                      }}
+                      onChange={(upd) => {
+                        setEssayConfig((prev) => ({
+                          ...prev,
+                          singlePlateConfig: {
+                            ...prev.singlePlateConfig,
+                            ...upd,
+                          },
+                        }));
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Mode B: WYSIWYG Monograph Editor */}
+                {(essayConfig.mode === "WYSIWYG" || (!essayConfig.mode && !essayConfig.useMatrixLayout)) && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Curatorial Monograph Body</label>
+                    <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
+                      <TiptapEditor
+                        content={curatorialEssay}
+                        onChange={(_, html) => setCuratorialEssay(html)}
+                        placeholder="Compose the scholastic curatorial statement, historical lineage of the paintings, and thematic spiritual symbolism..."
+                        catalogPageSize={pageSize}
+                        catalogOrientation={orientation}
+                        className="min-h-[280px]"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Mode C: Advanced Matrix Studio */}
+                {(essayConfig.mode === "MATRIX" || (essayConfig.useMatrixLayout && essayConfig.mode !== "WYSIWYG" && essayConfig.mode !== "SINGLE_PLATE")) && (
+                  <div className="pt-2">
+                    <CatalogMatrixStudio
+                      pageTitle={essayConfig.title || "Curatorial Foreword & Statement"}
+                      pageType="ESSAY"
+                      config={
+                        essayConfig.matrixConfig || {
+                          matrixRows: 2,
+                          matrixCols: 2,
+                          rowHeights: "1fr 1fr",
+                          colWidths: "1fr 1fr",
+                          hasHeader: false,
+                          hasFooter: false,
+                          verticalSpineMode: "NONE",
+                          segments: reconcileMatrixCells(2, 2, [], curatorialEssay || ""),
+                        }
+                      }
+                      onChange={(upd) =>
+                        setEssayConfig((prev) => {
+                          const currentMatrix = prev.matrixConfig || {
+                            matrixRows: 2,
+                            matrixCols: 2,
+                            rowHeights: "1fr 1fr",
+                            colWidths: "1fr 1fr",
+                            hasHeader: false,
+                            hasFooter: false,
+                            verticalSpineMode: "NONE",
+                            segments: reconcileMatrixCells(2, 2, [], curatorialEssay || ""),
+                          };
+                          const newRows = upd.matrixRows ?? currentMatrix.matrixRows;
+                          const newCols = upd.matrixCols ?? currentMatrix.matrixCols;
+                          let newSegments = upd.segments ?? currentMatrix.segments;
+                          if (newSegments) {
+                            newSegments = reconcileMatrixCells(newRows, newCols, newSegments);
+                          }
+                          return {
+                            ...prev,
+                            useMatrixLayout: true,
+                            matrixConfig: {
+                              ...currentMatrix,
+                              ...upd,
+                              matrixRows: newRows,
+                              matrixCols: newCols,
+                              segments: newSegments,
+                            },
+                          };
+                        })
+                      }
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="pt-2">
@@ -2458,7 +2794,7 @@ export default function AdminCatalogStudioPage() {
 
                   <CardContent className="space-y-4 pt-4">
                     {/* Header Details */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5 sm:col-span-1">
                         <label className="text-xs font-semibold text-foreground">Page Title</label>
                         <Input
@@ -2478,41 +2814,67 @@ export default function AdminCatalogStudioPage() {
                           className="text-xs"
                         />
                       </div>
-
-                      <div className="space-y-1.5 sm:col-span-1">
-                        <label className="text-xs font-semibold text-foreground">Magazine Page Layout</label>
-                        <Select
-                          value={page.layoutType || "2_COL"}
-                          onValueChange={(val: MagazineLayoutType) => changeCustomPageLayout(pIdx, val)}
-                        >
-                          <SelectTrigger className="text-xs">
-                            <SelectValue placeholder="Layout Mode" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1_COL">1-Column Full Feature (Scholarly)</SelectItem>
-                            <SelectItem value="2_COL">2-Column Balanced (50:50)</SelectItem>
-                            <SelectItem value="ASYMMETRIC_70_30">2-Column Asymmetric (70:30)</SelectItem>
-                            <SelectItem value="ASYMMETRIC_30_70">2-Column Asymmetric (30:70)</SelectItem>
-                            <SelectItem value="3_COL">3-Column Magazine Spread (33:33:33)</SelectItem>
-                            <SelectItem value="4_COL">4-Column Grid (Archival &amp; Footnotes)</SelectItem>
-                            <SelectItem value="6_COL">6-Column Gallery Matrix</SelectItem>
-                            <SelectItem value="MATRIX">✨ Advanced Matrix Grid Engine (InDesign Grade)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
                     </div>
+
+                    {/* Editorial Page Mode Switcher */}
+                    <div className="pt-2 border-t border-border/60">
+                      <EditorialModeSwitcher
+                        label={`Page ${pIdx + 1} Presentation Engine`}
+                        mode={
+                          page.mode ||
+                          (page.layoutType === "MATRIX"
+                            ? "MATRIX"
+                            : page.singlePlateConfig?.primaryImageUrl && page.layoutType === "1_COL" && (!page.segments || page.segments.length === 0)
+                            ? "SINGLE_PLATE"
+                            : "WYSIWYG")
+                        }
+                        onChange={(newMode) => {
+                          updateCustomPage(pIdx, {
+                            mode: newMode,
+                            layoutType: newMode === "MATRIX" ? "MATRIX" : page.layoutType === "MATRIX" ? "2_COL" : (page.layoutType || "2_COL"),
+                          });
+                        }}
+                      />
+                    </div>
+
+                    {/* Mode A: Single Image Plate */}
+                    {page.mode === "SINGLE_PLATE" && (
+                      <div className="pt-2">
+                        <CatalogSinglePlateEditor
+                          sectionLabel={page.title || `Editorial Page ${pIdx + 1}`}
+                          config={{
+                            primaryImageUrl: page.singlePlateConfig?.primaryImageUrl || "",
+                            presentation: page.singlePlateConfig?.presentation || "contained",
+                            mattingBgColor: page.singlePlateConfig?.mattingBgColor || page.backgroundColor || "#FAF7F2",
+                            focalPosition: page.singlePlateConfig?.focalPosition,
+                            headerSlot: page.singlePlateConfig?.headerSlot,
+                            footerSlot: page.singlePlateConfig?.footerSlot,
+                            leftSpineSlot: page.singlePlateConfig?.leftSpineSlot,
+                            rightSpineSlot: page.singlePlateConfig?.rightSpineSlot,
+                          }}
+                          onChange={(upd) => {
+                            updateCustomPage(pIdx, {
+                              singlePlateConfig: {
+                                ...page.singlePlateConfig,
+                                ...upd,
+                              },
+                            });
+                          }}
+                        />
+                      </div>
+                    )}
 
                     {/* Universal Background & Framing Suite for this page */}
                     <div className="pt-1">
                       <CatalogBackgroundControl
                         config={page}
                         onChange={(upd) => updateCustomPage(pIdx, upd)}
-                        title="Page Background &amp; Framing Suite"
+                        title="Page Background & Framing Suite"
                         description="Select canvas backdrop, sacred heritage pattern, or custom image for this discrete magazine page."
                       />
                     </div>
 
-                    {page.layoutType === "MATRIX" ? (
+                    {(page.mode === "MATRIX" || (page.layoutType === "MATRIX" && page.mode !== "SINGLE_PLATE" && page.mode !== "WYSIWYG")) ? (
                       /* Advanced InDesign Matrix Grid Studio */
                       <div className="pt-2">
                         <CatalogMatrixStudio
@@ -2553,21 +2915,37 @@ export default function AdminCatalogStudioPage() {
                           }}
                         />
                       </div>
-                    ) : (
-                      /* Multi-Segment Independent Column Studio */
+                    ) : page.mode === "SINGLE_PLATE" ? null : (
+                      /* Mode B: Multi-Segment Independent Column Studio */
                       <div className="space-y-3 pt-2">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border/50">
                           <div className="space-y-0.5">
                             <label className="text-xs font-serif font-bold text-foreground">
-                              Multi-Segment Column Studio ({page.segments?.length || 1} Columns)
+                              Magazine Multi-Column Grid Layout
                             </label>
                             <p className="text-[11px] text-muted-foreground">
-                              Each column functions independently with its own typography, headings, images, and AI polish.
+                              Choose the column distribution and proportion for this editorial article.
                             </p>
                           </div>
-                          <Badge variant="outline" className="text-[10px] font-mono text-primary border-primary/30">
-                            {page.layoutType || "2_COL"} Spacing
-                          </Badge>
+                          <div className="w-full sm:w-64">
+                            <Select
+                              value={page.layoutType || "2_COL"}
+                              onValueChange={(val: MagazineLayoutType) => changeCustomPageLayout(pIdx, val)}
+                            >
+                              <SelectTrigger className="text-xs">
+                                <SelectValue placeholder="Layout Mode" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="1_COL">1-Column Full Feature (Scholarly)</SelectItem>
+                                <SelectItem value="2_COL">2-Column Balanced (50:50)</SelectItem>
+                                <SelectItem value="ASYMMETRIC_70_30">2-Column Asymmetric (70:30)</SelectItem>
+                                <SelectItem value="ASYMMETRIC_30_70">2-Column Asymmetric (30:70)</SelectItem>
+                                <SelectItem value="3_COL">3-Column Magazine Spread (33:33:33)</SelectItem>
+                                <SelectItem value="4_COL">4-Column Grid (Archival &amp; Footnotes)</SelectItem>
+                                <SelectItem value="6_COL">6-Column Gallery Matrix</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
 
                         <div
@@ -3001,20 +3379,122 @@ export default function AdminCatalogStudioPage() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Closing Statement / Artist Biography</label>
-                  <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
-                    <TiptapEditor
-                      content={endPageConfig.contentHtml || ""}
-                      onChange={(_, html) =>
-                        setEndPageConfig((prev) => ({ ...prev, contentHtml: html }))
-                      }
-                      placeholder="Compose concluding scholarly remarks, artist background, technique provenance, or exhibition credits..."
-                      catalogPageSize={pageSize}
-                      catalogOrientation={orientation}
-                      className="min-h-[220px]"
-                    />
-                  </div>
+                {/* Colophon Presentation Engine */}
+                <div className="pt-2 border-t border-border/60 space-y-4">
+                  <EditorialModeSwitcher
+                    label="Colophon Presentation Engine"
+                    mode={
+                      endPageConfig.mode ||
+                      (endPageConfig.useMatrixLayout ? "MATRIX" : "WYSIWYG")
+                    }
+                    onChange={(newMode) => {
+                      setEndPageConfig((prev) => ({
+                        ...prev,
+                        mode: newMode,
+                        useMatrixLayout: newMode === "MATRIX",
+                      }));
+                    }}
+                  />
+
+                  {/* Mode A: Single Image Plate */}
+                  {endPageConfig.mode === "SINGLE_PLATE" && (
+                    <div className="pt-2">
+                      <CatalogSinglePlateEditor
+                        sectionLabel="Colophon Closing Plate"
+                        config={{
+                          primaryImageUrl: endPageConfig.singlePlateConfig?.primaryImageUrl || "",
+                          presentation: endPageConfig.singlePlateConfig?.presentation || "contained",
+                          mattingBgColor: endPageConfig.singlePlateConfig?.mattingBgColor || endPageConfig.backgroundColor || "#FAF7F2",
+                          focalPosition: endPageConfig.singlePlateConfig?.focalPosition,
+                          headerSlot: endPageConfig.singlePlateConfig?.headerSlot,
+                          footerSlot: endPageConfig.singlePlateConfig?.footerSlot,
+                          leftSpineSlot: endPageConfig.singlePlateConfig?.leftSpineSlot,
+                          rightSpineSlot: endPageConfig.singlePlateConfig?.rightSpineSlot,
+                        }}
+                        onChange={(upd) => {
+                          setEndPageConfig((prev) => ({
+                            ...prev,
+                            singlePlateConfig: {
+                              ...prev.singlePlateConfig,
+                              ...upd,
+                            },
+                          }));
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Mode B: WYSIWYG Editor */}
+                  {(endPageConfig.mode === "WYSIWYG" || (!endPageConfig.mode && !endPageConfig.useMatrixLayout)) && (
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground">Closing Statement / Artist Biography</label>
+                      <div className="rounded-md border border-input bg-card/60 p-1 shadow-sm">
+                        <TiptapEditor
+                          content={endPageConfig.contentHtml || ""}
+                          onChange={(_, html) =>
+                            setEndPageConfig((prev) => ({ ...prev, contentHtml: html }))
+                          }
+                          placeholder="Compose concluding scholarly remarks, artist background, technique provenance, or exhibition credits..."
+                          catalogPageSize={pageSize}
+                          catalogOrientation={orientation}
+                          className="min-h-[220px]"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mode C: Advanced Matrix Studio */}
+                  {(endPageConfig.mode === "MATRIX" || (endPageConfig.useMatrixLayout && endPageConfig.mode !== "WYSIWYG" && endPageConfig.mode !== "SINGLE_PLATE")) && (
+                    <div className="pt-2">
+                      <CatalogMatrixStudio
+                        pageTitle={endPageConfig.title || "Colophon & Atelier Heritage"}
+                        pageType="END_PAGE"
+                        config={
+                          endPageConfig.matrixConfig || {
+                            matrixRows: 2,
+                            matrixCols: 2,
+                            rowHeights: "1fr 1fr",
+                            colWidths: "1fr 1fr",
+                            hasHeader: false,
+                            hasFooter: false,
+                            verticalSpineMode: "NONE",
+                            segments: reconcileMatrixCells(2, 2, []),
+                          }
+                        }
+                        onChange={(upd) =>
+                          setEndPageConfig((prev) => {
+                            const currentMatrix = prev.matrixConfig || {
+                              matrixRows: 2,
+                              matrixCols: 2,
+                              rowHeights: "1fr 1fr",
+                              colWidths: "1fr 1fr",
+                              hasHeader: false,
+                              hasFooter: false,
+                              verticalSpineMode: "NONE",
+                              segments: reconcileMatrixCells(2, 2, []),
+                            };
+                            const newRows = upd.matrixRows ?? currentMatrix.matrixRows;
+                            const newCols = upd.matrixCols ?? currentMatrix.matrixCols;
+                            let newSegments = upd.segments ?? currentMatrix.segments;
+                            if (newSegments) {
+                              newSegments = reconcileMatrixCells(newRows, newCols, newSegments);
+                            }
+                            return {
+                              ...prev,
+                              useMatrixLayout: true,
+                              matrixConfig: {
+                                ...currentMatrix,
+                                ...upd,
+                                matrixRows: newRows,
+                                matrixCols: newCols,
+                                segments: newSegments,
+                              },
+                            };
+                          })
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-2">
@@ -3134,97 +3614,6 @@ export default function AdminCatalogStudioPage() {
                   <p className="text-[10px] text-muted-foreground">
                     Displayed at the very bottom of the closing colophon page.
                   </p>
-                </div>
-                {/* Advanced Matrix Colophon Layout Engine */}
-                <div className="pt-4 border-t border-border/60 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-primary" /> Advanced Matrix Colophon Layout Engine (Optional)
-                      </h4>
-                      <p className="text-[11px] text-muted-foreground">
-                        Switch this colophon from a standard single column into an InDesign-grade multi-cell visual matrix layout.
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-foreground">Matrix Colophon:</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(endPageConfig.useMatrixLayout)}
-                          onChange={(e) =>
-                            setEndPageConfig((prev) => ({
-                              ...prev,
-                              useMatrixLayout: e.target.checked,
-                              matrixConfig: prev.matrixConfig || {
-                                matrixRows: 2,
-                                matrixCols: 2,
-                                rowHeights: "1fr 1fr",
-                                colWidths: "1fr 1fr",
-                                hasHeader: false,
-                                hasFooter: false,
-                                verticalSpineMode: "NONE",
-                                segments: reconcileMatrixCells(2, 2, []),
-                              },
-                            }))
-                          }
-                          className="sr-only peer"
-                        />
-                        <div className="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-                      </label>
-                    </div>
-                  </div>
-
-                  {endPageConfig.useMatrixLayout && (
-                    <div className="pt-2">
-                      <CatalogMatrixStudio
-                        pageTitle={endPageConfig.title || "Colophon & Atelier Heritage"}
-                        pageType="END_PAGE"
-                        config={
-                          endPageConfig.matrixConfig || {
-                            matrixRows: 2,
-                            matrixCols: 2,
-                            rowHeights: "1fr 1fr",
-                            colWidths: "1fr 1fr",
-                            hasHeader: false,
-                            hasFooter: false,
-                            verticalSpineMode: "NONE",
-                            segments: reconcileMatrixCells(2, 2, []),
-                          }
-                        }
-                        onChange={(upd) =>
-                          setEndPageConfig((prev) => {
-                            const currentMatrix = prev.matrixConfig || {
-                              matrixRows: 2,
-                              matrixCols: 2,
-                              rowHeights: "1fr 1fr",
-                              colWidths: "1fr 1fr",
-                              hasHeader: false,
-                              hasFooter: false,
-                              verticalSpineMode: "NONE",
-                              segments: reconcileMatrixCells(2, 2, []),
-                            };
-                            const newRows = upd.matrixRows ?? currentMatrix.matrixRows;
-                            const newCols = upd.matrixCols ?? currentMatrix.matrixCols;
-                            let newSegments = upd.segments ?? currentMatrix.segments;
-                            if (newSegments) {
-                              newSegments = reconcileMatrixCells(newRows, newCols, newSegments);
-                            }
-                            return {
-                              ...prev,
-                              matrixConfig: {
-                                ...currentMatrix,
-                                ...upd,
-                                matrixRows: newRows,
-                                matrixCols: newCols,
-                                segments: newSegments,
-                              },
-                            };
-                          })
-                        }
-                      />
-                    </div>
-                  )}
                 </div>
               </CardContent>
             )}

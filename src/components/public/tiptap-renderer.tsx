@@ -543,6 +543,47 @@ function renderNode(
       );
     }
 
+    case "floatingLayer": {
+      const attrs = node.attrs || {};
+      const x = typeof attrs.x === "number" ? attrs.x : 24;
+      const y = typeof attrs.y === "number" ? attrs.y : 24;
+      const width = (attrs.width as string) || "340px";
+      const height = (attrs.height as string) || "auto";
+      const zIndex = typeof attrs.zIndex === "number" ? attrs.zIndex : 10;
+      const opacity = typeof attrs.opacity === "number" ? attrs.opacity : 1;
+      const blendMode = (attrs.blendMode as string) || "normal";
+      const backgroundColor = (attrs.backgroundColor as string) || "rgba(255, 255, 255, 0.9)";
+      const borderColor = (attrs.borderColor as string) || "#D4AF37";
+      const borderWidth = typeof attrs.borderWidth === "number" ? attrs.borderWidth : 1;
+      const borderRadius = (attrs.borderRadius as string) || "12px";
+      const padding = (attrs.padding as string) || "16px";
+
+      return (
+        <div
+          key={key}
+          data-floating-layer="true"
+          className="floating-layer-container my-3 relative shadow-md pointer-events-auto"
+          style={{
+            position: "relative",
+            transform: `translate3d(${x}px, ${y}px, 0)`,
+            width,
+            height: height === "auto" ? undefined : height,
+            zIndex,
+            opacity,
+            mixBlendMode: (blendMode as React.CSSProperties["mixBlendMode"]) || "normal",
+            backgroundColor,
+            border: `${borderWidth}px solid ${borderColor}`,
+            borderRadius,
+            padding,
+          }}
+        >
+          <div className="relative z-10 w-full h-full flex flex-col justify-center">
+            {children}
+          </div>
+        </div>
+      );
+    }
+
     default:
       if (children) {
         return <div key={key}>{children}</div>;
