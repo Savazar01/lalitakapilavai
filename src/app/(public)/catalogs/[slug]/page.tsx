@@ -24,8 +24,6 @@ import {
 } from "lucide-react";
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
 import { ProtectedImage } from "@/components/public/protected-image";
-import { CatalogScrollEngine, type ScrollTransitionMode } from "@/components/public/catalog-scroll-engine";
-import { ExhibitionSimulatorModal } from "@/components/public/exhibition-simulator-modal";
 import {
   resolveContainerThemeScope,
   resolveContainerContrast,
@@ -440,7 +438,6 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   }
 
   const themeConfig = (catalog.themeConfig as Record<string, unknown> | null) || {};
-  const scrollTransition = ((themeConfig.scrollTransition as string) || "book-turn") as ScrollTransitionMode;
   const coverConfig = (catalog.coverConfig as Record<string, unknown> | null) || {};
   const essayConfig = (catalog.essayConfig as Record<string, unknown> | null) || {};
   const endPageConfig = (catalog.endPageConfig as Record<string, unknown> | null) || {};
@@ -653,20 +650,6 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           </Link>
 
           <div className="flex items-center gap-3">
-            <ExhibitionSimulatorModal
-              artwork={{
-                title: catalog.title,
-                subtitle: catalog.subtitle || "Archival Exhibition Monograph",
-                medium: "22k Gold Foil, Gesso Relief & Mineral Pigments",
-                period: "Atelier Lalita Kapilavai Heritage Collection",
-                dimensions: "Digital e-Catalog Archival Plates",
-                imageUrl: catalog.coverImageUrl || (catalog.items?.[0]?.artwork?.primaryImageUrl || ""),
-              }}
-              triggerText="Simulate on Wall"
-              triggerVariant="outline"
-              triggerClassName="h-7 text-xs border-amber-600/50 bg-amber-500/10 text-amber-950 dark:text-amber-200"
-            />
-
             <CatalogPrintButton catalogTitle={catalog.title} />
 
             {catalog.downloadablePdfUrl ? (
@@ -686,7 +669,6 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         {/* ------------------------------------------------------------------ */}
         {/* PAGE 1: BOOK COVER (Strict Single Page on Print)                   */}
         {/* ------------------------------------------------------------------ */}
-        <CatalogScrollEngine mode={scrollTransition} pageIndex={0} className="w-full">
         {coverDesignMode === "MATRIX" && coverConfig.matrixConfig ? (
           (() => {
             const mc = coverConfig.matrixConfig as Record<string, unknown>;
@@ -893,12 +875,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             </div>
           </CatalogSinglePlateView>
         )}
-        </CatalogScrollEngine>
 
         {/* ------------------------------------------------------------------ */}
         {/* PAGE 2: CURATORIAL FOREWORD & ESSAY (Multi-Mode Parity)            */}
         {/* ------------------------------------------------------------------ */}
-        <CatalogScrollEngine mode={scrollTransition} pageIndex={1} className="w-full">
         {essayMode === "MATRIX" && curatorialConfig.matrixConfig ? (
           (() => {
             const mc = curatorialConfig.matrixConfig as Record<string, unknown>;
@@ -1047,7 +1027,6 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             </div>
           </section>
         ) : null}
-        </CatalogScrollEngine>
 
         {/* ------------------------------------------------------------------ */}
         {/* EDITORIAL & MAGAZINE PAGES: (Multi-Segment Layouts & Per-Page BG)  */}
@@ -1080,96 +1059,84 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               : [];
 
             return (
-              <CatalogScrollEngine
+              <CatalogMatrixPage
                 key={page.id || pIdx}
-                mode={scrollTransition}
-                pageIndex={pIdx + 2}
-                className="w-full"
-              >
-                <CatalogMatrixPage
-                  pageNumber={page.pageNumber || pIdx + 1}
-                  pageTitle={page.title}
-                  pageSubtitle={page.subtitle}
-                  matrixRows={page.matrixRows || 2}
-                  matrixCols={page.matrixCols || 2}
-                  rowHeights={page.rowHeights}
-                  colWidths={page.colWidths}
-                  hasHeader={page.hasHeader}
-                  headerHtml={page.headerHtml}
-                  hasFooter={page.hasFooter}
-                  footerHtml={page.footerHtml}
-                  verticalSpineMode={page.verticalSpineMode || "NONE"}
-                  verticalSpineHtml={page.verticalSpineHtml}
-                  verticalSpineWidth={page.verticalSpineWidth}
-                  segments={matrixSegments}
-                  frameClass={pageFrameClass}
-                  backgroundColor={(isUniversalSync ? universalMattingBgColor || page.backgroundColor : page.backgroundColor) ?? undefined}
-                  canvasBgColor={activeCoverCanvasBg}
-                  outerBorderColor={isUniversalSync ? universalOuterBorder : undefined}
-                  innerBorderColor={isUniversalSync ? universalInnerBorder : undefined}
-                  mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : undefined}
-                  backgroundLayer={bgLayerNode}
-                  catalogTitle={catalog.title}
-                  fallbackContentHtml={page.contentHtml}
-                  aspectRatio={geometry.ratio}
-                />
-              </CatalogScrollEngine>
+                pageNumber={page.pageNumber || pIdx + 1}
+                pageTitle={page.title}
+                pageSubtitle={page.subtitle}
+                matrixRows={page.matrixRows || 2}
+                matrixCols={page.matrixCols || 2}
+                rowHeights={page.rowHeights}
+                colWidths={page.colWidths}
+                hasHeader={page.hasHeader}
+                headerHtml={page.headerHtml}
+                hasFooter={page.hasFooter}
+                footerHtml={page.footerHtml}
+                verticalSpineMode={page.verticalSpineMode || "NONE"}
+                verticalSpineHtml={page.verticalSpineHtml}
+                verticalSpineWidth={page.verticalSpineWidth}
+                segments={matrixSegments}
+                frameClass={pageFrameClass}
+                backgroundColor={(isUniversalSync ? universalMattingBgColor || page.backgroundColor : page.backgroundColor) ?? undefined}
+                canvasBgColor={activeCoverCanvasBg}
+                outerBorderColor={isUniversalSync ? universalOuterBorder : undefined}
+                innerBorderColor={isUniversalSync ? universalInnerBorder : undefined}
+                mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : undefined}
+                backgroundLayer={bgLayerNode}
+                catalogTitle={catalog.title}
+                fallbackContentHtml={page.contentHtml}
+                aspectRatio={geometry.ratio}
+              />
             );
           }
 
           // Mode A: Single Image Plate with Spine Embellishments
           if (effectivePageMode === "SINGLE_PLATE" && pageSinglePlate?.primaryImageUrl) {
             return (
-              <CatalogScrollEngine
+              <CatalogSinglePlateView
                 key={page.id || pIdx}
-                mode={scrollTransition}
-                pageIndex={pIdx + 2}
-                className="w-full"
+                primaryImageUrl={pageSinglePlate.primaryImageUrl as string}
+                presentation={(pageSinglePlate.presentation as "contained" | "full-bleed") || "contained"}
+                canvasBgColor={activeCoverCanvasBg}
+                outerMattingColor={isUniversalSync ? universalMattingBgColor : (pageSinglePlate.outerMattingColor as string)}
+                mattingBgColor={(isUniversalSync ? universalMattingBgColor || page.backgroundColor : (pageSinglePlate.mattingBgColor as string) || page.backgroundColor) ?? undefined}
+                focalPosition={pageSinglePlate.focalPosition as string}
+                headerSlot={pageSinglePlate.headerSlot as SpineDecoratorSlot}
+                footerSlot={pageSinglePlate.footerSlot as SpineDecoratorSlot}
+                leftSpineSlot={pageSinglePlate.leftSpineSlot as SpineDecoratorSlot}
+                rightSpineSlot={pageSinglePlate.rightSpineSlot as SpineDecoratorSlot}
+                frameClass={pageFrameClass}
+                aspectRatio={geometry.ratio}
+                innerBorderColor={isUniversalSync ? universalInnerBorder : (pageSinglePlate.innerBorderColor as string)}
+                mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : 24}
+                backgroundLayer={bgLayerNode}
               >
-                <CatalogSinglePlateView
-                  primaryImageUrl={pageSinglePlate.primaryImageUrl as string}
-                  presentation={(pageSinglePlate.presentation as "contained" | "full-bleed") || "contained"}
-                  canvasBgColor={activeCoverCanvasBg}
-                  outerMattingColor={isUniversalSync ? universalMattingBgColor : (pageSinglePlate.outerMattingColor as string)}
-                  mattingBgColor={(isUniversalSync ? universalMattingBgColor || page.backgroundColor : (pageSinglePlate.mattingBgColor as string) || page.backgroundColor) ?? undefined}
-                  focalPosition={pageSinglePlate.focalPosition as string}
-                  headerSlot={pageSinglePlate.headerSlot as SpineDecoratorSlot}
-                  footerSlot={pageSinglePlate.footerSlot as SpineDecoratorSlot}
-                  leftSpineSlot={pageSinglePlate.leftSpineSlot as SpineDecoratorSlot}
-                  rightSpineSlot={pageSinglePlate.rightSpineSlot as SpineDecoratorSlot}
-                  frameClass={pageFrameClass}
-                  aspectRatio={geometry.ratio}
-                  innerBorderColor={isUniversalSync ? universalInnerBorder : (pageSinglePlate.innerBorderColor as string)}
-                  mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : 24}
-                  backgroundLayer={bgLayerNode}
-                >
-                  {(page.title || page.subtitle) && (
-                    <div className="border-b border-primary/20 pb-3 mb-2">
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
-                          Editorial Monograph • Page {page.pageNumber || pIdx + 1}
-                        </span>
-                        <BookOpen className="w-4 h-4 text-primary shrink-0" />
-                      </div>
-                      {page.title && (
-                        <h2 className="text-xl sm:text-2xl font-serif font-bold leading-tight">
-                          {page.title}
-                        </h2>
-                      )}
-                      {page.subtitle && (
-                        <p className="text-xs font-serif italic text-muted-foreground mt-0.5">
-                          {page.subtitle}
-                        </p>
-                      )}
+                {(page.title || page.subtitle) && (
+                  <div className="border-b border-primary/20 pb-3 mb-2">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+                        Editorial Monograph • Page {page.pageNumber || pIdx + 1}
+                      </span>
+                      <BookOpen className="w-4 h-4 text-primary shrink-0" />
                     </div>
-                  )}
-
-                  <div className="pt-3 border-t border-primary/20 flex items-center justify-between text-[11px] font-mono text-muted-foreground mt-auto">
-                    <span>{catalog.title} • Atelier Monograph</span>
-                    <span>Page {page.pageNumber || pIdx + 1}</span>
+                    {page.title && (
+                      <h2 className="text-xl sm:text-2xl font-serif font-bold leading-tight">
+                        {page.title}
+                      </h2>
+                    )}
+                    {page.subtitle && (
+                      <p className="text-xs font-serif italic text-muted-foreground mt-0.5">
+                        {page.subtitle}
+                      </p>
+                    )}
                   </div>
-                </CatalogSinglePlateView>
-              </CatalogScrollEngine>
+                )}
+
+                <div className="pt-3 border-t border-primary/20 flex items-center justify-between text-[11px] font-mono text-muted-foreground mt-auto">
+                  <span>{catalog.title} • Atelier Monograph</span>
+                  <span>Page {page.pageNumber || pIdx + 1}</span>
+                </div>
+              </CatalogSinglePlateView>
             );
           }
 
@@ -1186,14 +1153,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           const pageTypographyClasses = getContrastTypographyClasses(pageScope.contrastMode);
 
           return (
-            <CatalogScrollEngine
+            <section
               key={page.id || pIdx}
-              mode={scrollTransition}
-              pageIndex={pIdx + 2}
-              className="w-full"
-            >
-              <section
-                className={cn(
+              className={cn(
                 "catalog-page catalog-magazine-page editorial-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none",
                 isUniversalSync && typeof universalThickness === "number" ? "" : "p-6 sm:p-12",
                 pageScope.wrapperClass,
@@ -1270,8 +1232,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 </div>
               </div>
             </section>
-          </CatalogScrollEngine>
-        );
+          );
         })}
 
         {/* ------------------------------------------------------------------ */}
@@ -1287,14 +1248,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           const showPlateNumber = item.showPlateNumber !== false;
 
           return (
-            <CatalogScrollEngine
+            <section
               key={item.id}
-              mode={scrollTransition}
-              pageIndex={idx + (catalog.customPages?.length || 0) + 2}
-              className="w-full"
-            >
-              <section
-                className={cn(
+              className={cn(
                 "catalog-page plate-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none",
                 !syncArtworkPlates && "p-6 sm:p-10"
               )}
@@ -1404,20 +1360,6 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       )}
 
                       <div className="print-hidden pt-2 clear-both flex flex-wrap items-center gap-3">
-                        <ExhibitionSimulatorModal
-                          artwork={{
-                            title: displayTitle,
-                            subtitle: displaySubtitle,
-                            medium: item.artwork.medium,
-                            period: item.artwork.category?.name || "Traditional Indian Fine Art",
-                            dimensions: item.artwork.dimensions || "Gallery Plate",
-                            imageUrl: item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl,
-                            slug: item.artwork.slug,
-                          }}
-                          triggerText="Simulate on Wall"
-                          triggerVariant="outline"
-                          triggerClassName="h-7 text-xs border-amber-600/50 bg-amber-500/10 text-amber-950 dark:text-amber-200"
-                        />
                         <Link
                           href={`/artwork/${item.artwork.slug}`}
                           target="_blank"
@@ -1523,20 +1465,6 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                           )}
 
                           <div className="print-hidden pt-1 flex flex-wrap items-center gap-3">
-                            <ExhibitionSimulatorModal
-                              artwork={{
-                                title: displayTitle,
-                                subtitle: displaySubtitle,
-                                medium: item.artwork.medium,
-                                period: item.artwork.category?.name || "Traditional Indian Fine Art",
-                                dimensions: item.artwork.dimensions || "Gallery Plate",
-                                imageUrl: item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl,
-                                slug: item.artwork.slug,
-                              }}
-                              triggerText="Simulate on Wall"
-                              triggerVariant="outline"
-                              triggerClassName="h-7 text-xs border-amber-600/50 bg-amber-500/10 text-amber-950 dark:text-amber-200"
-                            />
                             <Link
                               href={`/artwork/${item.artwork.slug}`}
                               target="_blank"
@@ -1620,20 +1548,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 </div>
               </div>
             </section>
-          </CatalogScrollEngine>
-        );
+          );
         })}
 
         {/* ------------------------------------------------------------------ */}
         {/* FINAL PAGE: COLOPHON & ATELIER HERITAGE (Multi-Mode Parity)        */}
         {/* ------------------------------------------------------------------ */}
         {endPageConfig.isEnabled !== false && (
-          <CatalogScrollEngine
-            mode={scrollTransition}
-            pageIndex={catalog.items.length + (catalog.customPages?.length || 0) + 2}
-            className="w-full"
-          >
-          {endMode === "MATRIX" && endPageConfig.matrixConfig ? (
+          endMode === "MATRIX" && endPageConfig.matrixConfig ? (
             (() => {
               const mc = endPageConfig.matrixConfig as Record<string, unknown>;
               const matrixSegments = Array.isArray(mc.segments)
@@ -1852,8 +1774,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               </div>
             </section>
             );
-          })()}
-        </CatalogScrollEngine>
+          })()
         )}
       </main>
 

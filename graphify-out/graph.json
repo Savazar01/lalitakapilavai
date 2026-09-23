@@ -1320,7 +1320,7 @@
       "label": "PageProps",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L42",
+      "source_location": "L40",
       "id": "src_app_public_catalogs_slug_page_tsx_slug_page_pageprops",
       "community": 0,
       "norm_label": "pageprops"
@@ -1329,7 +1329,7 @@
       "label": "getFrameClass()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L48",
+      "source_location": "L46",
       "id": "slug_page_getframeclass",
       "community": 0,
       "norm_label": "getframeclass()"
@@ -1338,7 +1338,7 @@
       "label": "getMagazineGridClass()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L61",
+      "source_location": "L59",
       "id": "slug_page_getmagazinegridclass",
       "community": 0,
       "norm_label": "getmagazinegridclass()"
@@ -1347,7 +1347,7 @@
       "label": "SpineDecoratorSlotView()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L83",
+      "source_location": "L81",
       "id": "slug_page_spinedecoratorslotview",
       "community": 59,
       "norm_label": "spinedecoratorslotview()"
@@ -1356,7 +1356,7 @@
       "label": "CatalogSinglePlateView()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L164",
+      "source_location": "L162",
       "id": "slug_page_catalogsingleplateview",
       "community": 59,
       "norm_label": "catalogsingleplateview()"
@@ -1365,7 +1365,7 @@
       "label": "CatalogBackgroundLayer()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L294",
+      "source_location": "L292",
       "id": "slug_page_catalogbackgroundlayer",
       "community": 0,
       "norm_label": "catalogbackgroundlayer()"
@@ -1374,7 +1374,7 @@
       "label": "generateMetadata()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L399",
+      "source_location": "L397",
       "id": "src_app_public_catalogs_slug_page_tsx_slug_page_generatemetadata",
       "community": 0,
       "norm_label": "generatemetadata()"
@@ -1383,7 +1383,7 @@
       "label": "ECatalogReaderPage()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L417",
+      "source_location": "L415",
       "id": "slug_page_ecatalogreaderpage",
       "community": 0,
       "norm_label": "ecatalogreaderpage()"
@@ -1905,7 +1905,7 @@
       "label": "ECatalogCoverConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L202",
+      "source_location": "L201",
       "id": "id_page_ecatalogcoverconfig",
       "community": 69,
       "norm_label": "ecatalogcoverconfig"
@@ -1914,7 +1914,7 @@
       "label": "ECatalogEssayConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L246",
+      "source_location": "L245",
       "id": "id_page_ecatalogessayconfig",
       "community": 69,
       "norm_label": "ecatalogessayconfig"
@@ -1923,7 +1923,7 @@
       "label": "ECatalogEndPageConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L265",
+      "source_location": "L264",
       "id": "id_page_ecatalogendpageconfig",
       "community": 69,
       "norm_label": "ecatalogendpageconfig"
@@ -1932,7 +1932,7 @@
       "label": "ECatalogCustomPageItem",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L290",
+      "source_location": "L289",
       "id": "id_page_ecatalogcustompageitem",
       "community": 69,
       "norm_label": "ecatalogcustompageitem"
@@ -1941,7 +1941,7 @@
       "label": "ECatalogDetail",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L323",
+      "source_location": "L322",
       "id": "id_page_ecatalogdetail",
       "community": 69,
       "norm_label": "ecatalogdetail"
@@ -1950,7 +1950,7 @@
       "label": "AdminCatalogStudioPage()",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L351",
+      "source_location": "L350",
       "id": "id_page_admincatalogstudiopage",
       "community": 69,
       "norm_label": "admincatalogstudiopage()"
@@ -11370,9 +11370,9 @@
       "source_file": "package.json",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_package_devdependencies",
-      "target": "lalitakapilavai_package_devdependencies_types_three",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_package_devdependencies_types_three"
     },
     {
       "relation": "contains",
@@ -13041,61 +13041,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L27",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_public_catalogs_slug_page_tsx",
-      "target": "src_components_public_catalog_scroll_engine_tsx"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L27",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_public_catalogs_slug_page_tsx",
-      "target": "public_catalog_scroll_engine_catalogscrollengine"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L27",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_public_catalogs_slug_page_tsx",
-      "target": "public_catalog_scroll_engine_scrolltransitionmode"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L28",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_public_catalogs_slug_page_tsx",
-      "target": "src_components_public_exhibition_simulator_modal_tsx"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L28",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app_public_catalogs_slug_page_tsx",
-      "target": "public_exhibition_simulator_modal_exhibitionsimulatormodal"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L21",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -13280,6 +13225,61 @@
       "confidence_score": 1.0,
       "source": "src_app_public_catalogs_slug_page_tsx",
       "target": "slug_page_ecatalogreaderpage"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_public_catalogs_slug_page_tsx",
+      "target": "src_components_public_catalog_scroll_engine_tsx"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_public_catalogs_slug_page_tsx",
+      "target": "public_catalog_scroll_engine_catalogscrollengine"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_public_catalogs_slug_page_tsx",
+      "target": "public_catalog_scroll_engine_scrolltransitionmode"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_public_catalogs_slug_page_tsx",
+      "target": "src_components_public_exhibition_simulator_modal_tsx"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_public_catalogs_slug_page_tsx",
+      "target": "public_exhibition_simulator_modal_exhibitionsimulatormodal"
     },
     {
       "relation": "imports",
@@ -34842,9 +34842,9 @@
       "source_file": "src/components/public/blocks/media-gallery-block.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blocks_media_gallery_block_tsx",
-      "target": "blocks_media_gallery_block_threecylindercarousel",
-      "confidence_score": 1.0
+      "target": "blocks_media_gallery_block_threecylindercarousel"
     },
     {
       "relation": "contains",
@@ -34852,9 +34852,9 @@
       "source_file": "src/components/public/blocks/media-gallery-block.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blocks_media_gallery_block_tsx",
-      "target": "blocks_media_gallery_block_threeliquidwarp",
-      "confidence_score": 1.0
+      "target": "blocks_media_gallery_block_threeliquidwarp"
     },
     {
       "relation": "contains",
@@ -34862,9 +34862,9 @@
       "source_file": "src/components/public/blocks/media-gallery-block.tsx",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blocks_media_gallery_block_tsx",
-      "target": "blocks_media_gallery_block_interactivedepthcard",
-      "confidence_score": 1.0
+      "target": "blocks_media_gallery_block_interactivedepthcard"
     },
     {
       "relation": "contains",
@@ -34872,9 +34872,9 @@
       "source_file": "src/components/public/blocks/media-gallery-block.tsx",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blocks_media_gallery_block_tsx",
-      "target": "blocks_media_gallery_block_kenburnscanvas",
-      "confidence_score": 1.0
+      "target": "blocks_media_gallery_block_kenburnscanvas"
     },
     {
       "relation": "contains",
@@ -41074,5 +41074,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "775674a0d1266f6b41a41432f631da070cd953fe"
+  "built_at_commit": "a308c3c90c58ac603c7dc0021c77621d7eb644c5"
 }

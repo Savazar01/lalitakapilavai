@@ -195,7 +195,6 @@ interface ECatalogThemeConfig {
   textColor?: string;
   frameStyle?: "none" | "gold-fillet" | "double-fillet" | "silk-border";
   accentColor?: string;
-  scrollTransition?: "book-turn" | "parallax-float" | "stagger-reveal" | "soft-fade" | "none";
   readerTheme?: ECatalogThemeTokens;
 }
 
@@ -386,7 +385,6 @@ export default function AdminCatalogStudioPage() {
     textColor: "#FAF7F2",
     frameStyle: "gold-fillet",
     accentColor: "#D4AF37",
-    scrollTransition: "book-turn",
     readerTheme: DEFAULT_CATALOG_THEME_TOKENS,
   });
 
@@ -482,7 +480,6 @@ export default function AdminCatalogStudioPage() {
               textColor: catData.themeConfig.textColor || "#FAF7F2",
               frameStyle: catData.themeConfig.frameStyle || "gold-fillet",
               accentColor: catData.themeConfig.accentColor || "#D4AF37",
-              scrollTransition: catData.themeConfig.scrollTransition || "book-turn",
             });
           }
           if (catData.coverConfig) setCoverConfig((prev) => ({ ...prev, ...catData.coverConfig }));
@@ -1301,30 +1298,6 @@ export default function AdminCatalogStudioPage() {
                   </Select>
                   <p className="text-[10px] text-muted-foreground">
                     Applies gold leaf borders, corner medallions, and framing accents across all catalog pages.
-                  </p>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Page Scroll Motion & 3D Transitions</label>
-                  <Select
-                    value={themeConfig.scrollTransition || "book-turn"}
-                    onValueChange={(val: "book-turn" | "parallax-float" | "stagger-reveal" | "soft-fade" | "none") =>
-                      setThemeConfig((prev) => ({ ...prev, scrollTransition: val }))
-                    }
-                  >
-                    <SelectTrigger className="text-xs">
-                      <SelectValue placeholder="Select Transition Mode" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="book-turn">3D Book Turn & Realistic Page Flip</SelectItem>
-                      <SelectItem value="parallax-float">Smooth Inertia Parallax Floating</SelectItem>
-                      <SelectItem value="stagger-reveal">Staggered Plate Reveal</SelectItem>
-                      <SelectItem value="soft-fade">Soft Vignette Fade</SelectItem>
-                      <SelectItem value="none">Standard Smooth Scroll</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-[10px] text-muted-foreground">
-                    Interactive 3D page curl, scroll-driven perspective rotation, and plate reveal mechanics.
                   </p>
                 </div>
 

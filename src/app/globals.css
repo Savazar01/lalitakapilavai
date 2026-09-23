@@ -859,5 +859,49 @@ body {
   border-color: var(--cat-border-color, #E2E8F0) !important;
 }
 
+/* =============================================================================
+ * Flat 2D Invariant & Print Isolation for e-Catalog Reader
+ * Eliminates all 3D transforms, perspective warping, and inertia scroll skew.
+ * ============================================================================= */
+[data-catalog-reader="true"] .catalog-page,
+[data-catalog-reader="true"] .catalog-frame,
+[data-catalog-reader="true"] .catalog-page-card {
+  transform: none !important;
+  perspective: none !important;
+  transform-style: flat !important;
+}
+
+@media print {
+  body,
+  html,
+  [data-catalog-reader="true"] {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .no-print,
+  .print-hidden,
+  header,
+  nav,
+  .catalog-action-bar,
+  [data-catalog-toolbar="true"] {
+    display: none !important;
+  }
+
+  .catalog-page {
+    page-break-after: always !important;
+    break-after: page !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;
+  }
+}
+
+
 
 
