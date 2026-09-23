@@ -1347,16 +1347,16 @@
       "label": "CatalogBackgroundLayer()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L284",
+      "source_location": "L291",
       "id": "slug_page_catalogbackgroundlayer",
-      "community": 51,
+      "community": 44,
       "norm_label": "catalogbackgroundlayer()"
     },
     {
       "label": "generateMetadata()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L389",
+      "source_location": "L396",
       "id": "src_app_public_catalogs_slug_page_tsx_slug_page_generatemetadata",
       "community": 51,
       "norm_label": "generatemetadata()"
@@ -1365,7 +1365,7 @@
       "label": "ECatalogReaderPage()",
       "file_type": "code",
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
-      "source_location": "L407",
+      "source_location": "L414",
       "id": "slug_page_ecatalogreaderpage",
       "community": 51,
       "norm_label": "ecatalogreaderpage()"
@@ -1619,7 +1619,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_posts_slug_page_tsx",
-      "community": 81,
+      "community": 8,
       "norm_label": "page.tsx"
     },
     {
@@ -1628,7 +1628,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L3",
       "id": "src_app_public_posts_slug_page_tsx_slug_page_pageprops",
-      "community": 81,
+      "community": 8,
       "norm_label": "pageprops"
     },
     {
@@ -1637,7 +1637,7 @@
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L9",
       "id": "slug_page_postsluglegacyredirect",
-      "community": 81,
+      "community": 8,
       "norm_label": "postsluglegacyredirect()"
     },
     {
@@ -1869,7 +1869,7 @@
       "label": "ECatalogEssayConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L242",
+      "source_location": "L245",
       "id": "id_page_ecatalogessayconfig",
       "community": 69,
       "norm_label": "ecatalogessayconfig"
@@ -1878,7 +1878,7 @@
       "label": "ECatalogEndPageConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L259",
+      "source_location": "L264",
       "id": "id_page_ecatalogendpageconfig",
       "community": 69,
       "norm_label": "ecatalogendpageconfig"
@@ -1887,7 +1887,7 @@
       "label": "ECatalogCustomPageItem",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L282",
+      "source_location": "L289",
       "id": "id_page_ecatalogcustompageitem",
       "community": 69,
       "norm_label": "ecatalogcustompageitem"
@@ -1896,7 +1896,7 @@
       "label": "ECatalogDetail",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L315",
+      "source_location": "L322",
       "id": "id_page_ecatalogdetail",
       "community": 69,
       "norm_label": "ecatalogdetail"
@@ -1905,7 +1905,7 @@
       "label": "AdminCatalogStudioPage()",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
-      "source_location": "L343",
+      "source_location": "L350",
       "id": "id_page_admincatalogstudiopage",
       "community": 69,
       "norm_label": "admincatalogstudiopage()"
@@ -2141,7 +2141,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/builder-client.tsx",
       "source_location": "L152",
       "id": "builder_builder_client_sortablesection",
-      "community": 51,
+      "community": 44,
       "norm_label": "sortablesection()"
     },
     {
@@ -3104,7 +3104,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_posts_id_route_ts",
-      "community": 48,
+      "community": 29,
       "norm_label": "route.ts"
     },
     {
@@ -3113,7 +3113,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L5",
       "id": "src_app_api_admin_posts_id_route_ts_id_route_routeparams",
-      "community": 48,
+      "community": 29,
       "norm_label": "routeparams"
     },
     {
@@ -3122,7 +3122,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L9",
       "id": "src_app_api_admin_posts_id_route_ts_id_route_get",
-      "community": 48,
+      "community": 29,
       "norm_label": "get()"
     },
     {
@@ -3131,7 +3131,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L36",
       "id": "src_app_api_admin_posts_id_route_ts_id_route_put",
-      "community": 48,
+      "community": 29,
       "norm_label": "put()"
     },
     {
@@ -3140,7 +3140,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L131",
       "id": "src_app_api_admin_posts_id_route_ts_id_route_delete",
-      "community": 48,
+      "community": 29,
       "norm_label": "delete()"
     },
     {
@@ -3302,7 +3302,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_widgets_route_ts",
-      "community": 45,
+      "community": 48,
       "norm_label": "route.ts"
     },
     {
@@ -3311,7 +3311,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L7",
       "id": "widgets_route_get",
-      "community": 45,
+      "community": 48,
       "norm_label": "get()"
     },
     {
@@ -3320,7 +3320,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L71",
       "id": "widgets_route_post",
-      "community": 45,
+      "community": 48,
       "norm_label": "post()"
     },
     {
@@ -3329,7 +3329,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L116",
       "id": "widgets_route_put",
-      "community": 45,
+      "community": 48,
       "norm_label": "put()"
     },
     {
@@ -3392,7 +3392,7 @@
       "source_file": "src/app/api/blogs/route.ts",
       "source_location": "L1",
       "id": "src_app_api_blogs_route_ts",
-      "community": 29,
+      "community": 48,
       "norm_label": "route.ts"
     },
     {
@@ -3401,7 +3401,7 @@
       "source_file": "src/app/api/blogs/route.ts",
       "source_location": "L4",
       "id": "blogs_route_get",
-      "community": 29,
+      "community": 48,
       "norm_label": "get()"
     },
     {
@@ -3698,7 +3698,7 @@
       "source_file": "src/components/admin/catalog-matrix-studio.tsx",
       "source_location": "L101",
       "id": "admin_catalog_matrix_studio_catalogmatrixstudioprops",
-      "community": 43,
+      "community": 4,
       "norm_label": "catalogmatrixstudioprops"
     },
     {
@@ -3741,7 +3741,7 @@
       "label": "CatalogSinglePlateEditorProps",
       "file_type": "code",
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
-      "source_location": "L45",
+      "source_location": "L47",
       "id": "admin_catalog_single_plate_editor_catalogsingleplateeditorprops",
       "community": 69,
       "norm_label": "catalogsingleplateeditorprops"
@@ -3750,7 +3750,7 @@
       "label": "MATTING_PRESETS",
       "file_type": "code",
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
-      "source_location": "L52",
+      "source_location": "L54",
       "id": "admin_catalog_single_plate_editor_matting_presets",
       "community": 69,
       "norm_label": "matting_presets"
@@ -3759,7 +3759,7 @@
       "label": "CatalogSinglePlateEditor()",
       "file_type": "code",
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
-      "source_location": "L61",
+      "source_location": "L63",
       "id": "admin_catalog_single_plate_editor_catalogsingleplateeditor",
       "community": 69,
       "norm_label": "catalogsingleplateeditor()"
@@ -3768,7 +3768,7 @@
       "label": "EditorialModeSwitcher()",
       "file_type": "code",
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
-      "source_location": "L703",
+      "source_location": "L705",
       "id": "admin_catalog_single_plate_editor_editorialmodeswitcher",
       "community": 69,
       "norm_label": "editorialmodeswitcher()"
@@ -4139,7 +4139,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L46",
       "id": "builder_form_block_inspector_formblockdata",
-      "community": 4,
+      "community": 44,
       "norm_label": "formblockdata"
     },
     {
@@ -4247,7 +4247,7 @@
       "source_file": "src/components/builder/page-matrix-studio.tsx",
       "source_location": "L113",
       "id": "builder_page_matrix_studio_pagematrixstudioprops",
-      "community": 43,
+      "community": 4,
       "norm_label": "pagematrixstudioprops"
     },
     {
@@ -4373,7 +4373,7 @@
       "source_file": "src/components/builder/timeline-inspector.tsx",
       "source_location": "L77",
       "id": "builder_timeline_inspector_timelineinspector",
-      "community": 44,
+      "community": 43,
       "norm_label": "timelineinspector()"
     },
     {
@@ -5037,7 +5037,7 @@
       "label": "CatalogMatrixPage()",
       "file_type": "code",
       "source_file": "src/components/public/catalog-matrix-page.tsx",
-      "source_location": "L41",
+      "source_location": "L45",
       "id": "public_catalog_matrix_page_catalogmatrixpage",
       "community": 4,
       "norm_label": "catalogmatrixpage()"
@@ -5390,7 +5390,7 @@
       "source_file": "src/components/public/tiptap-renderer.tsx",
       "source_location": "L68",
       "id": "public_tiptap_renderer_tiptaprendererprops",
-      "community": 43,
+      "community": 4,
       "norm_label": "tiptaprendererprops"
     },
     {
@@ -5498,7 +5498,7 @@
       "source_file": "src/components/public/blocks/dynamic-form-block.tsx",
       "source_location": "L34",
       "id": "blocks_dynamic_form_block_dynamicformconfig",
-      "community": 4,
+      "community": 44,
       "norm_label": "dynamicformconfig"
     },
     {
@@ -5642,7 +5642,7 @@
       "source_file": "src/components/public/blocks/timeline-block.tsx",
       "source_location": "L66",
       "id": "blocks_timeline_block_timelineblock",
-      "community": 59,
+      "community": 43,
       "norm_label": "timelineblock()"
     },
     {
@@ -6578,7 +6578,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L1",
       "id": "src_lib_background_patterns_ts",
-      "community": 51,
+      "community": 44,
       "norm_label": "background-patterns.ts"
     },
     {
@@ -6587,7 +6587,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L6",
       "id": "lib_background_patterns_backgroundpattern",
-      "community": 51,
+      "community": 44,
       "norm_label": "backgroundpattern"
     },
     {
@@ -6596,7 +6596,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L33",
       "id": "lib_background_patterns_background_patterns",
-      "community": 51,
+      "community": 44,
       "norm_label": "background_patterns"
     },
     {
@@ -6605,7 +6605,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L84",
       "id": "lib_background_patterns_getpatternbyid",
-      "community": 51,
+      "community": 44,
       "norm_label": "getpatternbyid()"
     },
     {
@@ -6614,7 +6614,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L89",
       "id": "lib_background_patterns_getpatternstyle",
-      "community": 51,
+      "community": 44,
       "norm_label": "getpatternstyle()"
     },
     {
@@ -7406,7 +7406,7 @@
       "source_file": "src/lib/theme-contrast.ts",
       "source_location": "L155",
       "id": "lib_theme_contrast_dynamiccontrastscope",
-      "community": 43,
+      "community": 4,
       "norm_label": "dynamiccontrastscope"
     },
     {
@@ -7415,7 +7415,7 @@
       "source_file": "src/lib/theme-contrast.ts",
       "source_location": "L156",
       "id": "lib_theme_contrast_contrastmode",
-      "community": 43,
+      "community": 4,
       "norm_label": "contrastmode"
     },
     {
@@ -7602,7 +7602,7 @@
       "label": "CoverFramingConfig",
       "file_type": "code",
       "source_file": "src/types/catalog.ts",
-      "source_location": "L61",
+      "source_location": "L63",
       "id": "types_catalog_coverframingconfig",
       "community": 69,
       "norm_label": "coverframingconfig"
@@ -7611,7 +7611,7 @@
       "label": "EssayConfig",
       "file_type": "code",
       "source_file": "src/types/catalog.ts",
-      "source_location": "L81",
+      "source_location": "L86",
       "id": "types_catalog_essayconfig",
       "community": 69,
       "norm_label": "essayconfig"
@@ -7620,7 +7620,7 @@
       "label": "EndPageConfig",
       "file_type": "code",
       "source_file": "src/types/catalog.ts",
-      "source_location": "L90",
+      "source_location": "L95",
       "id": "types_catalog_endpageconfig",
       "community": 69,
       "norm_label": "endpageconfig"
@@ -7629,7 +7629,7 @@
       "label": "ECatalogCustomTextConfig",
       "file_type": "code",
       "source_file": "src/types/catalog.ts",
-      "source_location": "L103",
+      "source_location": "L108",
       "id": "types_catalog_ecatalogcustomtextconfig",
       "community": 69,
       "norm_label": "ecatalogcustomtextconfig"
@@ -7638,7 +7638,7 @@
       "label": "ECatalogThemeTokens",
       "file_type": "code",
       "source_file": "src/types/catalog.ts",
-      "source_location": "L116",
+      "source_location": "L121",
       "id": "types_catalog_ecatalogthemetokens",
       "community": 69,
       "norm_label": "ecatalogthemetokens"
@@ -7647,7 +7647,7 @@
       "label": "DEFAULT_CATALOG_THEME_TOKENS",
       "file_type": "code",
       "source_file": "src/types/catalog.ts",
-      "source_location": "L135",
+      "source_location": "L140",
       "id": "types_catalog_default_catalog_theme_tokens",
       "community": 69,
       "norm_label": "default_catalog_theme_tokens"
@@ -10141,7 +10141,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L22",
-      "community": 81,
+      "community": 8,
       "norm_label": "generatemetadata()",
       "id": "src_app_public_posts_slug_page_tsx_slug_page_generatemetadata"
     },
@@ -10150,7 +10150,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/[slug]/page.tsx",
       "source_location": "L53",
-      "community": 81,
+      "community": 8,
       "norm_label": "blogpostdetailpage()",
       "id": "slug_page_blogpostdetailpage"
     },
@@ -12455,9 +12455,9 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_catalogs_slug_page_tsx",
-      "target": "types_catalog_spinedecoratorslot",
-      "confidence_score": 1.0
+      "target": "types_catalog_spinedecoratorslot"
     },
     {
       "relation": "imports_from",
@@ -12671,9 +12671,9 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L80",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_catalogs_slug_page_tsx",
-      "target": "slug_page_spinedecoratorslotview",
-      "confidence_score": 1.0
+      "target": "slug_page_spinedecoratorslotview"
     },
     {
       "relation": "contains",
@@ -12681,9 +12681,9 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L161",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_public_catalogs_slug_page_tsx",
-      "target": "slug_page_catalogsingleplateview",
-      "confidence_score": 1.0
+      "target": "slug_page_catalogsingleplateview"
     },
     {
       "relation": "contains",
@@ -15740,9 +15740,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_catalogs_id_page_tsx",
-      "target": "types_catalog_editorialpagemode",
-      "confidence_score": 1.0
+      "target": "types_catalog_editorialpagemode"
     },
     {
       "relation": "imports",
@@ -15751,9 +15751,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_catalogs_id_page_tsx",
-      "target": "types_catalog_spinedecoratorslot",
-      "confidence_score": 1.0
+      "target": "types_catalog_spinedecoratorslot"
     },
     {
       "relation": "imports",
@@ -15762,9 +15762,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_catalogs_id_page_tsx",
-      "target": "types_catalog_universalpageconfig",
-      "confidence_score": 1.0
+      "target": "types_catalog_universalpageconfig"
     },
     {
       "relation": "imports_from",
@@ -15773,9 +15773,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_catalogs_id_page_tsx",
-      "target": "src_components_admin_catalog_single_plate_editor_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_admin_catalog_single_plate_editor_tsx"
     },
     {
       "relation": "imports",
@@ -15784,9 +15784,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_catalogs_id_page_tsx",
-      "target": "admin_catalog_single_plate_editor_catalogsingleplateeditor",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_catalogsingleplateeditor"
     },
     {
       "relation": "imports",
@@ -15795,9 +15795,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_catalogs_id_page_tsx",
-      "target": "admin_catalog_single_plate_editor_editorialmodeswitcher",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_editorialmodeswitcher"
     },
     {
       "relation": "imports",
@@ -15806,9 +15806,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_dashboard_catalogs_id_page_tsx",
-      "target": "admin_catalog_single_plate_editor_singleplateconfigstate",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_singleplateconfigstate"
     },
     {
       "relation": "imports_from",
@@ -16519,9 +16519,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L202",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogcoverconfig",
-      "target": "types_catalog_editorialpagemode",
-      "confidence_score": 1.0
+      "target": "types_catalog_editorialpagemode"
     },
     {
       "relation": "references",
@@ -16541,9 +16541,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L209",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogcoverconfig",
-      "target": "admin_catalog_single_plate_editor_singleplateconfigstate",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_singleplateconfigstate"
     },
     {
       "relation": "references",
@@ -16552,9 +16552,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L218",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogcoverconfig",
-      "target": "types_catalog_spinedecoratorslot",
-      "confidence_score": 1.0
+      "target": "types_catalog_spinedecoratorslot"
     },
     {
       "relation": "references",
@@ -16563,9 +16563,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L243",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogessayconfig",
-      "target": "types_catalog_editorialpagemode",
-      "confidence_score": 1.0
+      "target": "types_catalog_editorialpagemode"
     },
     {
       "relation": "references",
@@ -16574,9 +16574,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L248",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogessayconfig",
-      "target": "admin_catalog_matrix_studio_catalogmatrixconfig",
-      "confidence_score": 1.0
+      "target": "admin_catalog_matrix_studio_catalogmatrixconfig"
     },
     {
       "relation": "references",
@@ -16585,9 +16585,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L249",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogessayconfig",
-      "target": "admin_catalog_single_plate_editor_singleplateconfigstate",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_singleplateconfigstate"
     },
     {
       "relation": "references",
@@ -16596,9 +16596,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L260",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogendpageconfig",
-      "target": "types_catalog_editorialpagemode",
-      "confidence_score": 1.0
+      "target": "types_catalog_editorialpagemode"
     },
     {
       "relation": "references",
@@ -16618,9 +16618,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L269",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogendpageconfig",
-      "target": "admin_catalog_single_plate_editor_singleplateconfigstate",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_singleplateconfigstate"
     },
     {
       "relation": "references",
@@ -16629,9 +16629,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L287",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogcustompageitem",
-      "target": "types_catalog_editorialpagemode",
-      "confidence_score": 1.0
+      "target": "types_catalog_editorialpagemode"
     },
     {
       "relation": "references",
@@ -16640,9 +16640,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L291",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogcustompageitem",
-      "target": "admin_catalog_single_plate_editor_singleplateconfigstate",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_singleplateconfigstate"
     },
     {
       "relation": "references",
@@ -16651,9 +16651,9 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L292",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "id_page_ecatalogcustompageitem",
-      "target": "types_catalog_universalpageconfig",
-      "confidence_score": 1.0
+      "target": "types_catalog_universalpageconfig"
     },
     {
       "relation": "references",
@@ -25510,9 +25510,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "src_components_admin_media_uploader_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_admin_media_uploader_tsx"
     },
     {
       "relation": "imports",
@@ -25521,9 +25521,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "admin_media_uploader_mediauploader",
-      "confidence_score": 1.0
+      "target": "admin_media_uploader_mediauploader"
     },
     {
       "relation": "imports_from",
@@ -25532,9 +25532,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "src_components_admin_universal_media_dialog_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_admin_universal_media_dialog_tsx"
     },
     {
       "relation": "imports",
@@ -25543,9 +25543,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "admin_universal_media_dialog_universalmediadialog",
-      "confidence_score": 1.0
+      "target": "admin_universal_media_dialog_universalmediadialog"
     },
     {
       "relation": "imports_from",
@@ -25554,9 +25554,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "src_lib_catalog_ribbon_patterns_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_catalog_ribbon_patterns_ts"
     },
     {
       "relation": "imports",
@@ -25565,9 +25565,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "lib_catalog_ribbon_patterns_standard_ribbon_patterns",
-      "confidence_score": 1.0
+      "target": "lib_catalog_ribbon_patterns_standard_ribbon_patterns"
     },
     {
       "relation": "imports_from",
@@ -25576,9 +25576,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "src_lib_utils_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_utils_ts"
     },
     {
       "relation": "imports",
@@ -25587,9 +25587,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "lib_utils_cn",
-      "confidence_score": 1.0
+      "target": "lib_utils_cn"
     },
     {
       "relation": "imports_from",
@@ -25598,9 +25598,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "src_components_ui_input_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_input_tsx"
     },
     {
       "relation": "imports",
@@ -25609,9 +25609,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "ui_input_input",
-      "confidence_score": 1.0
+      "target": "ui_input_input"
     },
     {
       "relation": "imports_from",
@@ -25620,9 +25620,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "src_components_ui_button_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_button_tsx"
     },
     {
       "relation": "imports",
@@ -25631,9 +25631,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "ui_button_button",
-      "confidence_score": 1.0
+      "target": "ui_button_button"
     },
     {
       "relation": "imports_from",
@@ -25642,9 +25642,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "src_components_ui_badge_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_badge_tsx"
     },
     {
       "relation": "imports",
@@ -25653,9 +25653,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "ui_badge_badge",
-      "confidence_score": 1.0
+      "target": "ui_badge_badge"
     },
     {
       "relation": "imports_from",
@@ -25664,9 +25664,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "src_types_catalog_ts",
-      "confidence_score": 1.0
+      "target": "src_types_catalog_ts"
     },
     {
       "relation": "imports",
@@ -25675,9 +25675,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "types_catalog_spinedecoratorslot",
-      "confidence_score": 1.0
+      "target": "types_catalog_spinedecoratorslot"
     },
     {
       "relation": "contains",
@@ -25685,9 +25685,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "admin_catalog_single_plate_editor_singleplateconfigstate",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_singleplateconfigstate"
     },
     {
       "relation": "contains",
@@ -25695,9 +25695,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "admin_catalog_single_plate_editor_catalogsingleplateeditorprops",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_catalogsingleplateeditorprops"
     },
     {
       "relation": "contains",
@@ -25705,9 +25705,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "admin_catalog_single_plate_editor_matting_presets",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_matting_presets"
     },
     {
       "relation": "contains",
@@ -25715,9 +25715,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "admin_catalog_single_plate_editor_catalogsingleplateeditor",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_catalogsingleplateeditor"
     },
     {
       "relation": "contains",
@@ -25725,9 +25725,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L703",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_catalog_single_plate_editor_tsx",
-      "target": "admin_catalog_single_plate_editor_editorialmodeswitcher",
-      "confidence_score": 1.0
+      "target": "admin_catalog_single_plate_editor_editorialmodeswitcher"
     },
     {
       "relation": "references",
@@ -25736,9 +25736,9 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_catalog_single_plate_editor_singleplateconfigstate",
-      "target": "types_catalog_spinedecoratorslot",
-      "confidence_score": 1.0
+      "target": "types_catalog_spinedecoratorslot"
     },
     {
       "relation": "calls",
@@ -29656,9 +29656,9 @@
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_editor_tsx",
-      "target": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_builder_tiptap_floating_layer_node_tsx"
     },
     {
       "relation": "imports",
@@ -29667,9 +29667,9 @@
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_editor_tsx",
-      "target": "builder_tiptap_floating_layer_node_floatinglayernode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_floating_layer_node_floatinglayernode"
     },
     {
       "relation": "re_exports",
@@ -30034,9 +30034,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "src_components_ui_button_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_button_tsx"
     },
     {
       "relation": "imports",
@@ -30045,9 +30045,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "ui_button_button",
-      "confidence_score": 1.0
+      "target": "ui_button_button"
     },
     {
       "relation": "imports_from",
@@ -30056,9 +30056,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "src_components_ui_input_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_input_tsx"
     },
     {
       "relation": "imports",
@@ -30067,9 +30067,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "ui_input_input",
-      "confidence_score": 1.0
+      "target": "ui_input_input"
     },
     {
       "relation": "imports_from",
@@ -30078,9 +30078,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "src_components_ui_popover_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_popover_tsx"
     },
     {
       "relation": "imports",
@@ -30089,9 +30089,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "ui_popover_popovercontent",
-      "confidence_score": 1.0
+      "target": "ui_popover_popovercontent"
     },
     {
       "relation": "imports_from",
@@ -30100,9 +30100,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "src_components_ui_select_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_select_tsx"
     },
     {
       "relation": "imports",
@@ -30111,9 +30111,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "ui_select_selectcontent",
-      "confidence_score": 1.0
+      "target": "ui_select_selectcontent"
     },
     {
       "relation": "imports",
@@ -30122,9 +30122,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "ui_select_selectitem",
-      "confidence_score": 1.0
+      "target": "ui_select_selectitem"
     },
     {
       "relation": "imports",
@@ -30133,9 +30133,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "ui_select_selecttrigger",
-      "confidence_score": 1.0
+      "target": "ui_select_selecttrigger"
     },
     {
       "relation": "contains",
@@ -30143,9 +30143,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "builder_tiptap_floating_layer_node_floatinglayerattributes",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_floating_layer_node_floatinglayerattributes"
     },
     {
       "relation": "contains",
@@ -30153,9 +30153,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "builder_tiptap_floating_layer_node_blend_modes",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_floating_layer_node_blend_modes"
     },
     {
       "relation": "contains",
@@ -30163,9 +30163,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "builder_tiptap_floating_layer_node_floatinglayerviewcomponent",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_floating_layer_node_floatinglayerviewcomponent"
     },
     {
       "relation": "contains",
@@ -30173,9 +30173,9 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L396",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_builder_tiptap_floating_layer_node_tsx",
-      "target": "builder_tiptap_floating_layer_node_floatinglayernode",
-      "confidence_score": 1.0
+      "target": "builder_tiptap_floating_layer_node_floatinglayernode"
     },
     {
       "relation": "imports_from",
@@ -35172,9 +35172,9 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_catalog_ribbon_patterns_ts",
-      "target": "lib_catalog_ribbon_patterns_ribbonpattern",
-      "confidence_score": 1.0
+      "target": "lib_catalog_ribbon_patterns_ribbonpattern"
     },
     {
       "relation": "contains",
@@ -35182,9 +35182,9 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_catalog_ribbon_patterns_ts",
-      "target": "lib_catalog_ribbon_patterns_standard_ribbon_patterns",
-      "confidence_score": 1.0
+      "target": "lib_catalog_ribbon_patterns_standard_ribbon_patterns"
     },
     {
       "relation": "contains",
@@ -35192,9 +35192,9 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L180",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_catalog_ribbon_patterns_ts",
-      "target": "lib_catalog_ribbon_patterns_getribbonpatternbyid",
-      "confidence_score": 1.0
+      "target": "lib_catalog_ribbon_patterns_getribbonpatternbyid"
     },
     {
       "relation": "contains",
@@ -35202,9 +35202,9 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L185",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_catalog_ribbon_patterns_ts",
-      "target": "lib_catalog_ribbon_patterns_ispresetribbonpattern",
-      "confidence_score": 1.0
+      "target": "lib_catalog_ribbon_patterns_ispresetribbonpattern"
     },
     {
       "relation": "contains",
@@ -36433,9 +36433,9 @@
       "source_file": "src/types/catalog.ts",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_types_catalog_ts",
-      "target": "types_catalog_editorialpagemode",
-      "confidence_score": 1.0
+      "target": "types_catalog_editorialpagemode"
     },
     {
       "relation": "contains",
@@ -36443,9 +36443,9 @@
       "source_file": "src/types/catalog.ts",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_types_catalog_ts",
-      "target": "types_catalog_spinedecoratorslot",
-      "confidence_score": 1.0
+      "target": "types_catalog_spinedecoratorslot"
     },
     {
       "relation": "contains",
@@ -36453,9 +36453,9 @@
       "source_file": "src/types/catalog.ts",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_types_catalog_ts",
-      "target": "types_catalog_universalpageconfig",
-      "confidence_score": 1.0
+      "target": "types_catalog_universalpageconfig"
     },
     {
       "relation": "contains",
@@ -38940,5 +38940,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "ca0fbe6a22d554d82ee678bf8eab87d121c8681e"
+  "built_at_commit": "fb6fc7e5ed621545f765fa4f29d9682f9f2bdbf1"
 }

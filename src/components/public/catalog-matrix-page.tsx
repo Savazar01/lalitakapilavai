@@ -32,6 +32,10 @@ interface CatalogMatrixPageProps {
   segments?: MatrixCellSegmentData[] | null;
   frameClass?: string;
   backgroundColor?: string | null;
+  outerBorderColor?: string | null;
+  innerBorderColor?: string | null;
+  canvasBgColor?: string | null;
+  mattingPadding?: number;
   backgroundLayer?: React.ReactNode;
   catalogTitle: string;
   fallbackContentHtml?: string | null;
@@ -56,14 +60,19 @@ export function CatalogMatrixPage({
   segments = [],
   frameClass = "catalog-frame-gold border-2 border-primary/50",
   backgroundColor,
+  outerBorderColor,
+  innerBorderColor,
+  canvasBgColor,
+  mattingPadding,
   backgroundLayer,
   catalogTitle,
   fallbackContentHtml,
   aspectRatio,
 }: CatalogMatrixPageProps) {
+  const resolvedBg = outerBorderColor || backgroundColor;
   const contrast = resolveContainerContrast({
-    backgroundColor,
-    backgroundMode: backgroundColor ? "color" : "none",
+    backgroundColor: canvasBgColor || backgroundColor,
+    backgroundMode: (canvasBgColor || backgroundColor) ? "color" : "none",
   });
   const typographyClasses = getContrastTypographyClasses(contrast);
 
@@ -89,22 +98,32 @@ export function CatalogMatrixPage({
 
   const hasMatrixCells = Array.isArray(segments) && segments.length > 0;
   const isSpineActive = verticalSpineMode === "LEFT" || verticalSpineMode === "RIGHT";
+  const hasCustomPadding = typeof mattingPadding === "number";
 
   return (
     <section
       className={cn(
-        "catalog-page catalog-matrix-page-wrapper editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none",
+        "catalog-page catalog-matrix-page-wrapper editorial-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none",
+        !hasCustomPadding && "p-6 sm:p-10",
         typographyClasses
       )}
       style={{
-        ...(backgroundColor ? { backgroundColor } : {}),
+        ...(resolvedBg ? { backgroundColor: resolvedBg } : {}),
+        ...(hasCustomPadding ? { padding: `${mattingPadding}px` } : {}),
         ...(aspectRatio ? { aspectRatio: `${aspectRatio}` } : {}),
       }}
     >
       {backgroundLayer}
 
       <div
-        className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+        className={cn(
+          "catalog-frame relative z-10 p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full transition-colors",
+          frameClass
+        )}
+        style={{
+          ...(canvasBgColor ? { backgroundColor: canvasBgColor } : { backgroundColor: "var(--cat-card-bg, rgba(255, 255, 255, 0.95))" }),
+          ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
+        }}
       >
         {/* Running Header */}
         {hasHeader && headerHtml ? (

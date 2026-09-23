@@ -32,9 +32,11 @@ export interface SinglePlateConfigState {
   primaryImageUrl?: string;
   presentation?: "contained" | "full-bleed";
   mattingBgColor?: string;
+  canvasBgColor?: string;
   outerBorderColor?: string;
   innerBorderColor?: string;
   borderWidth?: number;
+  mattingPadding?: number;
   focalPosition?: string;
   headerSlot?: SpineDecoratorSlot;
   footerSlot?: SpineDecoratorSlot;
@@ -164,22 +166,22 @@ export function CatalogSinglePlateEditor({
           </div>
         </div>
 
-        {/* Matting Canvas Background Color */}
+        {/* Plate Canvas Background Color */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-              <Palette className="w-3.5 h-3.5 text-primary" /> Matting Canvas Background Color
+              <Palette className="w-3.5 h-3.5 text-primary" /> Plate Canvas Background Color
             </label>
             <div className="flex items-center gap-2">
               <input
                 type="color"
-                value={mattingBgColor}
-                onChange={(e) => onChange({ mattingBgColor: e.target.value })}
+                value={config.canvasBgColor || mattingBgColor}
+                onChange={(e) => onChange({ mattingBgColor: e.target.value, canvasBgColor: e.target.value })}
                 className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
               />
               <Input
-                value={mattingBgColor}
-                onChange={(e) => onChange({ mattingBgColor: e.target.value })}
+                value={config.canvasBgColor || mattingBgColor}
+                onChange={(e) => onChange({ mattingBgColor: e.target.value, canvasBgColor: e.target.value })}
                 placeholder="#FAF7F2"
                 className="text-xs font-mono"
               />
@@ -190,7 +192,7 @@ export function CatalogSinglePlateEditor({
                 <button
                   key={preset.hex}
                   type="button"
-                  onClick={() => onChange({ mattingBgColor: preset.hex })}
+                  onClick={() => onChange({ mattingBgColor: preset.hex, canvasBgColor: preset.hex })}
                   className="px-1.5 py-0.5 text-[9px] rounded border border-border/80 bg-background hover:bg-muted font-mono flex items-center gap-1 cursor-pointer transition-colors"
                   title={preset.name}
                 >

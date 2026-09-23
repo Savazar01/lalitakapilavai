@@ -54,15 +54,20 @@ export interface UniversalPageConfig {
     innerColor?: string;
     thicknessPx?: number;
     mattingBgColor?: string;
+    canvasBgColor?: string;
     syncGlobal?: boolean;
+    syncArtworkPlates?: boolean;
   };
 }
 
 export interface CoverFramingConfig {
-  coverMattingColor?: string; // e.g. "transparent" or hex code
+  coverMattingColor?: string; // e.g. "transparent" or hex code for outer matting
   innerBorderColor?: string;  // e.g. "#D4AF37"
-  mattingPadding?: number;    // e.g. 0, 4, 8, 16, 24
-  coverBgColor?: string;      // Dedicated Cover Canvas Background Color (Default: "#FAF7F2" or inherits base canvas)
+  mattingPadding?: number;    // e.g. 0, 4, 8, 16, 24, 32
+  coverBgColor?: string;      // Dedicated Cover Canvas Background Color (Default: "#FAF7F2")
+  canvasBgColor?: string;     // Inner canvas background alias
+  syncGlobal?: boolean;       // Apply universally across editorial pages
+  syncArtworkPlates?: boolean;// Apply framing to artwork masterwork plates
   coverTextColor?: string;
   titleColor?: string;        // Default: "#0F172A"
   titleFont?: string;         // Default: "var(--font-cinzel), serif"

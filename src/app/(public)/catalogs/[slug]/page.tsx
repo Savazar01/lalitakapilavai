@@ -163,6 +163,7 @@ function CatalogSinglePlateView({
   presentation = "contained",
   mattingBgColor,
   outerMattingColor,
+  canvasBgColor,
   focalPosition = "center center",
   headerSlot,
   footerSlot,
@@ -180,6 +181,7 @@ function CatalogSinglePlateView({
   presentation?: "contained" | "full-bleed";
   mattingBgColor?: string;
   outerMattingColor?: string;
+  canvasBgColor?: string;
   focalPosition?: string;
   headerSlot?: SpineDecoratorSlot;
   footerSlot?: SpineDecoratorSlot;
@@ -230,12 +232,17 @@ function CatalogSinglePlateView({
   }
 
   // Contained with Matting & Spines
+  const resolvedInnerBg = canvasBgColor || mattingBgColor || "var(--cat-canvas-bg, #FAF7F2)";
+  const resolvedOuterBg = (mattingPadding > 0 && outerMattingColor)
+    ? outerMattingColor
+    : resolvedInnerBg;
+
   return (
     <div
       className="catalog-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none"
       style={{
         aspectRatio: `${aspectRatio}`,
-        backgroundColor: (mattingPadding > 0 && outerMattingColor) ? outerMattingColor : (mattingBgColor || "var(--cat-canvas-bg)"),
+        backgroundColor: resolvedOuterBg,
         padding: `${mattingPadding}px`,
       }}
     >
@@ -246,7 +253,7 @@ function CatalogSinglePlateView({
           frameClass
         )}
         style={{
-          backgroundColor: mattingBgColor || "var(--cat-canvas-bg)",
+          backgroundColor: resolvedInnerBg,
           ...(innerBorderColor ? { borderColor: innerBorderColor } : {}),
         }}
       >
@@ -549,43 +556,41 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
   const pageSize = ((catalog as unknown as { pageSize?: string }).pageSize as CatalogPageSize) || "A4";
   const geometry = getCatalogDimensions(pageSize, orientation);
 
-  // Dedicated Cover Canvas Background Color (Primary source of truth for Cover)
+  // Dedicated Cover Canvas Background Color (Primary source of truth for Cover Sheet/Canvas)
+  const coverBorderConfig = (coverConfig.borderConfig as Record<string, unknown> | undefined) || {};
   const activeCoverCanvasBg =
     (coverConfig.coverBgColor as string) ||
-    (coverConfig.mattingBgColor as string) ||
-    ((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.mattingBgColor as string) ||
-    (coverConfig.backgroundColor as string) ||
-    (themeConfig.backgroundColor as string) ||
+    (coverBorderConfig.canvasBgColor as string) ||
     "#FAF7F2";
 
   // Dedicated Cover Matting Padding (0px eliminates outer matting for full edge-to-edge frame)
   const coverMattingPadding =
     typeof coverConfig.mattingPadding === "number"
       ? coverConfig.mattingPadding
-      : (typeof (coverConfig.borderConfig as Record<string, unknown> | undefined)?.thicknessPx === "number"
-      ? ((coverConfig.borderConfig as Record<string, unknown>).thicknessPx as number)
+      : (typeof coverBorderConfig.thicknessPx === "number"
+      ? (coverBorderConfig.thicknessPx as number)
       : 24);
 
   // Dedicated Outer Matting / Border Color
   const coverOuterBorderColor =
     (coverConfig.coverMattingColor as string) ||
-    ((coverConfig.borderConfig as Record<string, unknown> | undefined)?.outerColor as string) ||
-    (themeConfig.backgroundColor as string) ||
+    (coverBorderConfig.outerColor as string) ||
+    (coverBorderConfig.mattingBgColor as string) ||
     "#1C1814";
 
   // Dedicated Inner Border Fillet
   const coverInnerBorderColor =
     (coverConfig.innerBorderColor as string) ||
-    ((coverConfig.borderConfig as Record<string, unknown> | undefined)?.innerColor as string) ||
+    (coverBorderConfig.innerColor as string) ||
     "#D4AF37";
 
   // Universal Framing Synchronization across all pages
-  const coverBorderConfig = (coverConfig.borderConfig as Record<string, unknown> | undefined) || {};
   const isUniversalSync = Boolean(coverBorderConfig.syncGlobal ?? coverConfig.syncGlobal);
+  const syncArtworkPlates = Boolean(coverBorderConfig.syncArtworkPlates ?? coverConfig.syncArtworkPlates ?? false);
   const universalOuterBorder = isUniversalSync ? coverOuterBorderColor : undefined;
   const universalInnerBorder = isUniversalSync ? coverInnerBorderColor : undefined;
   const universalThickness = isUniversalSync ? coverMattingPadding : undefined;
-  const universalMattingBgColor = isUniversalSync ? activeCoverCanvasBg : undefined;
+  const universalMattingBgColor = isUniversalSync ? coverOuterBorderColor : undefined;
 
   // Curatorial Section Configuration & Multi-Mode Parity
   const curatorialConfig = ((catalog.curatorialConfig || catalog.essayConfig) as Record<string, unknown> | null) || {};
@@ -687,7 +692,11 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 verticalSpineWidth={mc.verticalSpineWidth as string | undefined}
                 segments={matrixSegments}
                 frameClass={coverFrameClass}
-                backgroundColor={activeCoverCanvasBg}
+                backgroundColor={coverOuterBorderColor}
+                canvasBgColor={activeCoverCanvasBg}
+                outerBorderColor={coverOuterBorderColor}
+                innerBorderColor={coverInnerBorderColor}
+                mattingPadding={coverMattingPadding}
                 backgroundLayer={
                   <CatalogBackgroundLayer
                     bgType={coverBgType}
@@ -768,7 +777,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           <CatalogSinglePlateView
             primaryImageUrl={catalog.coverImageUrl || undefined}
             presentation={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.presentation as "contained" | "full-bleed") || coverConfig.imagePlatePresentation || "contained"}
-            mattingBgColor={activeCoverCanvasBg}
+            canvasBgColor={activeCoverCanvasBg}
+            mattingBgColor={coverOuterBorderColor}
             outerMattingColor={coverOuterBorderColor}
             focalPosition={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.focalPosition as string) || (coverConfig.imageFocalPosition as string)}
             headerSlot={((coverConfig.singlePlateConfig as Record<string, unknown> | undefined)?.headerSlot as SpineDecoratorSlot) || (coverConfig.headerSlot as SpineDecoratorSlot)}
@@ -893,6 +903,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 segments={matrixSegments}
                 frameClass={essayFrameClass}
                 backgroundColor={isUniversalSync ? universalMattingBgColor || essayBgColor : essayBgColor}
+                canvasBgColor={activeCoverCanvasBg}
+                outerBorderColor={isUniversalSync ? universalOuterBorder : undefined}
+                innerBorderColor={isUniversalSync ? universalInnerBorder : undefined}
+                mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : undefined}
                 backgroundLayer={
                   <CatalogBackgroundLayer
                     bgType={essayBgType}
@@ -917,6 +931,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           <CatalogSinglePlateView
             primaryImageUrl={(curatorialSinglePlateConfig.primaryImageUrl as string) || (curatorialConfig.primaryImageUrl as string)}
             presentation={(curatorialSinglePlateConfig.presentation as "contained" | "full-bleed") || "contained"}
+            canvasBgColor={activeCoverCanvasBg}
+            outerMattingColor={isUniversalSync ? universalMattingBgColor : (curatorialSinglePlateConfig.outerMattingColor as string)}
             mattingBgColor={isUniversalSync ? universalMattingBgColor || essayBgColor : (curatorialSinglePlateConfig.mattingBgColor as string) || essayBgColor}
             focalPosition={curatorialSinglePlateConfig.focalPosition as string}
             headerSlot={curatorialSinglePlateConfig.headerSlot as SpineDecoratorSlot}
@@ -962,10 +978,14 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           </CatalogSinglePlateView>
         ) : catalog.curatorialEssay ? (
           <section
-            className="catalog-page essay-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none"
+            className={cn(
+              "catalog-page essay-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none",
+              isUniversalSync && typeof universalThickness === "number" ? "" : "p-6 sm:p-12"
+            )}
             style={{
               aspectRatio: `${geometry.ratio}`,
               ...((isUniversalSync ? universalMattingBgColor || essayBgColor : essayBgColor) ? { backgroundColor: isUniversalSync ? universalMattingBgColor || essayBgColor : essayBgColor } : {}),
+              ...(isUniversalSync && typeof universalThickness === "number" ? { padding: `${universalThickness}px` } : {}),
             }}
           >
             <CatalogBackgroundLayer
@@ -1057,6 +1077,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 segments={matrixSegments}
                 frameClass={pageFrameClass}
                 backgroundColor={(isUniversalSync ? universalMattingBgColor || page.backgroundColor : page.backgroundColor) ?? undefined}
+                canvasBgColor={activeCoverCanvasBg}
+                outerBorderColor={isUniversalSync ? universalOuterBorder : undefined}
+                innerBorderColor={isUniversalSync ? universalInnerBorder : undefined}
+                mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : undefined}
                 backgroundLayer={bgLayerNode}
                 catalogTitle={catalog.title}
                 fallbackContentHtml={page.contentHtml}
@@ -1072,6 +1096,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 key={page.id}
                 primaryImageUrl={pageSinglePlate.primaryImageUrl as string}
                 presentation={(pageSinglePlate.presentation as "contained" | "full-bleed") || "contained"}
+                canvasBgColor={activeCoverCanvasBg}
+                outerMattingColor={isUniversalSync ? universalMattingBgColor : (pageSinglePlate.outerMattingColor as string)}
                 mattingBgColor={(isUniversalSync ? universalMattingBgColor || page.backgroundColor : (pageSinglePlate.mattingBgColor as string) || page.backgroundColor) ?? undefined}
                 focalPosition={pageSinglePlate.focalPosition as string}
                 headerSlot={pageSinglePlate.headerSlot as SpineDecoratorSlot}
@@ -1129,7 +1155,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             <section
               key={page.id}
               className={cn(
-                "catalog-page catalog-magazine-page editorial-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none",
+                "catalog-page catalog-magazine-page editorial-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none",
+                isUniversalSync && typeof universalThickness === "number" ? "" : "p-6 sm:p-12",
                 pageScope.wrapperClass,
                 pageTypographyClasses
               )}
@@ -1137,6 +1164,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 ...pageScope.wrapperStyle,
                 aspectRatio: `${geometry.ratio}`,
                 ...(resolvedPageBg ? { backgroundColor: resolvedPageBg } : {}),
+                ...(isUniversalSync && typeof universalThickness === "number" ? { padding: `${universalThickness}px` } : {}),
               }}
             >
               {bgLayerNode}
@@ -1221,9 +1249,13 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           return (
             <section
               key={item.id}
-              className="catalog-page plate-page relative rounded-3xl overflow-hidden p-6 sm:p-10 flex flex-col justify-between print:rounded-none"
+              className={cn(
+                "catalog-page plate-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none",
+                !syncArtworkPlates && "p-6 sm:p-10"
+              )}
               style={{
                 aspectRatio: `${geometry.ratio}`,
+                ...(syncArtworkPlates ? { backgroundColor: coverOuterBorderColor, padding: `${coverMattingPadding}px` } : {}),
               }}
             >
               <CatalogBackgroundLayer
@@ -1235,6 +1267,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               />
               <div
                 className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+                style={{
+                  ...(syncArtworkPlates && coverInnerBorderColor ? { borderColor: coverInnerBorderColor } : {}),
+                }}
               >
                 {/* Plate Header (Plate number & Traditional school) */}
                 <div className="flex items-center justify-between border-b border-primary/20 pb-2.5 mb-2">
@@ -1544,6 +1579,10 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                   segments={matrixSegments}
                   frameClass={endFrameClass}
                   backgroundColor={isUniversalSync ? universalMattingBgColor || endBgColor : endBgColor}
+                  canvasBgColor={activeCoverCanvasBg}
+                  outerBorderColor={isUniversalSync ? universalOuterBorder : undefined}
+                  innerBorderColor={isUniversalSync ? universalInnerBorder : undefined}
+                  mattingPadding={isUniversalSync && typeof universalThickness === "number" ? universalThickness : undefined}
                   backgroundLayer={
                     <CatalogBackgroundLayer
                       bgType={endBgType}
@@ -1568,6 +1607,8 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             <CatalogSinglePlateView
               primaryImageUrl={(endSinglePlateConfig.primaryImageUrl as string) || (endPageConfig.primaryImageUrl as string)}
               presentation={(endSinglePlateConfig.presentation as "contained" | "full-bleed") || "contained"}
+              canvasBgColor={activeCoverCanvasBg}
+              outerMattingColor={isUniversalSync ? universalMattingBgColor : (endSinglePlateConfig.outerMattingColor as string)}
               mattingBgColor={isUniversalSync ? universalMattingBgColor || endBgColor : (endSinglePlateConfig.mattingBgColor as string) || endBgColor}
               focalPosition={endSinglePlateConfig.focalPosition as string}
               headerSlot={endSinglePlateConfig.headerSlot as SpineDecoratorSlot}
@@ -1642,13 +1683,15 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
             return (
               <section
                 className={cn(
-                  "catalog-page end-page relative rounded-3xl overflow-hidden p-6 sm:p-12 flex flex-col justify-between print:rounded-none",
+                  "catalog-page end-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none",
+                  isUniversalSync && typeof universalThickness === "number" ? "" : "p-6 sm:p-12",
                   endScope.wrapperClass
                 )}
                 style={{
                   aspectRatio: `${geometry.ratio}`,
                   ...((isUniversalSync ? universalMattingBgColor || endBgColor : endBgColor) ? { backgroundColor: isUniversalSync ? universalMattingBgColor || endBgColor : endBgColor } : {}),
                   ...endScope.wrapperStyle,
+                  ...(isUniversalSync && typeof universalThickness === "number" ? { padding: `${universalThickness}px` } : {}),
                 }}
               >
                 <CatalogBackgroundLayer

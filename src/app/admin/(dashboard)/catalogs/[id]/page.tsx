@@ -212,9 +212,12 @@ interface ECatalogCoverConfig extends CatalogBackgroundConfig {
     innerColor?: string;
     thicknessPx?: number;
     mattingBgColor?: string;
+    canvasBgColor?: string;
     syncGlobal?: boolean;
+    syncArtworkPlates?: boolean;
   };
   syncGlobal?: boolean;
+  syncArtworkPlates?: boolean;
   headerSlot?: SpineDecoratorSlot;
   footerSlot?: SpineDecoratorSlot;
   leftSpineSlot?: SpineDecoratorSlot;
@@ -252,7 +255,9 @@ interface ECatalogEssayConfig extends CatalogBackgroundConfig {
     innerColor?: string;
     thicknessPx?: number;
     mattingBgColor?: string;
+    canvasBgColor?: string;
     syncGlobal?: boolean;
+    syncArtworkPlates?: boolean;
   };
 }
 
@@ -272,7 +277,9 @@ interface ECatalogEndPageConfig extends CatalogBackgroundConfig {
     innerColor?: string;
     thicknessPx?: number;
     mattingBgColor?: string;
+    canvasBgColor?: string;
     syncGlobal?: boolean;
+    syncArtworkPlates?: boolean;
   };
   endPageBgColor?: string;
   colophonTitleColor?: string;
@@ -627,24 +634,32 @@ export default function AdminCatalogStudioPage() {
         plateRatio,
         themeConfig,
         coverConfig: (() => {
-          const activeCoverBg = coverConfig.coverBgColor || coverConfig.mattingBgColor || "#FAF7F2";
+          const activeCoverBg = coverConfig.coverBgColor || "#FAF7F2";
           const activeCoverPadding = typeof coverConfig.mattingPadding === "number" ? coverConfig.mattingPadding : 0;
           const activeOuterColor = coverConfig.coverMattingColor || themeConfig.backgroundColor || "#1C1814";
           const activeInnerColor = coverConfig.innerBorderColor || "#D4AF37";
           const isUniversalSyncActive = Boolean(coverConfig.borderConfig?.syncGlobal ?? coverConfig.syncGlobal);
+          const isArtworkPlatesSyncActive = Boolean(coverConfig.borderConfig?.syncArtworkPlates ?? coverConfig.syncArtworkPlates ?? false);
 
           return {
             ...coverConfig,
             coverBgColor: activeCoverBg,
             mattingBgColor: activeCoverBg,
+            canvasBgColor: activeCoverBg,
             mattingPadding: activeCoverPadding,
             coverMattingColor: activeOuterColor,
             innerBorderColor: activeInnerColor,
+            syncGlobal: isUniversalSyncActive,
+            syncArtworkPlates: isArtworkPlatesSyncActive,
             singlePlateConfig: {
               ...(coverConfig.singlePlateConfig || {}),
               primaryImageUrl: coverImageUrl || undefined,
               presentation: coverConfig.imagePlatePresentation || "contained",
               mattingBgColor: activeCoverBg,
+              canvasBgColor: activeCoverBg,
+              outerBorderColor: activeOuterColor,
+              innerBorderColor: activeInnerColor,
+              mattingPadding: activeCoverPadding,
               focalPosition: coverConfig.imageFocalPosition,
               headerSlot: coverConfig.headerSlot,
               footerSlot: coverConfig.footerSlot,
@@ -654,10 +669,12 @@ export default function AdminCatalogStudioPage() {
             borderConfig: {
               ...(coverConfig.borderConfig || {}),
               syncGlobal: isUniversalSyncActive,
+              syncArtworkPlates: isArtworkPlatesSyncActive,
               outerColor: activeOuterColor,
               innerColor: activeInnerColor,
               thicknessPx: activeCoverPadding,
-              mattingBgColor: activeCoverBg,
+              mattingBgColor: activeOuterColor,
+              canvasBgColor: activeCoverBg,
             },
             mode: coverConfig.mode || (coverConfig.coverDesignMode === "WYSIWYG" ? "WYSIWYG" : coverConfig.coverDesignMode === "MATRIX" || coverConfig.useMatrixLayout ? "MATRIX" : "SINGLE_PLATE"),
           };
@@ -1454,6 +1471,85 @@ export default function AdminCatalogStudioPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Outer Matting / Border Color */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                      <span>Outer Matting / Border Color</span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={coverConfig.coverMattingColor || themeConfig.backgroundColor || "#1C1814"}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverMattingColor: val,
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              outerColor: val,
+                              mattingBgColor: val,
+                            },
+                          }));
+                        }}
+                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
+                      />
+                      <Input
+                        value={coverConfig.coverMattingColor || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCoverConfig((prev) => ({
+                            ...prev,
+                            coverMattingColor: val,
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              outerColor: val,
+                              mattingBgColor: val,
+                            },
+                          }));
+                        }}
+                        className="text-xs font-mono"
+                        placeholder="Inherit / #1C1814"
+                      />
+                    </div>
+                    {/* Quick Outer Matting Presets */}
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {[
+                        { name: "Charcoal", hex: "#151B26" },
+                        { name: "Deep Teak", hex: "#1C130D" },
+                        { name: "Obsidian", hex: "#0B0F17" },
+                        { name: "Amethyst", hex: "#b62db9" },
+                        { name: "Raw Silk", hex: "#F4EFEA" },
+                        { name: "Parchment", hex: "#FAF7F2" },
+                      ].map((preset) => (
+                        <button
+                          key={preset.hex}
+                          type="button"
+                          onClick={() => {
+                            setCoverConfig((prev) => ({
+                              ...prev,
+                              coverMattingColor: preset.hex,
+                              borderConfig: {
+                                ...(prev.borderConfig || {}),
+                                outerColor: preset.hex,
+                                mattingBgColor: preset.hex,
+                              },
+                            }));
+                          }}
+                          className="px-1.5 py-0.5 text-[9px] rounded border border-border/80 bg-background hover:bg-muted font-mono flex items-center gap-1 cursor-pointer transition-colors"
+                          title={preset.name}
+                        >
+                          <span
+                            className="w-2 h-2 rounded-full border border-black/20"
+                            style={{ backgroundColor: preset.hex }}
+                          />
+                          {preset.name}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground pt-0.5">Surrounds the framed artwork/content</p>
+                  </div>
+
                   {/* Cover Canvas Background Color */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
@@ -1464,6 +1560,11 @@ export default function AdminCatalogStudioPage() {
                           setCoverConfig((prev) => ({
                             ...prev,
                             coverBgColor: themeConfig.backgroundColor || "#FAF7F2",
+                            canvasBgColor: themeConfig.backgroundColor || "#FAF7F2",
+                            borderConfig: {
+                              ...(prev.borderConfig || {}),
+                              canvasBgColor: themeConfig.backgroundColor || "#FAF7F2",
+                            },
                           }))
                         }
                         className="text-[10px] text-primary hover:underline cursor-pointer font-medium"
@@ -1480,14 +1581,15 @@ export default function AdminCatalogStudioPage() {
                           setCoverConfig((prev) => ({
                             ...prev,
                             coverBgColor: val,
-                            mattingBgColor: val,
+                            canvasBgColor: val,
                             singlePlateConfig: {
                               ...(prev.singlePlateConfig || {}),
+                              canvasBgColor: val,
                               mattingBgColor: val,
                             },
                             borderConfig: {
                               ...(prev.borderConfig || {}),
-                              mattingBgColor: val,
+                              canvasBgColor: val,
                             },
                           }));
                         }}
@@ -1500,14 +1602,15 @@ export default function AdminCatalogStudioPage() {
                           setCoverConfig((prev) => ({
                             ...prev,
                             coverBgColor: val,
-                            mattingBgColor: val,
+                            canvasBgColor: val,
                             singlePlateConfig: {
                               ...(prev.singlePlateConfig || {}),
+                              canvasBgColor: val,
                               mattingBgColor: val,
                             },
                             borderConfig: {
                               ...(prev.borderConfig || {}),
-                              mattingBgColor: val,
+                              canvasBgColor: val,
                             },
                           }));
                         }}
@@ -1519,10 +1622,10 @@ export default function AdminCatalogStudioPage() {
                     <div className="flex flex-wrap gap-1 pt-1">
                       {[
                         { name: "Parchment", hex: "#FAF7F2" },
+                        { name: "White", hex: "#FFFFFF" },
                         { name: "Obsidian", hex: "#0B0F17" },
                         { name: "Deep Teak", hex: "#1C130D" },
                         { name: "Raw Silk", hex: "#F4EFEA" },
-                        { name: "Charcoal", hex: "#151B26" },
                       ].map((preset) => (
                         <button
                           key={preset.hex}
@@ -1531,14 +1634,15 @@ export default function AdminCatalogStudioPage() {
                             setCoverConfig((prev) => ({
                               ...prev,
                               coverBgColor: preset.hex,
-                              mattingBgColor: preset.hex,
+                              canvasBgColor: preset.hex,
                               singlePlateConfig: {
                                 ...(prev.singlePlateConfig || {}),
+                                canvasBgColor: preset.hex,
                                 mattingBgColor: preset.hex,
                               },
                               borderConfig: {
                                 ...(prev.borderConfig || {}),
-                                mattingBgColor: preset.hex,
+                                canvasBgColor: preset.hex,
                               },
                             }));
                           }}
@@ -1553,47 +1657,10 @@ export default function AdminCatalogStudioPage() {
                         </button>
                       ))}
                     </div>
+                    <p className="text-[10px] text-muted-foreground pt-0.5">Inner content sheet background</p>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground">Outer Matting / Border Color</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={coverConfig.coverMattingColor || themeConfig.backgroundColor || "#1C1814"}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setCoverConfig((prev) => ({
-                            ...prev,
-                            coverMattingColor: val,
-                            borderConfig: {
-                              ...(prev.borderConfig || {}),
-                              outerColor: val,
-                            },
-                          }));
-                        }}
-                        className="w-8 h-8 rounded border border-border cursor-pointer p-0 bg-transparent shrink-0"
-                      />
-                      <Input
-                        value={coverConfig.coverMattingColor || ""}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setCoverConfig((prev) => ({
-                            ...prev,
-                            coverMattingColor: val,
-                            borderConfig: {
-                              ...(prev.borderConfig || {}),
-                              outerColor: val,
-                            },
-                          }));
-                        }}
-                        className="text-xs font-mono"
-                        placeholder="Inherit / #1C1814"
-                      />
-                    </div>
-                    <p className="text-[10px] text-muted-foreground pt-1">Surrounds the framed cover art</p>
-                  </div>
-
+                  {/* Inner Framing Border Color */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-foreground">Inner Framing Border Color</label>
                     <div className="flex items-center gap-2">
@@ -1633,10 +1700,11 @@ export default function AdminCatalogStudioPage() {
                     <p className="text-[10px] text-muted-foreground pt-1">Inner gold fillet or decorative accent</p>
                   </div>
 
+                  {/* Matting Thickness / Padding */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-foreground">Matting Thickness / Padding</label>
                     <div className="flex items-center gap-1">
-                      {[0, 4, 8, 16, 24].map((pad) => {
+                      {[0, 4, 8, 16, 24, 32].map((pad) => {
                         const current = typeof coverConfig.mattingPadding === "number" ? coverConfig.mattingPadding : 24;
                         const isSelected = current === pad;
                         return (
@@ -1670,38 +1738,61 @@ export default function AdminCatalogStudioPage() {
                   </div>
 
                   {/* Universal Framing Sync Toggle */}
-                  <div className="pt-3 border-t border-border/60 sm:col-span-2 lg:col-span-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-border/60 sm:col-span-2 lg:col-span-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
                       <span className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5 text-primary" /> Universal Exhibition Framing Sync
                       </span>
                       <p className="text-[10px] text-muted-foreground">
-                        Synchronize matting canvas color, outer border, inner framing fillet, and padding universally across Curatorial, Magazine, and End Pages.
+                        Synchronize outer matting color, inner framing fillet, and margin thickness across exhibition pages.
                       </p>
                     </div>
-                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/30 shrink-0">
-                      <input
-                        type="checkbox"
-                        checked={coverConfig.borderConfig?.syncGlobal ?? coverConfig.syncGlobal ?? false}
-                        onChange={(e) => {
-                          const checked = e.target.checked;
-                          setCoverConfig((prev) => ({
-                            ...prev,
-                            syncGlobal: checked,
-                            borderConfig: {
-                              ...(prev.borderConfig || {}),
+                    <div className="flex flex-wrap items-center gap-2">
+                      <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/30 shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={coverConfig.borderConfig?.syncGlobal ?? coverConfig.syncGlobal ?? false}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setCoverConfig((prev) => ({
+                              ...prev,
                               syncGlobal: checked,
-                              outerColor: prev.coverMattingColor || "#1C1814",
-                              innerColor: prev.innerBorderColor || "#D4AF37",
-                              thicknessPx: typeof prev.mattingPadding === "number" ? prev.mattingPadding : 24,
-                              mattingBgColor: prev.coverBgColor || "#FAF7F2",
-                            },
-                          }));
-                        }}
-                        className="rounded border-border text-primary focus:ring-primary h-4 w-4"
-                      />
-                      <span className="text-primary font-bold">Apply Universally to All Pages</span>
-                    </label>
+                              borderConfig: {
+                                ...(prev.borderConfig || {}),
+                                syncGlobal: checked,
+                                outerColor: prev.coverMattingColor || "#1C1814",
+                                innerColor: prev.innerBorderColor || "#D4AF37",
+                                thicknessPx: typeof prev.mattingPadding === "number" ? prev.mattingPadding : 24,
+                                mattingBgColor: prev.coverMattingColor || "#1C1814",
+                                canvasBgColor: prev.coverBgColor || "#FAF7F2",
+                              },
+                            }));
+                          }}
+                          className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                        />
+                        <span className="text-primary font-bold">Apply to Editorial Pages</span>
+                      </label>
+
+                      <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/30 shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={coverConfig.borderConfig?.syncArtworkPlates ?? coverConfig.syncArtworkPlates ?? false}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setCoverConfig((prev) => ({
+                              ...prev,
+                              syncArtworkPlates: checked,
+                              borderConfig: {
+                                ...(prev.borderConfig || {}),
+                                syncArtworkPlates: checked,
+                              },
+                            }));
+                          }}
+                          className="rounded border-border text-amber-600 focus:ring-amber-500 h-4 w-4"
+                        />
+                        <span className="text-amber-700 dark:text-amber-400 font-bold">Apply to Artwork Plates</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3088,6 +3179,47 @@ export default function AdminCatalogStudioPage() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Masterwork Plates Exhibition Framing Customization */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/5">
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <div>
+                <div className="text-xs font-semibold text-foreground flex items-center gap-2">
+                  <span>Masterwork Plates Exhibition Framing:</span>
+                  <Badge variant="outline" className={`text-[10px] font-mono ${
+                    (coverConfig.borderConfig?.syncArtworkPlates ?? coverConfig.syncArtworkPlates)
+                      ? "border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10"
+                      : "border-border text-muted-foreground bg-muted/40"
+                  }`}>
+                    {(coverConfig.borderConfig?.syncArtworkPlates ?? coverConfig.syncArtworkPlates) ? "Exhibition Matting Active" : "Default Border"}
+                  </Badge>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Wrap each artwork masterwork plate in the same outer matting canvas, inner framing fillet, and margin thickness configured on the Cover Page.
+                </p>
+              </div>
+            </div>
+            <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer bg-amber-500/10 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg border border-amber-500/30 shrink-0 transition-colors">
+              <input
+                type="checkbox"
+                checked={coverConfig.borderConfig?.syncArtworkPlates ?? coverConfig.syncArtworkPlates ?? false}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setCoverConfig((prev) => ({
+                    ...prev,
+                    syncArtworkPlates: checked,
+                    borderConfig: {
+                      ...(prev.borderConfig || {}),
+                      syncArtworkPlates: checked,
+                    },
+                  }));
+                }}
+                className="rounded border-border text-amber-600 focus:ring-amber-500 h-4 w-4"
+              />
+              <span className="text-amber-800 dark:text-amber-300 font-bold">Apply Exhibition Frame to Plates</span>
+            </label>
           </div>
 
           <div className="flex items-center justify-between">
