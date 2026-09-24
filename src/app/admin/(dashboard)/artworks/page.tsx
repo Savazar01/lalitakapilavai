@@ -721,20 +721,28 @@ export default function ArtworksAdminPage() {
         <div className="flex items-center gap-2">
           <Button
             key="all"
-            variant={selectedCategory === "ALL" ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedCategory("ALL")}
-            className="rounded-full px-4 text-xs font-serif shrink-0 cursor-pointer h-8"
+            className={cn(
+              "rounded-full px-4 text-xs font-serif shrink-0 cursor-pointer h-8 transition-all border",
+              selectedCategory === "ALL"
+                ? "bg-amber-700 text-white border-amber-800 shadow-sm hover:bg-amber-800 dark:bg-amber-600 dark:text-white"
+                : "bg-background text-foreground border-border hover:bg-muted/80 hover:text-foreground"
+            )}
           >
             All Works ({artworks.length})
           </Button>
           {categories.map((cat) => (
             <Button
               key={cat.id}
-              variant={selectedCategory === cat.id ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(cat.id)}
-              className="rounded-full px-4 text-xs font-serif shrink-0 cursor-pointer h-8"
+              className={cn(
+                "rounded-full px-4 text-xs font-serif shrink-0 cursor-pointer h-8 transition-all border",
+                selectedCategory === cat.id
+                  ? "bg-amber-700 text-white border-amber-800 shadow-sm hover:bg-amber-800 dark:bg-amber-600 dark:text-white"
+                  : "bg-background text-foreground border-border hover:bg-muted/80 hover:text-foreground"
+              )}
             >
               {cat.name} ({cat._count?.artworks ?? 0})
             </Button>
@@ -777,7 +785,7 @@ export default function ArtworksAdminPage() {
             variant="outline"
             size="sm"
             onClick={toggleSelectAll}
-            className="h-9 text-xs font-serif cursor-pointer"
+            className="h-9 text-xs font-serif cursor-pointer text-foreground hover:text-foreground"
           >
             {filteredArtworks.length > 0 && selectedArtworkIds.size === filteredArtworks.length
               ? "Deselect All"
@@ -813,7 +821,7 @@ export default function ArtworksAdminPage() {
             size="sm"
             onClick={handleExportExcel}
             disabled={exportingExcel}
-            className="h-9 text-xs font-serif gap-1.5"
+            className="h-9 text-xs font-serif gap-1.5 text-foreground hover:text-foreground border-border cursor-pointer"
             title="Export entire artwork collection as high-fidelity Excel workbook"
           >
             {exportingExcel ? (
@@ -825,21 +833,23 @@ export default function ArtworksAdminPage() {
           </Button>
 
           <Button
-            variant="default"
-            size="sm"
             onClick={handleOpenCreate}
-            className="h-9 text-xs font-serif gap-1.5 cursor-pointer"
+            size="sm"
+            className="h-9 px-4 text-xs font-serif bg-amber-600 hover:bg-amber-700 text-white border border-amber-700 shadow-sm shrink-0 gap-1.5 cursor-pointer font-medium"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 text-white" />
             Add Artwork
           </Button>
 
-          <div className="flex items-center border border-border rounded-md p-0.5 ml-1">
+          <div className="flex items-center border border-border rounded-md p-0.5 ml-1 bg-background">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className="h-7 w-7 p-0 cursor-pointer"
+              className={cn(
+                "h-7 w-7 p-0 cursor-pointer",
+                viewMode === "grid" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
               title="Grid View"
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -848,7 +858,10 @@ export default function ArtworksAdminPage() {
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("table")}
-              className="h-7 w-7 p-0 cursor-pointer"
+              className={cn(
+                "h-7 w-7 p-0 cursor-pointer",
+                viewMode === "table" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
               title="Table View"
             >
               <ListIcon className="w-3.5 h-3.5" />
@@ -876,8 +889,12 @@ export default function ArtworksAdminPage() {
               ? "No artworks match your query."
               : "Begin cataloging masterworks with 22k gold leaf relief details."}
           </p>
-          <Button variant="default" size="sm" onClick={handleOpenCreate}>
-            <Plus className="w-3.5 h-3.5 mr-1" />
+          <Button
+            size="sm"
+            onClick={handleOpenCreate}
+            className="h-9 px-4 text-xs font-serif bg-amber-600 hover:bg-amber-700 text-white border border-amber-700 shadow-sm shrink-0 gap-1.5 cursor-pointer font-medium"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1 text-white" />
             Catalog First Artwork
           </Button>
         </Card>

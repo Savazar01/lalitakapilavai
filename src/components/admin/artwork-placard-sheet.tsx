@@ -187,16 +187,17 @@ export function ArtworkPlacardSheet({
       window.removeEventListener("afterprint", cleanup);
     };
     window.addEventListener("afterprint", cleanup);
+    // Give preview tab and QR images a moment to settle in DOM before triggering browser print
     setTimeout(() => {
       window.print();
-    }, 150);
+    }, 250);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[92vh] flex flex-col p-0 overflow-hidden bg-background">
-        <DialogHeader className="p-4 sm:p-5 border-b border-border/80 bg-muted/20 shrink-0">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <DialogHeader className="no-print p-4 sm:p-5 border-b border-border/80 bg-muted/20 shrink-0">
+          <div className="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <DialogTitle className="font-serif text-lg sm:text-xl font-bold flex items-center gap-2 text-foreground">
                 <Printer className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -252,7 +253,7 @@ export function ArtworkPlacardSheet({
           </div>
 
           {/* Configuration Toolbar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 pt-3 mt-1 border-t border-border/60">
+          <div className="no-print grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 pt-3 mt-1 border-t border-border/60">
             {/* Format */}
             <div className="space-y-1">
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Format</span>
@@ -394,11 +395,11 @@ export function ArtworkPlacardSheet({
 
         {/* Tab 1: Live Interactive Print Preview */}
         {activeTab === "preview" && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60 print:p-0 print:m-0 print:overflow-visible print:bg-transparent">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60 print:p-0 print:m-0 print:overflow-visible print:bg-white print:h-auto print:block">
             <div
               id="placard-print-root"
               className={cn(
-                "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all",
+                "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all w-full",
                 "print:w-full print:max-w-none print:m-0 print:bg-white print:text-black print:block",
                 // Responsive & Print Grid Layout
                 cardFormat === "visiting-card"
@@ -418,7 +419,7 @@ export function ArtworkPlacardSheet({
                   <div
                     key={art.id || idx}
                     className={cn(
-                      "relative bg-white text-stone-900 border border-stone-200 p-3.5 print:p-3 transition-all flex flex-col justify-between overflow-hidden",
+                      "placard-card-item relative bg-white text-stone-900 border border-stone-200 p-3.5 print:p-3 transition-all flex flex-col justify-between overflow-hidden",
                       // 18mm bottom safety margin so acrylic stands/clips never occlude card typography
                       "pb-[18mm] print:pb-[18mm]",
                       showCropMarks && "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1",
@@ -538,7 +539,7 @@ export function ArtworkPlacardSheet({
 
         {/* Tab 2: Live In-Modal Card Metadata Customizer */}
         {activeTab === "edit" && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-background space-y-4">
+          <div className="no-print flex-1 overflow-y-auto p-4 sm:p-6 bg-background space-y-4">
             {/* Global Quick Action Bar */}
             <div className="p-3.5 rounded-xl border border-amber-500/40 bg-amber-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
@@ -694,7 +695,7 @@ export function ArtworkPlacardSheet({
           </div>
         )}
 
-        <DialogFooter className="p-3 border-t border-border/80 bg-muted/20 shrink-0 flex items-center justify-between sm:justify-between">
+        <DialogFooter className="no-print p-3 border-t border-border/80 bg-muted/20 shrink-0 flex items-center justify-between sm:justify-between">
           <p className="text-[11px] text-muted-foreground hidden sm:block">
             Tip: In print dialog, select &quot;Margins: None&quot; and check &quot;Background graphics&quot; for accurate double-fillet borders.
           </p>
@@ -720,77 +721,6 @@ export function ArtworkPlacardSheet({
           </div>
         </DialogFooter>
       </DialogContent>
-
-      {/* Isolated Print Media Stylesheet */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media print {
-          @page {
-            size: auto;
-            margin: 6mm !important;
-          }
-          body, html {
-            background: #ffffff !important;
-            color: #000000 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          /* Completely hide the background admin layout & body chrome */
-          body > *:not([data-radix-portal]),
-          nav, header, footer, aside, .no-print, [data-sonner-toaster] {
-            display: none !important;
-            visibility: hidden !important;
-          }
-          /* Neutralize modal wrapper and hide backdrop overlay */
-          [data-radix-portal] > div.fixed.inset-0,
-          [data-state="open"].fixed.inset-0 {
-            display: none !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-          }
-          [data-radix-portal], [role="dialog"] {
-            position: static !important;
-            transform: none !important;
-            max-width: none !important;
-            max-height: none !important;
-            width: 100% !important;
-            height: auto !important;
-            overflow: visible !important;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-          }
-          /* Hide dialog header, tabs, editor, close button and footer */
-          [role="dialog"] > div > *:not(:has(#placard-print-root)),
-          [role="dialog"] button,
-          [data-radix-collection-item] {
-            display: none !important;
-            visibility: hidden !important;
-          }
-          /* Isolate placard print container */
-          #placard-print-root {
-            display: block !important;
-            visibility: visible !important;
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 4mm !important;
-            background: #ffffff !important;
-            box-shadow: none !important;
-            border: none !important;
-            z-index: 999999 !important;
-          }
-          #placard-print-root * {
-            visibility: visible !important;
-          }
-        }
-      `}} />
     </Dialog>
   );
 }
