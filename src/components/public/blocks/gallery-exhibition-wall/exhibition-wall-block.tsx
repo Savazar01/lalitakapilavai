@@ -7,10 +7,6 @@ import {
   Minimize2,
   Play,
   Pause,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Info,
 } from "lucide-react";
 import { MediaGalleryItem, ArtworkPlacard } from "../media-gallery-block";
 import {
@@ -42,15 +38,6 @@ interface ArtworkPlacement {
   width: number;
   height: number;
   frameType: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
-}
-
-function getHexLuminance(hex: string): number {
-  const clean = hex.replace("#", "");
-  if (clean.length < 6) return 0;
-  const r = parseInt(clean.substring(0, 2), 16);
-  const g = parseInt(clean.substring(2, 4), 16);
-  const b = parseInt(clean.substring(4, 6), 16);
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
 /**
@@ -174,7 +161,7 @@ export function ExhibitionWallBlock({
   autoplayTour = true,
   tourSpeedSeconds = 5,
   overviewDwellSeconds = 4,
-  showExhibitionBadge = true,
+  showExhibitionBadge: _showExhibitionBadge = true,
   className = "",
 }: ExhibitionWallBlockProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -187,7 +174,6 @@ export function ExhibitionWallBlock({
   const [selectedArtworkIndex, setSelectedArtworkIndex] = React.useState<number>(0);
   const [isTourPlaying, setIsTourPlaying] = React.useState<boolean>(autoplayTour);
   const [isFullscreen, setIsFullscreen] = React.useState<boolean>(false);
-  const [showBadge, setShowBadge] = React.useState<boolean>(showExhibitionBadge);
 
   const isOverview = tourStep === -1;
   const activeTourStyle: CameraTourStyle = isOverview
@@ -210,10 +196,6 @@ export function ExhibitionWallBlock({
     }
     return found;
   }, [environmentId, customWallUrl]);
-
-  const isLightWall = React.useMemo(() => {
-    return getHexLuminance(env.wallBgColor) > 140;
-  }, [env.wallBgColor]);
 
   // Three.js internal references
   const threeRef = React.useRef<{
@@ -332,29 +314,51 @@ export function ExhibitionWallBlock({
     });
 
     // Architectural Back Wall
-    const wallGeo = new THREE.PlaneGeometry(30, 10);
+    const wallGeo = new THREE.PlaneGeometry(32, 12);
     const wallCanvas = document.createElement("canvas");
     wallCanvas.width = 1024;
     wallCanvas.height = 512;
     const wCtx = wallCanvas.getContext("2d")!;
-    // Subtle plaster gradient
-    const grad = wCtx.createLinearGradient(0, 0, 0, 512);
-    grad.addColorStop(0, env.mouldingColor);
-    grad.addColorStop(0.06, env.wallBgColor);
-    grad.addColorStop(0.94, env.wallBgColor);
-    grad.addColorStop(1, env.skirtingColor);
-    wCtx.fillStyle = grad;
+
+    // 1. Base Wall Wash with realistic architectural wall color
+    wCtx.fillStyle = env.wallBgColor;
     wCtx.fillRect(0, 0, 1024, 512);
 
-    // Subtle fine architectural lines
-    wCtx.fillStyle = env.mouldingColor;
-    wCtx.fillRect(0, 24, 1024, 8);
-    wCtx.fillStyle = env.skirtingColor;
-    wCtx.fillRect(0, 492, 1024, 20);
+    // 2. Layered Gentle Diffuse Museum Track-Light Wash
+    const trackLightGrad = wCtx.createRadialGradient(512, 120, 30, 512, 180, 540);
+    trackLightGrad.addColorStop(0, "rgba(255, 255, 255, 0.45)");
+    trackLightGrad.addColorStop(0.35, "rgba(255, 255, 255, 0.16)");
+    trackLightGrad.addColorStop(0.7, "rgba(255, 255, 255, 0.03)");
+    trackLightGrad.addColorStop(1, "rgba(0, 0, 0, 0.18)");
+    wCtx.fillStyle = trackLightGrad;
+    wCtx.fillRect(0, 0, 1024, 512);
+
+    // 3. Subtle authentic fine plaster micro-stipple noise
+    const wallData = wCtx.getImageData(0, 0, 1024, 512);
+    for (let i = 0; i < wallData.data.length; i += 4) {
+      const n = (Math.random() - 0.5) * 12;
+      wallData.data[i] = Math.min(255, Math.max(0, wallData.data[i] + n));
+      wallData.data[i + 1] = Math.min(255, Math.max(0, wallData.data[i + 1] + n));
+      wallData.data[i + 2] = Math.min(255, Math.max(0, wallData.data[i + 2] + n));
+    }
+    wCtx.putImageData(wallData, 0, 0);
+
+    // 4. Subtle Ambient Occlusion along ceiling and baseboard junctions
+    const topShadow = wCtx.createLinearGradient(0, 0, 0, 36);
+    topShadow.addColorStop(0, "rgba(0, 0, 0, 0.35)");
+    topShadow.addColorStop(1, "rgba(0, 0, 0, 0)");
+    wCtx.fillStyle = topShadow;
+    wCtx.fillRect(0, 0, 1024, 36);
+
+    const bottomShadow = wCtx.createLinearGradient(0, 476, 0, 512);
+    bottomShadow.addColorStop(0, "rgba(0, 0, 0, 0)");
+    bottomShadow.addColorStop(1, "rgba(0, 0, 0, 0.40)");
+    wCtx.fillStyle = bottomShadow;
+    wCtx.fillRect(0, 476, 1024, 36);
 
     const wallTex = new THREE.CanvasTexture(wallCanvas);
 
-    // Procedural Fine Plaster / Linen Bump Map for Physical Depth
+    // Procedural Fine Plaster / Linen Micro-Bump Map for Physical Depth
     const bumpCanvas = document.createElement("canvas");
     bumpCanvas.width = 256;
     bumpCanvas.height = 256;
@@ -376,9 +380,9 @@ export function ExhibitionWallBlock({
     const wallMat = new THREE.MeshStandardMaterial({
       map: wallTex,
       bumpMap: bumpTex,
-      bumpScale: 0.035,
-      roughness: 0.88,
-      metalness: 0.05,
+      bumpScale: 0.04,
+      roughness: 0.92,
+      metalness: 0.02,
     });
     const wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(0, 2.5, 0);
@@ -386,10 +390,10 @@ export function ExhibitionWallBlock({
     scene.add(wallMesh);
 
     // 3D Architectural Crown Moulding Beam along Ceiling
-    const crownGeo = new THREE.BoxGeometry(30, 0.28, 0.2);
+    const crownGeo = new THREE.BoxGeometry(32, 0.28, 0.2);
     const crownMat = new THREE.MeshStandardMaterial({
       color: new THREE.Color(env.mouldingColor),
-      roughness: 0.65,
+      roughness: 0.6,
       metalness: 0.1,
     });
     const crownMesh = new THREE.Mesh(crownGeo, crownMat);
@@ -398,31 +402,34 @@ export function ExhibitionWallBlock({
     crownMesh.receiveShadow = true;
     scene.add(crownMesh);
 
-    // 3D Architectural Baseboard / Skirting Mesh along Floor Line
-    const skirtingGeo = new THREE.BoxGeometry(30, 0.24, 0.1);
+    // 3D Architectural Baseboard / Skirting (24px–36px scale) along Floor Line
+    const skirtingGeo = new THREE.BoxGeometry(32, 0.34, 0.12);
     const skirtingMat = new THREE.MeshStandardMaterial({
       color: new THREE.Color(env.skirtingColor),
-      roughness: 0.7,
-      metalness: 0.1,
+      roughness: 0.55,
+      metalness: 0.15,
     });
     const skirtingMesh = new THREE.Mesh(skirtingGeo, skirtingMat);
-    skirtingMesh.position.set(0, 0.12, 0.05);
+    skirtingMesh.position.set(0, 0.17, 0.06);
     skirtingMesh.castShadow = true;
     skirtingMesh.receiveShadow = true;
     scene.add(skirtingMesh);
 
-    // Hardwood / Stone Floor Plane
-    const floorGeo = new THREE.PlaneGeometry(30, 16);
+    // Hardwood / Stone Floor Plane (15% perspective depth at base)
+    const floorGeo = new THREE.PlaneGeometry(32, 16);
     const floorCanvas = document.createElement("canvas");
     floorCanvas.width = 512;
     floorCanvas.height = 512;
     const fCtx = floorCanvas.getContext("2d")!;
     fCtx.fillStyle = env.floorBgColor;
     fCtx.fillRect(0, 0, 512, 512);
-    // Draw wood plank lines
-    fCtx.strokeStyle = "rgba(0, 0, 0, 0.28)";
-    fCtx.lineWidth = 2;
-    for (let y = 0; y < 512; y += 40) {
+
+    // Draw wood plank lines with subtle alternating tone
+    for (let y = 0; y < 512; y += 36) {
+      fCtx.fillStyle = (y / 36) % 2 === 0 ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 0, 0, 0.06)";
+      fCtx.fillRect(0, y, 512, 36);
+      fCtx.strokeStyle = "rgba(0, 0, 0, 0.32)";
+      fCtx.lineWidth = 1.5;
       fCtx.beginPath();
       fCtx.moveTo(0, y);
       fCtx.lineTo(512, y);
@@ -435,8 +442,8 @@ export function ExhibitionWallBlock({
 
     const floorMat = new THREE.MeshStandardMaterial({
       map: floorTex,
-      roughness: 0.45,
-      metalness: 0.1,
+      roughness: 0.42,
+      metalness: 0.12,
     });
     const floorMesh = new THREE.Mesh(floorGeo, floorMat);
     floorMesh.rotation.x = -Math.PI / 2;
@@ -466,26 +473,52 @@ export function ExhibitionWallBlock({
       const frameH = placement.height + framePadding * 2;
       const frameDepth = 0.06;
 
-      // Outer Frame Material
-      let frameColor = 0xd4af37; // Gold
+      // 1. Fine-Art Mounting Drop Shadow directly against the wall surface
+      // Simulates: box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.15)
+      const shadowCanvas = document.createElement("canvas");
+      shadowCanvas.width = 128;
+      shadowCanvas.height = 128;
+      const sCtx = shadowCanvas.getContext("2d")!;
+      const sGrad = sCtx.createRadialGradient(64, 70, 16, 64, 70, 60);
+      sGrad.addColorStop(0, "rgba(0, 0, 0, 0.58)");
+      sGrad.addColorStop(0.42, "rgba(0, 0, 0, 0.30)");
+      sGrad.addColorStop(0.78, "rgba(0, 0, 0, 0.08)");
+      sGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      sCtx.fillStyle = sGrad;
+      sCtx.fillRect(0, 0, 128, 128);
+      const shadowTex = new THREE.CanvasTexture(shadowCanvas);
+
+      const shadowGeo = new THREE.PlaneGeometry(frameW * 1.28, frameH * 1.28);
+      const shadowMat = new THREE.MeshBasicMaterial({
+        map: shadowTex,
+        transparent: true,
+        opacity: 0.82,
+        depthWrite: false,
+      });
+      const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+      shadowMesh.position.set(0, -0.05, 0.002);
+      artGroup.add(shadowMesh);
+
+      // 2. Outer Frame Material with realistic timber/gilded bevels
+      let frameColor = 0xd4af37; // 22k Gold Fillet
       let roughness = 0.35;
       let metalness = 0.65;
 
       if (placement.frameType === "rosewood-ivory") {
-        frameColor = 0x3d1f14;
-        roughness = 0.5;
-        metalness = 0.1;
+        frameColor = 0x3d1f14; // Traditional Chettinad/Mysore Rosewood
+        roughness = 0.48;
+        metalness = 0.12;
       } else if (placement.frameType === "light-oak") {
-        frameColor = 0xc8ab83;
-        roughness = 0.6;
-        metalness = 0.05;
+        frameColor = 0xc8ab83; // Heritage Cedar / Oak
+        roughness = 0.58;
+        metalness = 0.06;
       } else if (placement.frameType === "white-float") {
-        frameColor = 0xf5f5f5;
-        roughness = 0.8;
+        frameColor = 0xf5f5f3; // Museum Gallery Pure White
+        roughness = 0.75;
         metalness = 0.0;
       }
 
-      // Outer Frame Mesh
+      // Outer Beveled Frame Mesh
       const frameGeo = new THREE.BoxGeometry(frameW, frameH, frameDepth);
       const frameMat = new THREE.MeshStandardMaterial({
         color: frameColor,
@@ -499,13 +532,30 @@ export function ExhibitionWallBlock({
       frameMesh.receiveShadow = true;
       artGroup.add(frameMesh);
 
-      // Inner Matting Plane
+      // Inner Gilded Bevel Fillet Step (Lalita MA Exhibition Frame Standard)
+      const filletGeo = new THREE.BoxGeometry(
+        placement.width + 0.04,
+        placement.height + 0.04,
+        frameDepth + 0.004
+      );
+      const filletMat = new THREE.MeshStandardMaterial({
+        color: 0xd4af37,
+        roughness: 0.3,
+        metalness: 0.7,
+        transparent: true,
+        opacity: 1.0,
+      });
+      const filletMesh = new THREE.Mesh(filletGeo, filletMat);
+      filletMesh.position.set(0, 0, 0.002);
+      artGroup.add(filletMesh);
+
+      // 3. Warm Ivory Matting Plane
       const matGeo = new THREE.PlaneGeometry(
         placement.width + 0.03,
         placement.height + 0.03
       );
       const matMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
+        color: 0xfbf8f3,
         roughness: 0.95,
         transparent: true,
         opacity: 1.0,
@@ -514,7 +564,7 @@ export function ExhibitionWallBlock({
       matMesh.position.set(0, 0, frameDepth / 2 + 0.002);
       artGroup.add(matMesh);
 
-      // Canvas Texture Plane
+      // 4. Canvas Texture Plane
       const canvasGeo = new THREE.PlaneGeometry(placement.width, placement.height);
       const canvasMat = new THREE.MeshStandardMaterial({
         color: 0xffffff,
@@ -545,29 +595,13 @@ export function ExhibitionWallBlock({
       canvasMesh.receiveShadow = true;
       artGroup.add(canvasMesh);
 
-      // Museum Placard beside/underneath
-      const placardGeo = new THREE.PlaneGeometry(0.25, 0.12);
-      const placardMat = new THREE.MeshStandardMaterial({
-        color: 0xfdfdfd,
-        roughness: 0.9,
-        transparent: true,
-        opacity: 1.0,
-      });
-      const placardMesh = new THREE.Mesh(placardGeo, placardMat);
-      placardMesh.position.set(
-        frameW / 2 + 0.16,
-        -frameH / 2 + 0.1,
-        0.02
-      );
-      artGroup.add(placardMesh);
-
       scene.add(artGroup);
 
       // Save reference for raycasting clicks and opacity fading
       artworkMeshes.push({
         mesh: canvasMesh,
         group: artGroup,
-        materials: [frameMat, matMaterial, canvasMat, placardMat],
+        materials: [frameMat, filletMat, matMaterial, canvasMat, shadowMat],
         placement,
         index: idx,
       });
@@ -684,16 +718,16 @@ export function ExhibitionWallBlock({
       state.targetCamPos.set(0, 2.4, 9.2);
       state.targetLookAt.set(0, 2.4, 0);
     } else {
-      // Isolated Focus Framing: Dolly camera directly in front of target piece so it fills ~80% of viewport height
-      // with clean 10% margins top and bottom, and 10% margins left and right.
+      // Isolated Focus Framing: Dolly camera directly in front of target piece so it fills 75% of viewport height
+      // with zero clipping from adjacent frames.
       const frameH = activePlacement.height + 0.16;
       const frameW = activePlacement.width + 0.16;
       const vFovRad = ((state.camera.fov || 50) * Math.PI) / 180;
       const aspect = state.camera.aspect || 1.6;
 
-      const dHeight = (frameH / 0.8) / (2 * Math.tan(vFovRad / 2));
-      const dWidth = (frameW / 0.8) / (2 * Math.tan(vFovRad / 2) * aspect);
-      const idealDistance = Math.max(dHeight, dWidth, 1.4);
+      const dHeight = (frameH / 0.75) / (2 * Math.tan(vFovRad / 2));
+      const dWidth = (frameW / 0.75) / (2 * Math.tan(vFovRad / 2) * aspect);
+      const idealDistance = Math.max(dHeight, dWidth, 1.5);
 
       if (activeTourStyle === "inspection") {
         // Macro archival inspection close-up
@@ -712,7 +746,7 @@ export function ExhibitionWallBlock({
         );
         state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
       } else {
-        // Focused Dolly: Centered squarely in front of the artwork at 80% viewport framing
+        // Focused Dolly: Centered squarely in front of the artwork at 75% viewport framing
         state.targetCamPos.set(
           activePlacement.x,
           activePlacement.y,
@@ -755,7 +789,7 @@ export function ExhibitionWallBlock({
     return () => clearTimeout(timer);
   }, [isTourPlaying, tourStep, placements.length, overviewDwellSeconds, tourSpeedSeconds]);
 
-  // Handle Canvas Click to Focus Artwork
+  // Handle Canvas Click to Focus Artwork or Return to Panoramic Overview
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const state = threeRef.current;
     const canvas = canvasRef.current;
@@ -776,6 +810,9 @@ export function ExhibitionWallBlock({
         setTourStep(hit.index);
         setUserTourStyle("drone");
       }
+    } else {
+      // Clicked on background wall -> smoothly return to Panoramic Overview Wall
+      setTourStep(-1);
     }
   };
 
@@ -788,15 +825,6 @@ export function ExhibitionWallBlock({
     } else {
       document.exitFullscreen().catch(() => {});
       setIsFullscreen(false);
-    }
-  };
-
-  const handleToggleOverview = () => {
-    if (isOverview) {
-      setTourStep(selectedArtworkIndex >= 0 ? selectedArtworkIndex : 0);
-      setUserTourStyle("drone");
-    } else {
-      setTourStep(-1);
     }
   };
 
@@ -815,149 +843,37 @@ export function ExhibitionWallBlock({
       <div
         ref={containerRef}
         className={cn(
-          "relative w-full rounded-2xl overflow-hidden border border-amber-500/30 bg-stone-950 select-none shadow-2xl transition-all duration-300",
+          "relative w-full rounded-2xl overflow-hidden border border-border/60 bg-stone-950 select-none shadow-2xl transition-all duration-300",
           isFullscreen ? "fixed inset-0 z-50 rounded-none border-none h-screen w-screen" : "h-[540px] sm:h-[640px]"
         )}
       >
-        {/* 3D WebGL Canvas */}
+        {/* 3D WebGL Canvas: Edge-to-edge down to the clean floor plane */}
         <canvas
           ref={canvasRef}
           onClick={handleCanvasClick}
           className="w-full h-full block cursor-pointer touch-none"
         />
 
-        {/* Top-Left Curatorial Callout Box / Badge with High Contrast */}
-        {showBadge && (
-          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 max-w-xs sm:max-w-sm z-20 pointer-events-auto transition-all duration-300">
-            <div
-              className={cn(
-                "p-3 sm:p-3.5 rounded-xl shadow-2xl backdrop-blur-md border transition-colors",
-                isLightWall
-                  ? "bg-white/95 border-amber-600/30 text-slate-900 shadow-amber-950/10"
-                  : "bg-stone-950/90 border-amber-400/40 text-stone-100 shadow-black/60"
-              )}
-            >
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <span
-                  className={cn(
-                    "text-[10px] font-mono uppercase tracking-widest font-bold flex items-center gap-1.5",
-                    isLightWall ? "text-amber-800" : "text-amber-300"
-                  )}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  {isOverview
-                    ? "Exhibition Wall • Salon Overview"
-                    : `Exhibition Wall • Item ${selectedArtworkIndex + 1} of ${placements.length}`}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowBadge(false)}
-                  title="Dismiss Callout"
-                  className={cn(
-                    "text-xs p-0.5 rounded-md hover:opacity-100 transition-opacity cursor-pointer",
-                    isLightWall ? "text-slate-500 hover:text-slate-900" : "text-stone-400 hover:text-stone-100"
-                  )}
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {isOverview ? (
-                <div>
-                  <h4
-                    className={cn(
-                      "font-serif font-bold text-xs sm:text-sm leading-tight",
-                      isLightWall ? "text-slate-900" : "text-white"
-                    )}
-                  >
-                    {env.name}
-                  </h4>
-                  <p
-                    className={cn(
-                      "text-[11px] mt-0.5 line-clamp-2",
-                      isLightWall ? "text-slate-700" : "text-stone-300"
-                    )}
-                  >
-                    {isTourPlaying
-                      ? "Director-Guided Walkthrough Active — Panoramic Wall Overview"
-                      : "Click any artwork on the wall or thumbnail strip below to inspect details."}
-                  </p>
-                </div>
-              ) : (
-                activePlacement && (
-                  <div>
-                    <h4
-                      className={cn(
-                        "font-serif font-bold text-xs sm:text-sm leading-tight",
-                        isLightWall ? "text-slate-900" : "text-white"
-                      )}
-                    >
-                      {activePlacement.item.title || "Classical Masterwork Detail"}
-                    </h4>
-                    {(activePlacement.item.traditionalSchool ||
-                      activePlacement.item.medium ||
-                      activePlacement.item.dimensions) && (
-                      <p
-                        className={cn(
-                          "text-[11px] mt-0.5 line-clamp-1",
-                          isLightWall ? "text-slate-700" : "text-stone-300"
-                        )}
-                      >
-                        {[
-                          activePlacement.item.traditionalSchool,
-                          activePlacement.item.medium,
-                          activePlacement.item.dimensions,
-                        ]
-                          .filter(Boolean)
-                          .join(" • ")}
-                      </p>
-                    )}
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Minimalist High-Contrast Top-Right Floating Actions: Play/Pause tour, Overview & Fullscreen */}
+        {/* Minimalist Frosted Glass Top-Right Controls: Strictly Touring / Pause & Fullscreen */}
         <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2 z-20 pointer-events-auto">
-          {/* Info toggle if dismissed */}
-          {!showBadge && (
-            <button
-              type="button"
-              onClick={() => setShowBadge(true)}
-              title="Show Exhibition Details"
-              className="px-2.5 py-1.5 rounded-full bg-stone-950/90 hover:bg-stone-900 border border-amber-500/50 text-amber-300 hover:text-white text-xs font-serif flex items-center gap-1 backdrop-blur-md shadow-lg transition-all cursor-pointer"
-            >
-              <Info className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Info</span>
-            </button>
-          )}
-
-          {/* Overview / Focus toggle button */}
-          <button
-            type="button"
-            onClick={handleToggleOverview}
-            title={isOverview ? "Focus Selected Artwork" : "View Entire Wall (Salon Overview)"}
-            className="px-3 py-1.5 rounded-full bg-stone-950/90 hover:bg-stone-900 border border-amber-500/50 text-amber-300 hover:text-white text-xs font-serif flex items-center gap-1.5 backdrop-blur-md shadow-lg transition-all cursor-pointer"
-          >
-            <span>{isOverview ? "Focus Piece" : "Salon View"}</span>
-          </button>
-
-          {/* Play / Pause Tour Button with active indicator */}
+          {/* Play / Pause Tour Button */}
           <button
             type="button"
             onClick={() => setIsTourPlaying((prev) => !prev)}
             title={isTourPlaying ? "Pause Cinematic Walkthrough" : "Start Director-Guided Walkthrough"}
             className={cn(
-              "h-8 px-2.5 rounded-full border text-xs font-serif flex items-center gap-1.5 backdrop-blur-md transition-all shadow-lg cursor-pointer",
+              "h-8 px-3 rounded-full border text-xs font-serif flex items-center gap-1.5 backdrop-blur-sm transition-all shadow-xs cursor-pointer",
               isTourPlaying
-                ? "bg-amber-500/20 border-amber-400 text-amber-300 ring-1 ring-amber-400/40"
-                : "bg-stone-950/90 hover:bg-stone-900 border-white/20 text-stone-200 hover:text-white"
+                ? "bg-amber-500/20 border-amber-400 text-amber-900 dark:text-amber-200 ring-1 ring-amber-400/40"
+                : "bg-white/70 hover:bg-white/90 text-slate-800 border-slate-300 dark:bg-slate-900/70 dark:hover:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700"
             )}
           >
-            {isTourPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-400" />}
-            <span className="hidden md:inline">{isTourPlaying ? "Touring" : "Tour"}</span>
+            {isTourPlaying ? (
+              <Pause className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            ) : (
+              <Play className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            )}
+            <span>{isTourPlaying ? "Touring" : "Tour"}</span>
           </button>
 
           {/* Fullscreen Button */}
@@ -965,79 +881,18 @@ export function ExhibitionWallBlock({
             type="button"
             onClick={toggleFullscreen}
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-            className="w-8 h-8 rounded-full bg-stone-950/90 hover:bg-stone-900 border border-amber-500/50 text-amber-200 hover:text-white flex items-center justify-center backdrop-blur-md transition-transform hover:scale-105 shadow-lg cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/70 hover:bg-white/90 text-slate-800 border border-slate-300 dark:bg-slate-900/70 dark:hover:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700 flex items-center justify-center backdrop-blur-sm transition-transform hover:scale-105 shadow-xs cursor-pointer"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
-
-        {/* Bottom Thumbnail Strip for Instant Jump-to-Artwork */}
-        <div className="absolute bottom-3 inset-x-3 sm:bottom-4 sm:inset-x-6 z-20 pointer-events-auto">
-          <div className="p-2 rounded-xl bg-stone-950/85 backdrop-blur-md border border-white/10 flex items-center justify-between gap-3 shadow-xl">
-            {/* Previous chevron */}
-            <button
-              type="button"
-              onClick={() => {
-                const nextIdx = (selectedArtworkIndex - 1 + placements.length) % placements.length;
-                setSelectedArtworkIndex(nextIdx);
-                setTourStep(nextIdx);
-                setUserTourStyle("drone");
-              }}
-              aria-label="Previous artwork"
-              className="w-7 h-7 rounded-lg bg-stone-900 hover:bg-stone-800 text-amber-300 flex items-center justify-center shrink-0 cursor-pointer transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            {/* Thumbnail Rail */}
-            <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-              {placements.map((p, idx) => (
-                <button
-                  key={p.item.id || idx}
-                  type="button"
-                  onClick={() => {
-                    setSelectedArtworkIndex(idx);
-                    setTourStep(idx);
-                    setUserTourStyle("drone");
-                  }}
-                  className={cn(
-                    "relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer group",
-                    !isOverview && selectedArtworkIndex === idx
-                      ? "border-amber-400 scale-105 shadow-md shadow-amber-500/20"
-                      : "border-transparent opacity-60 hover:opacity-100"
-                  )}
-                  title={p.item.title || `Artwork ${idx + 1}`}
-                >
-                  <img
-                    src={p.item.url}
-                    alt={p.item.title || "Thumbnail"}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-
-            {/* Next chevron */}
-            <button
-              type="button"
-              onClick={() => {
-                const nextIdx = (selectedArtworkIndex + 1) % placements.length;
-                setSelectedArtworkIndex(nextIdx);
-                setTourStep(nextIdx);
-                setUserTourStyle("drone");
-              }}
-              aria-label="Next artwork"
-              className="w-7 h-7 rounded-lg bg-stone-900 hover:bg-stone-800 text-amber-300 flex items-center justify-center shrink-0 cursor-pointer transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
       </div>
 
-      {/* Authentic Museum Placard Rendered CLEANLY BELOW the 3D Canvas Viewport */}
+      {/* Artwork details (Title, Medium, Dimensions) ONLY rendered below the exhibition container in standard HTML flow */}
       {!isFullscreen && activePlacement && (
-        <ArtworkPlacard item={activePlacement.item} className="mt-3.5" />
+        <div className="mt-4 p-4 text-center">
+          <ArtworkPlacard item={activePlacement.item} />
+        </div>
       )}
     </div>
   );

@@ -86,7 +86,6 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const wallLayout = data.wallLayout ?? "salon";
   const autoplayTour = data.autoplayTour ?? true;
   const overviewDwellSeconds = data.overviewDwellSeconds ?? 4;
-  const showExhibitionBadge = data.showExhibitionBadge ?? true;
   const showFrameHeader = data.showFrameHeader ?? false;
   const frameHeaderBg = data.frameHeaderBg ?? "#0F0E0D";
   const frameHeaderTextColor = data.frameHeaderTextColor ?? "#F5EBE1";
@@ -287,13 +286,6 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       overviewDwellSeconds: val,
-    });
-  };
-
-  const handleShowExhibitionBadgeChange = (val: boolean) => {
-    onChange({
-      ...data,
-      showExhibitionBadge: val,
     });
   };
 
@@ -667,9 +659,9 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             </div>
           )}
 
-          {/* Autoplay Tour & Speed */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-amber-500/20">
-            <div className="flex items-center justify-between">
+          {/* Autoplay Tour & Dwell Speeds */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-amber-500/20">
+            <div className="flex items-center justify-between sm:flex-col sm:items-start sm:justify-center gap-1.5">
               <div>
                 <Label className="text-xs font-semibold text-foreground">Autoplay Cinematic Tour</Label>
                 <p className="text-[10px] text-muted-foreground">
@@ -695,7 +687,24 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
 
             <div className="space-y-1">
               <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
-                <span>Artwork Dwell Time</span>
+                <span>Overview Wall Dwell</span>
+                <span className="text-primary font-mono text-xs">{overviewDwellSeconds}s</span>
+              </Label>
+              <input
+                type="range"
+                min={2}
+                max={10}
+                step={1}
+                value={overviewDwellSeconds}
+                onChange={(e) => handleOverviewDwellSecondsChange(Number(e.target.value))}
+                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+              />
+              <span className="text-[10px] text-muted-foreground">Panoramic wall hold duration (2s - 10s)</span>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Artwork Focus Dwell</span>
                 <span className="text-primary font-mono text-xs">{autoplayTimer}s</span>
               </Label>
               <input
@@ -708,50 +717,6 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
               />
               <span className="text-[10px] text-muted-foreground">Focus dwell per masterwork (3s - 15s)</span>
-            </div>
-          </div>
-
-          {/* Panoramic Wall Overview Dwell & Info Badge Toggle */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-amber-500/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-xs font-semibold text-foreground">Exhibition Info Callout</Label>
-                <p className="text-[10px] text-muted-foreground">
-                  Displays high-contrast curatorial badge in top-left.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleShowExhibitionBadgeChange(!showExhibitionBadge)}
-                className={cn(
-                  "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
-                  showExhibitionBadge ? "bg-amber-600" : "bg-muted"
-                )}
-              >
-                <span
-                  className={cn(
-                    "block w-4 h-4 rounded-full bg-white transition-transform transform",
-                    showExhibitionBadge ? "translate-x-6" : "translate-x-1"
-                  )}
-                />
-              </button>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
-                <span>Panoramic Overview Dwell</span>
-                <span className="text-primary font-mono text-xs">{overviewDwellSeconds}s</span>
-              </Label>
-              <input
-                type="range"
-                min={2}
-                max={10}
-                step={1}
-                value={overviewDwellSeconds}
-                onChange={(e) => handleOverviewDwellSecondsChange(Number(e.target.value))}
-                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
-              />
-              <span className="text-[10px] text-muted-foreground">Initial panoramic wall hold duration before dollies.</span>
             </div>
           </div>
         </div>

@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-09-24)
 
 ## Corpus Check
-- 202 files · ~204,169 words
+- 202 files · ~203,832 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1208 nodes · 2911 edges · 94 communities (77 shown, 17 thin omitted)
+- 1208 nodes · 2911 edges · 93 communities (75 shown, 18 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `27c65c88`
+- Built from commit: `7865c11b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -125,7 +125,7 @@
 - `AlternatingTimelineList()` --calls--> `cn()`  [EXTRACTED]
   src/components/public/blocks/timeline-block.tsx → src/lib/utils.ts
 
-## Communities (94 total, 17 thin omitted)
+## Communities (93 total, 18 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.11
@@ -208,8 +208,8 @@ Cohesion: 0.14
 Nodes (13): ArtworkSummary, EventFormData, EventFormModal(), EventFormModalProps, EventRsvpConfig, EventRsvpCustomField, GalleryImageItem, ArtworkSummary (+5 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.09
-Nodes (4): { GET, POST }, auth, AuthSession, MediaVaultItem
+Cohesion: 0.08
+Nodes (5): { GET, POST }, auth, AuthSession, MediaVaultItem, RouteParams
 
 ### Community 31 - "Community 31"
 Cohesion: 0.14
@@ -218,10 +218,6 @@ Nodes (16): MediaVaultDialog(), FOCAL_POINTS, PRESET_BORDERS, PRESET_FILLS, PRES
 ### Community 32 - "Community 32"
 Cohesion: 0.25
 Nodes (7): artisticBorderPresets, availableIcons, colorPresets, fontFamilies, StyleInspector(), StyleInspectorProps, Separator
-
-### Community 33 - "Community 33"
-Cohesion: 0.12
-Nodes (3): globalForPrisma, RouteParams, RouteParams
 
 ### Community 35 - "Community 35"
 Cohesion: 0.39
@@ -402,17 +398,17 @@ Nodes (4): Commands, TextOrientationExtension, TextOrientationOptions, TextOrien
 ## Knowledge Gaps
 - **475 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+470 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Button` connect `Community 50` to `Community 0`, `Community 7`, `Community 8`, `Community 18`, `Community 21`, `Community 31`, `Community 32`, `Community 36`, `Community 39`, `Community 40`, `Community 44`, `Community 47`, `Community 49`, `Community 56`, `Community 59`, `Community 62`, `Community 67`, `Community 69`, `Community 81`, `Community 82`, `Community 84`, `Community 92`?**
-  _High betweenness centrality (0.046) - this node is a cross-community bridge._
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
 - **Why does `cn()` connect `Community 59` to `Community 0`, `Community 32`, `Community 67`, `Community 36`, `Community 69`, `Community 39`, `Community 40`, `Community 7`, `Community 44`, `Community 45`, `Community 47`, `Community 80`, `Community 49`, `Community 50`, `Community 18`, `Community 81`, `Community 56`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
 - **Why does `Badge()` connect `Community 40` to `Community 36`, `Community 69`, `Community 7`, `Community 8`, `Community 39`, `Community 44`, `Community 47`, `Community 49`, `Community 50`, `Community 18`, `Community 21`, `Community 56`, `Community 59`, `Community 92`, `Community 62`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **What connects `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig` to the rest of the system?**
   _475 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
