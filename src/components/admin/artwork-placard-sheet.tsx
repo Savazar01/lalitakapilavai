@@ -4,14 +4,12 @@ import * as React from "react";
 import QRCode from "qrcode";
 import {
   Printer,
+  Edit3,
+  Eye,
   Sparkles,
-  Sliders,
-  Check,
-  QrCode,
-  X,
-  Layers,
-  FileText,
-  Copy,
+  Image as ImageIcon,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +20,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -54,19 +53,60 @@ export interface ArtworkPlacardSheetProps {
   artworks: PlacardArtwork[];
 }
 
+export interface EditablePlacardItem {
+  id: string;
+  title: string;
+  artistName: string;
+  category: string;
+  medium: string;
+  dimensions: string;
+  year: string;
+  thumbnail?: string;
+  slug: string;
+}
+
 export function ArtworkPlacardSheet({
   open,
   onOpenChange,
   artworks = [],
 }: ArtworkPlacardSheetProps) {
+  // Configurator Toggles
   const [cardFormat, setCardFormat] = React.useState<"visiting-card" | "museum-placard">("visiting-card");
   const [orientation, setOrientation] = React.useState<"landscape" | "portrait">("landscape");
+  const [borderStyle, setBorderStyle] = React.useState<"double-fillet" | "single-rule" | "none">("double-fillet");
   const [showCropMarks, setShowCropMarks] = React.useState(true);
-  const [showGoldBorder, setShowGoldBorder] = React.useState(true);
-  const [includeArtistName, setIncludeArtistName] = React.useState(true);
-  const [includeThumbnail, setIncludeThumbnail] = React.useState(false);
+  const [showThumbnail, setShowThumbnail] = React.useState(true);
+  const [showQrCode, setShowQrCode] = React.useState(true);
+  const [showCategoryHeader, setShowCategoryHeader] = React.useState(true);
+  const [showArtistHeader, setShowArtistHeader] = React.useState(true);
+
+  // Active View Tab: "preview" vs "edit"
+  const [activeTab, setActiveTab] = React.useState<"preview" | "edit">("preview");
+
+  // Editable In-Modal Card Data Overrides
+  const [userOverrides, setUserOverrides] = React.useState<Record<string, Partial<EditablePlacardItem>>>({});
+  const [globalArtistName, setGlobalArtistName] = React.useState("Lalita Kapilavai");
+
+  // QR Code batch mapping
   const [qrCodeDataUrls, setQrCodeDataUrls] = React.useState<Record<string, string>>({});
-  const [generatingQr, setGeneratingQr] = React.useState(false);
+
+  const getItemData = React.useCallback(
+    (art: PlacardArtwork): EditablePlacardItem => {
+      const over = userOverrides[art.id] || {};
+      return {
+        id: art.id,
+        title: over.title ?? art.title ?? "",
+        artistName: over.artistName ?? "Lalita Kapilavai",
+        category: over.category ?? art.traditionalSchool ?? art.category?.name ?? "Thanjavur Traditional",
+        medium: over.medium ?? art.medium ?? "22k Gold Foil, Gesso, Teak Wood",
+        dimensions: over.dimensions ?? art.dimensions ?? "",
+        year: over.year ?? (art.yearCreated ? String(art.yearCreated) : ""),
+        thumbnail: over.thumbnail ?? art.watermarkedWebpUrl ?? art.primaryImageUrl,
+        slug: over.slug ?? art.slug ?? "",
+      };
+    },
+    [userOverrides]
+  );
 
   // Generate QR codes for all artworks in batch
   React.useEffect(() => {
@@ -74,7 +114,6 @@ export function ArtworkPlacardSheet({
 
     let active = true;
     const generateAllQrs = async () => {
-      setGeneratingQr(true);
       const origin = getClientBaseUrl();
       const qrMap: Record<string, string> = {};
 
@@ -99,7 +138,6 @@ export function ArtworkPlacardSheet({
 
       if (active) {
         setQrCodeDataUrls(qrMap);
-        setGeneratingQr(false);
       }
     };
 
@@ -109,13 +147,36 @@ export function ArtworkPlacardSheet({
     };
   }, [open, artworks]);
 
+  const updateCardItem = (id: string, field: keyof EditablePlacardItem, value: string) => {
+    setUserOverrides((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [field]: value,
+      },
+    }));
+  };
+
+  const applyGlobalArtistToAll = () => {
+    setUserOverrides((prev) => {
+      const next = { ...prev };
+      for (const art of artworks) {
+        next[art.id] = { ...next[art.id], artistName: globalArtistName };
+      }
+      return next;
+    });
+  };
+
   const handlePrint = () => {
-    window.print();
+    setActiveTab("preview");
+    setTimeout(() => {
+      window.print();
+    }, 150);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-background">
+      <DialogContent className="max-w-5xl max-h-[92vh] flex flex-col p-0 overflow-hidden bg-background">
         <DialogHeader className="p-4 sm:p-5 border-b border-border/80 bg-muted/20 shrink-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
@@ -124,12 +185,42 @@ export function ArtworkPlacardSheet({
                 Printable Artwork Display Placards &amp; Cards
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                Formatted for 8-up and 10-up batch printing on standard A4 or Letter sheets with alignment crop marks.
+                Two-column fine-art exhibition cards with 18mm acrylic stand base margin and live metadata customizer.
               </DialogDescription>
             </div>
             <div className="flex items-center gap-2">
+              {/* Tab Selector */}
+              <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/60">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("preview")}
+                  className={cn(
+                    "px-3 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer",
+                    activeTab === "preview"
+                      ? "bg-background text-foreground shadow-xs font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Preview</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("edit")}
+                  className={cn(
+                    "px-3 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer",
+                    activeTab === "edit"
+                      ? "bg-background text-foreground shadow-xs font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit Details</span>
+                </button>
+              </div>
+
               <Badge variant="outline" className="text-xs border-amber-500/40 text-amber-800 dark:text-amber-300">
-                {artworks.length} Masterwork{artworks.length === 1 ? "" : "s"} Selected
+                {artworks.length} Selected
               </Badge>
               <Button
                 type="button"
@@ -137,13 +228,13 @@ export function ArtworkPlacardSheet({
                 className="text-xs h-8 gap-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-md cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span>Print / Export PDF</span>
+                <span>Print / PDF</span>
               </Button>
             </div>
           </div>
 
           {/* Configuration Toolbar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 pt-3 mt-1 border-t border-border/60">
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 pt-3 mt-1 border-t border-border/60">
             {/* Format */}
             <div className="space-y-1">
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Format</span>
@@ -178,204 +269,416 @@ export function ArtworkPlacardSheet({
               </Select>
             </div>
 
-            {/* Crop Marks */}
+            {/* Border Options */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Border Style</span>
+              <Select
+                value={borderStyle}
+                onValueChange={(val: "double-fillet" | "single-rule" | "none") => setBorderStyle(val)}
+              >
+                <SelectTrigger className="h-7 text-xs bg-card">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="double-fillet">Double Gold Fillet</SelectItem>
+                  <SelectItem value="single-rule">Minimal Single Rule</SelectItem>
+                  <SelectItem value="none">Borderless</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Toggle: Thumbnail */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Thumbnail</span>
+              <button
+                type="button"
+                onClick={() => setShowThumbnail(!showThumbnail)}
+                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
+                  showThumbnail
+                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
+                    : "border-border bg-card text-muted-foreground"
+                }`}
+              >
+                <span>Image</span>
+                {showThumbnail ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+              </button>
+            </div>
+
+            {/* Toggle: QR Code */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">QR Code</span>
+              <button
+                type="button"
+                onClick={() => setShowQrCode(!showQrCode)}
+                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
+                  showQrCode
+                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
+                    : "border-border bg-card text-muted-foreground"
+                }`}
+              >
+                <span>QR Code</span>
+                {showQrCode ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+              </button>
+            </div>
+
+            {/* Toggle: Category Header */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Category</span>
+              <button
+                type="button"
+                onClick={() => setShowCategoryHeader(!showCategoryHeader)}
+                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
+                  showCategoryHeader
+                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
+                    : "border-border bg-card text-muted-foreground"
+                }`}
+              >
+                <span>School</span>
+                {showCategoryHeader ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+              </button>
+            </div>
+
+            {/* Toggle: Artist Header */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Artist</span>
+              <button
+                type="button"
+                onClick={() => setShowArtistHeader(!showArtistHeader)}
+                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
+                  showArtistHeader
+                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
+                    : "border-border bg-card text-muted-foreground"
+                }`}
+              >
+                <span>Artist</span>
+                {showArtistHeader ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+              </button>
+            </div>
+
+            {/* Toggle: Crop Marks */}
             <div className="space-y-1">
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Crop Marks</span>
               <button
                 type="button"
                 onClick={() => setShowCropMarks(!showCropMarks)}
                 className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  showCropMarks ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold" : "border-border bg-card text-muted-foreground"
+                  showCropMarks
+                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
+                    : "border-border bg-card text-muted-foreground"
                 }`}
               >
                 <span>Guides</span>
-                {showCropMarks && <Check className="w-3 h-3 text-amber-600" />}
-              </button>
-            </div>
-
-            {/* Gold Hairline Fillet */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Fillet Border</span>
-              <button
-                type="button"
-                onClick={() => setShowGoldBorder(!showGoldBorder)}
-                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  showGoldBorder ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold" : "border-border bg-card text-muted-foreground"
-                }`}
-              >
-                <span>Gold Fillet</span>
-                {showGoldBorder && <Check className="w-3 h-3 text-amber-600" />}
-              </button>
-            </div>
-
-            {/* Artist Header */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Artist Header</span>
-              <button
-                type="button"
-                onClick={() => setIncludeArtistName(!includeArtistName)}
-                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  includeArtistName ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold" : "border-border bg-card text-muted-foreground"
-                }`}
-              >
-                <span>Lalita K.</span>
-                {includeArtistName && <Check className="w-3 h-3 text-amber-600" />}
-              </button>
-            </div>
-
-            {/* Thumbnail */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Thumbnail</span>
-              <button
-                type="button"
-                onClick={() => setIncludeThumbnail(!includeThumbnail)}
-                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  includeThumbnail ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold" : "border-border bg-card text-muted-foreground"
-                }`}
-              >
-                <span>Mini Image</span>
-                {includeThumbnail && <Check className="w-3 h-3 text-amber-600" />}
+                {showCropMarks ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
               </button>
             </div>
           </div>
         </DialogHeader>
 
-        {/* Print Preview Scrollable Canvas */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60">
-          <div
-            id="artwork-printable-sheet"
-            className={cn(
-              "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all",
-              "print:w-full print:bg-white print:text-black",
-              // Print Grid Setup
-              cardFormat === "visiting-card"
-                ? orientation === "landscape"
-                  ? "max-w-[760px] grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-4 print:gap-3"
-                  : "max-w-[760px] grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3 gap-3 print:gap-2.5"
-                : orientation === "landscape"
-                ? "max-w-[800px] grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-5 print:gap-4"
-                : "max-w-[800px] grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3"
-            )}
-          >
-            {artworks.map((art, idx) => {
-              const qrDataUrl = qrCodeDataUrls[art.id];
-              const school = art.traditionalSchool || art.category?.name || "Thanjavur Traditional";
-              const medium = art.medium || "22k Gold Foil, Gesso, Teak Wood";
-              const dimensions = art.dimensions || "";
-              const year = art.yearCreated ? String(art.yearCreated) : "";
-              const thumbnail = art.watermarkedWebpUrl || art.primaryImageUrl;
+        {/* Tab 1: Live Interactive Print Preview */}
+        {activeTab === "preview" && (
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60">
+            <div
+              id="artwork-printable-sheet"
+              className={cn(
+                "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all",
+                "print:w-full print:bg-white print:text-black",
+                // Responsive & Print Grid Layout
+                cardFormat === "visiting-card"
+                  ? orientation === "landscape"
+                    ? "max-w-[760px] grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-4 print:gap-3"
+                    : "max-w-[760px] grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3 gap-3 print:gap-2.5"
+                  : orientation === "landscape"
+                  ? "max-w-[820px] grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-5 print:gap-4"
+                  : "max-w-[820px] grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3"
+              )}
+            >
+              {artworks.map((art, idx) => {
+                const itemData = getItemData(art);
+                const qrDataUrl = qrCodeDataUrls[art.id];
 
-              return (
-                <div
-                  key={art.id || idx}
-                  className={cn(
-                    "relative bg-white text-stone-900 border border-stone-200 p-3.5 print:p-3 transition-all flex flex-col justify-between overflow-hidden",
-                    showCropMarks && "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1",
-                    cardFormat === "visiting-card"
-                      ? orientation === "landscape"
-                        ? "min-h-[145px] h-[155px]"
-                        : "min-h-[195px] h-[215px]"
-                      : orientation === "landscape"
-                      ? "min-h-[185px] h-[200px]"
-                      : "min-h-[235px] h-[255px]"
-                  )}
-                  style={{
-                    pageBreakInside: "avoid",
-                    breakInside: "avoid",
-                  }}
-                >
-                  {/* Outer Gold Decorative Fillet Border */}
-                  {showGoldBorder && (
-                    <div className="absolute inset-1.5 border border-amber-600/35 pointer-events-none rounded-[1px]">
-                      <div className="absolute inset-0.5 border border-amber-600/15 pointer-events-none" />
-                    </div>
-                  )}
+                return (
+                  <div
+                    key={art.id || idx}
+                    className={cn(
+                      "relative bg-white text-stone-900 border border-stone-200 p-3.5 print:p-3 transition-all flex flex-col justify-between overflow-hidden",
+                      // 18mm bottom safety margin so acrylic stands/clips never occlude card typography
+                      "pb-[18mm] print:pb-[18mm]",
+                      showCropMarks && "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1",
+                      cardFormat === "visiting-card"
+                        ? orientation === "landscape"
+                          ? "min-h-[175px] h-[190px]"
+                          : "min-h-[225px] h-[245px]"
+                        : orientation === "landscape"
+                        ? "min-h-[215px] h-[230px]"
+                        : "min-h-[265px] h-[285px]"
+                    )}
+                    style={{
+                      pageBreakInside: "avoid",
+                      breakInside: "avoid",
+                    }}
+                  >
+                    {/* Border Options */}
+                    {borderStyle === "double-fillet" && (
+                      <div className="absolute inset-1.5 border border-amber-600/35 pointer-events-none rounded-[1px]">
+                        <div className="absolute inset-0.5 border border-amber-600/15 pointer-events-none" />
+                      </div>
+                    )}
+                    {borderStyle === "single-rule" && (
+                      <div className="absolute inset-1.5 border border-stone-300 print:border-black pointer-events-none rounded-[1px]" />
+                    )}
 
-                  {/* Corner Crop Marks for Professional Trimmer Guides */}
-                  {showCropMarks && (
-                    <>
-                      <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-stone-400 print:border-black pointer-events-none" />
-                      <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-stone-400 print:border-black pointer-events-none" />
-                      <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-stone-400 print:border-black pointer-events-none" />
-                      <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-stone-400 print:border-black pointer-events-none" />
-                    </>
-                  )}
+                    {/* Corner Crop Marks for Professional Trimmer Guides */}
+                    {showCropMarks && (
+                      <>
+                        <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-stone-400 print:border-black pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-stone-400 print:border-black pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-stone-400 print:border-black pointer-events-none" />
+                        <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-stone-400 print:border-black pointer-events-none" />
+                      </>
+                    )}
 
-                  {/* Placard Header: Artist Name & Traditional School */}
-                  <div className="relative z-10 space-y-0.5">
-                    {includeArtistName && (
-                      <div className="flex items-center justify-between border-b border-amber-600/20 pb-0.5 mb-1">
-                        <span className="font-serif tracking-widest text-[9px] uppercase font-bold text-amber-900 print:text-black">
-                          Lalita Kapilavai
+                    {/* Header: Category / Traditional School on Left; Artist Name on Right */}
+                    {(showCategoryHeader || showArtistHeader) && (
+                      <div className="relative z-10 flex items-center justify-between border-b border-amber-600/30 print:border-stone-300 pb-1 mb-1.5">
+                        <span className="font-serif tracking-widest text-[8.5px] sm:text-[9px] uppercase font-bold text-amber-900 print:text-black truncate max-w-[55%]">
+                          {showCategoryHeader ? itemData.category : ""}
                         </span>
-                        <span className="font-sans text-[8px] text-stone-500 print:text-stone-700 tracking-wide">
-                          Atelier Masterwork
+                        <span className="font-serif tracking-wide text-[8.5px] sm:text-[9px] font-semibold text-stone-800 print:text-black shrink-0">
+                          {showArtistHeader ? itemData.artistName : ""}
                         </span>
                       </div>
                     )}
 
-                    {/* Masterwork Title */}
-                    <h3 className="font-serif font-bold text-xs sm:text-sm text-stone-950 print:text-black leading-tight italic">
-                      {art.title}
-                    </h3>
-                  </div>
-
-                  {/* Placard Body: Curatorial Metadata & QR Code */}
-                  <div className="relative z-10 flex items-end justify-between gap-2 mt-auto pt-1">
-                    <div className="flex-1 space-y-0.5 pr-1">
-                      {/* Line 2: Materials & Medium */}
-                      {medium && (
-                        <p className="text-[9.5px] leading-tight text-stone-700 print:text-black font-medium">
-                          {medium}
+                    {/* Two-Column Body */}
+                    <div className="relative z-10 flex-1 flex items-stretch justify-between gap-2.5">
+                      {/* Left Column (65%): Artwork Title, Medium & Materials, Dimensions & Year */}
+                      <div className="w-[65%] flex flex-col justify-between pr-1">
+                        <div>
+                          <h3 className="font-serif font-bold text-[13px] sm:text-[14.5px] leading-tight text-stone-950 print:text-black italic">
+                            {itemData.title}
+                          </h3>
+                          {itemData.medium && (
+                            <p className="font-serif italic text-[9.5px] leading-snug text-stone-700 print:text-black mt-1">
+                              {itemData.medium}
+                            </p>
+                          )}
+                        </div>
+                        <p className="font-mono text-[8.5px] text-stone-600 print:text-stone-800 leading-tight mt-1">
+                          {[itemData.dimensions, itemData.year].filter(Boolean).join(" • ")}
                         </p>
-                      )}
-
-                      {/* Line 3: Dimensions & School */}
-                      <p className="text-[8.5px] leading-tight text-stone-600 print:text-stone-800">
-                        {[dimensions, school, year].filter(Boolean).join(" • ")}
-                      </p>
-                    </div>
-
-                    {/* Optional Thumbnail Image */}
-                    {includeThumbnail && thumbnail && (
-                      <div className="w-10 h-10 shrink-0 rounded overflow-hidden border border-stone-300">
-                        <img
-                          src={thumbnail}
-                          alt={art.title}
-                          className="w-full h-full object-cover"
-                        />
                       </div>
-                    )}
 
-                    {/* Dynamic High-Resolution QR Code */}
-                    <div className="shrink-0 flex flex-col items-center">
-                      <div className="w-12 h-12 bg-white p-0.5 rounded border border-stone-300 shadow-xs print:shadow-none">
-                        {qrDataUrl ? (
-                          <img
-                            src={qrDataUrl}
-                            alt={`QR for ${art.title}`}
-                            className="w-full h-full object-contain block"
-                          />
+                      {/* Right Column (35%): Stacked Artwork Thumbnail (top) and Vector QR Code (bottom) */}
+                      <div className="w-[35%] flex flex-col items-center justify-between pl-1 shrink-0">
+                        {showThumbnail && itemData.thumbnail ? (
+                          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded overflow-hidden border border-stone-300 shadow-xs shrink-0">
+                            <img
+                              src={itemData.thumbnail}
+                              alt={itemData.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-[7px] text-stone-400">
-                            QR
+                          <div className="h-0" />
+                        )}
+
+                        {showQrCode && (
+                          <div className="flex flex-col items-center shrink-0">
+                            <div className="w-11 h-11 bg-white p-0.5 rounded border border-stone-300 shadow-xs print:shadow-none">
+                              {qrDataUrl ? (
+                                <img
+                                  src={qrDataUrl}
+                                  alt={`QR for ${itemData.title}`}
+                                  className="w-full h-full object-contain block"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-[7px] text-stone-400">
+                                  QR
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-[6.5px] font-sans text-stone-500 print:text-black tracking-tight mt-0.5 whitespace-nowrap">
+                              Scan for Provenance
+                            </span>
                           </div>
                         )}
                       </div>
-                      <span className="text-[6.5px] text-stone-500 print:text-black tracking-tight mt-0.5">
-                        Scan for Archive
+                    </div>
+
+                    {/* Acrylic Base Margin Indicator (Subtle UI guide, hidden on print) */}
+                    <div className="absolute bottom-0 inset-x-0 h-[18mm] border-t border-dashed border-stone-200 bg-stone-50/50 print:hidden flex items-center justify-center pointer-events-none">
+                      <span className="text-[7.5px] uppercase tracking-wider text-stone-400 font-mono">
+                        18mm Stand Base Margin (Kept Clear)
                       </span>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Tab 2: Live In-Modal Card Metadata Customizer */}
+        {activeTab === "edit" && (
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-background space-y-4">
+            {/* Global Quick Action Bar */}
+            <div className="p-3.5 rounded-xl border border-amber-500/40 bg-amber-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Apply Artist Name to All Cards
+                </Label>
+                <p className="text-[11px] text-muted-foreground">
+                  Update the artist credit across all selected display cards simultaneously.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  value={globalArtistName}
+                  onChange={(e) => setGlobalArtistName(e.target.value)}
+                  className="h-8 text-xs w-48 bg-card"
+                  placeholder="e.g. Lalita Kapilavai"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={applyGlobalArtistToAll}
+                  className="h-8 text-xs shrink-0 cursor-pointer border-amber-500/40 text-amber-800 dark:text-amber-200"
+                >
+                  Apply All
+                </Button>
+              </div>
+            </div>
+
+            {/* Individual Card Editors */}
+            <div className="space-y-3">
+              {artworks.map((art, idx) => {
+                const itemData = getItemData(art);
+
+                return (
+                  <div
+                    key={art.id || idx}
+                    className="p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-3"
+                  >
+                    <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                      <div className="flex items-center gap-2.5">
+                        {itemData.thumbnail ? (
+                          <img
+                            src={itemData.thumbnail}
+                            alt=""
+                            className="w-8 h-8 rounded object-cover border border-border/80 shrink-0"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded bg-muted flex items-center justify-center shrink-0">
+                            <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div>
+                          <h4 className="font-serif font-bold text-xs text-foreground truncate max-w-[280px]">
+                            {itemData.title || "Untitled Masterwork"}
+                          </h4>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            {art.slug}
+                          </span>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="text-[10px]">
+                        Card #{idx + 1}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                      {/* Title */}
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Artwork Title
+                        </Label>
+                        <Input
+                          type="text"
+                          value={itemData.title}
+                          onChange={(e) => updateCardItem(art.id, "title", e.target.value)}
+                          className="h-8 text-xs font-serif"
+                        />
+                      </div>
+
+                      {/* Artist Name */}
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Artist Name
+                        </Label>
+                        <Input
+                          type="text"
+                          value={itemData.artistName}
+                          onChange={(e) => updateCardItem(art.id, "artistName", e.target.value)}
+                          className="h-8 text-xs font-serif"
+                        />
+                      </div>
+
+                      {/* Category / School */}
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Category / School
+                        </Label>
+                        <Input
+                          type="text"
+                          value={itemData.category}
+                          onChange={(e) => updateCardItem(art.id, "category", e.target.value)}
+                          className="h-8 text-xs"
+                        />
+                      </div>
+
+                      {/* Medium & Materials */}
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Medium &amp; Materials
+                        </Label>
+                        <Input
+                          type="text"
+                          value={itemData.medium}
+                          onChange={(e) => updateCardItem(art.id, "medium", e.target.value)}
+                          className="h-8 text-xs font-serif italic"
+                        />
+                      </div>
+
+                      {/* Dimensions */}
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Dimensions
+                        </Label>
+                        <Input
+                          type="text"
+                          value={itemData.dimensions}
+                          onChange={(e) => updateCardItem(art.id, "dimensions", e.target.value)}
+                          className="h-8 text-xs font-mono"
+                          placeholder="e.g. 24 x 36 inches"
+                        />
+                      </div>
+
+                      {/* Year Created */}
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Year Created
+                        </Label>
+                        <Input
+                          type="text"
+                          value={itemData.year}
+                          onChange={(e) => updateCardItem(art.id, "year", e.target.value)}
+                          className="h-8 text-xs font-mono"
+                          placeholder="e.g. 2026"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <DialogFooter className="p-3 border-t border-border/80 bg-muted/20 shrink-0 flex items-center justify-between sm:justify-between">
           <p className="text-[11px] text-muted-foreground hidden sm:block">
-            Tip: In print settings, set &quot;Margins&quot; to &quot;None&quot; and check &quot;Background graphics&quot; for accurate double-fillet borders.
+            Tip: In print dialog, select &quot;Margins: None&quot; and check &quot;Background graphics&quot; for accurate double-fillet borders.
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -391,7 +694,7 @@ export function ArtworkPlacardSheet({
               type="button"
               onClick={handlePrint}
               size="sm"
-              className="text-xs gap-1.5 bg-primary text-primary-foreground font-semibold"
+              className="text-xs gap-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-xs"
             >
               <Printer className="w-3.5 h-3.5" />
               Print Cards ({artworks.length})

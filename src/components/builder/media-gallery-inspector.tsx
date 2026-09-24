@@ -50,7 +50,9 @@ export interface MediaGalleryBlockData {
   framePadding?: number;
   showCaptionRibbon?: boolean;
   environmentId?: string;
+  culturalEnvironment?: string;
   customWallUrl?: string;
+  customWallBackdropUrl?: string;
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
@@ -80,8 +82,8 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const borderWidth = data.borderWidth ?? 0;
   const framePadding = data.framePadding ?? 0;
   const showCaptionRibbon = data.showCaptionRibbon ?? false;
-  const environmentId = data.environmentId ?? "london-school-arts";
-  const customWallUrl = data.customWallUrl ?? "";
+  const environmentId = data.culturalEnvironment ?? data.environmentId ?? "london-school-arts";
+  const customWallUrl = data.customWallBackdropUrl ?? data.customWallUrl ?? "";
   const cameraTourStyle = data.cameraTourStyle ?? "drone";
   const wallLayout = data.wallLayout ?? "salon";
   const autoplayTour = data.autoplayTour ?? true;
@@ -251,6 +253,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       environmentId: env,
+      culturalEnvironment: env,
     });
   };
 
@@ -258,6 +261,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       customWallUrl: url,
+      customWallBackdropUrl: url,
     });
   };
 

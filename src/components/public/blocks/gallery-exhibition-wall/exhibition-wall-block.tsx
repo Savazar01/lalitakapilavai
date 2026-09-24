@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import * as THREE from "three";
+import QRCode from "qrcode";
 import {
   Maximize2,
   Minimize2,
   Play,
   Pause,
+  QrCode,
 } from "lucide-react";
 import { MediaGalleryItem, ArtworkPlacard } from "../media-gallery-block";
 import {
@@ -21,7 +23,9 @@ export type WallLayoutMatrix = "salon" | "linear" | "grid";
 export interface ExhibitionWallBlockProps {
   items: MediaGalleryItem[];
   environmentId?: string;
+  culturalEnvironment?: string;
   customWallUrl?: string;
+  customWallBackdropUrl?: string;
   cameraTourStyle?: CameraTourStyle;
   wallLayout?: WallLayoutMatrix;
   autoplayTour?: boolean;
@@ -155,7 +159,9 @@ function computePlacements(
 export function ExhibitionWallBlock({
   items = [],
   environmentId = "london-school-arts",
+  culturalEnvironment,
   customWallUrl,
+  customWallBackdropUrl,
   cameraTourStyle = "drone",
   wallLayout = "salon",
   autoplayTour = true,
@@ -167,6 +173,12 @@ export function ExhibitionWallBlock({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
+  const activeEnvId = culturalEnvironment || environmentId || "london-school-arts";
+  const activeCustomWallUrl = customWallBackdropUrl || customWallUrl;
+  const isCustomBackdrop =
+    (activeEnvId === "custom" || activeEnvId.toLowerCase().includes("custom")) &&
+    !!activeCustomWallUrl;
+
   // Tour Step: -1 represents the Panoramic Overview Wall (all masterworks hung together).
   // 0..(placements.length - 1) represents individual focused artworks.
   const [tourStep, setTourStep] = React.useState<number>(-1);
@@ -174,6 +186,7 @@ export function ExhibitionWallBlock({
   const [selectedArtworkIndex, setSelectedArtworkIndex] = React.useState<number>(0);
   const [isTourPlaying, setIsTourPlaying] = React.useState<boolean>(autoplayTour);
   const [isFullscreen, setIsFullscreen] = React.useState<boolean>(false);
+  const [sidePlacardQrUrl, setSidePlacardQrUrl] = React.useState<string | null>(null);
 
   const isOverview = tourStep === -1;
   const activeTourStyle: CameraTourStyle = isOverview
@@ -190,12 +203,40 @@ export function ExhibitionWallBlock({
 
   const activePlacement = placements[selectedArtworkIndex] || placements[0];
   const env: WallEnvironment = React.useMemo(() => {
-    const found = getWallEnvironment(environmentId);
-    if (environmentId === "custom" && customWallUrl) {
-      return { ...found, wallTextureUrl: customWallUrl };
+    const found = getWallEnvironment(activeEnvId);
+    if ((activeEnvId === "custom" || activeEnvId.toLowerCase().includes("custom")) && activeCustomWallUrl) {
+      return { ...found, wallTextureUrl: activeCustomWallUrl };
     }
     return found;
-  }, [environmentId, customWallUrl]);
+  }, [activeEnvId, activeCustomWallUrl]);
+
+  // Synchronized QR Code for side-mounted wall placard
+  React.useEffect(() => {
+    let active = true;
+    if (!activePlacement) return;
+
+    const slug =
+      activePlacement.item.artwork?.slug ||
+      activePlacement.item.slug ||
+      activePlacement.item.linkTarget ||
+      "";
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const url = slug ? `${origin}/artwork/${slug}?ref=exhibition` : `${origin}/gallery`;
+
+    QRCode.toDataURL(url, {
+      width: 160,
+      margin: 1,
+      color: { dark: "#0F172A", light: "#FFFFFF" },
+    })
+      .then((dataUrl) => {
+        if (active) setSidePlacardQrUrl(dataUrl);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [activePlacement]);
 
   // Three.js internal references
   const threeRef = React.useRef<{
@@ -244,8 +285,12 @@ export function ExhibitionWallBlock({
     const height = container.clientHeight || 580;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(env.wallBgColor);
-    scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.032);
+    if (isCustomBackdrop) {
+      scene.background = null;
+    } else {
+      scene.background = new THREE.Color(env.wallBgColor);
+      scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.032);
+    }
 
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
     // Initial camera view: Panoramic Overview Wall
@@ -254,14 +299,21 @@ export function ExhibitionWallBlock({
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
+      alpha: isCustomBackdrop,
       powerPreference: "high-performance",
     });
+    if (isCustomBackdrop) {
+      renderer.setClearColor(0x000000, 0);
+    }
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.08;
+
+    const texLoader = new THREE.TextureLoader();
+    texLoader.crossOrigin = "anonymous";
 
     // Ambient Lighting
     const ambientLight = new THREE.AmbientLight(
@@ -383,7 +435,27 @@ export function ExhibitionWallBlock({
       bumpScale: 0.04,
       roughness: 0.92,
       metalness: 0.02,
+      transparent: isCustomBackdrop,
+      opacity: isCustomBackdrop ? 0.88 : 1.0,
     });
+
+    if (env.wallTextureUrl) {
+      texLoader.load(
+        env.wallTextureUrl,
+        (loadedTex) => {
+          loadedTex.colorSpace = THREE.SRGBColorSpace;
+          loadedTex.wrapS = THREE.ClampToEdgeWrapping;
+          loadedTex.wrapT = THREE.ClampToEdgeWrapping;
+          wallMat.map = loadedTex;
+          wallMat.needsUpdate = true;
+        },
+        undefined,
+        (err) => {
+          console.warn("Could not load wall texture:", err);
+        }
+      );
+    }
+
     const wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(0, 2.5, 0);
     wallMesh.receiveShadow = true;
@@ -452,9 +524,6 @@ export function ExhibitionWallBlock({
     scene.add(floorMesh);
 
     // Build Artwork Meshes & Frames
-    const texLoader = new THREE.TextureLoader();
-    texLoader.crossOrigin = "anonymous";
-
     const artworkMeshes: {
       mesh: THREE.Mesh;
       group: THREE.Group;
@@ -692,14 +761,19 @@ export function ExhibitionWallBlock({
         threeRef.current.renderer.dispose();
       }
     };
-  }, [placements, env, activeTourStyle]);
+  }, [placements, env, activeTourStyle, isCustomBackdrop]);
 
   // Update Environment Lighting & Color dynamically
   React.useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
-    state.scene.background = new THREE.Color(env.wallBgColor);
-    state.scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.032);
+    if (isCustomBackdrop) {
+      state.scene.background = null;
+      state.renderer.setClearColor(0x000000, 0);
+    } else {
+      state.scene.background = new THREE.Color(env.wallBgColor);
+      state.scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.032);
+    }
     state.ambientLight.color.set(env.lightingColor);
     state.spotlight.color.set(env.lightingColor);
     state.spotlight.intensity = env.spotlightIntensity * 28;
@@ -707,7 +781,7 @@ export function ExhibitionWallBlock({
       s.color.set(env.lightingColor);
       s.intensity = env.spotlightIntensity * 14;
     });
-  }, [env]);
+  }, [env, isCustomBackdrop]);
 
   // Camera Target Position Calculator based on Tour Mode and Selected Artwork
   React.useEffect(() => {
@@ -718,7 +792,7 @@ export function ExhibitionWallBlock({
       state.targetCamPos.set(0, 2.4, 9.2);
       state.targetLookAt.set(0, 2.4, 0);
     } else {
-      // Isolated Focus Framing: Dolly camera directly in front of target piece so it fills 75% of viewport height
+      // Isolated Focus Framing: Dolly camera directly in front of target piece so it fills ~75% of viewport height
       // with zero clipping from adjacent frames.
       const frameH = activePlacement.height + 0.16;
       const frameW = activePlacement.width + 0.16;
@@ -729,30 +803,34 @@ export function ExhibitionWallBlock({
       const dWidth = (frameW / 0.75) / (2 * Math.tan(vFovRad / 2) * aspect);
       const idealDistance = Math.max(dHeight, dWidth, 1.5);
 
+      // Shift camera target slightly to the right so the artwork is framed comfortably in the left ~60% of the canvas,
+      // leaving room for the side-mounted gallery wall placard on the right ~35% of the frame.
+      const sideShiftX = idealDistance * Math.tan(vFovRad / 2) * aspect * 0.28;
+
       if (activeTourStyle === "inspection") {
         // Macro archival inspection close-up
         state.targetCamPos.set(
-          activePlacement.x,
+          activePlacement.x + sideShiftX * 0.4,
           activePlacement.y,
           Math.min(idealDistance * 0.6, 1.2)
         );
-        state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
+        state.targetLookAt.set(activePlacement.x + sideShiftX * 0.4, activePlacement.y, 0);
       } else if (activeTourStyle === "walkthrough") {
         // First-person eye-level visitor perspective
         state.targetCamPos.set(
-          activePlacement.x,
+          activePlacement.x + sideShiftX,
           1.65,
           Math.max(idealDistance, 2.2)
         );
-        state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
+        state.targetLookAt.set(activePlacement.x + sideShiftX, activePlacement.y, 0);
       } else {
-        // Focused Dolly: Centered squarely in front of the artwork at 75% viewport framing
+        // Focused Dolly: Centered in left 60% of viewport framing
         state.targetCamPos.set(
-          activePlacement.x,
+          activePlacement.x + sideShiftX,
           activePlacement.y,
           idealDistance
         );
-        state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
+        state.targetLookAt.set(activePlacement.x + sideShiftX, activePlacement.y, 0);
       }
     }
   }, [selectedArtworkIndex, activeTourStyle, activePlacement]);
@@ -842,6 +920,16 @@ export function ExhibitionWallBlock({
     <div className={cn("w-full flex flex-col", className)}>
       <div
         ref={containerRef}
+        style={
+          isCustomBackdrop
+            ? {
+                backgroundImage: `url("${activeCustomWallUrl}")`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }
+            : undefined
+        }
         className={cn(
           "relative w-full rounded-2xl overflow-hidden border border-border/60 bg-stone-950 select-none shadow-2xl transition-all duration-300",
           isFullscreen ? "fixed inset-0 z-50 rounded-none border-none h-screen w-screen" : "h-[540px] sm:h-[640px]"
@@ -853,6 +941,83 @@ export function ExhibitionWallBlock({
           onClick={handleCanvasClick}
           className="w-full h-full block cursor-pointer touch-none"
         />
+
+        {/* Synchronized Side-Mounted Artwork Placard on the Gallery Wall */}
+        {!isOverview && activePlacement && (
+          <div
+            className={cn(
+              "absolute right-3 sm:right-6 md:right-10 top-1/2 -translate-y-1/2",
+              "w-[220px] sm:w-[260px] md:w-[290px]",
+              "p-3.5 sm:p-4 bg-white/95 text-stone-900 rounded-[2px] shadow-2xl",
+              "border border-stone-300 dark:border-stone-400 backdrop-blur-md z-20 pointer-events-auto",
+              "transition-all duration-500 animate-in fade-in slide-in-from-right-6"
+            )}
+          >
+            {/* Subtle Fillet Double Border */}
+            <div className="absolute inset-1 border border-amber-600/30 pointer-events-none rounded-[1px]" />
+
+            {/* Top Bar: Category / Traditional School on Left; Artist Name on Right */}
+            <div className="relative z-10 flex items-center justify-between border-b border-amber-600/30 pb-1 mb-2">
+              <span className="font-serif text-[8.5px] sm:text-[9.5px] tracking-wider uppercase font-bold text-amber-900 truncate max-w-[130px]">
+                {activePlacement.item.artwork?.traditionalSchool ||
+                  activePlacement.item.artwork?.category?.name ||
+                  activePlacement.item.traditionalSchool ||
+                  "Traditional Indian Art"}
+              </span>
+              <span className="font-serif text-[8.5px] sm:text-[9.5px] tracking-wide text-stone-800 font-semibold shrink-0">
+                Lalita Kapilavai
+              </span>
+            </div>
+
+            {/* Title (prominent serif) */}
+            <div className="relative z-10 space-y-1">
+              <h3 className="font-serif font-bold text-sm sm:text-base text-stone-950 leading-snug italic">
+                {activePlacement.item.title || activePlacement.item.artwork?.title || "Masterwork"}
+              </h3>
+
+              {/* Medium */}
+              <p className="text-[10px] sm:text-[10.5px] font-serif italic text-stone-700 leading-tight">
+                {activePlacement.item.artwork?.medium ||
+                  activePlacement.item.medium ||
+                  activePlacement.item.description ||
+                  "22k Gold Foil, Gesso, Teak Wood"}
+              </p>
+
+              {/* Dimensions & Year */}
+              <p className="text-[8.5px] sm:text-[9px] font-mono text-stone-600 leading-tight">
+                {[
+                  activePlacement.item.artwork?.dimensions || activePlacement.item.dimensions,
+                  activePlacement.item.artwork?.yearCreated || activePlacement.item.year,
+                ]
+                  .filter(Boolean)
+                  .join(" • ")}
+              </p>
+            </div>
+
+            {/* Bottom: QR Code with 'Scan for Provenance' */}
+            <div className="relative z-10 mt-2.5 pt-2 border-t border-stone-200 flex items-center justify-between gap-2">
+              <div className="space-y-0.5">
+                <span className="text-[8px] sm:text-[8.5px] font-serif font-semibold text-stone-900 block leading-tight">
+                  Scan for Provenance
+                </span>
+                <span className="text-[7px] sm:text-[7.5px] text-stone-500 block leading-tight">
+                  Verified Atelier Archive
+                </span>
+              </div>
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white p-0.5 rounded border border-stone-300 shadow-xs shrink-0 flex items-center justify-center">
+                {sidePlacardQrUrl ? (
+                  <img
+                    src={sidePlacardQrUrl}
+                    alt="Provenance QR"
+                    className="w-full h-full object-contain block"
+                  />
+                ) : (
+                  <QrCode className="w-5 h-5 text-stone-400" />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Minimalist Frosted Glass Top-Right Controls: Strictly Touring / Pause & Fullscreen */}
         <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2 z-20 pointer-events-auto">

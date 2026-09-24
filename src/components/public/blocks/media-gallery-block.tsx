@@ -35,6 +35,20 @@ const ExhibitionWallBlock = dynamic(
   }
 );
 
+export interface ArtworkMetadata {
+  id?: string;
+  title?: string;
+  slug?: string;
+  medium?: string;
+  dimensions?: string;
+  yearCreated?: number | string;
+  traditionalSchool?: string;
+  description?: string;
+  category?: { name: string };
+  primaryImageUrl?: string;
+  watermarkedWebpUrl?: string;
+}
+
 export interface MediaGalleryItem {
   id: string;
   url: string;
@@ -42,6 +56,7 @@ export interface MediaGalleryItem {
   title?: string;
   caption?: string;
   artworkId?: string;       // Linked Artwork Record ID
+  slug?: string;
   medium?: string;          // Materials used (e.g. 22k Gold Foil, Teakwood, Gemstones)
   dimensions?: string;      // Dimensions (e.g. 24 x 36 inches / 61 x 91.4 cm)
   year?: string;
@@ -50,6 +65,7 @@ export interface MediaGalleryItem {
   description?: string;
   linkType?: "none" | "artwork" | "category" | "custom";
   linkTarget?: string; // slug for artwork/category, or full url
+  artwork?: ArtworkMetadata;
 }
 
 export type MediaGalleryDisplayMode =
@@ -77,7 +93,9 @@ export interface MediaGalleryBlockProps {
   framePadding?: number;
   showCaptionRibbon?: boolean;
   environmentId?: string;
+  culturalEnvironment?: string;
   customWallUrl?: string;
+  customWallBackdropUrl?: string;
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
@@ -279,7 +297,9 @@ export function MediaGalleryBlock({
   framePadding = 0,
   showCaptionRibbon = false,
   environmentId = "london-school-arts",
+  culturalEnvironment,
   customWallUrl,
+  customWallBackdropUrl,
   cameraTourStyle = "drone",
   wallLayout = "salon",
   autoplayTour = true,
@@ -387,7 +407,9 @@ export function MediaGalleryBlock({
       <ExhibitionWallBlock
         items={validItems}
         environmentId={environmentId}
+        culturalEnvironment={culturalEnvironment}
         customWallUrl={customWallUrl}
+        customWallBackdropUrl={customWallBackdropUrl}
         cameraTourStyle={cameraTourStyle}
         wallLayout={wallLayout}
         autoplayTour={autoplayTour}
