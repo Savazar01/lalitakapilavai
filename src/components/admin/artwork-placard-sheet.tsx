@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { cn } from "@/lib/utils";
-import { printIsolatedElement } from "@/lib/print-isolated-html";
+import { printIsolatedElement, getPhysicalDimensions } from "@/lib/print-isolated-html";
 
 export interface PlacardArtwork {
   id: string;
@@ -178,8 +178,10 @@ export function ArtworkPlacardSheet({
           printContainer.innerHTML,
           "Exhibition Display Cards",
           {
+            format: cardFormat,
             orientation,
-            columns: orientation === "portrait" ? 3 : 2,
+            borderStyle,
+            showCropMarks,
           }
         );
       }, 150);
@@ -192,11 +194,15 @@ export function ArtworkPlacardSheet({
       printContainer.innerHTML,
       "Exhibition Display Cards",
       {
+        format: cardFormat,
         orientation,
-        columns: orientation === "portrait" ? 3 : 2,
+        borderStyle,
+        showCropMarks,
       }
     );
   };
+
+  const dim = getPhysicalDimensions(cardFormat, orientation);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -404,16 +410,11 @@ export function ArtworkPlacardSheet({
             <div
               id="placard-render-cards"
               className={cn(
-                "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all w-full",
-                "print:w-full print:max-w-none print:m-0 print:bg-white print:text-black print:block",
-                // Responsive & Print Grid Layout
+                "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all",
+                "flex flex-wrap gap-5 items-start justify-center",
                 cardFormat === "visiting-card"
-                  ? orientation === "landscape"
-                    ? "max-w-[760px] grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-4 print:gap-3"
-                    : "max-w-[760px] grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3 gap-3 print:gap-2.5"
-                  : orientation === "landscape"
-                  ? "max-w-[820px] grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-5 print:gap-4"
-                  : "max-w-[820px] grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3"
+                  ? "max-w-[780px]"
+                  : "max-w-[860px]"
               )}
             >
               {artworks.map((art, idx) => {
@@ -423,23 +424,22 @@ export function ArtworkPlacardSheet({
                 return (
                   <div
                     key={art.id || idx}
-                    className={cn(
-                      "placard-card-item relative bg-white text-stone-900 border border-stone-200 p-3.5 print:p-3 transition-all flex flex-col justify-between overflow-hidden",
-                      // 18mm bottom safety margin so acrylic stands/clips never occlude card typography
-                      "pb-[18mm] print:pb-[18mm]",
-                      showCropMarks && "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1",
-                      cardFormat === "visiting-card"
-                        ? orientation === "landscape"
-                          ? "min-h-[175px] h-[190px]"
-                          : "min-h-[225px] h-[245px]"
-                        : orientation === "landscape"
-                        ? "min-h-[215px] h-[230px]"
-                        : "min-h-[265px] h-[285px]"
-                    )}
                     style={{
+                      width: `${dim.widthMm}mm`,
+                      height: `${dim.heightMm}mm`,
+                      minWidth: `${dim.widthMm}mm`,
+                      minHeight: `${dim.heightMm}mm`,
+                      maxWidth: `${dim.widthMm}mm`,
+                      maxHeight: `${dim.heightMm}mm`,
                       pageBreakInside: "avoid",
                       breakInside: "avoid",
                     }}
+                    className={cn(
+                      "placard-card-item relative bg-white text-stone-900 border border-stone-200 p-3.5 print:p-3 transition-all flex flex-col justify-between overflow-hidden shrink-0",
+                      // 18mm bottom safety margin so acrylic stands/clips never occlude card typography
+                      "pb-[18mm] print:pb-[18mm]",
+                      showCropMarks && "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1"
+                    )}
                   >
                     {/* Border Options */}
                     {borderStyle === "double-fillet" && (

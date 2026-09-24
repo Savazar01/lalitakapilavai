@@ -2,18 +2,43 @@
  * Isolated Iframe Print Driver
  * Injects HTML content directly into a clean, unstyled hidden <iframe> with dedicated
  * print stylesheets, isolated from parent Radix Dialogs, overlays, and Next.js DOM trees.
+ * Enforces true physical metric/imperial dimensions and anti-splitting page break rules.
  */
 
-export interface PrintIsolatedOptions {
+export interface PlacardPrintOptions {
   title?: string;
+  format?: "visiting-card" | "museum-placard";
   orientation?: "landscape" | "portrait";
-  columns?: number;
+  borderStyle?: "double-fillet" | "single-rule" | "none";
+  showCropMarks?: boolean;
+}
+
+export interface PhysicalDimensions {
+  widthMm: number;
+  heightMm: number;
+  widthIn: string;
+  heightIn: string;
+}
+
+export function getPhysicalDimensions(
+  format: "visiting-card" | "museum-placard" = "visiting-card",
+  orientation: "landscape" | "portrait" = "landscape"
+): PhysicalDimensions {
+  if (format === "museum-placard") {
+    return orientation === "portrait"
+      ? { widthMm: 63.5, heightMm: 101.6, widthIn: "2.5in", heightIn: "4in" }
+      : { widthMm: 101.6, heightMm: 63.5, widthIn: "4in", heightIn: "2.5in" };
+  }
+  // Default: Visiting Card (3.5" x 2")
+  return orientation === "portrait"
+    ? { widthMm: 50.8, heightMm: 88.9, widthIn: "2in", heightIn: "3.5in" }
+    : { widthMm: 88.9, heightMm: 50.8, widthIn: "3.5in", heightIn: "2in" };
 }
 
 export function printIsolatedElement(
   htmlContent: string,
   title: string = "Artwork Placards",
-  options: PrintIsolatedOptions = {}
+  options: PlacardPrintOptions = {}
 ) {
   if (typeof document === "undefined") return;
 
@@ -46,9 +71,9 @@ export function printIsolatedElement(
     .map((node) => node.outerHTML)
     .join("\n");
 
-  const pageOrientation = options.orientation || "auto";
+  const dim = getPhysicalDimensions(options.format, options.orientation);
 
-  // 4. Assemble isolated print HTML document
+  // 4. Assemble isolated print HTML document with physical scale & anti-split grid
   doc.open();
   doc.write(`
     <!DOCTYPE html>
@@ -63,11 +88,13 @@ export function printIsolatedElement(
         ${parentStyles}
         <style>
           @page {
-            size: ${pageOrientation};
-            margin: 6mm !important;
+            size: auto;
+            margin: 10mm 8mm 10mm 8mm;
           }
           *, *::before, *::after {
-            box-sizing: border-box;
+            box-sizing: border-box !important;
+            margin: 0;
+            padding: 0;
           }
           html, body {
             width: 100% !important;
@@ -79,20 +106,41 @@ export function printIsolatedElement(
             overflow: visible !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Georgia, serif;
           }
-          .isolated-print-container {
+          /* Clean Gang-Run Grid: fixed cell widths prevent full-width page stretching */
+          .isolated-print-container,
+          .placard-sheet-grid {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            gap: 6mm 8mm !important;
+            align-content: flex-start !important;
+            justify-content: flex-start !important;
             width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
+            margin: 0 auto !important;
             padding: 0 !important;
             background: #ffffff !important;
-            box-shadow: none !important;
           }
+          /* Fixed physical scale card container - NEVER stretches to 100% width of the page */
           .placard-card-item {
+            width: ${dim.widthMm}mm !important;
+            min-width: ${dim.widthMm}mm !important;
+            max-width: ${dim.widthMm}mm !important;
+            height: ${dim.heightMm}mm !important;
+            min-height: ${dim.heightMm}mm !important;
+            max-height: ${dim.heightMm}mm !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            box-shadow: none !important;
+            position: relative !important;
             background: #ffffff !important;
+            padding: 3.5mm 4mm !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
           }
           .print\\:hidden,
           [data-acrylic-guide="true"] {
@@ -102,7 +150,7 @@ export function printIsolatedElement(
         </style>
       </head>
       <body>
-        <div class="isolated-print-container">
+        <div class="isolated-print-container placard-sheet-grid">
           ${htmlContent}
         </div>
       </body>
