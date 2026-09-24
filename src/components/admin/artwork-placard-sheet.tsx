@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { cn } from "@/lib/utils";
+import { printIsolatedElement } from "@/lib/print-isolated-html";
 
 export interface PlacardArtwork {
   id: string;
@@ -167,30 +168,34 @@ export function ArtworkPlacardSheet({
     });
   };
 
-  React.useEffect(() => {
-    return () => {
-      if (typeof document !== "undefined") {
-        document.body.classList.remove("printing-placards");
-      }
-    };
-  }, []);
-
   const handlePrint = () => {
-    setActiveTab("preview");
-    if (typeof document !== "undefined") {
-      document.body.classList.add("printing-placards");
+    if (activeTab !== "preview") {
+      setActiveTab("preview");
+      setTimeout(() => {
+        const printContainer = document.getElementById("placard-render-cards");
+        if (!printContainer) return;
+        printIsolatedElement(
+          printContainer.innerHTML,
+          "Exhibition Display Cards",
+          {
+            orientation,
+            columns: orientation === "portrait" ? 3 : 2,
+          }
+        );
+      }, 150);
+      return;
     }
-    const cleanup = () => {
-      if (typeof document !== "undefined") {
-        document.body.classList.remove("printing-placards");
+
+    const printContainer = document.getElementById("placard-render-cards");
+    if (!printContainer) return;
+    printIsolatedElement(
+      printContainer.innerHTML,
+      "Exhibition Display Cards",
+      {
+        orientation,
+        columns: orientation === "portrait" ? 3 : 2,
       }
-      window.removeEventListener("afterprint", cleanup);
-    };
-    window.addEventListener("afterprint", cleanup);
-    // Give preview tab and QR images a moment to settle in DOM before triggering browser print
-    setTimeout(() => {
-      window.print();
-    }, 250);
+    );
   };
 
   return (
@@ -397,7 +402,7 @@ export function ArtworkPlacardSheet({
         {activeTab === "preview" && (
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60 print:p-0 print:m-0 print:overflow-visible print:bg-white print:h-auto print:block">
             <div
-              id="placard-print-root"
+              id="placard-render-cards"
               className={cn(
                 "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all w-full",
                 "print:w-full print:max-w-none print:m-0 print:bg-white print:text-black print:block",
@@ -525,7 +530,10 @@ export function ArtworkPlacardSheet({
                     </div>
 
                     {/* Acrylic Base Margin Indicator (Subtle UI guide, hidden on print) */}
-                    <div className="absolute bottom-0 inset-x-0 h-[18mm] border-t border-dashed border-stone-200 bg-stone-50/50 print:hidden flex items-center justify-center pointer-events-none">
+                    <div
+                      data-acrylic-guide="true"
+                      className="absolute bottom-0 inset-x-0 h-[18mm] border-t border-dashed border-stone-200 bg-stone-50/50 print:hidden flex items-center justify-center pointer-events-none"
+                    >
                       <span className="text-[7.5px] uppercase tracking-wider text-stone-400 font-mono">
                         18mm Stand Base Margin (Kept Clear)
                       </span>

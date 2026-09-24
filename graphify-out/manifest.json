@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1790240696.8857312,
+    "mtime": 1790241798.1558645,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
@@ -1060,8 +1060,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\artwork-placard-sheet.tsx": {
-    "mtime": 1790240534.475783,
-    "ast_hash": "95318511966e1ddc1146c4547fce5726",
+    "mtime": 1790241639.872649,
+    "ast_hash": "ead0ace1a7dc694916d960744ef74e09",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\print-isolated-html.ts": {
+    "mtime": 1790241550.6090176,
+    "ast_hash": "b6303e7a527a587fa67c8751fcbf41fe",
     "semantic_hash": ""
   }
 }
