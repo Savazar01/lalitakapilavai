@@ -30,6 +30,13 @@ export interface UniversalMediaItem {
   url: string;
   originalFileName?: string;
   title?: string;
+  artworkId?: string;
+  slug?: string;
+  medium?: string;
+  dimensions?: string;
+  year?: string | number;
+  traditionalSchool?: string;
+  description?: string;
 }
 
 export interface UniversalMediaDialogProps {
@@ -53,6 +60,12 @@ interface VaultItem {
   category?: string;
   createdAt?: string;
   mediaType?: "image" | "pdf";
+  slug?: string;
+  medium?: string;
+  dimensions?: string;
+  year?: string | number;
+  traditionalSchool?: string;
+  description?: string;
 }
 
 export function UniversalMediaDialog({
@@ -137,6 +150,13 @@ export function UniversalMediaDialog({
       url: item.url,
       originalFileName: item.fileName,
       title: item.title,
+      artworkId: item.source === "artwork" ? item.id : undefined,
+      slug: item.slug,
+      medium: item.medium,
+      dimensions: item.dimensions,
+      year: item.year,
+      traditionalSchool: item.traditionalSchool || item.category,
+      description: item.description,
     };
 
     if (allowMultiple) {

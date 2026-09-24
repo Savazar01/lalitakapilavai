@@ -9,6 +9,8 @@ import {
   Pause,
   ChevronLeft,
   ChevronRight,
+  X,
+  Info,
 } from "lucide-react";
 import { MediaGalleryItem, ArtworkPlacard } from "../media-gallery-block";
 import {
@@ -28,6 +30,8 @@ export interface ExhibitionWallBlockProps {
   wallLayout?: WallLayoutMatrix;
   autoplayTour?: boolean;
   tourSpeedSeconds?: number;
+  overviewDwellSeconds?: number;
+  showExhibitionBadge?: boolean;
   className?: string;
 }
 
@@ -38,6 +42,15 @@ interface ArtworkPlacement {
   width: number;
   height: number;
   frameType: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
+}
+
+function getHexLuminance(hex: string): number {
+  const clean = hex.replace("#", "");
+  if (clean.length < 6) return 0;
+  const r = parseInt(clean.substring(0, 2), 16);
+  const g = parseInt(clean.substring(2, 4), 16);
+  const b = parseInt(clean.substring(4, 6), 16);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
 /**
@@ -159,19 +172,27 @@ export function ExhibitionWallBlock({
   cameraTourStyle = "drone",
   wallLayout = "salon",
   autoplayTour = true,
-  tourSpeedSeconds = 7,
+  tourSpeedSeconds = 5,
+  overviewDwellSeconds = 4,
+  showExhibitionBadge = true,
   className = "",
 }: ExhibitionWallBlockProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
+  // Tour Step: -1 represents the Panoramic Overview Wall (all masterworks hung together).
+  // 0..(placements.length - 1) represents individual focused artworks.
+  const [tourStep, setTourStep] = React.useState<number>(-1);
   const [userTourStyle, setUserTourStyle] = React.useState<CameraTourStyle | null>(null);
-  const activeTourStyle = userTourStyle ?? cameraTourStyle;
-  const setActiveTourStyle = setUserTourStyle;
-
   const [selectedArtworkIndex, setSelectedArtworkIndex] = React.useState<number>(0);
   const [isTourPlaying, setIsTourPlaying] = React.useState<boolean>(autoplayTour);
   const [isFullscreen, setIsFullscreen] = React.useState<boolean>(false);
+  const [showBadge, setShowBadge] = React.useState<boolean>(showExhibitionBadge);
+
+  const isOverview = tourStep === -1;
+  const activeTourStyle: CameraTourStyle = isOverview
+    ? "overview"
+    : (userTourStyle ?? (cameraTourStyle === "overview" ? "drone" : cameraTourStyle));
 
   const validItems = React.useMemo(() => {
     return (items || []).filter((item) => item && typeof item.url === "string" && item.url.trim() !== "");
@@ -190,6 +211,10 @@ export function ExhibitionWallBlock({
     return found;
   }, [environmentId, customWallUrl]);
 
+  const isLightWall = React.useMemo(() => {
+    return getHexLuminance(env.wallBgColor) > 140;
+  }, [env.wallBgColor]);
+
   // Three.js internal references
   const threeRef = React.useRef<{
     scene: THREE.Scene;
@@ -206,6 +231,7 @@ export function ExhibitionWallBlock({
     targetLookAt: THREE.Vector3;
     currentLookAt: THREE.Vector3;
     spotlight: THREE.SpotLight;
+    artSpotlights: THREE.SpotLight[];
     ambientLight: THREE.AmbientLight;
     wallMesh: THREE.Mesh;
     animationId: number;
@@ -233,15 +259,15 @@ export function ExhibitionWallBlock({
     if (!canvas || !container || placements.length === 0) return;
 
     const width = container.clientWidth;
-    const height = container.clientHeight || 560;
+    const height = container.clientHeight || 580;
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(env.wallBgColor);
-    scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.035);
+    scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.032);
 
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    // Initial camera view
-    camera.position.set(0, 2.4, 8.8);
+    // Initial camera view: Panoramic Overview Wall
+    camera.position.set(0, 2.4, 9.2);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -253,64 +279,104 @@ export function ExhibitionWallBlock({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.08;
 
     // Ambient Lighting
     const ambientLight = new THREE.AmbientLight(
       new THREE.Color(env.lightingColor),
-      0.85
+      0.9
     );
     scene.add(ambientLight);
 
-    // Directional Ceiling Track Spotlights
+    // Directional Ceiling Main Tracking Spotlight
     const spotlight = new THREE.SpotLight(
       new THREE.Color(env.lightingColor),
-      env.spotlightIntensity * 25,
-      25,
+      env.spotlightIntensity * 28,
+      28,
       Math.PI / 4,
-      0.35,
-      1.2
+      0.45,
+      1.3
     );
-    spotlight.position.set(0, 5.2, 5.0);
+    spotlight.position.set(0, 5.6, 5.2);
     spotlight.castShadow = true;
     spotlight.shadow.mapSize.width = 1024;
     spotlight.shadow.mapSize.height = 1024;
     scene.add(spotlight);
     scene.add(spotlight.target);
 
-    // Additional side fill lights for fine-art exhibition richness
-    const leftFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 10, 15);
-    leftFill.position.set(-4.5, 4.0, 3.5);
+    // Side Fill Lights for Fine-Art Chiaroscuro Richness
+    const leftFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 12, 16);
+    leftFill.position.set(-5.0, 4.2, 4.0);
     scene.add(leftFill);
 
-    const rightFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 10, 15);
-    rightFill.position.set(4.5, 4.0, 3.5);
+    const rightFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 12, 16);
+    rightFill.position.set(5.0, 4.2, 4.0);
     scene.add(rightFill);
 
+    // Per-Artwork Radial Falloff Spotlights (Focused Light Pools)
+    const artSpotlights: THREE.SpotLight[] = [];
+    placements.forEach((placement) => {
+      const artSpot = new THREE.SpotLight(
+        new THREE.Color(env.lightingColor),
+        env.spotlightIntensity * 14,
+        14,
+        Math.PI / 5.5,
+        0.75, // Soft radial penumbra
+        1.5   // Realistic physical decay
+      );
+      artSpot.position.set(placement.x, 5.4, 2.6);
+      artSpot.target.position.set(placement.x, placement.y, 0);
+      scene.add(artSpot);
+      scene.add(artSpot.target);
+      artSpotlights.push(artSpot);
+    });
+
     // Architectural Back Wall
-    const wallGeo = new THREE.PlaneGeometry(28, 9);
+    const wallGeo = new THREE.PlaneGeometry(30, 10);
     const wallCanvas = document.createElement("canvas");
     wallCanvas.width = 1024;
     wallCanvas.height = 512;
     const wCtx = wallCanvas.getContext("2d")!;
-    // Subtle plaster gradient with top crown moulding & baseboard
+    // Subtle plaster gradient
     const grad = wCtx.createLinearGradient(0, 0, 0, 512);
     grad.addColorStop(0, env.mouldingColor);
-    grad.addColorStop(0.08, env.wallBgColor);
-    grad.addColorStop(0.92, env.wallBgColor);
+    grad.addColorStop(0.06, env.wallBgColor);
+    grad.addColorStop(0.94, env.wallBgColor);
     grad.addColorStop(1, env.skirtingColor);
     wCtx.fillStyle = grad;
     wCtx.fillRect(0, 0, 1024, 512);
 
-    // Architectural Moulding line
+    // Subtle fine architectural lines
     wCtx.fillStyle = env.mouldingColor;
-    wCtx.fillRect(0, 30, 1024, 12);
+    wCtx.fillRect(0, 24, 1024, 8);
     wCtx.fillStyle = env.skirtingColor;
-    wCtx.fillRect(0, 485, 1024, 27);
+    wCtx.fillRect(0, 492, 1024, 20);
 
     const wallTex = new THREE.CanvasTexture(wallCanvas);
+
+    // Procedural Fine Plaster / Linen Bump Map for Physical Depth
+    const bumpCanvas = document.createElement("canvas");
+    bumpCanvas.width = 256;
+    bumpCanvas.height = 256;
+    const bCtx = bumpCanvas.getContext("2d")!;
+    const imgData = bCtx.createImageData(256, 256);
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const v = 120 + Math.floor(Math.random() * 26);
+      imgData.data[i] = v;
+      imgData.data[i + 1] = v;
+      imgData.data[i + 2] = v;
+      imgData.data[i + 3] = 255;
+    }
+    bCtx.putImageData(imgData, 0, 0);
+    const bumpTex = new THREE.CanvasTexture(bumpCanvas);
+    bumpTex.wrapS = THREE.RepeatWrapping;
+    bumpTex.wrapT = THREE.RepeatWrapping;
+    bumpTex.repeat.set(16, 8);
+
     const wallMat = new THREE.MeshStandardMaterial({
       map: wallTex,
+      bumpMap: bumpTex,
+      bumpScale: 0.035,
       roughness: 0.88,
       metalness: 0.05,
     });
@@ -319,8 +385,34 @@ export function ExhibitionWallBlock({
     wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
-    // Hardwood Floor Plane
-    const floorGeo = new THREE.PlaneGeometry(28, 16);
+    // 3D Architectural Crown Moulding Beam along Ceiling
+    const crownGeo = new THREE.BoxGeometry(30, 0.28, 0.2);
+    const crownMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(env.mouldingColor),
+      roughness: 0.65,
+      metalness: 0.1,
+    });
+    const crownMesh = new THREE.Mesh(crownGeo, crownMat);
+    crownMesh.position.set(0, 5.8, 0.1);
+    crownMesh.castShadow = true;
+    crownMesh.receiveShadow = true;
+    scene.add(crownMesh);
+
+    // 3D Architectural Baseboard / Skirting Mesh along Floor Line
+    const skirtingGeo = new THREE.BoxGeometry(30, 0.24, 0.1);
+    const skirtingMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(env.skirtingColor),
+      roughness: 0.7,
+      metalness: 0.1,
+    });
+    const skirtingMesh = new THREE.Mesh(skirtingGeo, skirtingMat);
+    skirtingMesh.position.set(0, 0.12, 0.05);
+    skirtingMesh.castShadow = true;
+    skirtingMesh.receiveShadow = true;
+    scene.add(skirtingMesh);
+
+    // Hardwood / Stone Floor Plane
+    const floorGeo = new THREE.PlaneGeometry(30, 16);
     const floorCanvas = document.createElement("canvas");
     floorCanvas.width = 512;
     floorCanvas.height = 512;
@@ -328,7 +420,7 @@ export function ExhibitionWallBlock({
     fCtx.fillStyle = env.floorBgColor;
     fCtx.fillRect(0, 0, 512, 512);
     // Draw wood plank lines
-    fCtx.strokeStyle = "rgba(0, 0, 0, 0.25)";
+    fCtx.strokeStyle = "rgba(0, 0, 0, 0.28)";
     fCtx.lineWidth = 2;
     for (let y = 0; y < 512; y += 40) {
       fCtx.beginPath();
@@ -393,7 +485,7 @@ export function ExhibitionWallBlock({
         metalness = 0.0;
       }
 
-      // Outer Frame Mesh (transparent for isolated focus fading)
+      // Outer Frame Mesh
       const frameGeo = new THREE.BoxGeometry(frameW, frameH, frameDepth);
       const frameMat = new THREE.MeshStandardMaterial({
         color: frameColor,
@@ -453,7 +545,7 @@ export function ExhibitionWallBlock({
       canvasMesh.receiveShadow = true;
       artGroup.add(canvasMesh);
 
-      // Museum Placard (beside or underneath)
+      // Museum Placard beside/underneath
       const placardGeo = new THREE.PlaneGeometry(0.25, 0.12);
       const placardMat = new THREE.MeshStandardMaterial({
         color: 0xfdfdfd,
@@ -481,7 +573,7 @@ export function ExhibitionWallBlock({
       });
     });
 
-    const targetCamPos = new THREE.Vector3(0, 2.4, 8.8);
+    const targetCamPos = new THREE.Vector3(0, 2.4, 9.2);
     const targetLookAt = new THREE.Vector3(0, 2.4, 0);
     const currentLookAt = new THREE.Vector3(0, 2.4, 0);
     const clock = new THREE.Clock();
@@ -497,6 +589,7 @@ export function ExhibitionWallBlock({
       targetLookAt,
       currentLookAt,
       spotlight,
+      artSpotlights,
       ambientLight,
       wallMesh,
       animationId: 0,
@@ -507,135 +600,160 @@ export function ExhibitionWallBlock({
 
     // Render loop with smooth cinematic interpolation
     const animate = () => {
+      const state = threeRef.current;
+      if (!state) return;
+
+      const delta = state.clock.getDelta();
+      const elapsed = state.clock.getElapsedTime();
+
+      // Smooth camera interpolation (lerp)
+      state.camera.position.lerp(state.targetCamPos, Math.min(1, delta * 3.2));
+      state.currentLookAt.lerp(state.targetLookAt, Math.min(1, delta * 3.5));
+      state.camera.lookAt(state.currentLookAt);
+
+      // Keep main spotlight focused on target
+      state.spotlight.target.position.copy(state.currentLookAt);
+
+      // Subtle breathing motion for Curatorial Walkthrough mode
+      if (activeTourStyle === "walkthrough") {
+        state.camera.position.y += Math.sin(elapsed * 2.2) * 0.0015;
+      }
+
+      // Isolated Focus: If not in overview mode, smoothly fade non-target artworks to 0.0 opacity
+      // so adjacent frames never clip into the viewport edges
+      const { selectedIndex, tourStyle } = focusRef.current;
+      const isTourOverview = tourStyle === "overview";
+      state.artworkMeshes.forEach((art) => {
+        const isTarget = art.index === selectedIndex;
+        const targetOpacity = isTourOverview || isTarget ? 1.0 : 0.0;
+        art.materials.forEach((mat) => {
+          if ("opacity" in mat) {
+            mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, Math.min(1, delta * 5.0));
+            mat.visible = mat.opacity > 0.01;
+          }
+        });
+      });
+
+      state.renderer.render(state.scene, state.camera);
+      state.animationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    const handleResize = () => {
+      if (!container || !threeRef.current) return;
+      const newWidth = container.clientWidth;
+      const newHeight = container.clientHeight || 580;
+      threeRef.current.camera.aspect = newWidth / newHeight;
+      threeRef.current.camera.updateProjectionMatrix();
+      threeRef.current.renderer.setSize(newWidth, newHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (threeRef.current) {
+        cancelAnimationFrame(threeRef.current.animationId);
+        threeRef.current.renderer.dispose();
+      }
+    };
+  }, [placements, env, activeTourStyle]);
+
+  // Update Environment Lighting & Color dynamically
+  React.useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
-
-    const delta = state.clock.getDelta();
-    const elapsed = state.clock.getElapsedTime();
-
-    // Smooth camera interpolation (lerp)
-    state.camera.position.lerp(state.targetCamPos, Math.min(1, delta * 3.2));
-    state.currentLookAt.lerp(state.targetLookAt, Math.min(1, delta * 3.5));
-    state.camera.lookAt(state.currentLookAt);
-
-    // Keep spotlight focused on target artwork
-    state.spotlight.target.position.copy(state.targetLookAt);
-
-    // Subtle breathing motion for Curatorial Walkthrough mode
-    if (activeTourStyle === "walkthrough") {
-      state.camera.position.y += Math.sin(elapsed * 2.2) * 0.0015;
-    }
-
-    // Isolated Focus: If not in overview mode, smoothly fade non-target artworks to 0.0 opacity
-    // so adjacent frames never clip into the viewport edges
-    const { selectedIndex, tourStyle } = focusRef.current;
-    const isOverview = tourStyle === "overview";
-    state.artworkMeshes.forEach((art) => {
-      const isTarget = art.index === selectedIndex;
-      const targetOpacity = isOverview || isTarget ? 1.0 : 0.0;
-      art.materials.forEach((mat) => {
-        if ("opacity" in mat) {
-          mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, Math.min(1, delta * 5.0));
-          mat.visible = mat.opacity > 0.01;
-        }
-      });
+    state.scene.background = new THREE.Color(env.wallBgColor);
+    state.scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.032);
+    state.ambientLight.color.set(env.lightingColor);
+    state.spotlight.color.set(env.lightingColor);
+    state.spotlight.intensity = env.spotlightIntensity * 28;
+    state.artSpotlights.forEach((s) => {
+      s.color.set(env.lightingColor);
+      s.intensity = env.spotlightIntensity * 14;
     });
+  }, [env]);
 
-    state.renderer.render(state.scene, state.camera);
-    state.animationId = requestAnimationFrame(animate);
-  };
-
-  animate();
-
-  const handleResize = () => {
-    if (!container || !threeRef.current) return;
-    const newWidth = container.clientWidth;
-    const newHeight = container.clientHeight || 560;
-    threeRef.current.camera.aspect = newWidth / newHeight;
-    threeRef.current.camera.updateProjectionMatrix();
-    threeRef.current.renderer.setSize(newWidth, newHeight);
-  };
-
-  window.addEventListener("resize", handleResize);
-
-  return () => {
-    window.removeEventListener("resize", handleResize);
-    if (threeRef.current) {
-      cancelAnimationFrame(threeRef.current.animationId);
-      threeRef.current.renderer.dispose();
-    }
-  };
-}, [placements, env, activeTourStyle]);
-
-// Update Environment Lighting & Color dynamically
-React.useEffect(() => {
-  const state = threeRef.current;
-  if (!state) return;
-  state.scene.background = new THREE.Color(env.wallBgColor);
-  state.scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.035);
-  state.ambientLight.color.set(env.lightingColor);
-  state.spotlight.color.set(env.lightingColor);
-  state.spotlight.intensity = env.spotlightIntensity * 25;
-}, [env]);
-
-// Camera Target Position Calculator based on Tour Mode and Selected Artwork
-React.useEffect(() => {
-  const state = threeRef.current;
-  if (!state || !activePlacement) return;
-
-  if (activeTourStyle === "overview") {
-    state.targetCamPos.set(0, 2.4, 9.0);
-    state.targetLookAt.set(0, 2.4, 0);
-  } else {
-    // Isolated Focus Framing: Dolly camera directly in front of target piece so it fills ~80% of viewport height
-    // with clean 10% margins top and bottom, and 10% margins left and right.
-    const frameH = activePlacement.height + 0.16;
-    const frameW = activePlacement.width + 0.16;
-    const vFovRad = ((state.camera.fov || 50) * Math.PI) / 180;
-    const aspect = state.camera.aspect || 1.6;
-
-    const dHeight = (frameH / 0.8) / (2 * Math.tan(vFovRad / 2));
-    const dWidth = (frameW / 0.8) / (2 * Math.tan(vFovRad / 2) * aspect);
-    const idealDistance = Math.max(dHeight, dWidth, 1.4);
-
-    if (activeTourStyle === "inspection") {
-      // Macro archival inspection close-up
-      state.targetCamPos.set(
-        activePlacement.x,
-        activePlacement.y,
-        Math.min(idealDistance * 0.6, 1.2)
-      );
-      state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
-    } else if (activeTourStyle === "walkthrough") {
-      // First-person eye-level visitor perspective
-      state.targetCamPos.set(
-        activePlacement.x,
-        1.65,
-        Math.max(idealDistance, 2.2)
-      );
-      state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
-    } else {
-      // Focused Dolly: Centered squarely in front of the artwork at 80% viewport framing
-      state.targetCamPos.set(
-        activePlacement.x,
-        activePlacement.y,
-        idealDistance
-      );
-      state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
-    }
-  }
-}, [selectedArtworkIndex, activeTourStyle, activePlacement]);
-
-  // Autoplay Tour Sequencer
+  // Camera Target Position Calculator based on Tour Mode and Selected Artwork
   React.useEffect(() => {
-    if (!isTourPlaying || placements.length <= 1 || activeTourStyle === "overview") return;
+    const state = threeRef.current;
+    if (!state || !activePlacement) return;
 
-    const interval = setInterval(() => {
-      setSelectedArtworkIndex((prev) => (prev + 1) % placements.length);
-    }, Math.max(3, tourSpeedSeconds) * 1000);
+    if (activeTourStyle === "overview") {
+      state.targetCamPos.set(0, 2.4, 9.2);
+      state.targetLookAt.set(0, 2.4, 0);
+    } else {
+      // Isolated Focus Framing: Dolly camera directly in front of target piece so it fills ~80% of viewport height
+      // with clean 10% margins top and bottom, and 10% margins left and right.
+      const frameH = activePlacement.height + 0.16;
+      const frameW = activePlacement.width + 0.16;
+      const vFovRad = ((state.camera.fov || 50) * Math.PI) / 180;
+      const aspect = state.camera.aspect || 1.6;
 
-    return () => clearInterval(interval);
-  }, [isTourPlaying, placements.length, activeTourStyle, tourSpeedSeconds]);
+      const dHeight = (frameH / 0.8) / (2 * Math.tan(vFovRad / 2));
+      const dWidth = (frameW / 0.8) / (2 * Math.tan(vFovRad / 2) * aspect);
+      const idealDistance = Math.max(dHeight, dWidth, 1.4);
+
+      if (activeTourStyle === "inspection") {
+        // Macro archival inspection close-up
+        state.targetCamPos.set(
+          activePlacement.x,
+          activePlacement.y,
+          Math.min(idealDistance * 0.6, 1.2)
+        );
+        state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
+      } else if (activeTourStyle === "walkthrough") {
+        // First-person eye-level visitor perspective
+        state.targetCamPos.set(
+          activePlacement.x,
+          1.65,
+          Math.max(idealDistance, 2.2)
+        );
+        state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
+      } else {
+        // Focused Dolly: Centered squarely in front of the artwork at 80% viewport framing
+        state.targetCamPos.set(
+          activePlacement.x,
+          activePlacement.y,
+          idealDistance
+        );
+        state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
+      }
+    }
+  }, [selectedArtworkIndex, activeTourStyle, activePlacement]);
+
+  // Director-Driven Autoplay Tour Sequencer:
+  // 1. Begins at Panoramic Overview Wall (dwells for overviewDwellSeconds, default 4s)
+  // 2. Smoothly dollies in to Artwork #1 (dwells for tourSpeedSeconds, default 5s)
+  // 3. Advances sequentially through all hung masterworks
+  // 4. Returns to Panoramic Overview Wall and repeats continuously without visitor intervention!
+  React.useEffect(() => {
+    if (!isTourPlaying || placements.length === 0) return;
+
+    const dwellTime = tourStep === -1
+      ? Math.max(2, overviewDwellSeconds) * 1000
+      : Math.max(3, tourSpeedSeconds) * 1000;
+
+    const timer = setTimeout(() => {
+      setTourStep((prev) => {
+        if (prev === -1) {
+          // Transition from Panoramic Overview to first artwork
+          setSelectedArtworkIndex(0);
+          return 0;
+        }
+        if (prev + 1 < placements.length) {
+          // Transition to next artwork
+          setSelectedArtworkIndex(prev + 1);
+          return prev + 1;
+        }
+        // Completed all artworks -> return to Panoramic Overview Wall
+        return -1;
+      });
+    }, dwellTime);
+
+    return () => clearTimeout(timer);
+  }, [isTourPlaying, tourStep, placements.length, overviewDwellSeconds, tourSpeedSeconds]);
 
   // Handle Canvas Click to Focus Artwork
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -655,9 +773,8 @@ React.useEffect(() => {
       const hit = state.artworkMeshes.find((a) => a.mesh === intersects[0].object);
       if (hit) {
         setSelectedArtworkIndex(hit.index);
-        if (activeTourStyle === "overview") {
-          setActiveTourStyle("drone");
-        }
+        setTourStep(hit.index);
+        setUserTourStyle("drone");
       }
     }
   };
@@ -671,6 +788,15 @@ React.useEffect(() => {
     } else {
       document.exitFullscreen().catch(() => {});
       setIsFullscreen(false);
+    }
+  };
+
+  const handleToggleOverview = () => {
+    if (isOverview) {
+      setTourStep(selectedArtworkIndex >= 0 ? selectedArtworkIndex : 0);
+      setUserTourStyle("drone");
+    } else {
+      setTourStep(-1);
     }
   };
 
@@ -690,7 +816,7 @@ React.useEffect(() => {
         ref={containerRef}
         className={cn(
           "relative w-full rounded-2xl overflow-hidden border border-amber-500/30 bg-stone-950 select-none shadow-2xl transition-all duration-300",
-          isFullscreen ? "fixed inset-0 z-50 rounded-none border-none h-screen w-screen" : "h-[520px] sm:h-[620px]"
+          isFullscreen ? "fixed inset-0 z-50 rounded-none border-none h-screen w-screen" : "h-[540px] sm:h-[640px]"
         )}
       >
         {/* 3D WebGL Canvas */}
@@ -700,28 +826,138 @@ React.useEffect(() => {
           className="w-full h-full block cursor-pointer touch-none"
         />
 
-        {/* Minimalist Top-Right Floating Actions: Play/Pause tour & Fullscreen (Zero visual clutter) */}
+        {/* Top-Left Curatorial Callout Box / Badge with High Contrast */}
+        {showBadge && (
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 max-w-xs sm:max-w-sm z-20 pointer-events-auto transition-all duration-300">
+            <div
+              className={cn(
+                "p-3 sm:p-3.5 rounded-xl shadow-2xl backdrop-blur-md border transition-colors",
+                isLightWall
+                  ? "bg-white/95 border-amber-600/30 text-slate-900 shadow-amber-950/10"
+                  : "bg-stone-950/90 border-amber-400/40 text-stone-100 shadow-black/60"
+              )}
+            >
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span
+                  className={cn(
+                    "text-[10px] font-mono uppercase tracking-widest font-bold flex items-center gap-1.5",
+                    isLightWall ? "text-amber-800" : "text-amber-300"
+                  )}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  {isOverview
+                    ? "Exhibition Wall • Salon Overview"
+                    : `Exhibition Wall • Item ${selectedArtworkIndex + 1} of ${placements.length}`}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowBadge(false)}
+                  title="Dismiss Callout"
+                  className={cn(
+                    "text-xs p-0.5 rounded-md hover:opacity-100 transition-opacity cursor-pointer",
+                    isLightWall ? "text-slate-500 hover:text-slate-900" : "text-stone-400 hover:text-stone-100"
+                  )}
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {isOverview ? (
+                <div>
+                  <h4
+                    className={cn(
+                      "font-serif font-bold text-xs sm:text-sm leading-tight",
+                      isLightWall ? "text-slate-900" : "text-white"
+                    )}
+                  >
+                    {env.name}
+                  </h4>
+                  <p
+                    className={cn(
+                      "text-[11px] mt-0.5 line-clamp-2",
+                      isLightWall ? "text-slate-700" : "text-stone-300"
+                    )}
+                  >
+                    {isTourPlaying
+                      ? "Director-Guided Walkthrough Active — Panoramic Wall Overview"
+                      : "Click any artwork on the wall or thumbnail strip below to inspect details."}
+                  </p>
+                </div>
+              ) : (
+                activePlacement && (
+                  <div>
+                    <h4
+                      className={cn(
+                        "font-serif font-bold text-xs sm:text-sm leading-tight",
+                        isLightWall ? "text-slate-900" : "text-white"
+                      )}
+                    >
+                      {activePlacement.item.title || "Classical Masterwork Detail"}
+                    </h4>
+                    {(activePlacement.item.traditionalSchool ||
+                      activePlacement.item.medium ||
+                      activePlacement.item.dimensions) && (
+                      <p
+                        className={cn(
+                          "text-[11px] mt-0.5 line-clamp-1",
+                          isLightWall ? "text-slate-700" : "text-stone-300"
+                        )}
+                      >
+                        {[
+                          activePlacement.item.traditionalSchool,
+                          activePlacement.item.medium,
+                          activePlacement.item.dimensions,
+                        ]
+                          .filter(Boolean)
+                          .join(" • ")}
+                      </p>
+                    )}
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Minimalist High-Contrast Top-Right Floating Actions: Play/Pause tour, Overview & Fullscreen */}
         <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2 z-20 pointer-events-auto">
+          {/* Info toggle if dismissed */}
+          {!showBadge && (
+            <button
+              type="button"
+              onClick={() => setShowBadge(true)}
+              title="Show Exhibition Details"
+              className="px-2.5 py-1.5 rounded-full bg-stone-950/90 hover:bg-stone-900 border border-amber-500/50 text-amber-300 hover:text-white text-xs font-serif flex items-center gap-1 backdrop-blur-md shadow-lg transition-all cursor-pointer"
+            >
+              <Info className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Info</span>
+            </button>
+          )}
+
           {/* Overview / Focus toggle button */}
           <button
             type="button"
-            onClick={() => {
-              setActiveTourStyle((prev) => (prev === "overview" ? "drone" : "overview"));
-            }}
-            title={activeTourStyle === "overview" ? "Focus Selected Artwork" : "View Entire Wall (Salon Overview)"}
-            className="px-3 py-1.5 rounded-full bg-stone-950/80 hover:bg-stone-900 border border-white/15 text-stone-200 hover:text-white text-xs font-serif flex items-center gap-1.5 backdrop-blur-md shadow-md transition-colors cursor-pointer"
+            onClick={handleToggleOverview}
+            title={isOverview ? "Focus Selected Artwork" : "View Entire Wall (Salon Overview)"}
+            className="px-3 py-1.5 rounded-full bg-stone-950/90 hover:bg-stone-900 border border-amber-500/50 text-amber-300 hover:text-white text-xs font-serif flex items-center gap-1.5 backdrop-blur-md shadow-lg transition-all cursor-pointer"
           >
-            <span>{activeTourStyle === "overview" ? "Focus Piece" : "Salon View"}</span>
+            <span>{isOverview ? "Focus Piece" : "Salon View"}</span>
           </button>
 
-          {/* Play / Pause Tour Button */}
+          {/* Play / Pause Tour Button with active indicator */}
           <button
             type="button"
             onClick={() => setIsTourPlaying((prev) => !prev)}
-            title={isTourPlaying ? "Pause Cinematic Tour" : "Play Cinematic Tour"}
-            className="w-8 h-8 rounded-full bg-stone-950/80 hover:bg-stone-900 border border-white/15 text-amber-300 flex items-center justify-center backdrop-blur-md transition-transform hover:scale-105 shadow-md cursor-pointer"
+            title={isTourPlaying ? "Pause Cinematic Walkthrough" : "Start Director-Guided Walkthrough"}
+            className={cn(
+              "h-8 px-2.5 rounded-full border text-xs font-serif flex items-center gap-1.5 backdrop-blur-md transition-all shadow-lg cursor-pointer",
+              isTourPlaying
+                ? "bg-amber-500/20 border-amber-400 text-amber-300 ring-1 ring-amber-400/40"
+                : "bg-stone-950/90 hover:bg-stone-900 border-white/20 text-stone-200 hover:text-white"
+            )}
           >
-            {isTourPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isTourPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-400" />}
+            <span className="hidden md:inline">{isTourPlaying ? "Touring" : "Tour"}</span>
           </button>
 
           {/* Fullscreen Button */}
@@ -729,40 +965,24 @@ React.useEffect(() => {
             type="button"
             onClick={toggleFullscreen}
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-            className="w-8 h-8 rounded-full bg-stone-950/80 hover:bg-stone-900 border border-white/15 text-stone-200 hover:text-white flex items-center justify-center backdrop-blur-md transition-transform hover:scale-105 shadow-md cursor-pointer"
+            className="w-8 h-8 rounded-full bg-stone-950/90 hover:bg-stone-900 border border-amber-500/50 text-amber-200 hover:text-white flex items-center justify-center backdrop-blur-md transition-transform hover:scale-105 shadow-lg cursor-pointer"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
 
-        {/* Floating Curatorial Card in Fullscreen Mode Only */}
-        {isFullscreen && activePlacement && (
-          <div className="absolute top-4 left-4 max-w-sm z-20 pointer-events-auto">
-            <div className="p-3.5 rounded-xl bg-stone-950/85 backdrop-blur-md border border-amber-500/30 text-stone-100 shadow-2xl space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold">
-                Exhibition Wall • Item {selectedArtworkIndex + 1} of {placements.length}
-              </span>
-              <h4 className="font-serif font-bold text-sm sm:text-base text-white leading-tight">
-                {activePlacement.item.title || "Traditional Fine Art Masterwork"}
-              </h4>
-              {(activePlacement.item.traditionalSchool || activePlacement.item.medium || activePlacement.item.dimensions) && (
-                <p className="text-xs text-stone-300">
-                  {[activePlacement.item.traditionalSchool, activePlacement.item.medium, activePlacement.item.dimensions].filter(Boolean).join(" • ")}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Bottom Thumbnail Strip for Instant Jump-to-Artwork */}
         <div className="absolute bottom-3 inset-x-3 sm:bottom-4 sm:inset-x-6 z-20 pointer-events-auto">
-          <div className="p-2 rounded-xl bg-stone-950/80 backdrop-blur-md border border-white/10 flex items-center justify-between gap-3 shadow-xl">
+          <div className="p-2 rounded-xl bg-stone-950/85 backdrop-blur-md border border-white/10 flex items-center justify-between gap-3 shadow-xl">
             {/* Previous chevron */}
             <button
               type="button"
-              onClick={() =>
-                setSelectedArtworkIndex((prev) => (prev - 1 + placements.length) % placements.length)
-              }
+              onClick={() => {
+                const nextIdx = (selectedArtworkIndex - 1 + placements.length) % placements.length;
+                setSelectedArtworkIndex(nextIdx);
+                setTourStep(nextIdx);
+                setUserTourStyle("drone");
+              }}
               aria-label="Previous artwork"
               className="w-7 h-7 rounded-lg bg-stone-900 hover:bg-stone-800 text-amber-300 flex items-center justify-center shrink-0 cursor-pointer transition-colors"
             >
@@ -777,11 +997,12 @@ React.useEffect(() => {
                   type="button"
                   onClick={() => {
                     setSelectedArtworkIndex(idx);
-                    if (activeTourStyle === "overview") setActiveTourStyle("drone");
+                    setTourStep(idx);
+                    setUserTourStyle("drone");
                   }}
                   className={cn(
                     "relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer group",
-                    selectedArtworkIndex === idx
+                    !isOverview && selectedArtworkIndex === idx
                       ? "border-amber-400 scale-105 shadow-md shadow-amber-500/20"
                       : "border-transparent opacity-60 hover:opacity-100"
                   )}
@@ -799,7 +1020,12 @@ React.useEffect(() => {
             {/* Next chevron */}
             <button
               type="button"
-              onClick={() => setSelectedArtworkIndex((prev) => (prev + 1) % placements.length)}
+              onClick={() => {
+                const nextIdx = (selectedArtworkIndex + 1) % placements.length;
+                setSelectedArtworkIndex(nextIdx);
+                setTourStep(nextIdx);
+                setUserTourStyle("drone");
+              }}
               aria-label="Next artwork"
               className="w-7 h-7 rounded-lg bg-stone-900 hover:bg-stone-800 text-amber-300 flex items-center justify-center shrink-0 cursor-pointer transition-colors"
             >

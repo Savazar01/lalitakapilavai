@@ -54,6 +54,8 @@ export interface MediaGalleryBlockData {
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
+  overviewDwellSeconds?: number;
+  showExhibitionBadge?: boolean;
   showFrameHeader?: boolean;
   frameHeaderBg?: string;
   frameHeaderTextColor?: string;
@@ -83,6 +85,8 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const cameraTourStyle = data.cameraTourStyle ?? "drone";
   const wallLayout = data.wallLayout ?? "salon";
   const autoplayTour = data.autoplayTour ?? true;
+  const overviewDwellSeconds = data.overviewDwellSeconds ?? 4;
+  const showExhibitionBadge = data.showExhibitionBadge ?? true;
   const showFrameHeader = data.showFrameHeader ?? false;
   const frameHeaderBg = data.frameHeaderBg ?? "#0F0E0D";
   const frameHeaderTextColor = data.frameHeaderTextColor ?? "#F5EBE1";
@@ -279,17 +283,70 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     });
   };
 
-  const handleAddItem = (newUrl = "", newTitle = "", newAlt = "") => {
-    const newItem: MediaGalleryItem = {
-      id: `mg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-      url: newUrl || "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=1200",
-      title: newTitle || "Classical Masterwork Detail",
-      caption: "Sacred iconographic panel rendered in authentic 22k gold foil.",
-      alt: newAlt || "Sacred painting plate",
-      linkType: "none",
-      linkTarget: "",
-    };
-    const updated = [...items, newItem].slice(0, 12);
+  const handleOverviewDwellSecondsChange = (val: number) => {
+    onChange({
+      ...data,
+      overviewDwellSeconds: val,
+    });
+  };
+
+  const handleShowExhibitionBadgeChange = (val: boolean) => {
+    onChange({
+      ...data,
+      showExhibitionBadge: val,
+    });
+  };
+
+  const enrichItemWithArtwork = React.useCallback(
+    (input: Partial<MediaGalleryItem> & { url: string; title?: string; alt?: string; originalFileName?: string; artworkId?: string; slug?: string }): MediaGalleryItem => {
+      // Find matching artwork in catalog
+      const matchingArt = artworksList.find(
+        (a) =>
+          (input.artworkId && a.id === input.artworkId) ||
+          (input.slug && a.slug === input.slug) ||
+          (input.linkTarget && a.slug === input.linkTarget) ||
+          (a.watermarkedWebpUrl && a.watermarkedWebpUrl === input.url) ||
+          (a.primaryImageUrl && a.primaryImageUrl === input.url) ||
+          (input.title && a.title.toLowerCase().trim() === input.title.toLowerCase().trim())
+      );
+
+      const resolvedTitle = input.title && input.title !== "Classical Masterwork Detail" ? input.title : (matchingArt?.title || input.title || "Classical Masterwork Detail");
+      const resolvedSchool = input.traditionalSchool || matchingArt?.category?.name || (matchingArt ? "Thanjavur (Tanjore) Classical" : "");
+      const resolvedMedium = input.medium || matchingArt?.medium || (matchingArt ? "22k Gold Foil, Gesso, Teak Wood" : "");
+      const resolvedDimensions = input.dimensions || matchingArt?.dimensions || "";
+      const resolvedYear = input.year || (matchingArt?.yearCreated ? String(matchingArt.yearCreated) : "");
+      const resolvedDesc = input.description || matchingArt?.description || "";
+      const resolvedLinkType = input.linkType && input.linkType !== "none" ? input.linkType : matchingArt ? "artwork" : "none";
+      const resolvedLinkTarget = input.linkTarget || matchingArt?.slug || "";
+
+      return {
+        id: input.id || `mg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        url: input.url,
+        title: resolvedTitle,
+        caption: input.caption || (matchingArt ? `Authentic ${resolvedSchool} sacred panel with 22k gold relief.` : "Sacred iconographic panel rendered in authentic 22k gold foil."),
+        alt: input.alt || input.originalFileName || resolvedTitle,
+        medium: resolvedMedium,
+        dimensions: resolvedDimensions,
+        traditionalSchool: resolvedSchool,
+        year: resolvedYear,
+        description: resolvedDesc,
+        artworkId: matchingArt?.id || input.artworkId,
+        linkType: resolvedLinkType,
+        linkTarget: resolvedLinkTarget,
+      };
+    },
+    [artworksList]
+  );
+
+  const handleAddItem = (newUrl = "", newTitle = "", newAlt = "", extra?: Partial<MediaGalleryItem>) => {
+    const url = newUrl || "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=1200";
+    const enriched = enrichItemWithArtwork({
+      url,
+      title: newTitle,
+      alt: newAlt,
+      ...extra,
+    });
+    const updated = [...items, enriched].slice(0, 12);
     onChange({
       ...data,
       items: updated,
@@ -650,6 +707,51 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 onChange={(e) => handleTimerChange(Number(e.target.value))}
                 className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
               />
+              <span className="text-[10px] text-muted-foreground">Focus dwell per masterwork (3s - 15s)</span>
+            </div>
+          </div>
+
+          {/* Panoramic Wall Overview Dwell & Info Badge Toggle */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-amber-500/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-xs font-semibold text-foreground">Exhibition Info Callout</Label>
+                <p className="text-[10px] text-muted-foreground">
+                  Displays high-contrast curatorial badge in top-left.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleShowExhibitionBadgeChange(!showExhibitionBadge)}
+                className={cn(
+                  "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
+                  showExhibitionBadge ? "bg-amber-600" : "bg-muted"
+                )}
+              >
+                <span
+                  className={cn(
+                    "block w-4 h-4 rounded-full bg-white transition-transform transform",
+                    showExhibitionBadge ? "translate-x-6" : "translate-x-1"
+                  )}
+                />
+              </button>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Panoramic Overview Dwell</span>
+                <span className="text-primary font-mono text-xs">{overviewDwellSeconds}s</span>
+              </Label>
+              <input
+                type="range"
+                min={2}
+                max={10}
+                step={1}
+                value={overviewDwellSeconds}
+                onChange={(e) => handleOverviewDwellSecondsChange(Number(e.target.value))}
+                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+              />
+              <span className="text-[10px] text-muted-foreground">Initial panoramic wall hold duration before dollies.</span>
             </div>
           </div>
         </div>
@@ -1211,6 +1313,56 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                   </div>
                 </div>
 
+                {/* 1-Click Masterwork Ingestion Helper */}
+                <div className="p-3 rounded-lg border border-amber-500/40 bg-amber-500/10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                      Auto-Fill from Masterwork Catalog
+                    </Label>
+                    <Badge variant="outline" className="text-[9px] bg-background/80 border-amber-500/40 text-amber-900 dark:text-amber-300 font-semibold">
+                      Instant Ingestion
+                    </Badge>
+                  </div>
+                  <p className="text-[11px] text-amber-950/80 dark:text-amber-200/80 leading-tight">
+                    Select a catalog artwork to automatically map title, medium, dimensions, school, year, and destination link:
+                  </p>
+                  <Select
+                    value={activeItem.artworkId || (artworksList.find((a) => a.slug === activeItem.linkTarget)?.id ?? "")}
+                    onValueChange={(artId) => {
+                      const art = artworksList.find((a) => a.id === artId);
+                      if (art) {
+                        const materials = art.medium || "22k Gold Foil, Gesso, Teak Wood";
+                        handleUpdateItem(activeItemIndex, {
+                          artworkId: art.id,
+                          title: art.title,
+                          medium: materials,
+                          dimensions: art.dimensions || "",
+                          traditionalSchool: art.category?.name || "Thanjavur (Tanjore) Classical",
+                          year: art.yearCreated ? String(art.yearCreated) : "",
+                          description: art.description || "",
+                          linkType: "artwork",
+                          linkTarget: art.slug,
+                          alt: art.title,
+                          url: art.watermarkedWebpUrl || art.primaryImageUrl || activeItem.url,
+                        });
+                        toast.success(`Auto-mapped all curatorial metadata for "${art.title}"!`);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-8 text-xs bg-background">
+                      <SelectValue placeholder="-- Select catalog masterwork to auto-fill --" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {artworksList.map((art) => (
+                        <SelectItem key={art.id} value={art.id}>
+                          {art.title} {art.dimensions ? `(${art.dimensions})` : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label className="text-xs font-semibold text-foreground">Title / Heading</Label>
@@ -1251,9 +1403,46 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                     <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
                       <Sparkles className="w-3 h-3 text-amber-500" /> Museum Placard Metadata
                     </Label>
-                    <Badge variant="outline" className="text-[10px] text-muted-foreground">
-                      Placard Lines 1-3
-                    </Badge>
+                    <div className="flex items-center gap-1.5">
+                      {artworksList.some(
+                        (a) =>
+                          (a.watermarkedWebpUrl && a.watermarkedWebpUrl === activeItem.url) ||
+                          (a.primaryImageUrl && a.primaryImageUrl === activeItem.url) ||
+                          (activeItem.title && a.title.toLowerCase().trim() === activeItem.title.toLowerCase().trim())
+                      ) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const matched = artworksList.find(
+                              (a) =>
+                                (a.watermarkedWebpUrl && a.watermarkedWebpUrl === activeItem.url) ||
+                                (a.primaryImageUrl && a.primaryImageUrl === activeItem.url) ||
+                                (activeItem.title && a.title.toLowerCase().trim() === activeItem.title.toLowerCase().trim())
+                            );
+                            if (matched) {
+                              handleUpdateItem(activeItemIndex, {
+                                artworkId: matched.id,
+                                title: matched.title,
+                                medium: matched.medium || activeItem.medium || "22k Gold Foil, Gesso, Teak Wood",
+                                dimensions: matched.dimensions || activeItem.dimensions || "",
+                                traditionalSchool: matched.category?.name || activeItem.traditionalSchool || "Thanjavur (Tanjore) Classical",
+                                year: matched.yearCreated ? String(matched.yearCreated) : activeItem.year,
+                                description: matched.description || activeItem.description || "",
+                                linkType: "artwork",
+                                linkTarget: matched.slug,
+                              });
+                              toast.success(`Synchronized metadata from "${matched.title}"!`);
+                            }
+                          }}
+                          className="text-[10px] font-bold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                        >
+                          ⚡ Auto-Fill Matching
+                        </button>
+                      )}
+                      <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                        Placard Lines 1-3
+                      </Badge>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -1479,39 +1668,55 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             toast.success("Custom wall backdrop updated!");
             return;
           }
+
+          const enriched = enrichItemWithArtwork({
+            url: media.url,
+            title: media.title,
+            alt: media.originalFileName,
+            artworkId: media.artworkId,
+            slug: media.slug,
+            medium: media.medium,
+            dimensions: media.dimensions,
+            year: media.year ? String(media.year) : undefined,
+            traditionalSchool: media.traditionalSchool,
+            description: media.description,
+          });
+
           if (mediaDialogTargetIndex !== null) {
-            handleUpdateItem(mediaDialogTargetIndex, {
-              url: media.url,
-              title: media.title || items[mediaDialogTargetIndex]?.title || "Classical Masterwork Detail",
-              alt: media.originalFileName || items[mediaDialogTargetIndex]?.alt || "Sacred painting plate",
-            });
-            toast.success("Image updated from vault!");
+            handleUpdateItem(mediaDialogTargetIndex, enriched);
+            toast.success(`Updated metadata for "${enriched.title}"!`);
           } else {
-            handleAddItem(
-              media.url,
-              media.title || "Classical Masterwork Detail",
-              media.originalFileName || "Sacred painting plate"
-            );
-            toast.success("Photo added to gallery!");
+            const updated = [...items, enriched].slice(0, 12);
+            onChange({
+              ...data,
+              items: updated,
+            });
+            setActiveItemIndex(updated.length - 1);
+            toast.success(`Added "${enriched.title}" with curatorial metadata!`);
           }
         }}
         onSelectMultiple={(mediaList) => {
-          const newItems: MediaGalleryItem[] = mediaList.map((m, idx) => ({
-            id: `mg-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
-            url: m.url,
-            title: m.title || "Classical Masterwork Detail",
-            caption: "Sacred iconographic panel rendered in authentic 22k gold foil.",
-            alt: m.originalFileName || "Sacred painting plate",
-            linkType: "none",
-            linkTarget: "",
-          }));
+          const newItems: MediaGalleryItem[] = mediaList.map((m) =>
+            enrichItemWithArtwork({
+              url: m.url,
+              title: m.title,
+              alt: m.originalFileName,
+              artworkId: m.artworkId,
+              slug: m.slug,
+              medium: m.medium,
+              dimensions: m.dimensions,
+              year: m.year ? String(m.year) : undefined,
+              traditionalSchool: m.traditionalSchool,
+              description: m.description,
+            })
+          );
           const updated = [...items, ...newItems].slice(0, 12);
           onChange({
             ...data,
             items: updated,
           });
           setActiveItemIndex(updated.length - 1);
-          toast.success(`Added ${newItems.length} photos from vault!`);
+          toast.success(`Added ${newItems.length} photos with curatorial metadata!`);
         }}
       />
     </div>

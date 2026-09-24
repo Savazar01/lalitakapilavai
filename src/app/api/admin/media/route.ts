@@ -15,6 +15,12 @@ export interface MediaVaultItem {
   category?: string;
   createdAt?: string;
   mediaType?: "image" | "pdf";
+  slug?: string;
+  medium?: string;
+  dimensions?: string;
+  year?: string | number;
+  traditionalSchool?: string;
+  description?: string;
 }
 
 export async function GET(request: NextRequest) {
@@ -53,8 +59,13 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           title: true,
+          slug: true,
           primaryImageUrl: true,
           watermarkedWebpUrl: true,
+          medium: true,
+          dimensions: true,
+          yearCreated: true,
+          description: true,
           createdAt: true,
           category: { select: { name: true } },
         },
@@ -71,8 +82,14 @@ export async function GET(request: NextRequest) {
             url,
             fileName: url.split("/").pop() || "artwork.jpg",
             title: art.title,
+            slug: art.slug,
             source: "artwork",
             category: art.category?.name || "Artwork",
+            traditionalSchool: art.category?.name || "Thanjavur (Tanjore) Classical",
+            medium: art.medium || "22k Gold Foil, Gesso, Teak Wood",
+            dimensions: art.dimensions || "",
+            year: art.yearCreated || undefined,
+            description: art.description || undefined,
             createdAt: art.createdAt?.toISOString(),
           });
         }

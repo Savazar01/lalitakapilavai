@@ -81,6 +81,8 @@ export interface MediaGalleryBlockProps {
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
+  overviewDwellSeconds?: number;
+  showExhibitionBadge?: boolean;
   showFrameHeader?: boolean;
   frameHeaderBg?: string;
   frameHeaderTextColor?: string;
@@ -281,6 +283,8 @@ export function MediaGalleryBlock({
   cameraTourStyle = "drone",
   wallLayout = "salon",
   autoplayTour = true,
+  overviewDwellSeconds = 4,
+  showExhibitionBadge = true,
   showFrameHeader = false,
   frameHeaderBg = "",
   frameHeaderTextColor = "",
@@ -388,6 +392,8 @@ export function MediaGalleryBlock({
         wallLayout={wallLayout}
         autoplayTour={autoplayTour}
         tourSpeedSeconds={autoplayTimer}
+        overviewDwellSeconds={overviewDwellSeconds}
+        showExhibitionBadge={showExhibitionBadge}
         className={className}
       />
     );

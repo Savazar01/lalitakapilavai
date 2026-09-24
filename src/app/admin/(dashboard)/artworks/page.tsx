@@ -28,13 +28,16 @@ import {
   Home,
   UploadCloud,
   FolderOpen,
+  Printer,
 } from "lucide-react";
 import { toast } from "sonner";
 import { UniversalMediaDialog } from "@/components/admin/universal-media-dialog";
 import { ArtworkBulkImportModal } from "@/components/admin/artwork-bulk-import-modal";
+import { ArtworkPlacardSheet } from "@/components/admin/artwork-placard-sheet";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -111,6 +114,10 @@ export default function ArtworksAdminPage() {
   const [selectedCategory, setSelectedCategory] = React.useState("ALL");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [viewMode, setViewMode] = React.useState<"grid" | "table">("grid");
+
+  // Selection & Batch Placard Printing State
+  const [selectedArtworkIds, setSelectedArtworkIds] = React.useState<Set<string>>(new Set());
+  const [placardModalOpen, setPlacardModalOpen] = React.useState(false);
 
   // Artwork Dialog (Create / Edit)
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -711,6 +718,23 @@ export default function ArtworksAdminPage() {
         </Button>
 
         <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            if (selectedArtworkIds.size === 0) {
+              const allIds = new Set(filteredArtworks.map((a) => a.id));
+              setSelectedArtworkIds(allIds);
+            }
+            setPlacardModalOpen(true);
+          }}
+          className="text-xs gap-1.5 border-amber-500/40 hover:bg-amber-500/10 text-amber-900 dark:text-amber-200"
+          title="Print display visiting cards and museum placards with dynamic QR codes"
+        >
+          <Printer className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+          Print Placards {selectedArtworkIds.size > 0 && `(${selectedArtworkIds.size})`}
+        </Button>
+
+        <Button
           variant="default"
           size="sm"
           onClick={handleOpenCreate}
@@ -752,8 +776,31 @@ export default function ArtworksAdminPage() {
           ))}
         </div>
 
-        {/* Search & View Mode Switcher */}
+        {/* Search, Selection Pill & View Mode Switcher */}
         <div className="flex items-center gap-2">
+          {selectedArtworkIds.size > 0 && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-xs shrink-0">
+              <span className="font-semibold text-amber-900 dark:text-amber-200 text-[11px]">
+                {selectedArtworkIds.size} selected
+              </span>
+              <button
+                type="button"
+                onClick={() => setPlacardModalOpen(true)}
+                className="text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer flex items-center gap-1"
+              >
+                <Printer className="w-3 h-3" /> Print
+              </button>
+              <span className="text-muted-foreground">•</span>
+              <button
+                type="button"
+                onClick={() => setSelectedArtworkIds(new Set())}
+                className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer underline"
+              >
+                Clear
+              </button>
+            </div>
+          )}
+
           <div className="relative flex-1 md:w-64">
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-muted-foreground" />
             <Input
@@ -817,9 +864,31 @@ export default function ArtworksAdminPage() {
           {filteredArtworks.map((art) => (
             <Card
               key={art.id}
-              className="overflow-hidden hover:border-primary/60 transition-all flex flex-col justify-between group"
+              className={cn(
+                "overflow-hidden hover:border-primary/60 transition-all flex flex-col justify-between group relative",
+                selectedArtworkIds.has(art.id) && "ring-2 ring-amber-500 border-amber-500 bg-amber-500/[0.03]"
+              )}
             >
               <div className="relative aspect-[4/5] bg-muted/40 overflow-hidden">
+                {/* Print Selection Checkbox */}
+                <div className="absolute top-2 left-2 z-20">
+                  <input
+                    type="checkbox"
+                    checked={selectedArtworkIds.has(art.id)}
+                    onChange={(e) => {
+                      const newSet = new Set(selectedArtworkIds);
+                      if (e.target.checked) {
+                        newSet.add(art.id);
+                      } else {
+                        newSet.delete(art.id);
+                      }
+                      setSelectedArtworkIds(newSet);
+                    }}
+                    className="w-4 h-4 rounded border-border accent-amber-600 bg-background/90 shadow-sm cursor-pointer"
+                    title="Select for print display placards"
+                  />
+                </div>
+
                 {art.watermarkedWebpUrl ? (
                   <Image
                     src={art.watermarkedWebpUrl}
@@ -835,7 +904,7 @@ export default function ArtworksAdminPage() {
                 )}
 
                 {/* Badges */}
-                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                <div className="absolute top-8 left-2 flex flex-col gap-1">
                   <Badge variant="outline" className="text-[10px] bg-background/80 backdrop-blur-md">
                     {art.category?.name}
                   </Badge>
@@ -953,6 +1022,25 @@ export default function ArtworksAdminPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <input
+                    type="checkbox"
+                    checked={filteredArtworks.length > 0 && filteredArtworks.every((a) => selectedArtworkIds.has(a.id))}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        const newSet = new Set(selectedArtworkIds);
+                        filteredArtworks.forEach((a) => newSet.add(a.id));
+                        setSelectedArtworkIds(newSet);
+                      } else {
+                        const newSet = new Set(selectedArtworkIds);
+                        filteredArtworks.forEach((a) => newSet.delete(a.id));
+                        setSelectedArtworkIds(newSet);
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-border accent-amber-600 cursor-pointer"
+                    title="Select all visible artworks"
+                  />
+                </TableHead>
                 <TableHead className="w-12">Preview</TableHead>
                 <TableHead>Title &amp; Category</TableHead>
                 <TableHead>Medium &amp; Dimensions</TableHead>
@@ -963,7 +1051,27 @@ export default function ArtworksAdminPage() {
             </TableHeader>
             <TableBody>
               {filteredArtworks.map((art) => (
-                <TableRow key={art.id}>
+                <TableRow
+                  key={art.id}
+                  className={selectedArtworkIds.has(art.id) ? "bg-amber-500/5 dark:bg-amber-500/10" : ""}
+                >
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      checked={selectedArtworkIds.has(art.id)}
+                      onChange={(e) => {
+                        const newSet = new Set(selectedArtworkIds);
+                        if (e.target.checked) {
+                          newSet.add(art.id);
+                        } else {
+                          newSet.delete(art.id);
+                        }
+                        setSelectedArtworkIds(newSet);
+                      }}
+                      className="w-4 h-4 rounded border-border accent-amber-600 cursor-pointer"
+                      title="Select for print display placards"
+                    />
+                  </TableCell>
                   <TableCell>
                     <div className="w-10 h-12 rounded bg-muted/60 relative overflow-hidden">
                       {art.watermarkedWebpUrl && (
@@ -1728,6 +1836,17 @@ export default function ArtworksAdminPage() {
           }
           toast.success("Artwork image selected successfully");
         }}
+      />
+
+      {/* Printable Placards Sheet Modal */}
+      <ArtworkPlacardSheet
+        open={placardModalOpen}
+        onOpenChange={setPlacardModalOpen}
+        artworks={
+          selectedArtworkIds.size > 0
+            ? artworks.filter((a) => selectedArtworkIds.has(a.id))
+            : filteredArtworks
+        }
       />
     </div>
   );
