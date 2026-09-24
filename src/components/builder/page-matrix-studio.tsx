@@ -1397,6 +1397,9 @@ export function PageMatrixStudio({
                             cameraTourStyle={block.galleryCameraTourStyle}
                             wallLayout={block.galleryWallLayout}
                             autoplayTour={block.galleryAutoplayTour}
+                            showFrameHeader={block.galleryShowFrameHeader}
+                            frameHeaderBg={block.galleryFrameHeaderBg}
+                            frameHeaderTextColor={block.galleryFrameHeaderTextColor}
                           />
                         </div>
                       )}
@@ -1933,6 +1936,9 @@ export function PageMatrixStudio({
                 cameraTourStyle: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCameraTourStyle,
                 wallLayout: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryWallLayout,
                 autoplayTour: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryAutoplayTour,
+                showFrameHeader: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryShowFrameHeader,
+                frameHeaderBg: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryFrameHeaderBg,
+                frameHeaderTextColor: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryFrameHeaderTextColor,
                 items: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryItems,
               }}
               onChange={(updated) => {
@@ -1959,6 +1965,9 @@ export function PageMatrixStudio({
                     galleryCameraTourStyle: updated.cameraTourStyle,
                     galleryWallLayout: updated.wallLayout,
                     galleryAutoplayTour: updated.autoplayTour,
+                    galleryShowFrameHeader: updated.showFrameHeader,
+                    galleryFrameHeaderBg: updated.frameHeaderBg,
+                    galleryFrameHeaderTextColor: updated.frameHeaderTextColor,
                   }
                 );
               }}

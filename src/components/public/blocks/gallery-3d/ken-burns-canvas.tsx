@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import { MediaGalleryItem } from "../media-gallery-block";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { MediaGalleryItem, ArtworkPlacard } from "../media-gallery-block";
 import { cn } from "@/lib/utils";
 
 export interface KenBurnsCanvasProps {
@@ -161,26 +161,25 @@ export function KenBurnsCanvas({
             {activeItem && (
               <motion.div
                 key={activeItem.id || activeIndex}
-                initial={{ scale: 1.02, x: 0, y: 0, opacity: 0 }}
+                initial={{ scale: 1.0, x: 0, y: 0, opacity: 0 }}
                 animate={{
-                  scale: 1.12,
-                  x: activeIndex % 2 === 0 ? 12 : -12,
-                  y: activeIndex % 2 === 0 ? -8 : 8,
-                  opacity: 1,
+                  scale: [1.0, 1.0, 1.06, 1.06],
+                  x: [0, 0, activeIndex % 2 === 0 ? 8 : -8, activeIndex % 2 === 0 ? 8 : -8],
+                  y: [0, 0, activeIndex % 2 === 0 ? -5 : 5, activeIndex % 2 === 0 ? -5 : 5],
+                  opacity: [0, 1, 1, 0],
                 }}
                 exit={{ opacity: 0 }}
                 transition={{
-                  scale: { duration: autoplayTimer + 1.2, ease: "linear" },
-                  x: { duration: autoplayTimer + 1.2, ease: "linear" },
-                  y: { duration: autoplayTimer + 1.2, ease: "linear" },
-                  opacity: { duration: 0.8 },
+                  duration: Math.max(3, autoplayTimer) + 1.2,
+                  times: [0, 0.25, 0.85, 1.0],
+                  ease: "easeInOut",
                 }}
-                className="absolute inset-0 w-full h-full"
+                className="absolute inset-0 w-full h-full flex items-center justify-center p-2 sm:p-4"
               >
                 <img
                   src={activeItem.url}
                   alt={activeItem.title || "Cinema Exhibition"}
-                  className="w-full h-full object-cover"
+                  className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-2xl select-none"
                 />
               </motion.div>
             )}
@@ -237,41 +236,12 @@ export function KenBurnsCanvas({
         </div>
       </div>
 
-      {/* Optional Unobtrusive Caption Ribbon (Outside Image Boundary) */}
-      {showCaptionRibbon && activeItem && (activeItem.title || activeItem.caption) && (
-        <div className="mt-3 px-4 py-2.5 rounded-xl bg-card/90 border border-border/80 flex items-center justify-between gap-4 shadow-sm backdrop-blur-xs">
-          <div className="min-w-0 space-y-0.5">
-            <h4
-              className="text-xs sm:text-sm font-serif font-bold text-foreground truncate"
-              style={{ color: overlayTitleColor || undefined }}
-            >
-              {activeItem.title || "Fine Art Masterwork"}
-            </h4>
-            {activeItem.caption && (
-              <p
-                className="text-[11px] text-muted-foreground truncate"
-                style={{ color: overlayTextColor || undefined }}
-              >
-                {activeItem.caption}
-              </p>
-            )}
-          </div>
-
-          {activeItem.linkTarget && (
-            <a
-              href={
-                activeItem.linkTarget.startsWith("/")
-                  ? activeItem.linkTarget
-                  : `/artwork/${activeItem.linkTarget}`
-              }
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-serif font-semibold shrink-0 transition-colors"
-            >
-              <span>Explore Piece</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
-        </div>
-      )}
+      {/* Dynamic Artwork Placard Card (Underneath Visual Canvas) */}
+      <ArtworkPlacard
+        item={activeItem}
+        overlayTitleColor={overlayTitleColor}
+        overlayTextColor={overlayTextColor}
+      />
     </div>
   );
 }

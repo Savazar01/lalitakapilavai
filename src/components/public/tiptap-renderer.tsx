@@ -788,6 +788,9 @@ export interface ColumnBlock {
   galleryCameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   galleryWallLayout?: "salon" | "linear" | "grid";
   galleryAutoplayTour?: boolean;
+  galleryShowFrameHeader?: boolean;
+  galleryFrameHeaderBg?: string;
+  galleryFrameHeaderTextColor?: string;
   galleryItems?: MediaGalleryItem[];
   // Hero Showcase Properties
   heroArchetype?: HeroArchetype;
@@ -957,6 +960,9 @@ export function renderColumnBlock(
           cameraTourStyle={block.galleryCameraTourStyle}
           wallLayout={block.galleryWallLayout}
           autoplayTour={block.galleryAutoplayTour}
+          showFrameHeader={block.galleryShowFrameHeader}
+          frameHeaderBg={block.galleryFrameHeaderBg}
+          frameHeaderTextColor={block.galleryFrameHeaderTextColor}
         />
       </div>
     );

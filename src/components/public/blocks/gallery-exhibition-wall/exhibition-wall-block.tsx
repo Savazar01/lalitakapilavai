@@ -2,24 +2,16 @@
 
 import * as React from "react";
 import * as THREE from "three";
-import Link from "next/link";
 import {
-  Compass,
-  Eye,
   Maximize2,
   Minimize2,
   Play,
   Pause,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
-  ExternalLink,
-  Layers,
-  ZoomIn,
 } from "lucide-react";
-import { MediaGalleryItem } from "../media-gallery-block";
+import { MediaGalleryItem, ArtworkPlacard } from "../media-gallery-block";
 import {
-  WALL_ENVIRONMENTS,
   WallEnvironment,
   getWallEnvironment,
 } from "./exhibition-environments";
@@ -173,8 +165,10 @@ export function ExhibitionWallBlock({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
-  const [activeTourStyle, setActiveTourStyle] = React.useState<CameraTourStyle>(cameraTourStyle);
-  const [activeEnvId, setActiveEnvId] = React.useState<string>(environmentId);
+  const [userTourStyle, setUserTourStyle] = React.useState<CameraTourStyle | null>(null);
+  const activeTourStyle = userTourStyle ?? cameraTourStyle;
+  const setActiveTourStyle = setUserTourStyle;
+
   const [selectedArtworkIndex, setSelectedArtworkIndex] = React.useState<number>(0);
   const [isTourPlaying, setIsTourPlaying] = React.useState<boolean>(autoplayTour);
   const [isFullscreen, setIsFullscreen] = React.useState<boolean>(false);
@@ -189,19 +183,25 @@ export function ExhibitionWallBlock({
 
   const activePlacement = placements[selectedArtworkIndex] || placements[0];
   const env: WallEnvironment = React.useMemo(() => {
-    const found = getWallEnvironment(activeEnvId);
-    if (activeEnvId === "custom" && customWallUrl) {
+    const found = getWallEnvironment(environmentId);
+    if (environmentId === "custom" && customWallUrl) {
       return { ...found, wallTextureUrl: customWallUrl };
     }
     return found;
-  }, [activeEnvId, customWallUrl]);
+  }, [environmentId, customWallUrl]);
 
   // Three.js internal references
   const threeRef = React.useRef<{
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
     renderer: THREE.WebGLRenderer;
-    artworkMeshes: { mesh: THREE.Mesh; placement: ArtworkPlacement; index: number }[];
+    artworkMeshes: {
+      mesh: THREE.Mesh;
+      group: THREE.Group;
+      materials: THREE.Material[];
+      placement: ArtworkPlacement;
+      index: number;
+    }[];
     targetCamPos: THREE.Vector3;
     targetLookAt: THREE.Vector3;
     currentLookAt: THREE.Vector3;
@@ -213,6 +213,18 @@ export function ExhibitionWallBlock({
     raycaster: THREE.Raycaster;
     mouse: THREE.Vector2;
   } | null>(null);
+
+  const focusRef = React.useRef({
+    selectedIndex: selectedArtworkIndex,
+    tourStyle: activeTourStyle,
+  });
+
+  React.useEffect(() => {
+    focusRef.current = {
+      selectedIndex: selectedArtworkIndex,
+      tourStyle: activeTourStyle,
+    };
+  }, [selectedArtworkIndex, activeTourStyle]);
 
   // Initialize Three.js WebGL Scene
   React.useEffect(() => {
@@ -346,6 +358,8 @@ export function ExhibitionWallBlock({
 
     const artworkMeshes: {
       mesh: THREE.Mesh;
+      group: THREE.Group;
+      materials: THREE.Material[];
       placement: ArtworkPlacement;
       index: number;
     }[] = [];
@@ -379,12 +393,14 @@ export function ExhibitionWallBlock({
         metalness = 0.0;
       }
 
-      // Outer Frame Mesh
+      // Outer Frame Mesh (transparent for isolated focus fading)
       const frameGeo = new THREE.BoxGeometry(frameW, frameH, frameDepth);
       const frameMat = new THREE.MeshStandardMaterial({
         color: frameColor,
         roughness,
         metalness,
+        transparent: true,
+        opacity: 1.0,
       });
       const frameMesh = new THREE.Mesh(frameGeo, frameMat);
       frameMesh.castShadow = true;
@@ -399,6 +415,8 @@ export function ExhibitionWallBlock({
       const matMaterial = new THREE.MeshStandardMaterial({
         color: 0xffffff,
         roughness: 0.95,
+        transparent: true,
+        opacity: 1.0,
       });
       const matMesh = new THREE.Mesh(matGeo, matMaterial);
       matMesh.position.set(0, 0, frameDepth / 2 + 0.002);
@@ -410,6 +428,8 @@ export function ExhibitionWallBlock({
         color: 0xffffff,
         roughness: 0.4,
         metalness: 0.05,
+        transparent: true,
+        opacity: 1.0,
       });
 
       // Load texture safely
@@ -438,6 +458,8 @@ export function ExhibitionWallBlock({
       const placardMat = new THREE.MeshStandardMaterial({
         color: 0xfdfdfd,
         roughness: 0.9,
+        transparent: true,
+        opacity: 1.0,
       });
       const placardMesh = new THREE.Mesh(placardGeo, placardMat);
       placardMesh.position.set(
@@ -449,9 +471,11 @@ export function ExhibitionWallBlock({
 
       scene.add(artGroup);
 
-      // Save reference for raycasting clicks
+      // Save reference for raycasting clicks and opacity fading
       artworkMeshes.push({
         mesh: canvasMesh,
+        group: artGroup,
+        materials: [frameMat, matMaterial, canvasMat, placardMat],
         placement,
         index: idx,
       });
@@ -483,96 +507,124 @@ export function ExhibitionWallBlock({
 
     // Render loop with smooth cinematic interpolation
     const animate = () => {
-      const state = threeRef.current;
-      if (!state) return;
-
-      const delta = state.clock.getDelta();
-      const elapsed = state.clock.getElapsedTime();
-
-      // Smooth camera interpolation (lerp)
-      state.camera.position.lerp(state.targetCamPos, Math.min(1, delta * 3.2));
-      state.currentLookAt.lerp(state.targetLookAt, Math.min(1, delta * 3.5));
-      state.camera.lookAt(state.currentLookAt);
-
-      // Keep spotlight focused on target artwork
-      state.spotlight.target.position.copy(state.targetLookAt);
-
-      // Subtle breathing motion for Curatorial Walkthrough mode
-      if (activeTourStyle === "walkthrough") {
-        state.camera.position.y += Math.sin(elapsed * 2.2) * 0.0015;
-      }
-
-      state.renderer.render(state.scene, state.camera);
-      state.animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      if (!container || !threeRef.current) return;
-      const newWidth = container.clientWidth;
-      const newHeight = container.clientHeight || 560;
-      threeRef.current.camera.aspect = newWidth / newHeight;
-      threeRef.current.camera.updateProjectionMatrix();
-      threeRef.current.renderer.setSize(newWidth, newHeight);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      if (threeRef.current) {
-        cancelAnimationFrame(threeRef.current.animationId);
-        threeRef.current.renderer.dispose();
-      }
-    };
-  }, [placements, env, activeTourStyle]);
-
-  // Update Environment Lighting & Color dynamically
-  React.useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
-    state.scene.background = new THREE.Color(env.wallBgColor);
-    state.scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.035);
-    state.ambientLight.color.set(env.lightingColor);
-    state.spotlight.color.set(env.lightingColor);
-    state.spotlight.intensity = env.spotlightIntensity * 25;
-  }, [env]);
 
-  // Camera Target Position Calculator based on Tour Mode and Selected Artwork
-  React.useEffect(() => {
-    const state = threeRef.current;
-    if (!state || !activePlacement) return;
+    const delta = state.clock.getDelta();
+    const elapsed = state.clock.getElapsedTime();
 
-    if (activeTourStyle === "overview") {
-      state.targetCamPos.set(0, 2.4, 9.0);
-      state.targetLookAt.set(0, 2.4, 0);
-    } else if (activeTourStyle === "drone") {
-      // Smooth drone dolly into the artwork
+    // Smooth camera interpolation (lerp)
+    state.camera.position.lerp(state.targetCamPos, Math.min(1, delta * 3.2));
+    state.currentLookAt.lerp(state.targetLookAt, Math.min(1, delta * 3.5));
+    state.camera.lookAt(state.currentLookAt);
+
+    // Keep spotlight focused on target artwork
+    state.spotlight.target.position.copy(state.targetLookAt);
+
+    // Subtle breathing motion for Curatorial Walkthrough mode
+    if (activeTourStyle === "walkthrough") {
+      state.camera.position.y += Math.sin(elapsed * 2.2) * 0.0015;
+    }
+
+    // Isolated Focus: If not in overview mode, smoothly fade non-target artworks to 0.0 opacity
+    // so adjacent frames never clip into the viewport edges
+    const { selectedIndex, tourStyle } = focusRef.current;
+    const isOverview = tourStyle === "overview";
+    state.artworkMeshes.forEach((art) => {
+      const isTarget = art.index === selectedIndex;
+      const targetOpacity = isOverview || isTarget ? 1.0 : 0.0;
+      art.materials.forEach((mat) => {
+        if ("opacity" in mat) {
+          mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, Math.min(1, delta * 5.0));
+          mat.visible = mat.opacity > 0.01;
+        }
+      });
+    });
+
+    state.renderer.render(state.scene, state.camera);
+    state.animationId = requestAnimationFrame(animate);
+  };
+
+  animate();
+
+  const handleResize = () => {
+    if (!container || !threeRef.current) return;
+    const newWidth = container.clientWidth;
+    const newHeight = container.clientHeight || 560;
+    threeRef.current.camera.aspect = newWidth / newHeight;
+    threeRef.current.camera.updateProjectionMatrix();
+    threeRef.current.renderer.setSize(newWidth, newHeight);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => {
+    window.removeEventListener("resize", handleResize);
+    if (threeRef.current) {
+      cancelAnimationFrame(threeRef.current.animationId);
+      threeRef.current.renderer.dispose();
+    }
+  };
+}, [placements, env, activeTourStyle]);
+
+// Update Environment Lighting & Color dynamically
+React.useEffect(() => {
+  const state = threeRef.current;
+  if (!state) return;
+  state.scene.background = new THREE.Color(env.wallBgColor);
+  state.scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.035);
+  state.ambientLight.color.set(env.lightingColor);
+  state.spotlight.color.set(env.lightingColor);
+  state.spotlight.intensity = env.spotlightIntensity * 25;
+}, [env]);
+
+// Camera Target Position Calculator based on Tour Mode and Selected Artwork
+React.useEffect(() => {
+  const state = threeRef.current;
+  if (!state || !activePlacement) return;
+
+  if (activeTourStyle === "overview") {
+    state.targetCamPos.set(0, 2.4, 9.0);
+    state.targetLookAt.set(0, 2.4, 0);
+  } else {
+    // Isolated Focus Framing: Dolly camera directly in front of target piece so it fills ~80% of viewport height
+    // with clean 10% margins top and bottom, and 10% margins left and right.
+    const frameH = activePlacement.height + 0.16;
+    const frameW = activePlacement.width + 0.16;
+    const vFovRad = ((state.camera.fov || 50) * Math.PI) / 180;
+    const aspect = state.camera.aspect || 1.6;
+
+    const dHeight = (frameH / 0.8) / (2 * Math.tan(vFovRad / 2));
+    const dWidth = (frameW / 0.8) / (2 * Math.tan(vFovRad / 2) * aspect);
+    const idealDistance = Math.max(dHeight, dWidth, 1.4);
+
+    if (activeTourStyle === "inspection") {
+      // Macro archival inspection close-up
       state.targetCamPos.set(
-        activePlacement.x * 0.85,
-        activePlacement.y + 0.15,
-        3.2
+        activePlacement.x,
+        activePlacement.y,
+        Math.min(idealDistance * 0.6, 1.2)
       );
       state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
     } else if (activeTourStyle === "walkthrough") {
       // First-person eye-level visitor perspective
       state.targetCamPos.set(
         activePlacement.x,
-        1.65, // Standard eye-level 1.65m
-        2.6
+        1.65,
+        Math.max(idealDistance, 2.2)
       );
       state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
-    } else if (activeTourStyle === "inspection") {
-      // Macro archival inspection close-up
+    } else {
+      // Focused Dolly: Centered squarely in front of the artwork at 80% viewport framing
       state.targetCamPos.set(
         activePlacement.x,
         activePlacement.y,
-        1.4
+        idealDistance
       );
       state.targetLookAt.set(activePlacement.x, activePlacement.y, 0);
     }
-  }, [selectedArtworkIndex, activeTourStyle, activePlacement]);
+  }
+}, [selectedArtworkIndex, activeTourStyle, activePlacement]);
 
   // Autoplay Tour Sequencer
   React.useEffect(() => {
@@ -633,122 +685,41 @@ export function ExhibitionWallBlock({
   }
 
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "relative w-full rounded-2xl overflow-hidden border border-amber-500/40 bg-stone-950 select-none shadow-2xl transition-all duration-300",
-        isFullscreen ? "h-screen w-screen rounded-none border-none" : "h-[540px] sm:h-[640px]",
-        className
-      )}
-    >
-      {/* 3D WebGL Canvas */}
-      <canvas
-        ref={canvasRef}
-        onClick={handleCanvasClick}
-        className="w-full h-full block cursor-pointer touch-none"
-      />
+    <div className={cn("w-full flex flex-col", className)}>
+      <div
+        ref={containerRef}
+        className={cn(
+          "relative w-full rounded-2xl overflow-hidden border border-amber-500/30 bg-stone-950 select-none shadow-2xl transition-all duration-300",
+          isFullscreen ? "fixed inset-0 z-50 rounded-none border-none h-screen w-screen" : "h-[520px] sm:h-[620px]"
+        )}
+      >
+        {/* 3D WebGL Canvas */}
+        <canvas
+          ref={canvasRef}
+          onClick={handleCanvasClick}
+          className="w-full h-full block cursor-pointer touch-none"
+        />
 
-      {/* Top Floating Curatorial Bar */}
-      <div className="absolute top-3 inset-x-3 sm:top-4 sm:inset-x-5 flex items-center justify-between pointer-events-none z-20">
-        <div className="flex items-center gap-2 pointer-events-auto">
-          {/* Environment Badge */}
-          <div className="px-3 py-1.5 rounded-full bg-stone-950/85 backdrop-blur-md border border-amber-500/40 text-amber-300 text-xs font-serif font-bold shadow-lg flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">{env.name}</span>
-            <span className="sm:hidden">{env.name.split(" ")[0]}</span>
-          </div>
-
-          {/* Environment Switcher Quick Menu */}
-          <div className="hidden md:flex items-center gap-1 bg-stone-950/80 backdrop-blur-md p-1 rounded-full border border-white/10 text-[11px]">
-            {WALL_ENVIRONMENTS.slice(0, 5).map((e) => (
-              <button
-                key={e.id}
-                type="button"
-                onClick={() => setActiveEnvId(e.id)}
-                className={cn(
-                  "px-2.5 py-0.5 rounded-full font-serif transition-colors cursor-pointer",
-                  activeEnvId === e.id
-                    ? "bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold"
-                    : "text-stone-300 hover:text-white"
-                )}
-              >
-                {e.name.split(" ")[0]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Controls: Tour Style, Play/Pause, Fullscreen */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          {/* Tour Style Selector */}
-          <div className="bg-stone-950/85 backdrop-blur-md p-1 rounded-full border border-white/15 flex items-center gap-1 text-xs">
-            <button
-              type="button"
-              onClick={() => setActiveTourStyle("overview")}
-              title="Overview Salon View"
-              className={cn(
-                "px-2.5 py-1 rounded-full flex items-center gap-1 transition-colors cursor-pointer",
-                activeTourStyle === "overview"
-                  ? "bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold"
-                  : "text-stone-300 hover:text-white"
-              )}
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span className="hidden lg:inline text-[11px]">Overview</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTourStyle("drone")}
-              title="Drone Glide Pan & Zoom"
-              className={cn(
-                "px-2.5 py-1 rounded-full flex items-center gap-1 transition-colors cursor-pointer",
-                activeTourStyle === "drone"
-                  ? "bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold"
-                  : "text-stone-300 hover:text-white"
-              )}
-            >
-              <Compass className="w-3.5 h-3.5" />
-              <span className="hidden lg:inline text-[11px]">Drone Pan</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTourStyle("walkthrough")}
-              title="Curatorial Eye-Level Walkthrough"
-              className={cn(
-                "px-2.5 py-1 rounded-full flex items-center gap-1 transition-colors cursor-pointer",
-                activeTourStyle === "walkthrough"
-                  ? "bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold"
-                  : "text-stone-300 hover:text-white"
-              )}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span className="hidden lg:inline text-[11px]">Visitor Walk</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTourStyle("inspection")}
-              title="Archival 22k Gold Macro Inspection"
-              className={cn(
-                "px-2.5 py-1 rounded-full flex items-center gap-1 transition-colors cursor-pointer",
-                activeTourStyle === "inspection"
-                  ? "bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold"
-                  : "text-stone-300 hover:text-white"
-              )}
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-              <span className="hidden lg:inline text-[11px]">Macro Detail</span>
-            </button>
-          </div>
+        {/* Minimalist Top-Right Floating Actions: Play/Pause tour & Fullscreen (Zero visual clutter) */}
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2 z-20 pointer-events-auto">
+          {/* Overview / Focus toggle button */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTourStyle((prev) => (prev === "overview" ? "drone" : "overview"));
+            }}
+            title={activeTourStyle === "overview" ? "Focus Selected Artwork" : "View Entire Wall (Salon Overview)"}
+            className="px-3 py-1.5 rounded-full bg-stone-950/80 hover:bg-stone-900 border border-white/15 text-stone-200 hover:text-white text-xs font-serif flex items-center gap-1.5 backdrop-blur-md shadow-md transition-colors cursor-pointer"
+          >
+            <span>{activeTourStyle === "overview" ? "Focus Piece" : "Salon View"}</span>
+          </button>
 
           {/* Play / Pause Tour Button */}
           <button
             type="button"
             onClick={() => setIsTourPlaying((prev) => !prev)}
             title={isTourPlaying ? "Pause Cinematic Tour" : "Play Cinematic Tour"}
-            className="w-8 h-8 rounded-full bg-stone-950/85 hover:bg-stone-900 border border-white/15 text-amber-300 flex items-center justify-center transition-transform hover:scale-105 shadow-md cursor-pointer"
+            className="w-8 h-8 rounded-full bg-stone-950/80 hover:bg-stone-900 border border-white/15 text-amber-300 flex items-center justify-center backdrop-blur-md transition-transform hover:scale-105 shadow-md cursor-pointer"
           >
             {isTourPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
           </button>
@@ -758,99 +729,90 @@ export function ExhibitionWallBlock({
             type="button"
             onClick={toggleFullscreen}
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-            className="w-8 h-8 rounded-full bg-stone-950/85 hover:bg-stone-900 border border-white/15 text-stone-200 hover:text-white flex items-center justify-center transition-transform hover:scale-105 shadow-md cursor-pointer"
+            className="w-8 h-8 rounded-full bg-stone-950/80 hover:bg-stone-900 border border-white/15 text-stone-200 hover:text-white flex items-center justify-center backdrop-blur-md transition-transform hover:scale-105 shadow-md cursor-pointer"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
-      </div>
 
-      {/* Floating Curatorial Card when an artwork is focused */}
-      {activeTourStyle !== "overview" && activePlacement && (
-        <div className="absolute top-16 left-4 sm:left-6 max-w-sm z-20 pointer-events-auto">
-          <div className="p-3.5 rounded-xl bg-stone-950/85 backdrop-blur-md border border-amber-500/30 text-stone-100 shadow-2xl space-y-1">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold">
-              Exhibition Wall • Item {selectedArtworkIndex + 1} of {placements.length}
-            </span>
-            <h4 className="font-serif font-bold text-sm sm:text-base text-white leading-tight">
-              {activePlacement.item.title || "Traditional Fine Art Masterwork"}
-            </h4>
-            {activePlacement.item.caption && (
-              <p className="text-xs text-stone-300 line-clamp-2 leading-relaxed">
-                {activePlacement.item.caption}
-              </p>
-            )}
-            {activePlacement.item.linkTarget && (
-              <div className="pt-1.5">
-                <Link
-                  href={
-                    activePlacement.item.linkTarget.startsWith("/")
-                      ? activePlacement.item.linkTarget
-                      : `/artwork/${activePlacement.item.linkTarget}`
-                  }
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-colors"
+        {/* Floating Curatorial Card in Fullscreen Mode Only */}
+        {isFullscreen && activePlacement && (
+          <div className="absolute top-4 left-4 max-w-sm z-20 pointer-events-auto">
+            <div className="p-3.5 rounded-xl bg-stone-950/85 backdrop-blur-md border border-amber-500/30 text-stone-100 shadow-2xl space-y-1">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold">
+                Exhibition Wall • Item {selectedArtworkIndex + 1} of {placements.length}
+              </span>
+              <h4 className="font-serif font-bold text-sm sm:text-base text-white leading-tight">
+                {activePlacement.item.title || "Traditional Fine Art Masterwork"}
+              </h4>
+              {(activePlacement.item.traditionalSchool || activePlacement.item.medium || activePlacement.item.dimensions) && (
+                <p className="text-xs text-stone-300">
+                  {[activePlacement.item.traditionalSchool, activePlacement.item.medium, activePlacement.item.dimensions].filter(Boolean).join(" • ")}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Bottom Thumbnail Strip for Instant Jump-to-Artwork */}
+        <div className="absolute bottom-3 inset-x-3 sm:bottom-4 sm:inset-x-6 z-20 pointer-events-auto">
+          <div className="p-2 rounded-xl bg-stone-950/80 backdrop-blur-md border border-white/10 flex items-center justify-between gap-3 shadow-xl">
+            {/* Previous chevron */}
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedArtworkIndex((prev) => (prev - 1 + placements.length) % placements.length)
+              }
+              aria-label="Previous artwork"
+              className="w-7 h-7 rounded-lg bg-stone-900 hover:bg-stone-800 text-amber-300 flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {/* Thumbnail Rail */}
+            <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+              {placements.map((p, idx) => (
+                <button
+                  key={p.item.id || idx}
+                  type="button"
+                  onClick={() => {
+                    setSelectedArtworkIndex(idx);
+                    if (activeTourStyle === "overview") setActiveTourStyle("drone");
+                  }}
+                  className={cn(
+                    "relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer group",
+                    selectedArtworkIndex === idx
+                      ? "border-amber-400 scale-105 shadow-md shadow-amber-500/20"
+                      : "border-transparent opacity-60 hover:opacity-100"
+                  )}
+                  title={p.item.title || `Artwork ${idx + 1}`}
                 >
-                  <span>Examine Provenance</span>
-                  <ExternalLink className="w-3 h-3" />
-                </Link>
-              </div>
-            )}
+                  <img
+                    src={p.item.url}
+                    alt={p.item.title || "Thumbnail"}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Next chevron */}
+            <button
+              type="button"
+              onClick={() => setSelectedArtworkIndex((prev) => (prev + 1) % placements.length)}
+              aria-label="Next artwork"
+              className="w-7 h-7 rounded-lg bg-stone-900 hover:bg-stone-800 text-amber-300 flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-        </div>
-      )}
-
-      {/* Bottom Thumbnail Strip for Instant Jump-to-Artwork */}
-      <div className="absolute bottom-3 inset-x-3 sm:bottom-4 sm:inset-x-6 z-20 pointer-events-auto">
-        <div className="p-2 rounded-xl bg-stone-950/80 backdrop-blur-md border border-white/10 flex items-center justify-between gap-3 shadow-xl">
-          {/* Previous / Next chevrons */}
-          <button
-            type="button"
-            onClick={() =>
-              setSelectedArtworkIndex((prev) => (prev - 1 + placements.length) % placements.length)
-            }
-            aria-label="Previous artwork"
-            className="w-7 h-7 rounded-lg bg-stone-900 hover:bg-stone-800 text-amber-300 flex items-center justify-center shrink-0 cursor-pointer"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          {/* Thumbnail Rail */}
-          <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-            {placements.map((p, idx) => (
-              <button
-                key={p.item.id || idx}
-                type="button"
-                onClick={() => {
-                  setSelectedArtworkIndex(idx);
-                  if (activeTourStyle === "overview") setActiveTourStyle("drone");
-                }}
-                className={cn(
-                  "relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer group",
-                  selectedArtworkIndex === idx
-                    ? "border-amber-400 scale-105 shadow-md shadow-amber-500/20"
-                    : "border-transparent opacity-60 hover:opacity-100"
-                )}
-                title={p.item.title || `Artwork ${idx + 1}`}
-              >
-                <img
-                  src={p.item.url}
-                  alt={p.item.title || "Thumbnail"}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setSelectedArtworkIndex((prev) => (prev + 1) % placements.length)}
-            aria-label="Next artwork"
-            className="w-7 h-7 rounded-lg bg-stone-900 hover:bg-stone-800 text-amber-300 flex items-center justify-center shrink-0 cursor-pointer"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
         </div>
       </div>
+
+      {/* Authentic Museum Placard Rendered CLEANLY BELOW the 3D Canvas Viewport */}
+      {!isFullscreen && activePlacement && (
+        <ArtworkPlacard item={activePlacement.item} className="mt-3.5" />
+      )}
     </div>
   );
 }

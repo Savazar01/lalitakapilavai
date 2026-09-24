@@ -15,12 +15,8 @@ import {
   Layers,
   Square,
   Film,
-  Eye,
   Palette,
-  Sliders,
   Landmark,
-  Compass,
-  ZoomIn,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -58,6 +54,9 @@ export interface MediaGalleryBlockData {
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
+  showFrameHeader?: boolean;
+  frameHeaderBg?: string;
+  frameHeaderTextColor?: string;
   items?: MediaGalleryItem[];
 }
 
@@ -84,6 +83,9 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const cameraTourStyle = data.cameraTourStyle ?? "drone";
   const wallLayout = data.wallLayout ?? "salon";
   const autoplayTour = data.autoplayTour ?? true;
+  const showFrameHeader = data.showFrameHeader ?? false;
+  const frameHeaderBg = data.frameHeaderBg ?? "#0F0E0D";
+  const frameHeaderTextColor = data.frameHeaderTextColor ?? "#F5EBE1";
   const items = data.items ?? [];
 
   const [activeItemIndex, setActiveItemIndex] = React.useState<number>(0);
@@ -96,16 +98,53 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const [mediaDialogMode, setMediaDialogMode] = React.useState<"items" | "customWall">("items");
 
   // Cached artworks and categories for item linking
-  const [artworksList, setArtworksList] = React.useState<{ id: string; title: string; slug: string }[]>([]);
+  const [artworksList, setArtworksList] = React.useState<{
+    id: string;
+    title: string;
+    slug: string;
+    medium?: string;
+    dimensions?: string;
+    yearCreated?: number | string;
+    description?: string;
+    category?: { name: string };
+    watermarkedWebpUrl?: string;
+    primaryImageUrl?: string;
+  }[]>([]);
   const [categoriesList, setCategoriesList] = React.useState<{ id: string; name: string; slug: string }[]>([]);
 
   React.useEffect(() => {
-    // Fetch artworks
+    // Fetch artworks with full curatorial metadata
     fetch("/api/admin/artworks")
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         if (Array.isArray(data)) {
-          setArtworksList(data.map((a: { id: string; title: string; slug: string }) => ({ id: a.id, title: a.title, slug: a.slug })));
+          setArtworksList(
+            data.map(
+              (a: {
+                id: string;
+                title: string;
+                slug: string;
+                medium?: string;
+                dimensions?: string;
+                yearCreated?: number | string;
+                description?: string;
+                category?: { name: string };
+                watermarkedWebpUrl?: string;
+                primaryImageUrl?: string;
+              }) => ({
+                id: a.id,
+                title: a.title,
+                slug: a.slug,
+                medium: a.medium,
+                dimensions: a.dimensions,
+                yearCreated: a.yearCreated,
+                description: a.description,
+                category: a.category ? { name: a.category.name } : undefined,
+                watermarkedWebpUrl: a.watermarkedWebpUrl,
+                primaryImageUrl: a.primaryImageUrl,
+              })
+            )
+          );
         }
       })
       .catch(() => {});
@@ -616,7 +655,87 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
         </div>
       )}
 
-      {/* 2B. Dedicated Canvas & Frame Styling Panel */}
+      {/* 2B. Filmstrip Reel Styling Controls */}
+      {displayMode === "filmstrip" && (
+        <div className="p-4 rounded-xl border border-border/80 bg-card/50 space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+              <Film className="w-3.5 h-3.5 text-primary" /> Filmstrip Reel Styling
+            </Label>
+            <Badge variant="outline" className="text-[10px]">
+              Full-Bleed Visual Frame
+            </Badge>
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-muted/20">
+            <div className="space-y-0.5">
+              <Label className="text-xs font-semibold text-foreground">Show Top Frame Header Strip</Label>
+              <p className="text-[10px] text-muted-foreground">
+                When disabled (default), artwork expands to the top border with zero black masking bands.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onChange({ ...data, showFrameHeader: !showFrameHeader })}
+              className={cn(
+                "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
+                showFrameHeader ? "bg-primary" : "bg-muted"
+              )}
+            >
+              <span
+                className={cn(
+                  "block w-4 h-4 rounded-full bg-white transition-transform transform",
+                  showFrameHeader ? "translate-x-6" : "translate-x-1"
+                )}
+              />
+            </button>
+          </div>
+
+          {showFrameHeader && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border/40">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Header Strip Background</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={frameHeaderBg || "#0F0E0D"}
+                    onChange={(e) => onChange({ ...data, frameHeaderBg: e.target.value })}
+                    className="w-7 h-7 rounded border border-border cursor-pointer p-0.5 bg-card shrink-0"
+                  />
+                  <Input
+                    type="text"
+                    value={frameHeaderBg}
+                    onChange={(e) => onChange({ ...data, frameHeaderBg: e.target.value })}
+                    placeholder="#0F0E0D"
+                    className="h-8 text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Header Text Color</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={frameHeaderTextColor || "#F5EBE1"}
+                    onChange={(e) => onChange({ ...data, frameHeaderTextColor: e.target.value })}
+                    className="w-7 h-7 rounded border border-border cursor-pointer p-0.5 bg-card shrink-0"
+                  />
+                  <Input
+                    type="text"
+                    value={frameHeaderTextColor}
+                    onChange={(e) => onChange({ ...data, frameHeaderTextColor: e.target.value })}
+                    placeholder="#F5EBE1"
+                    className="h-8 text-xs font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 2C. Dedicated Canvas & Frame Styling Panel */}
       <div className="p-4 rounded-xl border border-border/80 bg-card/50 space-y-4">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
@@ -1116,7 +1235,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs font-semibold text-foreground">Caption / Narrative Commentary</Label>
+                  <Label className="text-xs font-semibold text-foreground">Caption / Brief Commentary</Label>
                   <Textarea
                     rows={2}
                     value={activeItem.caption || ""}
@@ -1124,6 +1243,77 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                     placeholder="Brief curatorial commentary or historical details shown on hover/overlay..."
                     className="text-xs"
                   />
+                </div>
+
+                {/* Rich Curatorial Metadata Inputs (Displayed on Museum Placards) */}
+                <div className="p-3 rounded-lg border border-border/70 bg-card/60 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3 text-amber-500" /> Museum Placard Metadata
+                    </Label>
+                    <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                      Placard Lines 1-3
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-semibold text-foreground">Materials &amp; Medium</Label>
+                      <Input
+                        type="text"
+                        value={activeItem.medium || ""}
+                        onChange={(e) => handleUpdateItem(activeItemIndex, { medium: e.target.value })}
+                        placeholder="e.g. 22k Gold Foil, Gesso, Teak Wood"
+                        className="h-8 text-xs"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-semibold text-foreground">Dimensions</Label>
+                      <Input
+                        type="text"
+                        value={activeItem.dimensions || ""}
+                        onChange={(e) => handleUpdateItem(activeItemIndex, { dimensions: e.target.value })}
+                        placeholder="e.g. 36 x 24 in (91.4 x 61 cm)"
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-semibold text-foreground">Traditional School / Style</Label>
+                      <Input
+                        type="text"
+                        value={activeItem.traditionalSchool || ""}
+                        onChange={(e) => handleUpdateItem(activeItemIndex, { traditionalSchool: e.target.value })}
+                        placeholder="e.g. Thanjavur (Tanjore) Classical"
+                        className="h-8 text-xs"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-semibold text-foreground">Creation Year / Era</Label>
+                      <Input
+                        type="text"
+                        value={activeItem.year || ""}
+                        onChange={(e) => handleUpdateItem(activeItemIndex, { year: e.target.value })}
+                        placeholder="e.g. 2024"
+                        className="h-8 text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-[11px] font-semibold text-foreground">Placard Narrative / Provenance</Label>
+                    <Textarea
+                      rows={2}
+                      value={activeItem.description || ""}
+                      onChange={(e) => handleUpdateItem(activeItemIndex, { description: e.target.value })}
+                      placeholder="Detailed curatorial narrative shown on the museum placard below the artwork..."
+                      className="text-xs"
+                    />
+                  </div>
                 </div>
 
                 {/* Linking Configuration */}
@@ -1160,10 +1350,57 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
 
                     {activeItem.linkType === "artwork" && (
                       <div className="sm:col-span-2 space-y-1">
-                        <span className="text-[10px] text-muted-foreground">Select Masterwork</span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-muted-foreground">Select Masterwork</span>
+                          {artworksList.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const target = activeItem.linkTarget || artworksList[0]?.slug;
+                                const art = artworksList.find((a) => a.slug === target);
+                                if (art) {
+                                  handleUpdateItem(activeItemIndex, {
+                                    artworkId: art.id,
+                                    title: art.title,
+                                    medium: art.medium || activeItem.medium,
+                                    dimensions: art.dimensions || activeItem.dimensions,
+                                    year: art.yearCreated ? String(art.yearCreated) : activeItem.year,
+                                    traditionalSchool: art.category?.name || activeItem.traditionalSchool,
+                                    description: art.description || activeItem.description,
+                                    url: art.watermarkedWebpUrl || art.primaryImageUrl || activeItem.url,
+                                  });
+                                  toast.success(`Ingested metadata from "${art.title}"`);
+                                }
+                              }}
+                              className="text-[10px] font-bold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                            >
+                              ⚡ Re-Ingest Metadata
+                            </button>
+                          )}
+                        </div>
                         <Select
                           value={activeItem.linkTarget || (artworksList[0]?.slug ?? "")}
-                          onValueChange={(val) => handleUpdateItem(activeItemIndex, { linkTarget: val })}
+                          onValueChange={(val) => {
+                            const art = artworksList.find((a) => a.slug === val);
+                            handleUpdateItem(activeItemIndex, {
+                              linkTarget: val,
+                              ...(art
+                                ? {
+                                    artworkId: art.id,
+                                    title: art.title,
+                                    medium: art.medium || activeItem.medium,
+                                    dimensions: art.dimensions || activeItem.dimensions,
+                                    year: art.yearCreated ? String(art.yearCreated) : activeItem.year,
+                                    traditionalSchool: art.category?.name || activeItem.traditionalSchool,
+                                    description: art.description || activeItem.description,
+                                    url: art.watermarkedWebpUrl || art.primaryImageUrl || activeItem.url,
+                                  }
+                                : {}),
+                            });
+                            if (art) {
+                              toast.success(`Ingested curatorial metadata for "${art.title}"`);
+                            }
+                          }}
                         >
                           <SelectTrigger className="h-8 text-xs">
                             <SelectValue placeholder="Choose an artwork" />

@@ -41,6 +41,13 @@ export interface MediaGalleryItem {
   alt?: string;
   title?: string;
   caption?: string;
+  artworkId?: string;       // Linked Artwork Record ID
+  medium?: string;          // Materials used (e.g. 22k Gold Foil, Teakwood, Gemstones)
+  dimensions?: string;      // Dimensions (e.g. 24 x 36 inches / 61 x 91.4 cm)
+  year?: string;
+  traditionalSchool?: string;
+  altText?: string;
+  description?: string;
   linkType?: "none" | "artwork" | "category" | "custom";
   linkTarget?: string; // slug for artwork/category, or full url
 }
@@ -74,6 +81,9 @@ export interface MediaGalleryBlockProps {
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
+  showFrameHeader?: boolean;
+  frameHeaderBg?: string;
+  frameHeaderTextColor?: string;
 }
 
 // Helper to resolve item link
@@ -178,6 +188,79 @@ export function getBentoItemClass(index: number, total: number): string {
   return "col-span-12 sm:col-span-6 md:col-span-3 h-[180px] sm:h-[220px]";
 }
 
+export function ArtworkPlacard({
+  item,
+  className = "",
+  overlayTitleColor,
+  overlayTextColor,
+}: {
+  item?: MediaGalleryItem;
+  className?: string;
+  overlayTitleColor?: string;
+  overlayTextColor?: string;
+}) {
+  if (!item) return null;
+  const hasMetadata =
+    Boolean(item.title) ||
+    Boolean(item.medium) ||
+    Boolean(item.traditionalSchool) ||
+    Boolean(item.dimensions) ||
+    Boolean(item.description) ||
+    Boolean(item.caption);
+
+  if (!hasMetadata) return null;
+
+  const schoolMedium = [item.traditionalSchool, item.medium].filter(Boolean).join(" • ");
+  const href = getItemHref(item);
+
+  return (
+    <div
+      className={cn(
+        "mt-4 p-4 rounded-xl border bg-[#FAF7F2] dark:bg-stone-900 border-amber-900/10 dark:border-amber-500/20 shadow-xs text-left transition-all",
+        className
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <h4
+            className="font-serif text-base font-bold text-slate-900 dark:text-amber-100 tracking-wide"
+            style={{ color: overlayTitleColor || undefined }}
+          >
+            {item.title || "Classical Masterwork"}
+          </h4>
+          {schoolMedium && (
+            <p className="text-xs font-serif text-amber-950/80 dark:text-amber-300/80">
+              {schoolMedium}
+            </p>
+          )}
+          {item.dimensions && (
+            <p className="text-[11px] font-mono text-slate-500 dark:text-stone-400">
+              {item.dimensions}
+            </p>
+          )}
+          {(item.description || item.caption) && (
+            <p
+              className="text-xs font-serif text-slate-700 dark:text-stone-300 mt-2 leading-relaxed"
+              style={{ color: overlayTextColor || undefined }}
+            >
+              {item.description || item.caption}
+            </p>
+          )}
+        </div>
+        {href && (
+          <Link
+            href={href}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/30 text-xs font-serif font-semibold shrink-0 transition-colors cursor-pointer"
+          >
+            <span>View Work</span>
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function MediaGalleryBlock({
   items = [],
   displayMode = "carousel",
@@ -198,6 +281,9 @@ export function MediaGalleryBlock({
   cameraTourStyle = "drone",
   wallLayout = "salon",
   autoplayTour = true,
+  showFrameHeader = false,
+  frameHeaderBg = "",
+  frameHeaderTextColor = "",
 }: MediaGalleryBlockProps) {
   // Filter out empty items
   const validItems = React.useMemo(() => {
@@ -335,7 +421,6 @@ export function MediaGalleryBlock({
    * ----------------------------------------------------------- */
   if (displayMode === "soft-crossfade") {
     const activeItem = validItems[currentIndex] || validItems[0];
-    const isLinked = !!getItemHref(activeItem);
 
     return (
       <div
@@ -366,16 +451,16 @@ export function MediaGalleryBlock({
                   idx === currentIndex ? "opacity-100 z-10 pointer-events-auto" : "opacity-0 z-0 pointer-events-none"
                 )}
               >
-                <ItemLinkWrapper item={item} className="w-full h-full relative block">
+                <ItemLinkWrapper item={item} className="w-full h-full relative block flex items-center justify-center p-2 sm:p-4">
                   <ProtectedImage
                     src={item.url}
                     alt={item.alt || item.title || "Gallery image"}
                     useImg={true}
                     className={cn(
-                      "w-full h-full object-cover transition-transform duration-7000 ease-out",
+                      "max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xl select-none transition-transform duration-7000 ease-out",
                       idx === currentIndex ? "scale-105" : "scale-100"
                     )}
-                    wrapperClassName="w-full h-full"
+                    wrapperClassName="w-full h-full flex items-center justify-center"
                   />
                 </ItemLinkWrapper>
               </div>
@@ -432,36 +517,12 @@ export function MediaGalleryBlock({
           </div>
         </div>
 
-        {/* Optional Unobtrusive Caption Ribbon (Outside Image Boundary) */}
-        {showCaptionRibbon && activeItem && (activeItem.title || activeItem.caption) && (
-          <div className="mt-3 px-4 py-2.5 rounded-xl bg-card/90 border border-border/80 flex items-center justify-between gap-4 shadow-sm backdrop-blur-xs">
-            <div className="min-w-0 space-y-0.5">
-              <h4
-                className="text-xs sm:text-sm font-serif font-bold text-foreground truncate"
-                style={{ color: overlayTitleColor || undefined }}
-              >
-                {activeItem.title || "Fine Art Masterwork"}
-              </h4>
-              {activeItem.caption && (
-                <p
-                  className="text-[11px] text-muted-foreground truncate"
-                  style={{ color: overlayTextColor || undefined }}
-                >
-                  {activeItem.caption}
-                </p>
-              )}
-            </div>
-
-            {isLinked && (
-              <ItemLinkWrapper item={activeItem}>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-serif font-semibold shrink-0 transition-colors">
-                  <span>Explore Piece</span>
-                  <ExternalLink className="w-3 h-3" />
-                </span>
-              </ItemLinkWrapper>
-            )}
-          </div>
-        )}
+        {/* Dynamic Artwork Placard Card (Underneath Visual Canvas) */}
+        <ArtworkPlacard
+          item={activeItem}
+          overlayTitleColor={overlayTitleColor}
+          overlayTextColor={overlayTextColor}
+        />
       </div>
     );
   }
@@ -515,13 +576,21 @@ export function MediaGalleryBlock({
                 )}
               >
                 <ItemLinkWrapper item={item} className="h-full flex flex-col">
-                  {/* Top Film Sprocket / Index Header */}
-                  <div className="px-3 py-1.5 bg-stone-900 text-stone-300 text-[10px] font-mono flex items-center justify-between border-b border-white/10">
-                    <span className="text-amber-400 font-bold">FRAME #{String(idx + 1).padStart(2, "0")}</span>
-                    <span>ARCHIVAL 35MM</span>
-                  </div>
+                  {/* Top Film Sprocket / Index Header (Optional) */}
+                  {showFrameHeader && (
+                    <div
+                      className="px-3 py-1.5 text-[10px] font-mono flex items-center justify-between border-b border-white/10"
+                      style={{
+                        backgroundColor: frameHeaderBg || "#1c1917",
+                        color: frameHeaderTextColor || "#f5f5f4",
+                      }}
+                    >
+                      <span className="font-bold">FRAME #{String(idx + 1).padStart(2, "0")}</span>
+                      <span>ARCHIVAL 35MM</span>
+                    </div>
+                  )}
 
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-stone-950">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-stone-950 flex items-center justify-center">
                     <ProtectedImage
                       src={item.url}
                       alt={item.alt || item.title || `Filmstrip Item ${idx + 1}`}
@@ -536,16 +605,26 @@ export function MediaGalleryBlock({
                     )}
                   </div>
 
-                  {(item.title || item.caption) && (
-                    <div className="p-3.5 bg-card border-t border-border/60 flex-1 flex flex-col justify-center">
+                  {(item.title || item.medium || item.traditionalSchool || item.dimensions || item.caption || item.description) && (
+                    <div className="p-3.5 bg-card border-t border-border/60 flex-1 flex flex-col justify-center text-left">
                       {item.title && (
                         <h4 className="font-serif font-bold text-sm text-foreground line-clamp-1 group-hover:text-primary transition-colors">
                           {item.title}
                         </h4>
                       )}
-                      {item.caption && (
-                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mt-0.5">
-                          {item.caption}
+                      {(item.medium || item.traditionalSchool) && (
+                        <p className="text-[11px] font-serif text-amber-950/80 dark:text-amber-300/80 mt-0.5 line-clamp-1">
+                          {[item.traditionalSchool, item.medium].filter(Boolean).join(" • ")}
+                        </p>
+                      )}
+                      {item.dimensions && (
+                        <p className="text-[10px] font-mono text-slate-500 dark:text-stone-400 mt-0.5">
+                          {item.dimensions}
+                        </p>
+                      )}
+                      {(item.description || item.caption) && (
+                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mt-1">
+                          {item.description || item.caption}
                         </p>
                       )}
                     </div>
@@ -564,7 +643,6 @@ export function MediaGalleryBlock({
    * ----------------------------------------------------------- */
   if (displayMode === "carousel") {
     const activeItem = validItems[currentIndex] || validItems[0];
-    const isLinked = !!getItemHref(activeItem);
 
     return (
       <div
@@ -587,13 +665,13 @@ export function MediaGalleryBlock({
           }}
         >
           <div className={cn("relative w-full overflow-hidden bg-stone-950/40 rounded-xl", aspectClass)}>
-            <ItemLinkWrapper item={activeItem} className="w-full h-full relative">
+            <ItemLinkWrapper item={activeItem} className="w-full h-full relative block flex items-center justify-center p-2 sm:p-4">
               <ProtectedImage
                 src={activeItem.url}
                 alt={activeItem.alt || activeItem.title || "Gallery image"}
                 useImg={true}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                wrapperClassName="w-full h-full"
+                className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xl select-none transition-transform duration-700 group-hover:scale-105"
+                wrapperClassName="w-full h-full flex items-center justify-center"
               />
             </ItemLinkWrapper>
 
@@ -650,36 +728,12 @@ export function MediaGalleryBlock({
           </div>
         </div>
 
-        {/* Optional Unobtrusive Caption Ribbon (Outside Image Boundary) */}
-        {showCaptionRibbon && activeItem && (activeItem.title || activeItem.caption) && (
-          <div className="mt-3 px-4 py-2.5 rounded-xl bg-card/90 border border-border/80 flex items-center justify-between gap-4 shadow-sm backdrop-blur-xs">
-            <div className="min-w-0 space-y-0.5">
-              <h4
-                className="text-xs sm:text-sm font-serif font-bold text-foreground truncate"
-                style={{ color: overlayTitleColor || undefined }}
-              >
-                {activeItem.title || "Fine Art Masterwork"}
-              </h4>
-              {activeItem.caption && (
-                <p
-                  className="text-[11px] text-muted-foreground truncate"
-                  style={{ color: overlayTextColor || undefined }}
-                >
-                  {activeItem.caption}
-                </p>
-              )}
-            </div>
-
-            {isLinked && (
-              <ItemLinkWrapper item={activeItem}>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-serif font-semibold shrink-0 transition-colors">
-                  <span>Explore Piece</span>
-                  <ExternalLink className="w-3 h-3" />
-                </span>
-              </ItemLinkWrapper>
-            )}
-          </div>
-        )}
+        {/* Dynamic Artwork Placard Card (Underneath Visual Canvas) */}
+        <ArtworkPlacard
+          item={activeItem}
+          overlayTitleColor={overlayTitleColor}
+          overlayTextColor={overlayTextColor}
+        />
       </div>
     );
   }

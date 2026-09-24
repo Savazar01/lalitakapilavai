@@ -578,6 +578,9 @@ function SortableSection({
     cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
     wallLayout?: "salon" | "linear" | "grid";
     autoplayTour?: boolean;
+    showFrameHeader?: boolean;
+    frameHeaderBg?: string;
+    frameHeaderTextColor?: string;
     items?: MediaGalleryItem[];
   } | null>(null);
 
@@ -1454,6 +1457,9 @@ function SortableSection({
                                   cameraTourStyle: block.galleryCameraTourStyle,
                                   wallLayout: block.galleryWallLayout,
                                   autoplayTour: block.galleryAutoplayTour,
+                                  showFrameHeader: block.galleryShowFrameHeader,
+                                  frameHeaderBg: block.galleryFrameHeaderBg,
+                                  frameHeaderTextColor: block.galleryFrameHeaderTextColor,
                                   items: block.galleryItems,
                                 })
                               }
@@ -1484,6 +1490,9 @@ function SortableSection({
                               cameraTourStyle={block.galleryCameraTourStyle}
                               wallLayout={block.galleryWallLayout}
                               autoplayTour={block.galleryAutoplayTour}
+                              showFrameHeader={block.galleryShowFrameHeader}
+                              frameHeaderBg={block.galleryFrameHeaderBg}
+                              frameHeaderTextColor={block.galleryFrameHeaderTextColor}
                             />
                           </div>
                         </div>
@@ -1942,6 +1951,9 @@ function SortableSection({
                 cameraTourStyle: activeGalleryModal.cameraTourStyle,
                 wallLayout: activeGalleryModal.wallLayout,
                 autoplayTour: activeGalleryModal.autoplayTour,
+                showFrameHeader: activeGalleryModal.showFrameHeader,
+                frameHeaderBg: activeGalleryModal.frameHeaderBg,
+                frameHeaderTextColor: activeGalleryModal.frameHeaderTextColor,
                 items: activeGalleryModal.items,
               }}
               onChange={(updated) => {
@@ -1963,6 +1975,9 @@ function SortableSection({
                   galleryCameraTourStyle: updated.cameraTourStyle,
                   galleryWallLayout: updated.wallLayout,
                   galleryAutoplayTour: updated.autoplayTour,
+                  galleryShowFrameHeader: updated.showFrameHeader,
+                  galleryFrameHeaderBg: updated.frameHeaderBg,
+                  galleryFrameHeaderTextColor: updated.frameHeaderTextColor,
                   galleryItems: updated.items,
                 });
                 setActiveGalleryModal((prev) =>
@@ -1986,6 +2001,9 @@ function SortableSection({
                         cameraTourStyle: updated.cameraTourStyle,
                         wallLayout: updated.wallLayout,
                         autoplayTour: updated.autoplayTour,
+                        showFrameHeader: updated.showFrameHeader,
+                        frameHeaderBg: updated.frameHeaderBg,
+                        frameHeaderTextColor: updated.frameHeaderTextColor,
                         items: updated.items,
                       }
                     : null
