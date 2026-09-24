@@ -13,7 +13,8 @@ RUN apt-get update && \
 # Stage 1: Install dependencies with npm cache mount
 FROM base AS deps
 COPY package.json package-lock.json .npmrc* ./
-RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --loglevel=error
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --prefer-offline --no-audit --no-fund --progress=false --loglevel=error
 
 # Development stage for local multi-container live-reloading (inherits deps)
 FROM deps AS dev

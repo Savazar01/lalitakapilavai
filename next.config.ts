@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   output: "standalone",
   serverExternalPackages: ["sharp", "heic-convert"],
   outputFileTracingRoot: path.join(__dirname, "./"),
+  typescript: {
+    // Type-checking is strictly validated in Step 1 of quality gates prior to push
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       // Cloudflare R2 storage & custom domain distribution

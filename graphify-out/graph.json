@@ -1563,7 +1563,7 @@
       "label": "metadata",
       "file_type": "code",
       "source_file": "src/app/(public)/exhibition-simulator/page.tsx",
-      "source_location": "L6",
+      "source_location": "L9",
       "id": "exhibition_simulator_page_metadata",
       "community": 8,
       "norm_label": "metadata"
@@ -1572,7 +1572,7 @@
       "label": "ExhibitionSimulatorPage()",
       "file_type": "code",
       "source_file": "src/app/(public)/exhibition-simulator/page.tsx",
-      "source_location": "L12",
+      "source_location": "L15",
       "id": "exhibition_simulator_page_exhibitionsimulatorpage",
       "community": 8,
       "norm_label": "exhibitionsimulatorpage()"
@@ -25954,9 +25954,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "src_components_ui_input_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_input_tsx"
     },
     {
       "relation": "imports",
@@ -25965,9 +25965,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "ui_input_input",
-      "confidence_score": 1.0
+      "target": "ui_input_input"
     },
     {
       "relation": "imports_from",
@@ -26127,9 +26127,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "admin_artwork_placard_sheet_editableplacarditem",
-      "confidence_score": 1.0
+      "target": "admin_artwork_placard_sheet_editableplacarditem"
     },
     {
       "relation": "contains",
@@ -35443,9 +35443,9 @@
       "source_file": "src/components/public/blocks/media-gallery-block.tsx",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_public_blocks_media_gallery_block_tsx",
-      "target": "blocks_media_gallery_block_artworkmetadata",
-      "confidence_score": 1.0
+      "target": "blocks_media_gallery_block_artworkmetadata"
     },
     {
       "relation": "contains",
@@ -41960,5 +41960,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7685428cdf1712006ea252b8349c9aec050bb929"
+  "built_at_commit": "15096841a335fe543a2a2f4f4111f9b918c45c29"
 }

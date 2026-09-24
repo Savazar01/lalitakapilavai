@@ -25,42 +25,48 @@ export async function Navbar() {
   // Fetch settings and active menu items for Top Center and Top Right
   const [settings, centerItems, rightItems, drawerItems] = await Promise.all([
     prisma.systemSetting.findFirst().catch(() => null),
-    prisma.menuItem.findMany({
-      where: { position: MenuPosition.TOP_CENTER, parentId: null, isActive: true },
-      orderBy: { orderIndex: "asc" },
-      include: {
-        children: {
-          where: { isActive: true },
-          orderBy: { orderIndex: "asc" },
-          include: {
-            children: {
-              where: { isActive: true },
-              orderBy: { orderIndex: "asc" },
+    prisma.menuItem
+      .findMany({
+        where: { position: MenuPosition.TOP_CENTER, parentId: null, isActive: true },
+        orderBy: { orderIndex: "asc" },
+        include: {
+          children: {
+            where: { isActive: true },
+            orderBy: { orderIndex: "asc" },
+            include: {
+              children: {
+                where: { isActive: true },
+                orderBy: { orderIndex: "asc" },
+              },
             },
           },
         },
-      },
-    }),
-    prisma.menuItem.findMany({
-      where: { position: MenuPosition.TOP_RIGHT, parentId: null, isActive: true },
-      orderBy: { orderIndex: "asc" },
-    }),
-    prisma.menuItem.findMany({
-      where: { isActive: true, parentId: null },
-      orderBy: { orderIndex: "asc" },
-      include: {
-        children: {
-          where: { isActive: true },
-          orderBy: { orderIndex: "asc" },
-          include: {
-            children: {
-              where: { isActive: true },
-              orderBy: { orderIndex: "asc" },
+      })
+      .catch(() => []),
+    prisma.menuItem
+      .findMany({
+        where: { position: MenuPosition.TOP_RIGHT, parentId: null, isActive: true },
+        orderBy: { orderIndex: "asc" },
+      })
+      .catch(() => []),
+    prisma.menuItem
+      .findMany({
+        where: { isActive: true, parentId: null },
+        orderBy: { orderIndex: "asc" },
+        include: {
+          children: {
+            where: { isActive: true },
+            orderBy: { orderIndex: "asc" },
+            include: {
+              children: {
+                where: { isActive: true },
+                orderBy: { orderIndex: "asc" },
+              },
             },
           },
         },
-      },
-    }),
+      })
+      .catch(() => []),
   ]);
 
   return (
