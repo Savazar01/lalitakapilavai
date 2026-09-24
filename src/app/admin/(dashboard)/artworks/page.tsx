@@ -659,7 +659,6 @@ export default function ArtworksAdminPage() {
     }
   };
 
-
   // Filter artworks
   const filteredArtworks = artworks.filter((art) => {
     const matchesCategory =
@@ -670,6 +669,21 @@ export default function ArtworksAdminPage() {
       art.category?.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  const toggleSelectAll = () => {
+    if (filteredArtworks.length > 0 && selectedArtworkIds.size === filteredArtworks.length) {
+      setSelectedArtworkIds(new Set());
+    } else {
+      setSelectedArtworkIds(new Set(filteredArtworks.map((a) => a.id)));
+    }
+  };
+
+  const toggleSelectOne = (id: string) => {
+    const next = new Set(selectedArtworkIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedArtworkIds(next);
+  };
 
   return (
     <div className="space-y-6">
@@ -693,22 +707,6 @@ export default function ArtworksAdminPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={handleExportExcel}
-          disabled={exportingExcel}
-          className="text-xs gap-1.5"
-          title="Export entire artwork collection as high-fidelity Excel workbook with embedded thumbnails"
-        >
-          {exportingExcel ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <Download className="w-3.5 h-3.5 text-primary" />
-          )}
-          {exportingExcel ? "Exporting..." : "Export Excel"}
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
           onClick={() => setBulkImportOpen(true)}
           className="text-xs gap-1.5"
           title="Upload Excel spreadsheet to bulk create or update masterworks"
@@ -716,107 +714,132 @@ export default function ArtworksAdminPage() {
           <UploadCloud className="w-3.5 h-3.5 text-primary" />
           Bulk Import Excel
         </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            if (selectedArtworkIds.size === 0) {
-              const allIds = new Set(filteredArtworks.map((a) => a.id));
-              setSelectedArtworkIds(allIds);
-            }
-            setPlacardModalOpen(true);
-          }}
-          className="text-xs gap-1.5 border-amber-500/40 hover:bg-amber-500/10 text-amber-900 dark:text-amber-200"
-          title="Print display visiting cards and museum placards with dynamic QR codes"
-        >
-          <Printer className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-          Print Placards {selectedArtworkIds.size > 0 && `(${selectedArtworkIds.size})`}
-        </Button>
-
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleOpenCreate}
-          className="text-xs gap-1.5"
-        >
-          <Plus className="w-4 h-4" />
-          Add Artwork
-        </Button>
       </EditablePageHeader>
 
-      {/* Control Bar: Filters & Search */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-2 rounded-lg border border-border bg-card/60 backdrop-blur-md">
-        {/* Category Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-          <button
-            type="button"
+      {/* TIER 1: Dedicated Art Category Navigation */}
+      <div className="w-full border-b border-border/60 pb-3 mb-2 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2">
+          <Button
+            key="all"
+            variant={selectedCategory === "ALL" ? "default" : "outline"}
+            size="sm"
             onClick={() => setSelectedCategory("ALL")}
-            className={`h-8 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-              selectedCategory === "ALL"
-                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs"
-                : "bg-slate-100 text-slate-800 border border-slate-300 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700"
-            }`}
+            className="rounded-full px-4 text-xs font-serif shrink-0 cursor-pointer h-8"
           >
             All Works ({artworks.length})
-          </button>
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => setSelectedCategory(c.id)}
-              className={`h-8 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                selectedCategory === c.id
-                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold shadow-xs"
-                  : "bg-slate-100 text-slate-800 border border-slate-300 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700"
-              }`}
+          </Button>
+          {categories.map((cat) => (
+            <Button
+              key={cat.id}
+              variant={selectedCategory === cat.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(cat.id)}
+              className="rounded-full px-4 text-xs font-serif shrink-0 cursor-pointer h-8"
             >
-              {c.name} ({c._count?.artworks ?? 0})
-            </button>
+              {cat.name} ({cat._count?.artworks ?? 0})
+            </Button>
           ))}
         </div>
+      </div>
 
-        {/* Search, Selection Pill & View Mode Switcher */}
-        <div className="flex items-center gap-2">
+      {/* TIER 2: Management & Action Toolbar */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-3 bg-card rounded-xl border border-border/70 mb-6 shadow-xs">
+        {/* Left: Search input */}
+        <div className="relative w-full lg:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search title, medium, provenance..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 bg-background/50 h-9 text-xs"
+          />
+        </div>
+
+        {/* Center: Batch Selection Status & Select All / Deselect All / Clear */}
+        <div className="flex items-center gap-2 flex-wrap">
           {selectedArtworkIds.size > 0 && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-xs shrink-0">
-              <span className="font-semibold text-amber-900 dark:text-amber-200 text-[11px]">
-                {selectedArtworkIds.size} selected
+            <div className="flex items-center gap-2 mr-1">
+              <span className="text-xs font-mono font-medium text-amber-800 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-md border border-amber-200 dark:border-amber-800">
+                {selectedArtworkIds.size} Selected
               </span>
-              <button
-                type="button"
-                onClick={() => setPlacardModalOpen(true)}
-                className="text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer flex items-center gap-1"
-              >
-                <Printer className="w-3 h-3" /> Print
-              </button>
-              <span className="text-muted-foreground">•</span>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setSelectedArtworkIds(new Set())}
-                className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer underline"
+                className="h-8 text-xs text-muted-foreground hover:text-foreground cursor-pointer px-2"
               >
                 Clear
-              </button>
+              </Button>
             </div>
           )}
 
-          <div className="relative flex-1 md:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-muted-foreground" />
-            <Input
-              placeholder="Search title, medium..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 pl-8 text-xs"
-            />
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleSelectAll}
+            className="h-9 text-xs font-serif cursor-pointer"
+          >
+            {filteredArtworks.length > 0 && selectedArtworkIds.size === filteredArtworks.length
+              ? "Deselect All"
+              : "Select All"}
+          </Button>
+        </div>
 
-          <div className="flex items-center border border-border rounded-md p-0.5">
+        {/* Right: Action Grouping & View Switcher */}
+        <div className="flex items-center gap-2 w-full lg:w-auto justify-end flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={selectedArtworkIds.size === 0}
+            onClick={() => setPlacardModalOpen(true)}
+            className={cn(
+              "h-9 text-xs font-serif transition-colors gap-1.5 cursor-pointer",
+              selectedArtworkIds.size > 0
+                ? "text-amber-800 border-amber-300 bg-amber-50/60 hover:bg-amber-100 dark:text-amber-300 dark:border-amber-700 dark:bg-amber-950/40"
+                : "opacity-50 cursor-not-allowed text-muted-foreground"
+            )}
+            title={
+              selectedArtworkIds.size === 0
+                ? "Select one or more artworks using checkboxes to print placards"
+                : `Print display placards for ${selectedArtworkIds.size} selected artwork(s)`
+            }
+          >
+            <Printer className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            Print Placards ({selectedArtworkIds.size})
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportExcel}
+            disabled={exportingExcel}
+            className="h-9 text-xs font-serif gap-1.5"
+            title="Export entire artwork collection as high-fidelity Excel workbook"
+          >
+            {exportingExcel ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Download className="w-3.5 h-3.5 text-primary" />
+            )}
+            {exportingExcel ? "Exporting..." : "Export Excel"}
+          </Button>
+
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleOpenCreate}
+            className="h-9 text-xs font-serif gap-1.5 cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Artwork
+          </Button>
+
+          <div className="flex items-center border border-border rounded-md p-0.5 ml-1">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className="h-7 w-7 p-0"
+              className="h-7 w-7 p-0 cursor-pointer"
               title="Grid View"
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -825,7 +848,7 @@ export default function ArtworksAdminPage() {
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("table")}
-              className="h-7 w-7 p-0"
+              className="h-7 w-7 p-0 cursor-pointer"
               title="Table View"
             >
               <ListIcon className="w-3.5 h-3.5" />
@@ -871,23 +894,13 @@ export default function ArtworksAdminPage() {
             >
               <div className="relative aspect-[4/5] bg-muted/40 overflow-hidden">
                 {/* Print Selection Checkbox */}
-                <div className="absolute top-2 left-2 z-20">
-                  <input
-                    type="checkbox"
-                    checked={selectedArtworkIds.has(art.id)}
-                    onChange={(e) => {
-                      const newSet = new Set(selectedArtworkIds);
-                      if (e.target.checked) {
-                        newSet.add(art.id);
-                      } else {
-                        newSet.delete(art.id);
-                      }
-                      setSelectedArtworkIds(newSet);
-                    }}
-                    className="w-4 h-4 rounded border-border accent-amber-600 bg-background/90 shadow-sm cursor-pointer"
-                    title="Select for print display placards"
-                  />
-                </div>
+                <input
+                  type="checkbox"
+                  checked={selectedArtworkIds.has(art.id)}
+                  onChange={() => toggleSelectOne(art.id)}
+                  className="absolute top-3 left-3 z-30 w-5 h-5 rounded border-amber-600 accent-amber-600 cursor-pointer shadow-md bg-background/90"
+                  title="Select artwork for placard printing"
+                />
 
                 {art.watermarkedWebpUrl ? (
                   <Image
@@ -904,7 +917,7 @@ export default function ArtworksAdminPage() {
                 )}
 
                 {/* Badges */}
-                <div className="absolute top-8 left-2 flex flex-col gap-1">
+                <div className="absolute top-10 left-2 flex flex-col gap-1">
                   <Badge variant="outline" className="text-[10px] bg-background/80 backdrop-blur-md">
                     {art.category?.name}
                   </Badge>
@@ -1026,19 +1039,9 @@ export default function ArtworksAdminPage() {
                   <input
                     type="checkbox"
                     checked={filteredArtworks.length > 0 && filteredArtworks.every((a) => selectedArtworkIds.has(a.id))}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        const newSet = new Set(selectedArtworkIds);
-                        filteredArtworks.forEach((a) => newSet.add(a.id));
-                        setSelectedArtworkIds(newSet);
-                      } else {
-                        const newSet = new Set(selectedArtworkIds);
-                        filteredArtworks.forEach((a) => newSet.delete(a.id));
-                        setSelectedArtworkIds(newSet);
-                      }
-                    }}
+                    onChange={toggleSelectAll}
                     className="w-4 h-4 rounded border-border accent-amber-600 cursor-pointer"
-                    title="Select all visible artworks"
+                    title={filteredArtworks.length > 0 && filteredArtworks.every((a) => selectedArtworkIds.has(a.id)) ? "Deselect all visible artworks" : "Select all visible artworks"}
                   />
                 </TableHead>
                 <TableHead className="w-12">Preview</TableHead>
@@ -1059,15 +1062,7 @@ export default function ArtworksAdminPage() {
                     <input
                       type="checkbox"
                       checked={selectedArtworkIds.has(art.id)}
-                      onChange={(e) => {
-                        const newSet = new Set(selectedArtworkIds);
-                        if (e.target.checked) {
-                          newSet.add(art.id);
-                        } else {
-                          newSet.delete(art.id);
-                        }
-                        setSelectedArtworkIds(newSet);
-                      }}
+                      onChange={() => toggleSelectOne(art.id)}
                       className="w-4 h-4 rounded border-border accent-amber-600 cursor-pointer"
                       title="Select for print display placards"
                     />

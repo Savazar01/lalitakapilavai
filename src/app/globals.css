@@ -914,6 +914,102 @@ body {
   pointer-events: auto !important;
 }
 
+/* =============================================================================
+ * Isolated Placard & Visiting Card Print Driver Engine
+ * Completely prevents admin dashboard, modals, and overlays from bleeding into print
+ * ============================================================================= */
+@media print {
+  body:has(#placard-print-root),
+  body.printing-placards {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body:has(#placard-print-root) > *:not([data-radix-portal]),
+  body.printing-placards > *:not([data-radix-portal]),
+  body:has(#placard-print-root) nav,
+  body:has(#placard-print-root) header,
+  body:has(#placard-print-root) aside,
+  body:has(#placard-print-root) footer,
+  body:has(#placard-print-root) .no-print,
+  body:has(#placard-print-root) [data-sonner-toaster],
+  body.printing-placards nav,
+  body.printing-placards header,
+  body.printing-placards aside,
+  body.printing-placards footer,
+  body.printing-placards .no-print,
+  body.printing-placards [data-sonner-toaster] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Neutralize Radix Dialog / Portal constraints for print */
+  body:has(#placard-print-root) [data-radix-portal],
+  body.printing-placards [data-radix-portal],
+  body:has(#placard-print-root) [role="dialog"],
+  body.printing-placards [role="dialog"] {
+    position: static !important;
+    transform: none !important;
+    max-width: none !important;
+    max-height: none !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide modal overlay / backdrop */
+  body:has(#placard-print-root) [data-radix-portal] > div.fixed.inset-0,
+  body.printing-placards [data-radix-portal] > div.fixed.inset-0,
+  body:has(#placard-print-root) [data-state="open"].fixed.inset-0,
+  body.printing-placards [data-state="open"].fixed.inset-0 {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide dialog header, buttons, tabs, editor, footer */
+  body:has(#placard-print-root) [role="dialog"] > div > *:not(:has(#placard-print-root)),
+  body.printing-placards [role="dialog"] > div > *:not(:has(#placard-print-root)),
+  body:has(#placard-print-root) [role="dialog"] button,
+  body.printing-placards [role="dialog"] button,
+  body:has(#placard-print-root) [data-radix-collection-item],
+  body.printing-placards [data-radix-collection-item] {
+    display: none !important;
+  }
+
+  /* Only display the isolated placard print container */
+  #placard-print-root {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 6mm !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    z-index: 999999 !important;
+  }
+
+  #placard-print-root,
+  #placard-print-root * {
+    visibility: visible !important;
+  }
+}
+
 
 
 

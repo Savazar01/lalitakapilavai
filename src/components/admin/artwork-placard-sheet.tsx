@@ -167,8 +167,26 @@ export function ArtworkPlacardSheet({
     });
   };
 
+  React.useEffect(() => {
+    return () => {
+      if (typeof document !== "undefined") {
+        document.body.classList.remove("printing-placards");
+      }
+    };
+  }, []);
+
   const handlePrint = () => {
     setActiveTab("preview");
+    if (typeof document !== "undefined") {
+      document.body.classList.add("printing-placards");
+    }
+    const cleanup = () => {
+      if (typeof document !== "undefined") {
+        document.body.classList.remove("printing-placards");
+      }
+      window.removeEventListener("afterprint", cleanup);
+    };
+    window.addEventListener("afterprint", cleanup);
     setTimeout(() => {
       window.print();
     }, 150);
@@ -376,12 +394,12 @@ export function ArtworkPlacardSheet({
 
         {/* Tab 1: Live Interactive Print Preview */}
         {activeTab === "preview" && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60 print:p-0 print:m-0 print:overflow-visible print:bg-transparent">
             <div
-              id="artwork-printable-sheet"
+              id="placard-print-root"
               className={cn(
                 "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all",
-                "print:w-full print:bg-white print:text-black",
+                "print:w-full print:max-w-none print:m-0 print:bg-white print:text-black print:block",
                 // Responsive & Print Grid Layout
                 cardFormat === "visiting-card"
                   ? orientation === "landscape"
@@ -703,31 +721,76 @@ export function ArtworkPlacardSheet({
         </DialogFooter>
       </DialogContent>
 
-      {/* Scoped Print Media Stylesheet */}
-      <style jsx global>{`
+      {/* Isolated Print Media Stylesheet */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           @page {
             size: auto;
-            margin: 8mm;
+            margin: 6mm !important;
           }
-          body {
-            background: white !important;
-            color: black !important;
+          body, html {
+            background: #ffffff !important;
+            color: #000000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
-          /* Hide non-print dialog wrappers */
-          nav, header, footer, aside, .no-print, [role="dialog"] > div:not(:has(#artwork-printable-sheet)) {
+          /* Completely hide the background admin layout & body chrome */
+          body > *:not([data-radix-portal]),
+          nav, header, footer, aside, .no-print, [data-sonner-toaster] {
             display: none !important;
+            visibility: hidden !important;
           }
-          /* Ensure printable sheet is top-level */
-          #artwork-printable-sheet {
+          /* Neutralize modal wrapper and hide backdrop overlay */
+          [data-radix-portal] > div.fixed.inset-0,
+          [data-state="open"].fixed.inset-0 {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+          }
+          [data-radix-portal], [role="dialog"] {
+            position: static !important;
+            transform: none !important;
+            max-width: none !important;
+            max-height: none !important;
+            width: 100% !important;
+            height: auto !important;
+            overflow: visible !important;
+            background: transparent !important;
+            border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
+            margin: 0 !important;
+          }
+          /* Hide dialog header, tabs, editor, close button and footer */
+          [role="dialog"] > div > *:not(:has(#placard-print-root)),
+          [role="dialog"] button,
+          [data-radix-collection-item] {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          /* Isolate placard print container */
+          #placard-print-root {
+            display: block !important;
+            visibility: visible !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
             width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 4mm !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            border: none !important;
+            z-index: 999999 !important;
+          }
+          #placard-print-root * {
+            visibility: visible !important;
           }
         }
-      `}</style>
+      `}} />
     </Dialog>
   );
 }
