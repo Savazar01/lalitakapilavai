@@ -310,7 +310,7 @@ export function ExhibitionWallBlock({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.0;
 
     const texLoader = new THREE.TextureLoader();
     texLoader.crossOrigin = "anonymous";
@@ -318,17 +318,17 @@ export function ExhibitionWallBlock({
     // Ambient Lighting
     const ambientLight = new THREE.AmbientLight(
       new THREE.Color(env.lightingColor),
-      0.9
+      0.85
     );
     scene.add(ambientLight);
 
     // Directional Ceiling Main Tracking Spotlight
     const spotlight = new THREE.SpotLight(
       new THREE.Color(env.lightingColor),
-      env.spotlightIntensity * 28,
+      env.spotlightIntensity * 12,
       28,
       Math.PI / 4,
-      0.45,
+      0.55,
       1.3
     );
     spotlight.position.set(0, 5.6, 5.2);
@@ -339,11 +339,11 @@ export function ExhibitionWallBlock({
     scene.add(spotlight.target);
 
     // Side Fill Lights for Fine-Art Chiaroscuro Richness
-    const leftFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 12, 16);
+    const leftFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 8, 16);
     leftFill.position.set(-5.0, 4.2, 4.0);
     scene.add(leftFill);
 
-    const rightFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 12, 16);
+    const rightFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 8, 16);
     rightFill.position.set(5.0, 4.2, 4.0);
     scene.add(rightFill);
 
@@ -352,10 +352,10 @@ export function ExhibitionWallBlock({
     placements.forEach((placement) => {
       const artSpot = new THREE.SpotLight(
         new THREE.Color(env.lightingColor),
-        env.spotlightIntensity * 14,
+        env.spotlightIntensity * 6,
         14,
         Math.PI / 5.5,
-        0.75, // Soft radial penumbra
+        0.8, // Soft radial penumbra
         1.5   // Realistic physical decay
       );
       artSpot.position.set(placement.x, 5.4, 2.6);
@@ -376,12 +376,12 @@ export function ExhibitionWallBlock({
     wCtx.fillStyle = env.wallBgColor;
     wCtx.fillRect(0, 0, 1024, 512);
 
-    // 2. Layered Gentle Diffuse Museum Track-Light Wash
-    const trackLightGrad = wCtx.createRadialGradient(512, 120, 30, 512, 180, 540);
-    trackLightGrad.addColorStop(0, "rgba(255, 255, 255, 0.45)");
-    trackLightGrad.addColorStop(0.35, "rgba(255, 255, 255, 0.16)");
-    trackLightGrad.addColorStop(0.7, "rgba(255, 255, 255, 0.03)");
-    trackLightGrad.addColorStop(1, "rgba(0, 0, 0, 0.18)");
+    // 2. Layered Gentle Diffuse Museum Track-Light Wash - placed on back wall behind artwork
+    const trackLightGrad = wCtx.createRadialGradient(512, 110, 30, 512, 170, 520);
+    trackLightGrad.addColorStop(0, "rgba(255, 248, 230, 0.14)");
+    trackLightGrad.addColorStop(0.45, "rgba(212, 175, 55, 0.05)");
+    trackLightGrad.addColorStop(0.85, "transparent");
+    trackLightGrad.addColorStop(1, "rgba(0, 0, 0, 0.12)");
     wCtx.fillStyle = trackLightGrad;
     wCtx.fillRect(0, 0, 1024, 512);
 
@@ -775,11 +775,12 @@ export function ExhibitionWallBlock({
       state.scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.032);
     }
     state.ambientLight.color.set(env.lightingColor);
+    state.ambientLight.intensity = 0.85;
     state.spotlight.color.set(env.lightingColor);
-    state.spotlight.intensity = env.spotlightIntensity * 28;
+    state.spotlight.intensity = env.spotlightIntensity * 12;
     state.artSpotlights.forEach((s) => {
       s.color.set(env.lightingColor);
-      s.intensity = env.spotlightIntensity * 14;
+      s.intensity = env.spotlightIntensity * 6;
     });
   }, [env, isCustomBackdrop]);
 
@@ -803,9 +804,12 @@ export function ExhibitionWallBlock({
       const dWidth = (frameW / 0.75) / (2 * Math.tan(vFovRad / 2) * aspect);
       const idealDistance = Math.max(dHeight, dWidth, 1.5);
 
-      // Shift camera target slightly to the right so the artwork is framed comfortably in the left ~60% of the canvas,
+      // Shift camera target slightly to the right on desktop so the artwork is framed comfortably in the left ~60% of the canvas,
       // leaving room for the side-mounted gallery wall placard on the right ~35% of the frame.
-      const sideShiftX = idealDistance * Math.tan(vFovRad / 2) * aspect * 0.28;
+      // On mobile viewports (< 768px), keep artwork 100% centered and unobstructed.
+      const isMobileViewport =
+        (containerRef.current?.clientWidth || (typeof window !== "undefined" ? window.innerWidth : 1024)) < 768;
+      const sideShiftX = isMobileViewport ? 0 : idealDistance * Math.tan(vFovRad / 2) * aspect * 0.28;
 
       if (activeTourStyle === "inspection") {
         // Macro archival inspection close-up
@@ -942,41 +946,54 @@ export function ExhibitionWallBlock({
           className="w-full h-full block cursor-pointer touch-none"
         />
 
-        {/* Synchronized Side-Mounted Artwork Placard on the Gallery Wall */}
+        {/* Synchronized Side-Mounted Artwork Placard on the Gallery Wall - hidden on mobile (< 768px) */}
         {!isOverview && activePlacement && (
           <div
             className={cn(
-              "absolute right-3 sm:right-6 md:right-10 top-1/2 -translate-y-1/2",
+              "hidden md:block absolute right-3 sm:right-6 md:right-10 top-1/2 -translate-y-1/2",
               "w-[220px] sm:w-[260px] md:w-[290px]",
-              "p-3.5 sm:p-4 bg-white/95 text-stone-900 rounded-[2px] shadow-2xl",
+              "p-3.5 sm:p-4 rounded-[2px] shadow-2xl",
               "border border-stone-300 dark:border-stone-400 backdrop-blur-md z-20 pointer-events-auto",
-              "transition-all duration-500 animate-in fade-in slide-in-from-right-6"
+              "transition-all duration-500 animate-in fade-in slide-in-from-right-6 isolate [color-scheme:light]"
             )}
+            style={{ backgroundColor: "#FFFFFF", color: "#111827" }}
           >
             {/* Subtle Fillet Double Border */}
             <div className="absolute inset-1 border border-amber-600/30 pointer-events-none rounded-[1px]" />
 
             {/* Top Bar: Category / Traditional School on Left; Artist Name on Right */}
             <div className="relative z-10 flex items-center justify-between border-b border-amber-600/30 pb-1 mb-2">
-              <span className="font-serif text-[8.5px] sm:text-[9.5px] tracking-wider uppercase font-bold text-amber-900 truncate max-w-[130px]">
+              <span
+                className="font-serif text-[8.5px] sm:text-[9.5px] tracking-wider uppercase font-bold truncate max-w-[130px]"
+                style={{ color: "#854D0E" }}
+              >
                 {activePlacement.item.artwork?.traditionalSchool ||
                   activePlacement.item.artwork?.category?.name ||
                   activePlacement.item.traditionalSchool ||
                   "Traditional Indian Art"}
               </span>
-              <span className="font-serif text-[8.5px] sm:text-[9.5px] tracking-wide text-stone-800 font-semibold shrink-0">
+              <span
+                className="font-serif text-[8.5px] sm:text-[9.5px] tracking-wide font-semibold shrink-0"
+                style={{ color: "#374151" }}
+              >
                 Lalita Kapilavai
               </span>
             </div>
 
             {/* Title (prominent serif) */}
             <div className="relative z-10 space-y-1">
-              <h3 className="font-serif font-bold text-sm sm:text-base text-stone-950 leading-snug italic">
+              <h3
+                className="font-serif font-bold text-sm sm:text-base leading-snug italic"
+                style={{ color: "#111827" }}
+              >
                 {activePlacement.item.title || activePlacement.item.artwork?.title || "Masterwork"}
               </h3>
 
               {/* Medium */}
-              <p className="text-[10px] sm:text-[10.5px] font-serif italic text-stone-700 leading-tight">
+              <p
+                className="text-[10px] sm:text-[10.5px] font-serif italic leading-tight"
+                style={{ color: "#374151" }}
+              >
                 {activePlacement.item.artwork?.medium ||
                   activePlacement.item.medium ||
                   activePlacement.item.description ||
@@ -984,7 +1001,10 @@ export function ExhibitionWallBlock({
               </p>
 
               {/* Dimensions & Year */}
-              <p className="text-[8.5px] sm:text-[9px] font-mono text-stone-600 leading-tight">
+              <p
+                className="text-[8.5px] sm:text-[9px] font-mono leading-tight"
+                style={{ color: "#4B5563" }}
+              >
                 {[
                   activePlacement.item.artwork?.dimensions || activePlacement.item.dimensions,
                   activePlacement.item.artwork?.yearCreated || activePlacement.item.year,
@@ -997,14 +1017,23 @@ export function ExhibitionWallBlock({
             {/* Bottom: QR Code with 'Scan for Provenance' */}
             <div className="relative z-10 mt-2.5 pt-2 border-t border-stone-200 flex items-center justify-between gap-2">
               <div className="space-y-0.5">
-                <span className="text-[8px] sm:text-[8.5px] font-serif font-semibold text-stone-900 block leading-tight">
+                <span
+                  className="text-[8px] sm:text-[8.5px] font-serif font-semibold block leading-tight"
+                  style={{ color: "#111827" }}
+                >
                   Scan for Provenance
                 </span>
-                <span className="text-[7px] sm:text-[7.5px] text-stone-500 block leading-tight">
+                <span
+                  className="text-[7px] sm:text-[7.5px] block leading-tight"
+                  style={{ color: "#4B5563" }}
+                >
                   Verified Atelier Archive
                 </span>
               </div>
-              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white p-0.5 rounded border border-stone-300 shadow-xs shrink-0 flex items-center justify-center">
+              <div
+                className="w-9 h-9 sm:w-10 sm:h-10 p-0.5 rounded border border-stone-300 shadow-xs shrink-0 flex items-center justify-center"
+                style={{ backgroundColor: "#FFFFFF" }}
+              >
                 {sidePlacardQrUrl ? (
                   <img
                     src={sidePlacardQrUrl}

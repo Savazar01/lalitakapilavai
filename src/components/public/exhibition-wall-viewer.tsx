@@ -64,7 +64,7 @@ export const WALL_ENVIRONMENTS: WallEnvironment[] = [
       background: "linear-gradient(to bottom, #1C120C 0%, #2C1D13 40%, #0F0906 100%)",
     },
     ambientLight: "rgba(212, 175, 55, 0.15)",
-    spotlightGlow: "radial-gradient(circle at 50% 38%, rgba(255, 220, 130, 0.45) 0%, rgba(212, 175, 55, 0.15) 40%, transparent 75%)",
+    spotlightGlow: "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)",
   },
   {
     id: "mysore-darbar",
@@ -80,7 +80,7 @@ export const WALL_ENVIRONMENTS: WallEnvironment[] = [
       background: "linear-gradient(to bottom, #24140E 0%, #3D2218 40%, #140B08 100%)",
     },
     ambientLight: "rgba(230, 198, 90, 0.18)",
-    spotlightGlow: "radial-gradient(circle at 50% 38%, rgba(255, 235, 170, 0.4) 0%, rgba(230, 198, 90, 0.12) 42%, transparent 75%)",
+    spotlightGlow: "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)",
   },
   {
     id: "pahari-veranda",
@@ -96,7 +96,7 @@ export const WALL_ENVIRONMENTS: WallEnvironment[] = [
       background: "linear-gradient(to bottom, #4A3525 0%, #634732 40%, #2E2117 100%)",
     },
     ambientLight: "rgba(255, 245, 220, 0.35)",
-    spotlightGlow: "radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.6) 0%, rgba(251, 248, 241, 0.25) 45%, transparent 75%)",
+    spotlightGlow: "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)",
   },
   {
     id: "temple-mandapa",
@@ -112,7 +112,7 @@ export const WALL_ENVIRONMENTS: WallEnvironment[] = [
       background: "linear-gradient(to bottom, #141416 0%, #222226 40%, #0A0A0C 100%)",
     },
     ambientLight: "rgba(255, 160, 40, 0.2)",
-    spotlightGlow: "radial-gradient(circle at 50% 38%, rgba(255, 190, 80, 0.5) 0%, rgba(212, 120, 20, 0.2) 40%, transparent 75%)",
+    spotlightGlow: "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)",
   },
   {
     id: "white-cube",
@@ -128,7 +128,7 @@ export const WALL_ENVIRONMENTS: WallEnvironment[] = [
       background: "linear-gradient(to bottom, #5A5A5A 0%, #757575 40%, #3D3D3D 100%)",
     },
     ambientLight: "rgba(255, 255, 255, 0.5)",
-    spotlightGlow: "radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.75) 0%, rgba(240, 240, 240, 0.3) 45%, transparent 75%)",
+    spotlightGlow: "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)",
   },
   {
     id: "university-hall",
@@ -144,7 +144,7 @@ export const WALL_ENVIRONMENTS: WallEnvironment[] = [
       background: "linear-gradient(to bottom, #140E0A 0%, #2B1D15 40%, #0D0907 100%)",
     },
     ambientLight: "rgba(220, 180, 120, 0.2)",
-    spotlightGlow: "radial-gradient(circle at 50% 38%, rgba(255, 230, 180, 0.45) 0%, rgba(200, 160, 100, 0.15) 42%, transparent 75%)",
+    spotlightGlow: "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)",
   },
   {
     id: "heritage-nave",
@@ -160,7 +160,7 @@ export const WALL_ENVIRONMENTS: WallEnvironment[] = [
       background: "linear-gradient(to bottom, #1A130E 0%, #33261C 40%, #100C09 100%)",
     },
     ambientLight: "rgba(255, 200, 120, 0.2)",
-    spotlightGlow: "radial-gradient(circle at 50% 38%, rgba(255, 215, 150, 0.45) 0%, rgba(212, 160, 80, 0.18) 40%, transparent 75%)",
+    spotlightGlow: "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)",
   },
 ];
 
@@ -297,8 +297,8 @@ export function ExhibitionWallViewer({
 
   const lightOverlay =
     lightMode === "warm"
-      ? "radial-gradient(circle at 50% 36%, rgba(255, 215, 120, 0.38) 0%, rgba(212, 175, 55, 0.12) 45%, transparent 75%)"
-      : "radial-gradient(circle at 50% 36%, rgba(240, 245, 255, 0.42) 0%, rgba(200, 220, 255, 0.10) 45%, transparent 75%)";
+      ? "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)"
+      : "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(240, 245, 255, 0.14) 0%, rgba(200, 220, 255, 0.05) 50%, transparent 85%)";
 
   return (
     <div className="relative w-full h-full min-h-[90vh] flex flex-col bg-stone-950 text-stone-100 select-none overflow-hidden font-sans">
@@ -413,14 +413,14 @@ export function ExhibitionWallViewer({
             className="relative w-full flex-1 flex items-center justify-center transition-all duration-700 overflow-hidden"
             style={activeEnv.wallStyle}
           >
-            {/* Dynamic Spotlight Glow Layer */}
+            {/* Dynamic Spotlight Glow Layer - placed strictly behind the artwork frame */}
             <div
-              className="absolute inset-0 pointer-events-none transition-all duration-700"
+              className="absolute inset-0 pointer-events-none transition-all duration-700 z-[1]"
               style={{ background: lightOverlay }}
             />
 
             {/* Ceiling shadow falloff */}
-            <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+            <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none z-[2]" />
 
             {/* Mounted Masterwork Stage Frame */}
             <div
@@ -436,58 +436,70 @@ export function ExhibitionWallViewer({
                 <div className={cn("transition-all duration-500", activeFrame.innerMatClass)}>
                   {/* Gold Beading / Fillet Border */}
                   <div className={cn("relative overflow-hidden", activeFrame.goldBeadClass)}>
-                    {/* Artwork Image with Specular Sheen */}
+                    {/* Artwork Image with 100% Opacity and Natural Color Rendering */}
                     <div className="relative w-64 sm:w-80 md:w-96 aspect-[3/4] max-h-[58vh]">
                       <img
                         src={artwork.imageUrl}
                         alt={artwork.title}
                         className="w-full h-full object-cover object-center"
                       />
-
-                      {/* 22k Gold Foil directional reflection sheen */}
-                      <div
-                        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-40 transition-opacity"
-                        style={{
-                          background:
-                            lightMode === "warm"
-                              ? "radial-gradient(circle at 45% 30%, rgba(255,230,150,0.8) 0%, transparent 60%)"
-                              : "radial-gradient(circle at 45% 30%, rgba(255,255,255,0.7) 0%, transparent 60%)",
-                        }}
-                      />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Museum Exhibition Placard */}
+              {/* Museum Exhibition Placard - hidden on mobile viewports (< 768px) */}
               {showPlacard && (
                 <div
-                  className="absolute -bottom-16 sm:-bottom-20 right-0 sm:-right-24 md:-right-36 p-3 sm:p-3.5 rounded bg-[#FAF7F2] text-stone-900 shadow-2xl border border-stone-300 w-52 sm:w-60 z-20 text-left transition-all"
-                  style={{ transform: `scale(${100 / artworkScale})`, transformOrigin: "top left" }}
+                  className="hidden md:block absolute -bottom-16 sm:-bottom-20 right-0 sm:-right-24 md:-right-36 p-3 sm:p-3.5 rounded shadow-2xl border border-stone-300 w-52 sm:w-60 z-20 text-left transition-all isolate [color-scheme:light]"
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    color: "#111827",
+                    transform: `scale(${100 / artworkScale})`,
+                    transformOrigin: "top left",
+                  }}
                 >
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <span className="text-[9px] font-mono uppercase tracking-widest text-amber-800 font-bold">
+                    <span
+                      className="text-[9px] font-mono uppercase tracking-widest font-bold"
+                      style={{ color: "#854D0E" }}
+                    >
                       Atelier Lalita Kapilavai
                     </span>
                     <QrCode className="w-4 h-4 text-stone-500 shrink-0" />
                   </div>
-                  <h4 className="text-xs font-serif font-bold text-stone-900 leading-tight">
+                  <h4
+                    className="text-xs font-serif font-bold leading-tight"
+                    style={{ color: "#111827" }}
+                  >
                     {artwork.title}
                   </h4>
                   {artwork.subtitle && (
-                    <p className="text-[10px] text-stone-600 font-serif italic mb-1">
+                    <p
+                      className="text-[10px] font-serif italic mb-1"
+                      style={{ color: "#374151" }}
+                    >
                       {artwork.subtitle}
                     </p>
                   )}
-                  <p className="text-[9px] text-stone-700 leading-tight mb-1">
+                  <p
+                    className="text-[9px] leading-tight mb-1"
+                    style={{ color: "#374151" }}
+                  >
                     {artwork.medium}
                   </p>
-                  <div className="flex items-center justify-between text-[9px] font-mono text-stone-500 border-t border-stone-200 pt-1 mt-1">
+                  <div
+                    className="flex items-center justify-between text-[9px] font-mono border-t border-stone-200 pt-1 mt-1"
+                    style={{ color: "#4B5563" }}
+                  >
                     <span>{artwork.dimensions}</span>
                     <span>{artwork.period}</span>
                   </div>
                   {artwork.ragaLink && (
-                    <div className="text-[9px] font-mono text-amber-900 font-semibold mt-1">
+                    <div
+                      className="text-[9px] font-mono font-semibold mt-1"
+                      style={{ color: "#854D0E" }}
+                    >
                       Synesthesia: {artwork.ragaLink}
                     </div>
                   )}
