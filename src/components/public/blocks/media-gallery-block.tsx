@@ -20,6 +20,21 @@ const KenBurnsCanvas = dynamic(
   }
 );
 
+const ExhibitionWallBlock = dynamic(
+  () =>
+    import("./gallery-exhibition-wall/exhibition-wall-block").then(
+      (mod) => mod.ExhibitionWallBlock
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[560px] flex items-center justify-center rounded-2xl bg-stone-950 border border-amber-500/20 text-amber-300 text-sm font-serif">
+        Constructing Architectural Exhibition Wall...
+      </div>
+    ),
+  }
+);
+
 export interface MediaGalleryItem {
   id: string;
   url: string;
@@ -36,7 +51,8 @@ export type MediaGalleryDisplayMode =
   | "collage"
   | "ken-burns"
   | "soft-crossfade"
-  | "filmstrip";
+  | "filmstrip"
+  | "exhibition-wall";
 
 export interface MediaGalleryBlockProps {
   items?: MediaGalleryItem[];
@@ -48,6 +64,16 @@ export interface MediaGalleryBlockProps {
   overlayTitleColor?: string;
   overlayTextColor?: string;
   className?: string;
+  canvasBgColor?: string;
+  borderFilletColor?: string;
+  borderWidth?: number;
+  framePadding?: number;
+  showCaptionRibbon?: boolean;
+  environmentId?: string;
+  customWallUrl?: string;
+  cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
+  wallLayout?: "salon" | "linear" | "grid";
+  autoplayTour?: boolean;
 }
 
 // Helper to resolve item link
@@ -162,6 +188,16 @@ export function MediaGalleryBlock({
   overlayTitleColor,
   overlayTextColor,
   className = "",
+  canvasBgColor,
+  borderFilletColor = "#D4AF37",
+  borderWidth = 0,
+  framePadding = 0,
+  showCaptionRibbon = false,
+  environmentId = "london-school-arts",
+  customWallUrl,
+  cameraTourStyle = "drone",
+  wallLayout = "salon",
+  autoplayTour = true,
 }: MediaGalleryBlockProps) {
   // Filter out empty items
   const validItems = React.useMemo(() => {
@@ -254,6 +290,24 @@ export function MediaGalleryBlock({
   }
 
   /* -------------------------------------------------------------
+   * MODE: ARCHITECTURAL 3D EXHIBITION SALON WALL
+   * ----------------------------------------------------------- */
+  if (displayMode === "exhibition-wall") {
+    return (
+      <ExhibitionWallBlock
+        items={validItems}
+        environmentId={environmentId}
+        customWallUrl={customWallUrl}
+        cameraTourStyle={cameraTourStyle}
+        wallLayout={wallLayout}
+        autoplayTour={autoplayTour}
+        tourSpeedSeconds={autoplayTimer}
+        className={className}
+      />
+    );
+  }
+
+  /* -------------------------------------------------------------
    * CINEMA KEN BURNS MODE
    * ----------------------------------------------------------- */
   if (displayMode === "ken-burns") {
@@ -267,6 +321,11 @@ export function MediaGalleryBlock({
         overlayTitleColor={overlayTitleColor}
         overlayTextColor={overlayTextColor}
         className={className}
+        canvasBgColor={canvasBgColor}
+        borderFilletColor={borderFilletColor}
+        borderWidth={borderWidth}
+        framePadding={framePadding}
+        showCaptionRibbon={showCaptionRibbon}
       />
     );
   }
@@ -277,9 +336,6 @@ export function MediaGalleryBlock({
   if (displayMode === "soft-crossfade") {
     const activeItem = validItems[currentIndex] || validItems[0];
     const isLinked = !!getItemHref(activeItem);
-    const isParchment = kenBurnsOverlayTheme === "parchment-gold";
-    const titleColor = overlayTitleColor || (isParchment ? "#0F172A" : "#F8FAFC");
-    const captionColor = overlayTextColor || (isParchment ? "#334155" : "#E2E8F0");
 
     return (
       <div
@@ -287,155 +343,125 @@ export function MediaGalleryBlock({
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        <div className={cn("relative w-full overflow-hidden bg-stone-950", aspectClass, frameClasses)}>
-          {validItems.map((item, idx) => (
-            <div
-              key={item.id || idx}
-              className={cn(
-                "absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out",
-                idx === currentIndex ? "opacity-100 z-10 pointer-events-auto" : "opacity-0 z-0 pointer-events-none"
-              )}
-            >
-              <ItemLinkWrapper item={item} className="w-full h-full relative block">
-                <ProtectedImage
-                  src={item.url}
-                  alt={item.alt || item.title || "Gallery image"}
-                  useImg={true}
-                  className={cn(
-                    "w-full h-full object-cover transition-transform duration-7000 ease-out",
-                    idx === currentIndex ? "scale-105" : "scale-100"
-                  )}
-                  wrapperClassName="w-full h-full"
-                />
-              </ItemLinkWrapper>
-            </div>
-          ))}
-
-          {/* Atmospheric Scrim */}
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/20 to-stone-950/30 pointer-events-none z-15" />
-
-          {/* Top Archival Badge */}
-          <div className="absolute top-4 left-4 z-20 pointer-events-none">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-stone-900/80 text-amber-300 border border-amber-500/30 backdrop-blur-md shadow-md">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              Soft Crossfade &amp; Fine Art Reveal
-            </span>
-          </div>
-
-          {/* Prev / Next Controls */}
-          {validItems.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  prevSlide();
-                }}
-                aria-label="Previous Slide"
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-25 w-9 h-9 rounded-full bg-stone-950/70 hover:bg-stone-900 border border-amber-500/40 text-amber-300 flex items-center justify-center transition-all opacity-80 group-hover/crossfade:opacity-100 shadow-md cursor-pointer hover:scale-105"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  nextSlide();
-                }}
-                aria-label="Next Slide"
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-25 w-9 h-9 rounded-full bg-stone-950/70 hover:bg-stone-900 border border-amber-500/40 text-amber-300 flex items-center justify-center transition-all opacity-80 group-hover/crossfade:opacity-100 shadow-md cursor-pointer hover:scale-105"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
+        {/* Outer Matting & Border Frame Container */}
+        <div
+          className={cn(
+            "relative w-full rounded-2xl overflow-hidden transition-all duration-300 shadow-2xl",
+            frameStyle === "heritage" && "ring-1 ring-amber-500/30 shadow-[0_8px_32px_rgba(212,175,55,0.15)]",
+            frameStyle === "floating" && "shadow-2xl ring-1 ring-black/10 dark:ring-white/10",
+            frameStyle === "minimal" && "border border-border/80"
           )}
-
-          {/* Placard Overlay */}
-          <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 z-20 pointer-events-auto">
-            {kenBurnsOverlayTheme === "minimal-subtle" ? (
-              <div className="bg-stone-950/80 backdrop-blur-md px-4 py-2.5 rounded-lg border border-white/10 flex items-center justify-between gap-3 shadow-xl">
-                <div>
-                  <h4 className="text-sm font-serif font-bold leading-tight" style={{ color: overlayTitleColor || "#FFFFFF" }}>
-                    {activeItem.title || activeItem.alt || "Fine Art Composition"}
-                  </h4>
-                  {activeItem.caption && (
-                    <p className="text-[11px] line-clamp-1 max-w-xl" style={{ color: overlayTextColor || "#D1D5DB" }}>
-                      {activeItem.caption}
-                    </p>
-                  )}
-                </div>
-                {isLinked && (
-                  <ItemLinkWrapper item={activeItem}>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold">
-                      Explore <ExternalLink className="w-3 h-3" />
-                    </span>
-                  </ItemLinkWrapper>
-                )}
-              </div>
-            ) : (
+          style={{
+            backgroundColor: canvasBgColor || "transparent",
+            padding: framePadding ? `${framePadding}px` : undefined,
+            border: borderWidth > 0 ? `${borderWidth}px solid ${borderFilletColor}` : undefined,
+          }}
+        >
+          <div className={cn("relative w-full overflow-hidden bg-stone-950 rounded-xl", aspectClass)}>
+            {validItems.map((item, idx) => (
               <div
+                key={item.id || idx}
                 className={cn(
-                  "p-4 sm:p-5 rounded-xl backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xl transition-all duration-300",
-                  isParchment
-                    ? "bg-[#FAF7F2]/95 border-2 border-amber-600/50 shadow-amber-950/15"
-                    : "bg-[#0B0F17]/90 border border-amber-500/40 shadow-black/60"
+                  "absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out",
+                  idx === currentIndex ? "opacity-100 z-10 pointer-events-auto" : "opacity-0 z-0 pointer-events-none"
                 )}
               >
-                <div className="space-y-1">
-                  <span
-                    className="text-[10px] font-mono uppercase tracking-widest font-bold"
-                    style={{ color: isParchment ? "#B45309" : "#FBBF24" }}
-                  >
-                    Plate {currentIndex + 1} of {validItems.length}
-                  </span>
-                  <h4 className="text-base sm:text-lg font-serif font-bold leading-tight" style={{ color: titleColor }}>
-                    {activeItem.title || activeItem.alt || "Fine Art Composition"}
-                  </h4>
-                  {activeItem.caption && (
-                    <p className="text-xs line-clamp-1 max-w-xl" style={{ color: captionColor }}>
-                      {activeItem.caption}
-                    </p>
-                  )}
-                </div>
-                {isLinked && (
-                  <ItemLinkWrapper item={activeItem}>
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold shadow-xs self-start sm:self-auto",
-                        isParchment
-                          ? "bg-amber-600 text-white hover:bg-amber-700 border border-amber-700/40"
-                          : "bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40"
-                      )}
-                    >
-                      View Masterwork <ExternalLink className="w-3.5 h-3.5" />
-                    </span>
-                  </ItemLinkWrapper>
-                )}
+                <ItemLinkWrapper item={item} className="w-full h-full relative block">
+                  <ProtectedImage
+                    src={item.url}
+                    alt={item.alt || item.title || "Gallery image"}
+                    useImg={true}
+                    className={cn(
+                      "w-full h-full object-cover transition-transform duration-7000 ease-out",
+                      idx === currentIndex ? "scale-105" : "scale-100"
+                    )}
+                    wrapperClassName="w-full h-full"
+                  />
+                </ItemLinkWrapper>
               </div>
-            )}
-          </div>
+            ))}
 
-          {/* Dots Indicator */}
-          {validItems.length > 1 && (
-            <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-stone-950/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-              {validItems.map((_, idx) => (
+            {/* Prev / Next Controls (Appear on subtle hover) */}
+            {validItems.length > 1 && (
+              <>
                 <button
-                  key={idx}
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setCurrentIndex(idx);
+                    prevSlide();
                   }}
-                  aria-label={`Go to slide ${idx + 1}`}
-                  className={cn(
-                    "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
-                    currentIndex === idx ? "w-5 bg-amber-400" : "w-1.5 bg-stone-400/60 hover:bg-stone-200"
-                  )}
-                />
-              ))}
-            </div>
-          )}
+                  aria-label="Previous Slide"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-25 w-9 h-9 rounded-full bg-stone-950/70 hover:bg-stone-900 border border-amber-500/40 text-amber-300 flex items-center justify-center transition-all opacity-0 group-hover/crossfade:opacity-100 shadow-md cursor-pointer hover:scale-105"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextSlide();
+                  }}
+                  aria-label="Next Slide"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-25 w-9 h-9 rounded-full bg-stone-950/70 hover:bg-stone-900 border border-amber-500/40 text-amber-300 flex items-center justify-center transition-all opacity-0 group-hover/crossfade:opacity-100 shadow-md cursor-pointer hover:scale-105"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            {/* Dots Indicator */}
+            {validItems.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-stone-950/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 opacity-70 group-hover/crossfade:opacity-100 transition-opacity">
+                {validItems.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentIndex(idx);
+                    }}
+                    aria-label={`Go to slide ${idx + 1}`}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
+                      currentIndex === idx ? "w-5 bg-amber-400" : "w-1.5 bg-stone-400/60 hover:bg-stone-200"
+                    )}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Optional Unobtrusive Caption Ribbon (Outside Image Boundary) */}
+        {showCaptionRibbon && activeItem && (activeItem.title || activeItem.caption) && (
+          <div className="mt-3 px-4 py-2.5 rounded-xl bg-card/90 border border-border/80 flex items-center justify-between gap-4 shadow-sm backdrop-blur-xs">
+            <div className="min-w-0 space-y-0.5">
+              <h4
+                className="text-xs sm:text-sm font-serif font-bold text-foreground truncate"
+                style={{ color: overlayTitleColor || undefined }}
+              >
+                {activeItem.title || "Fine Art Masterwork"}
+              </h4>
+              {activeItem.caption && (
+                <p
+                  className="text-[11px] text-muted-foreground truncate"
+                  style={{ color: overlayTextColor || undefined }}
+                >
+                  {activeItem.caption}
+                </p>
+              )}
+            </div>
+
+            {isLinked && (
+              <ItemLinkWrapper item={activeItem}>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-serif font-semibold shrink-0 transition-colors">
+                  <span>Explore Piece</span>
+                  <ExternalLink className="w-3 h-3" />
+                </span>
+              </ItemLinkWrapper>
+            )}
+          </div>
+        )}
       </div>
     );
   }
@@ -546,94 +572,114 @@ export function MediaGalleryBlock({
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        <div className={cn("relative w-full overflow-hidden bg-stone-950/40", aspectClass, frameClasses)}>
-          <ItemLinkWrapper item={activeItem} className="w-full h-full relative">
-            <ProtectedImage
-              src={activeItem.url}
-              alt={activeItem.alt || activeItem.title || "Gallery image"}
-              useImg={true}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              wrapperClassName="w-full h-full"
-            />
-
-            {/* Gradient Scrim for Captions */}
-            {(activeItem.title || activeItem.caption || isLinked) && (
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/30 to-transparent pointer-events-none" />
-            )}
-
-            {/* Caption Overlay */}
-            {(activeItem.title || activeItem.caption || isLinked) && (
-              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 text-left z-10 pointer-events-none">
-                {activeItem.title && (
-                  <h4 className="font-serif font-bold text-base sm:text-xl text-white drop-shadow-md flex items-center gap-2">
-                    {activeItem.title}
-                    {isLinked && (
-                      <span className="text-xs text-amber-300 font-sans font-normal opacity-90 inline-flex items-center gap-0.5">
-                        <ExternalLink className="w-3 h-3" />
-                      </span>
-                    )}
-                  </h4>
-                )}
-                {activeItem.caption && (
-                  <p className="text-xs sm:text-sm text-stone-200/90 leading-relaxed mt-1 max-w-2xl drop-shadow-sm font-sans">
-                    {activeItem.caption}
-                  </p>
-                )}
-              </div>
-            )}
-          </ItemLinkWrapper>
-
-          {/* Previous / Next Controls */}
-          {validItems.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  prevSlide();
-                }}
-                aria-label="Previous Slide"
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-stone-950/70 hover:bg-stone-900 border border-amber-500/40 text-amber-300 flex items-center justify-center transition-all opacity-80 group-hover/carousel:opacity-100 shadow-md cursor-pointer hover:scale-105"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  nextSlide();
-                }}
-                aria-label="Next Slide"
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-stone-950/70 hover:bg-stone-900 border border-amber-500/40 text-amber-300 flex items-center justify-center transition-all opacity-80 group-hover/carousel:opacity-100 shadow-md cursor-pointer hover:scale-105"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
+        {/* Outer Matting & Border Frame Container */}
+        <div
+          className={cn(
+            "relative w-full rounded-2xl overflow-hidden transition-all duration-300 shadow-2xl",
+            frameStyle === "heritage" && "ring-1 ring-amber-500/30 shadow-[0_8px_32px_rgba(212,175,55,0.15)]",
+            frameStyle === "floating" && "shadow-2xl ring-1 ring-black/10 dark:ring-white/10",
+            frameStyle === "minimal" && "border border-border/80"
           )}
+          style={{
+            backgroundColor: canvasBgColor || "transparent",
+            padding: framePadding ? `${framePadding}px` : undefined,
+            border: borderWidth > 0 ? `${borderWidth}px solid ${borderFilletColor}` : undefined,
+          }}
+        >
+          <div className={cn("relative w-full overflow-hidden bg-stone-950/40 rounded-xl", aspectClass)}>
+            <ItemLinkWrapper item={activeItem} className="w-full h-full relative">
+              <ProtectedImage
+                src={activeItem.url}
+                alt={activeItem.alt || activeItem.title || "Gallery image"}
+                useImg={true}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                wrapperClassName="w-full h-full"
+              />
+            </ItemLinkWrapper>
 
-          {/* Dots Indicator Bar */}
-          {validItems.length > 1 && (
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-stone-950/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-              {validItems.map((_, idx) => (
+            {/* Previous / Next Controls */}
+            {validItems.length > 1 && (
+              <>
                 <button
-                  key={idx}
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setCurrentIndex(idx);
+                    prevSlide();
                   }}
-                  aria-label={`Go to slide ${idx + 1}`}
-                  className={cn(
-                    "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
-                    currentIndex === idx
-                      ? "w-5 bg-amber-400"
-                      : "w-1.5 bg-stone-400/60 hover:bg-stone-200"
-                  )}
-                />
-              ))}
-            </div>
-          )}
+                  aria-label="Previous Slide"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-stone-950/70 hover:bg-stone-900 border border-amber-500/40 text-amber-300 flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100 shadow-md cursor-pointer hover:scale-105"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextSlide();
+                  }}
+                  aria-label="Next Slide"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-stone-950/70 hover:bg-stone-900 border border-amber-500/40 text-amber-300 flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100 shadow-md cursor-pointer hover:scale-105"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            {/* Dots Indicator Bar */}
+            {validItems.length > 1 && (
+              <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-stone-950/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 opacity-70 group-hover/carousel:opacity-100 transition-opacity">
+                {validItems.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentIndex(idx);
+                    }}
+                    aria-label={`Go to slide ${idx + 1}`}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
+                      currentIndex === idx
+                        ? "w-5 bg-amber-400"
+                        : "w-1.5 bg-stone-400/60 hover:bg-stone-200"
+                    )}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Optional Unobtrusive Caption Ribbon (Outside Image Boundary) */}
+        {showCaptionRibbon && activeItem && (activeItem.title || activeItem.caption) && (
+          <div className="mt-3 px-4 py-2.5 rounded-xl bg-card/90 border border-border/80 flex items-center justify-between gap-4 shadow-sm backdrop-blur-xs">
+            <div className="min-w-0 space-y-0.5">
+              <h4
+                className="text-xs sm:text-sm font-serif font-bold text-foreground truncate"
+                style={{ color: overlayTitleColor || undefined }}
+              >
+                {activeItem.title || "Fine Art Masterwork"}
+              </h4>
+              {activeItem.caption && (
+                <p
+                  className="text-[11px] text-muted-foreground truncate"
+                  style={{ color: overlayTextColor || undefined }}
+                >
+                  {activeItem.caption}
+                </p>
+              )}
+            </div>
+
+            {isLinked && (
+              <ItemLinkWrapper item={activeItem}>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-serif font-semibold shrink-0 transition-colors">
+                  <span>Explore Piece</span>
+                  <ExternalLink className="w-3 h-3" />
+                </span>
+              </ItemLinkWrapper>
+            )}
+          </div>
+        )}
       </div>
     );
   }

@@ -7,7 +7,6 @@ import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { ArtCanvasViewer } from "@/components/public/art-canvas-viewer";
 import { ExhibitionQrModal } from "@/components/public/exhibition-qr-modal";
-import { ExhibitionSimulatorModal } from "@/components/public/exhibition-simulator-modal";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -289,26 +288,10 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               </a>
             </div>
 
-            {/* Action Buttons: Exhibition Simulator + Acquisition Inquiries */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-              <ExhibitionSimulatorModal
-                artwork={{
-                  title: artwork.title,
-                  subtitle: artwork.category?.name,
-                  medium: artwork.medium,
-                  period: `${artwork.category?.name} • ${artwork.yearCreated}`,
-                  dimensions: artwork.dimensions,
-                  imageUrl: artwork.primaryImageUrl,
-                  ragaLink: artwork.ragaLinks?.[0]?.raga?.name,
-                  slug: artwork.slug,
-                }}
-                triggerText="View on Exhibition Wall"
-                triggerVariant="outline"
-                triggerClassName="w-full sm:w-auto flex-1 font-serif text-amber-800 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/10"
-              />
-
-              <Link href="/commission" className="w-full sm:w-auto flex-1">
-                <Button variant="gold" className="w-full font-serif font-bold gap-2 cursor-pointer">
+            {/* Action Button: Acquisition Inquiries */}
+            <div className="pt-2">
+              <Link href="/commission" className="block w-full">
+                <Button variant="gold" className="w-full font-serif font-bold gap-2 cursor-pointer h-11 text-sm shadow-md">
                   <Sparkles className="w-4 h-4" />
                   Inquire for Acquisition
                 </Button>

@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Film, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { MediaGalleryItem } from "../media-gallery-block";
 import { cn } from "@/lib/utils";
 
-interface KenBurnsCanvasProps {
+export interface KenBurnsCanvasProps {
   items: MediaGalleryItem[];
   autoplayTimer?: number;
   aspectRatio?: string;
@@ -15,6 +15,11 @@ interface KenBurnsCanvasProps {
   overlayTitleColor?: string;
   overlayTextColor?: string;
   className?: string;
+  canvasBgColor?: string;
+  borderFilletColor?: string;
+  borderWidth?: number;
+  framePadding?: number;
+  showCaptionRibbon?: boolean;
 }
 
 interface GoldParticle {
@@ -31,10 +36,16 @@ export function KenBurnsCanvas({
   items,
   autoplayTimer = 6,
   aspectRatio = "landscape",
-  kenBurnsOverlayTheme = "dark-velvet",
+  frameStyle = "heritage",
+  kenBurnsOverlayTheme: _kenBurnsOverlayTheme = "dark-velvet",
   overlayTitleColor,
   overlayTextColor,
   className = "",
+  canvasBgColor,
+  borderFilletColor = "#D4AF37",
+  borderWidth = 0,
+  framePadding = 0,
+  showCaptionRibbon = false,
 }: KenBurnsCanvasProps) {
   const [activeIndex, setActiveIndex] = React.useState<number>(0);
   const particleCanvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -60,7 +71,7 @@ export function KenBurnsCanvas({
     window.addEventListener("resize", handleResize);
 
     const particles: GoldParticle[] = [];
-    const count = 45;
+    const count = 40;
 
     for (let i = 0; i < count; i++) {
       particles.push({
@@ -68,8 +79,8 @@ export function KenBurnsCanvas({
         y: Math.random() * height,
         radius: Math.random() * 2 + 0.8,
         alpha: Math.random() * 0.7 + 0.2,
-        speedY: -(Math.random() * 0.6 + 0.2),
-        speedX: (Math.random() - 0.5) * 0.4,
+        speedY: -(Math.random() * 0.5 + 0.2),
+        speedX: (Math.random() - 0.5) * 0.3,
         oscillation: Math.random() * Math.PI * 2,
       });
     }
@@ -115,166 +126,149 @@ export function KenBurnsCanvas({
     return () => clearInterval(interval);
   }, [autoplayTimer, totalItems]);
 
+  const heightStyle =
+    aspectRatio === "portrait"
+      ? "560px"
+      : aspectRatio === "square"
+      ? "480px"
+      : aspectRatio === "natural"
+      ? "420px"
+      : "450px";
+
   return (
-    <div
-      className={cn(
-        "relative w-full overflow-hidden rounded-2xl border border-amber-500/30 bg-stone-950 select-none shadow-2xl group",
-        className
-      )}
-      style={{ height: aspectRatio === "portrait" ? "560px" : aspectRatio === "square" ? "480px" : "440px" }}
-    >
-      {/* Ken Burns Animated Image */}
-      <AnimatePresence mode="wait">
-        {activeItem && (
-          <motion.div
-            key={activeItem.id || activeIndex}
-            initial={{ scale: 1.02, x: 0, y: 0, opacity: 0 }}
-            animate={{
-              scale: 1.14,
-              x: activeIndex % 2 === 0 ? 15 : -15,
-              y: activeIndex % 2 === 0 ? -10 : 10,
-              opacity: 1,
-            }}
-            exit={{ opacity: 0 }}
-            transition={{
-              scale: { duration: autoplayTimer + 1, ease: "linear" },
-              x: { duration: autoplayTimer + 1, ease: "linear" },
-              y: { duration: autoplayTimer + 1, ease: "linear" },
-              opacity: { duration: 0.8 },
-            }}
-            className="absolute inset-0 w-full h-full"
-          >
-            <img
-              src={activeItem.url}
-              alt={activeItem.title || "Cinema Exhibition"}
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
+    <div className={cn("w-full select-none", className)}>
+      {/* Outer Matting & Border Frame Container */}
+      <div
+        className={cn(
+          "relative w-full rounded-2xl overflow-hidden transition-all duration-300 group shadow-2xl",
+          frameStyle === "heritage" && "ring-1 ring-amber-500/30 shadow-[0_8px_32px_rgba(212,175,55,0.15)]",
+          frameStyle === "floating" && "shadow-2xl ring-1 ring-black/10 dark:ring-white/10",
+          frameStyle === "minimal" && "border border-border/80"
         )}
-      </AnimatePresence>
-
-      {/* Atmospheric Scrim & Light Leak */}
-      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/30 to-stone-950/40 pointer-events-none z-10" />
-
-      {/* 22k Gold Particulate Canvas Layer */}
-      <canvas ref={particleCanvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-15" />
-
-      {/* Top Badge: Cinema Ken Burns */}
-      <div className="absolute top-4 left-4 z-20 pointer-events-none">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-stone-900/80 text-amber-300 border border-amber-500/30 backdrop-blur-md shadow-md">
-          <Film className="w-3.5 h-3.5 text-amber-400" />
-          Cinema Ken Burns &amp; Ethereal Gold Particles
-        </span>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="absolute inset-y-0 left-4 flex items-center z-20">
-        <button
-          type="button"
-          onClick={() => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems)}
-          className="w-10 h-10 rounded-full bg-stone-950/80 hover:bg-stone-900 text-amber-300 border border-amber-500/40 flex items-center justify-center transition-transform hover:scale-110 shadow-lg cursor-pointer"
-          aria-label="Previous"
+        style={{
+          backgroundColor: canvasBgColor || "transparent",
+          padding: framePadding ? `${framePadding}px` : undefined,
+          border: borderWidth > 0 ? `${borderWidth}px solid ${borderFilletColor}` : undefined,
+        }}
+      >
+        {/* Inner Canvas Viewport with Ken Burns Animation */}
+        <div
+          className="relative w-full overflow-hidden rounded-xl bg-stone-950"
+          style={{ height: heightStyle }}
         >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-      </div>
+          {/* Ken Burns Animated Image */}
+          <AnimatePresence mode="wait">
+            {activeItem && (
+              <motion.div
+                key={activeItem.id || activeIndex}
+                initial={{ scale: 1.02, x: 0, y: 0, opacity: 0 }}
+                animate={{
+                  scale: 1.12,
+                  x: activeIndex % 2 === 0 ? 12 : -12,
+                  y: activeIndex % 2 === 0 ? -8 : 8,
+                  opacity: 1,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  scale: { duration: autoplayTimer + 1.2, ease: "linear" },
+                  x: { duration: autoplayTimer + 1.2, ease: "linear" },
+                  y: { duration: autoplayTimer + 1.2, ease: "linear" },
+                  opacity: { duration: 0.8 },
+                }}
+                className="absolute inset-0 w-full h-full"
+              >
+                <img
+                  src={activeItem.url}
+                  alt={activeItem.title || "Cinema Exhibition"}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      <div className="absolute inset-y-0 right-4 flex items-center z-20">
-        <button
-          type="button"
-          onClick={() => setActiveIndex((prev) => (prev + 1) % totalItems)}
-          className="w-10 h-10 rounded-full bg-stone-950/80 hover:bg-stone-900 text-amber-300 border border-amber-500/40 flex items-center justify-center transition-transform hover:scale-110 shadow-lg cursor-pointer"
-          aria-label="Next"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
+          {/* 22k Gold Particulate Canvas Layer */}
+          <canvas
+            ref={particleCanvasRef}
+            className="absolute inset-0 w-full h-full pointer-events-none z-15"
+          />
 
-      {/* Caption Placard */}
-      {activeItem && (
-        <div className="absolute bottom-4 inset-x-4 sm:inset-x-12 z-20 pointer-events-none">
-          {kenBurnsOverlayTheme === "minimal-subtle" ? (
-            <div className="p-3 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 flex items-center justify-between gap-3 shadow-lg">
-              <div className="space-y-0.5">
-                <h4
-                  className="text-sm font-serif font-bold leading-tight"
-                  style={{ color: overlayTitleColor || "#FFFFFF" }}
+          {/* Navigation Controls */}
+          {totalItems > 1 && (
+            <>
+              <div className="absolute inset-y-0 left-4 flex items-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button
+                  type="button"
+                  onClick={() => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems)}
+                  className="w-10 h-10 rounded-full bg-stone-950/80 hover:bg-stone-900 text-amber-300 border border-amber-500/40 flex items-center justify-center transition-transform hover:scale-110 shadow-lg cursor-pointer backdrop-blur-sm"
+                  aria-label="Previous"
                 >
-                  {activeItem.title || activeItem.alt || "Fine Art Composition"}
-                </h4>
-                {activeItem.caption && (
-                  <p
-                    className="text-[11px] line-clamp-1 max-w-xl"
-                    style={{ color: overlayTextColor || "#D1D5DB" }}
-                  >
-                    {activeItem.caption}
-                  </p>
-                )}
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
               </div>
-              {activeItem.linkTarget && (
-                <a
-                  href={activeItem.linkTarget.startsWith("/") ? activeItem.linkTarget : `/artwork/${activeItem.linkTarget}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold pointer-events-auto transition-colors"
-                >
-                  <span>View</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              )}
-            </div>
-          ) : (
-            (() => {
-              const isParchment = kenBurnsOverlayTheme === "parchment-gold";
-              const titleColor = overlayTitleColor || (isParchment ? "#0F172A" : "#F8FAFC");
-              const captionColor = overlayTextColor || (isParchment ? "#334155" : "#E2E8F0");
-              return (
-                <div
-                  className={cn(
-                    "p-4 sm:p-5 rounded-xl backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xl transition-all duration-300",
-                    isParchment
-                      ? "bg-[#FAF7F2]/95 border-2 border-amber-600/50 shadow-amber-950/15"
-                      : "bg-[#0B0F17]/90 border border-amber-500/40 shadow-black/60"
-                  )}
-                >
-                  <div className="space-y-1">
-                    <span
-                      className="text-[10px] font-mono uppercase tracking-widest font-bold"
-                      style={{ color: isParchment ? "#B45309" : "#FBBF24" }}
-                    >
-                      Cinematic Feature • Plate {activeIndex + 1} of {totalItems}
-                    </span>
-                    <h4
-                      className="text-base sm:text-lg font-serif font-bold leading-tight"
-                      style={{ color: titleColor }}
-                    >
-                      {activeItem.title || activeItem.alt || "Fine Art Composition"}
-                    </h4>
-                    {activeItem.caption && (
-                      <p
-                        className="text-xs line-clamp-1 max-w-xl"
-                        style={{ color: captionColor }}
-                      >
-                        {activeItem.caption}
-                      </p>
-                    )}
-                  </div>
 
-                  {activeItem.linkTarget && (
-                    <a
-                      href={activeItem.linkTarget.startsWith("/") ? activeItem.linkTarget : `/artwork/${activeItem.linkTarget}`}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold pointer-events-auto transition-colors self-start sm:self-auto shadow-xs",
-                        isParchment
-                          ? "bg-amber-600 text-white hover:bg-amber-700 border border-amber-700/40"
-                          : "bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40"
-                      )}
-                    >
-                      <span>View Masterwork</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                </div>
-              );
-            })()
+              <div className="absolute inset-y-0 right-4 flex items-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button
+                  type="button"
+                  onClick={() => setActiveIndex((prev) => (prev + 1) % totalItems)}
+                  className="w-10 h-10 rounded-full bg-stone-950/80 hover:bg-stone-900 text-amber-300 border border-amber-500/40 flex items-center justify-center transition-transform hover:scale-110 shadow-lg cursor-pointer backdrop-blur-sm"
+                  aria-label="Next"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Discreet Dots indicator */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-stone-950/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 opacity-70 group-hover:opacity-100 transition-opacity">
+                {items.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveIndex(idx)}
+                    aria-label={`Go to item ${idx + 1}`}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
+                      activeIndex === idx ? "w-5 bg-amber-400" : "w-1.5 bg-stone-400/60 hover:bg-stone-200"
+                    )}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Optional Unobtrusive Caption Ribbon (Outside Image Boundary) */}
+      {showCaptionRibbon && activeItem && (activeItem.title || activeItem.caption) && (
+        <div className="mt-3 px-4 py-2.5 rounded-xl bg-card/90 border border-border/80 flex items-center justify-between gap-4 shadow-sm backdrop-blur-xs">
+          <div className="min-w-0 space-y-0.5">
+            <h4
+              className="text-xs sm:text-sm font-serif font-bold text-foreground truncate"
+              style={{ color: overlayTitleColor || undefined }}
+            >
+              {activeItem.title || "Fine Art Masterwork"}
+            </h4>
+            {activeItem.caption && (
+              <p
+                className="text-[11px] text-muted-foreground truncate"
+                style={{ color: overlayTextColor || undefined }}
+              >
+                {activeItem.caption}
+              </p>
+            )}
+          </div>
+
+          {activeItem.linkTarget && (
+            <a
+              href={
+                activeItem.linkTarget.startsWith("/")
+                  ? activeItem.linkTarget
+                  : `/artwork/${activeItem.linkTarget}`
+              }
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-serif font-semibold shrink-0 transition-colors"
+            >
+              <span>Explore Piece</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
           )}
         </div>
       )}

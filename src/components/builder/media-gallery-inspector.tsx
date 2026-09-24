@@ -18,6 +18,9 @@ import {
   Eye,
   Palette,
   Sliders,
+  Landmark,
+  Compass,
+  ZoomIn,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -34,6 +37,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
+import { WALL_ENVIRONMENTS } from "@/components/public/blocks/gallery-exhibition-wall/exhibition-environments";
+import { cn } from "@/lib/utils";
 
 export interface MediaGalleryBlockData {
   displayMode?: MediaGalleryDisplayMode;
@@ -43,6 +48,16 @@ export interface MediaGalleryBlockData {
   kenBurnsOverlayTheme?: "dark-velvet" | "parchment-gold" | "minimal-subtle";
   overlayTitleColor?: string;
   overlayTextColor?: string;
+  canvasBgColor?: string;
+  borderFilletColor?: string;
+  borderWidth?: number;
+  framePadding?: number;
+  showCaptionRibbon?: boolean;
+  environmentId?: string;
+  customWallUrl?: string;
+  cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
+  wallLayout?: "salon" | "linear" | "grid";
+  autoplayTour?: boolean;
   items?: MediaGalleryItem[];
 }
 
@@ -59,6 +74,16 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const kenBurnsOverlayTheme = data.kenBurnsOverlayTheme ?? "dark-velvet";
   const overlayTitleColor = data.overlayTitleColor ?? "";
   const overlayTextColor = data.overlayTextColor ?? "";
+  const canvasBgColor = data.canvasBgColor ?? "";
+  const borderFilletColor = data.borderFilletColor ?? "#D4AF37";
+  const borderWidth = data.borderWidth ?? 0;
+  const framePadding = data.framePadding ?? 0;
+  const showCaptionRibbon = data.showCaptionRibbon ?? false;
+  const environmentId = data.environmentId ?? "london-school-arts";
+  const customWallUrl = data.customWallUrl ?? "";
+  const cameraTourStyle = data.cameraTourStyle ?? "drone";
+  const wallLayout = data.wallLayout ?? "salon";
+  const autoplayTour = data.autoplayTour ?? true;
   const items = data.items ?? [];
 
   const [activeItemIndex, setActiveItemIndex] = React.useState<number>(0);
@@ -68,6 +93,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   // Universal Media Dialog state
   const [isMediaDialogOpen, setIsMediaDialogOpen] = React.useState(false);
   const [mediaDialogTargetIndex, setMediaDialogTargetIndex] = React.useState<number | null>(null);
+  const [mediaDialogMode, setMediaDialogMode] = React.useState<"items" | "customWall">("items");
 
   // Cached artworks and categories for item linking
   const [artworksList, setArtworksList] = React.useState<{ id: string; title: string; slug: string }[]>([]);
@@ -141,6 +167,76 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       overlayTextColor: color,
+    });
+  };
+
+  const handleCanvasBgColorChange = (color: string) => {
+    onChange({
+      ...data,
+      canvasBgColor: color,
+    });
+  };
+
+  const handleBorderFilletColorChange = (color: string) => {
+    onChange({
+      ...data,
+      borderFilletColor: color,
+    });
+  };
+
+  const handleBorderWidthChange = (w: number) => {
+    onChange({
+      ...data,
+      borderWidth: w,
+    });
+  };
+
+  const handleFramePaddingChange = (p: number) => {
+    onChange({
+      ...data,
+      framePadding: p,
+    });
+  };
+
+  const handleShowCaptionRibbonChange = (show: boolean) => {
+    onChange({
+      ...data,
+      showCaptionRibbon: show,
+    });
+  };
+
+  const handleEnvironmentChange = (env: string) => {
+    onChange({
+      ...data,
+      environmentId: env,
+    });
+  };
+
+  const handleCustomWallUrlChange = (url: string) => {
+    onChange({
+      ...data,
+      customWallUrl: url,
+    });
+  };
+
+  const handleCameraTourStyleChange = (style: "overview" | "drone" | "walkthrough" | "inspection") => {
+    onChange({
+      ...data,
+      cameraTourStyle: style,
+    });
+  };
+
+  const handleWallLayoutChange = (layout: "salon" | "linear" | "grid") => {
+    onChange({
+      ...data,
+      wallLayout: layout,
+    });
+  };
+
+  const handleAutoplayTourChange = (auto: boolean) => {
+    onChange({
+      ...data,
+      autoplayTour: auto,
     });
   };
 
@@ -347,10 +443,316 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               Continuous panoramic filmstrip with vintage mounts.
             </p>
           </button>
+
+          <button
+            type="button"
+            onClick={() => handleModeChange("exhibition-wall")}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+              displayMode === "exhibition-wall"
+                ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-200 shadow-xs ring-1 ring-amber-500/40"
+                : "border-border bg-card/60 hover:bg-card text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <Landmark className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="font-semibold text-xs">Exhibition Wall</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              London School salon wall with 3D camera directed tour.
+            </p>
+          </button>
         </div>
       </div>
 
-      {/* 2. Mode Settings (Timer, Aspect Ratio, Frame) */}
+      {/* 2. Exhibition Salon Wall Architecture Studio */}
+      {displayMode === "exhibition-wall" && (
+        <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-500/5 space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
+              <Landmark className="w-3.5 h-3.5 text-amber-600" /> Exhibition Salon Wall Architecture Studio
+            </Label>
+            <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-800 dark:text-amber-300">
+              3D WebGL Multi-Artwork Salon
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Cultural Environment Preset */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">Cultural Environment</Label>
+              <Select value={environmentId} onValueChange={(val) => handleEnvironmentChange(val)}>
+                <SelectTrigger className="h-8 text-xs bg-card">
+                  <SelectValue placeholder="Select Environment" />
+                </SelectTrigger>
+                <SelectContent>
+                  {WALL_ENVIRONMENTS.map((e) => (
+                    <SelectItem key={e.id} value={e.id}>
+                      {e.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[10px] text-muted-foreground">
+                Authentic lighting, architectural moulding &amp; floorboards.
+              </p>
+            </div>
+
+            {/* Camera Walkthrough Style */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">Camera Directed Flow</Label>
+              <Select
+                value={cameraTourStyle}
+                onValueChange={(val: "overview" | "drone" | "walkthrough" | "inspection") =>
+                  handleCameraTourStyleChange(val)
+                }
+              >
+                <SelectTrigger className="h-8 text-xs bg-card">
+                  <SelectValue placeholder="Select Camera Tour" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="drone">Smooth Drone Pan &amp; Zoom</SelectItem>
+                  <SelectItem value="walkthrough">Curatorial Eye-Level Visitor</SelectItem>
+                  <SelectItem value="inspection">Archival Macro (22k Gold Relief)</SelectItem>
+                  <SelectItem value="overview">Salon Wall Wide Overview</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-[10px] text-muted-foreground">
+                Cinematic perspective interpolation.
+              </p>
+            </div>
+
+            {/* Wall Layout Matrix */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">Wall Hanging Layout</Label>
+              <Select
+                value={wallLayout}
+                onValueChange={(val: "salon" | "linear" | "grid") => handleWallLayoutChange(val)}
+              >
+                <SelectTrigger className="h-8 text-xs bg-card">
+                  <SelectValue placeholder="Select Layout" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="salon">Asymmetrical Salon (London School)</SelectItem>
+                  <SelectItem value="linear">Linear Eye-Level Promenade</SelectItem>
+                  <SelectItem value="grid">Balanced Curatorial Grid</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-[10px] text-muted-foreground">
+                Proportional fine-art salon spacing.
+              </p>
+            </div>
+          </div>
+
+          {/* Custom Wall Backdrop URL (when custom environment is selected) */}
+          {environmentId === "custom" && (
+            <div className="space-y-1.5 pt-1">
+              <Label className="text-xs font-semibold text-foreground">Custom Wall Backdrop URL</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  placeholder="https://... or /uploads/..."
+                  value={customWallUrl}
+                  onChange={(e) => handleCustomWallUrlChange(e.target.value)}
+                  className="h-8 text-xs font-mono"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setMediaDialogMode("customWall");
+                    setIsMediaDialogOpen(true);
+                  }}
+                  className="h-8 text-xs shrink-0 cursor-pointer"
+                >
+                  <ImageIcon className="w-3.5 h-3.5 mr-1" /> Media Vault
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Autoplay Tour & Speed */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-amber-500/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-xs font-semibold text-foreground">Autoplay Cinematic Tour</Label>
+                <p className="text-[10px] text-muted-foreground">
+                  Cycles camera sequentially between hung pieces.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleAutoplayTourChange(!autoplayTour)}
+                className={cn(
+                  "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
+                  autoplayTour ? "bg-amber-600" : "bg-muted"
+                )}
+              >
+                <span
+                  className={cn(
+                    "block w-4 h-4 rounded-full bg-white transition-transform transform",
+                    autoplayTour ? "translate-x-6" : "translate-x-1"
+                  )}
+                />
+              </button>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Artwork Dwell Time</span>
+                <span className="text-primary font-mono text-xs">{autoplayTimer}s</span>
+              </Label>
+              <input
+                type="range"
+                min={3}
+                max={15}
+                step={1}
+                value={autoplayTimer}
+                onChange={(e) => handleTimerChange(Number(e.target.value))}
+                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2B. Dedicated Canvas & Frame Styling Panel */}
+      <div className="p-4 rounded-xl border border-border/80 bg-card/50 space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+            <Palette className="w-3.5 h-3.5 text-primary" /> Canvas &amp; Frame Styling
+          </Label>
+          <Badge variant="outline" className="text-[10px]">
+            Unobstructed Art Focus
+          </Badge>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          {/* Background Color Picker & Swatches */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-foreground">Canvas Background</Label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={canvasBgColor && canvasBgColor !== "transparent" ? canvasBgColor : "#0B0F17"}
+                onChange={(e) => handleCanvasBgColorChange(e.target.value)}
+                className="w-7 h-7 rounded border border-border cursor-pointer p-0.5 bg-card shrink-0"
+              />
+              <Input
+                type="text"
+                placeholder="#0B0F17 or transparent"
+                value={canvasBgColor}
+                onChange={(e) => handleCanvasBgColorChange(e.target.value)}
+                className="h-8 text-xs font-mono"
+              />
+            </div>
+            {/* Cultural Swatches */}
+            <div className="flex items-center gap-1.5 pt-1">
+              {[
+                { name: "Obsidian", color: "#0B0F17" },
+                { name: "Teak", color: "#1C130D" },
+                { name: "Parchment", color: "#FAF7F2" },
+                { name: "Ivory", color: "#FFFFF8" },
+                { name: "Clear", color: "transparent" },
+              ].map((swatch) => (
+                <button
+                  key={swatch.name}
+                  type="button"
+                  onClick={() => handleCanvasBgColorChange(swatch.color)}
+                  className="px-1.5 py-0.5 rounded text-[9px] font-mono border border-border bg-muted/60 hover:bg-muted text-foreground cursor-pointer"
+                  title={swatch.name}
+                >
+                  {swatch.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Border Fillet Color */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-foreground">Border Fillet Color</Label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={borderFilletColor || "#D4AF37"}
+                onChange={(e) => handleBorderFilletColorChange(e.target.value)}
+                className="w-7 h-7 rounded border border-border cursor-pointer p-0.5 bg-card shrink-0"
+              />
+              <Input
+                type="text"
+                placeholder="#D4AF37"
+                value={borderFilletColor}
+                onChange={(e) => handleBorderFilletColorChange(e.target.value)}
+                className="h-8 text-xs font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Border Width */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-foreground">Border Width</Label>
+            <Select
+              value={String(borderWidth)}
+              onValueChange={(val) => handleBorderWidthChange(Number(val))}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Border Width" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">0px (No Fillet)</SelectItem>
+                <SelectItem value="1">1px (Hairline Gold)</SelectItem>
+                <SelectItem value="2">2px (Traditional Fillet)</SelectItem>
+                <SelectItem value="4">4px (Ornate Beading)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Frame Padding / Matting */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-foreground">Frame Padding / Matting</Label>
+            <Select
+              value={String(framePadding)}
+              onValueChange={(val) => handleFramePaddingChange(Number(val))}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Padding" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">Compact (0px)</SelectItem>
+                <SelectItem value="16">Standard Matting (16px)</SelectItem>
+                <SelectItem value="32">Exhibition Matting (32px)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Toggle: Show Title & Caption Ribbon */}
+        <div className="pt-2 flex items-center justify-between border-t border-border/50">
+          <div className="space-y-0.5">
+            <Label className="text-xs font-semibold text-foreground">Show Title &amp; Caption Ribbon</Label>
+            <p className="text-[10px] text-muted-foreground">
+              Renders an unobtrusive caption outside the image frame (Default: False for clean visual focus).
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleShowCaptionRibbonChange(!showCaptionRibbon)}
+            className={cn(
+              "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
+              showCaptionRibbon ? "bg-primary" : "bg-muted"
+            )}
+          >
+            <span
+              className={cn(
+                "block w-4 h-4 rounded-full bg-white transition-transform transform",
+                showCaptionRibbon ? "translate-x-6" : "translate-x-1"
+              )}
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* 2C. Legacy Mode Settings (Timer, Aspect Ratio, Frame) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl border border-border/70 bg-card/40">
         {(displayMode === "carousel" || displayMode === "ken-burns" || displayMode === "soft-crossfade") && (
           <div className="space-y-1.5">
@@ -821,15 +1223,25 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       {/* Universal Media Dialog for Batch Insertion or Single Item Swapping */}
       <UniversalMediaDialog
         open={isMediaDialogOpen}
-        onOpenChange={setIsMediaDialogOpen}
+        onOpenChange={(open) => {
+          setIsMediaDialogOpen(open);
+          if (!open) setMediaDialogMode("items");
+        }}
         acceptedTypes="image"
-        allowMultiple={mediaDialogTargetIndex === null}
+        allowMultiple={mediaDialogMode === "items" && mediaDialogTargetIndex === null}
         title={
-          mediaDialogTargetIndex !== null
+          mediaDialogMode === "customWall"
+            ? "Select Custom Wall Backdrop Image"
+            : mediaDialogTargetIndex !== null
             ? `Select Image for Photo #${mediaDialogTargetIndex + 1}`
             : "Select Media for Gallery"
         }
         onSelect={(media) => {
+          if (mediaDialogMode === "customWall") {
+            handleCustomWallUrlChange(media.url);
+            toast.success("Custom wall backdrop updated!");
+            return;
+          }
           if (mediaDialogTargetIndex !== null) {
             handleUpdateItem(mediaDialogTargetIndex, {
               url: media.url,

@@ -778,6 +778,16 @@ export interface ColumnBlock {
   galleryKenBurnsOverlayTheme?: "dark-velvet" | "parchment-gold" | "minimal-subtle";
   galleryOverlayTitleColor?: string;
   galleryOverlayTextColor?: string;
+  galleryCanvasBgColor?: string;
+  galleryBorderFilletColor?: string;
+  galleryBorderWidth?: number;
+  galleryFramePadding?: number;
+  galleryShowCaptionRibbon?: boolean;
+  galleryEnvironmentId?: string;
+  galleryCustomWallUrl?: string;
+  galleryCameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
+  galleryWallLayout?: "salon" | "linear" | "grid";
+  galleryAutoplayTour?: boolean;
   galleryItems?: MediaGalleryItem[];
   // Hero Showcase Properties
   heroArchetype?: HeroArchetype;
@@ -937,6 +947,16 @@ export function renderColumnBlock(
           kenBurnsOverlayTheme={block.galleryKenBurnsOverlayTheme}
           overlayTitleColor={block.galleryOverlayTitleColor}
           overlayTextColor={block.galleryOverlayTextColor}
+          canvasBgColor={block.galleryCanvasBgColor}
+          borderFilletColor={block.galleryBorderFilletColor}
+          borderWidth={block.galleryBorderWidth}
+          framePadding={block.galleryFramePadding}
+          showCaptionRibbon={block.galleryShowCaptionRibbon}
+          environmentId={block.galleryEnvironmentId}
+          customWallUrl={block.galleryCustomWallUrl}
+          cameraTourStyle={block.galleryCameraTourStyle}
+          wallLayout={block.galleryWallLayout}
+          autoplayTour={block.galleryAutoplayTour}
         />
       </div>
     );

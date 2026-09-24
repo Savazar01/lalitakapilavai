@@ -1387,6 +1387,16 @@ export function PageMatrixStudio({
                             kenBurnsOverlayTheme={block.galleryKenBurnsOverlayTheme}
                             overlayTitleColor={block.galleryOverlayTitleColor}
                             overlayTextColor={block.galleryOverlayTextColor}
+                            canvasBgColor={block.galleryCanvasBgColor}
+                            borderFilletColor={block.galleryBorderFilletColor}
+                            borderWidth={block.galleryBorderWidth}
+                            framePadding={block.galleryFramePadding}
+                            showCaptionRibbon={block.galleryShowCaptionRibbon}
+                            environmentId={block.galleryEnvironmentId}
+                            customWallUrl={block.galleryCustomWallUrl}
+                            cameraTourStyle={block.galleryCameraTourStyle}
+                            wallLayout={block.galleryWallLayout}
+                            autoplayTour={block.galleryAutoplayTour}
                           />
                         </div>
                       )}
@@ -1913,6 +1923,16 @@ export function PageMatrixStudio({
                 kenBurnsOverlayTheme: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryKenBurnsOverlayTheme,
                 overlayTitleColor: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryOverlayTitleColor,
                 overlayTextColor: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryOverlayTextColor,
+                canvasBgColor: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCanvasBgColor,
+                borderFilletColor: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryBorderFilletColor,
+                borderWidth: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryBorderWidth,
+                framePadding: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryFramePadding,
+                showCaptionRibbon: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryShowCaptionRibbon,
+                environmentId: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryEnvironmentId,
+                customWallUrl: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCustomWallUrl,
+                cameraTourStyle: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCameraTourStyle,
+                wallLayout: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryWallLayout,
+                autoplayTour: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryAutoplayTour,
                 items: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryItems,
               }}
               onChange={(updated) => {
@@ -1929,6 +1949,16 @@ export function PageMatrixStudio({
                     galleryKenBurnsOverlayTheme: updated.kenBurnsOverlayTheme,
                     galleryOverlayTitleColor: updated.overlayTitleColor,
                     galleryOverlayTextColor: updated.overlayTextColor,
+                    galleryCanvasBgColor: updated.canvasBgColor,
+                    galleryBorderFilletColor: updated.borderFilletColor,
+                    galleryBorderWidth: updated.borderWidth,
+                    galleryFramePadding: updated.framePadding,
+                    galleryShowCaptionRibbon: updated.showCaptionRibbon,
+                    galleryEnvironmentId: updated.environmentId,
+                    galleryCustomWallUrl: updated.customWallUrl,
+                    galleryCameraTourStyle: updated.cameraTourStyle,
+                    galleryWallLayout: updated.wallLayout,
+                    galleryAutoplayTour: updated.autoplayTour,
                   }
                 );
               }}

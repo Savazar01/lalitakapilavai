@@ -568,6 +568,16 @@ function SortableSection({
     kenBurnsOverlayTheme?: "dark-velvet" | "parchment-gold" | "minimal-subtle";
     overlayTitleColor?: string;
     overlayTextColor?: string;
+    canvasBgColor?: string;
+    borderFilletColor?: string;
+    borderWidth?: number;
+    framePadding?: number;
+    showCaptionRibbon?: boolean;
+    environmentId?: string;
+    customWallUrl?: string;
+    cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
+    wallLayout?: "salon" | "linear" | "grid";
+    autoplayTour?: boolean;
     items?: MediaGalleryItem[];
   } | null>(null);
 
@@ -1434,6 +1444,16 @@ function SortableSection({
                                   kenBurnsOverlayTheme: block.galleryKenBurnsOverlayTheme,
                                   overlayTitleColor: block.galleryOverlayTitleColor,
                                   overlayTextColor: block.galleryOverlayTextColor,
+                                  canvasBgColor: block.galleryCanvasBgColor,
+                                  borderFilletColor: block.galleryBorderFilletColor,
+                                  borderWidth: block.galleryBorderWidth,
+                                  framePadding: block.galleryFramePadding,
+                                  showCaptionRibbon: block.galleryShowCaptionRibbon,
+                                  environmentId: block.galleryEnvironmentId,
+                                  customWallUrl: block.galleryCustomWallUrl,
+                                  cameraTourStyle: block.galleryCameraTourStyle,
+                                  wallLayout: block.galleryWallLayout,
+                                  autoplayTour: block.galleryAutoplayTour,
                                   items: block.galleryItems,
                                 })
                               }
@@ -1454,6 +1474,16 @@ function SortableSection({
                               kenBurnsOverlayTheme={block.galleryKenBurnsOverlayTheme}
                               overlayTitleColor={block.galleryOverlayTitleColor}
                               overlayTextColor={block.galleryOverlayTextColor}
+                              canvasBgColor={block.galleryCanvasBgColor}
+                              borderFilletColor={block.galleryBorderFilletColor}
+                              borderWidth={block.galleryBorderWidth}
+                              framePadding={block.galleryFramePadding}
+                              showCaptionRibbon={block.galleryShowCaptionRibbon}
+                              environmentId={block.galleryEnvironmentId}
+                              customWallUrl={block.galleryCustomWallUrl}
+                              cameraTourStyle={block.galleryCameraTourStyle}
+                              wallLayout={block.galleryWallLayout}
+                              autoplayTour={block.galleryAutoplayTour}
                             />
                           </div>
                         </div>
@@ -1902,6 +1932,16 @@ function SortableSection({
                 kenBurnsOverlayTheme: activeGalleryModal.kenBurnsOverlayTheme,
                 overlayTitleColor: activeGalleryModal.overlayTitleColor,
                 overlayTextColor: activeGalleryModal.overlayTextColor,
+                canvasBgColor: activeGalleryModal.canvasBgColor,
+                borderFilletColor: activeGalleryModal.borderFilletColor,
+                borderWidth: activeGalleryModal.borderWidth,
+                framePadding: activeGalleryModal.framePadding,
+                showCaptionRibbon: activeGalleryModal.showCaptionRibbon,
+                environmentId: activeGalleryModal.environmentId,
+                customWallUrl: activeGalleryModal.customWallUrl,
+                cameraTourStyle: activeGalleryModal.cameraTourStyle,
+                wallLayout: activeGalleryModal.wallLayout,
+                autoplayTour: activeGalleryModal.autoplayTour,
                 items: activeGalleryModal.items,
               }}
               onChange={(updated) => {
@@ -1913,6 +1953,16 @@ function SortableSection({
                   galleryKenBurnsOverlayTheme: updated.kenBurnsOverlayTheme,
                   galleryOverlayTitleColor: updated.overlayTitleColor,
                   galleryOverlayTextColor: updated.overlayTextColor,
+                  galleryCanvasBgColor: updated.canvasBgColor,
+                  galleryBorderFilletColor: updated.borderFilletColor,
+                  galleryBorderWidth: updated.borderWidth,
+                  galleryFramePadding: updated.framePadding,
+                  galleryShowCaptionRibbon: updated.showCaptionRibbon,
+                  galleryEnvironmentId: updated.environmentId,
+                  galleryCustomWallUrl: updated.customWallUrl,
+                  galleryCameraTourStyle: updated.cameraTourStyle,
+                  galleryWallLayout: updated.wallLayout,
+                  galleryAutoplayTour: updated.autoplayTour,
                   galleryItems: updated.items,
                 });
                 setActiveGalleryModal((prev) =>
@@ -1926,6 +1976,16 @@ function SortableSection({
                         kenBurnsOverlayTheme: updated.kenBurnsOverlayTheme,
                         overlayTitleColor: updated.overlayTitleColor,
                         overlayTextColor: updated.overlayTextColor,
+                        canvasBgColor: updated.canvasBgColor,
+                        borderFilletColor: updated.borderFilletColor,
+                        borderWidth: updated.borderWidth,
+                        framePadding: updated.framePadding,
+                        showCaptionRibbon: updated.showCaptionRibbon,
+                        environmentId: updated.environmentId,
+                        customWallUrl: updated.customWallUrl,
+                        cameraTourStyle: updated.cameraTourStyle,
+                        wallLayout: updated.wallLayout,
+                        autoplayTour: updated.autoplayTour,
                         items: updated.items,
                       }
                     : null
