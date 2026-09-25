@@ -427,6 +427,7 @@ model Event {
   id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   title              String
   slug               String              @unique
+  earmarkText        String?             @default("Curated Exhibition & Recital")
   eventType          EventType
   description        String              @db.Text
   venue              String

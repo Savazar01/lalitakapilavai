@@ -1,5 +1,7 @@
 import nodemailer from "nodemailer";
 import prisma from "@/lib/prisma";
+import fs from "fs";
+import path from "path";
 
 export interface EmailDispatchOptions {
   triggerType: string;
@@ -130,23 +132,125 @@ export function interpolateTokens(template: string, tokens: Record<string, unkno
 }
 
 /**
- * Converts relative asset URLs (/media/public/...) to absolute HTTPS URLs
- * so external mail clients (Gmail, Apple Mail, Outlook) can resolve and render them.
+ * Resolves the primary base URL for generating absolute email links & media paths.
+ * Excludes invalid localhost bindings in production email contexts.
  */
-export function getAbsoluteAssetUrl(relativeOrAbsoluteUrl?: string | null): string | null {
-  if (!relativeOrAbsoluteUrl) return null;
-  const trimmed = relativeOrAbsoluteUrl.trim();
+export function getBaseAppUrl(): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL.trim().replace(/\/$/, "");
+    if (!appUrl.includes("localhost") && !appUrl.includes("127.0.0.1")) {
+      return appUrl;
+    }
+  }
+  if (process.env.COOLIFY_FQDN) {
+    const fqdn = process.env.COOLIFY_FQDN.split(",")[0].trim();
+    if (fqdn) {
+      return fqdn.startsWith("http://") || fqdn.startsWith("https://")
+        ? fqdn.replace(/\/$/, "")
+        : `https://${fqdn.replace(/\/$/, "")}`;
+    }
+  }
+  return "https://lalitakapilavai.com";
+}
+
+/**
+ * Resolves an asset path to a fully qualified absolute HTTPS URL.
+ */
+export function resolveAbsoluteLogoUrl(logoPath?: string | null): string | null {
+  if (!logoPath) return null;
+  const trimmed = logoPath.trim();
   if (!trimmed) return null;
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
     return trimmed;
   }
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.COOLIFY_FQDN ? `https://${process.env.COOLIFY_FQDN}` : "https://lalitakapilavai.com")
-  ).replace(/\/$/, "");
-
+  const base = getBaseAppUrl();
   const cleanPath = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-  return `${baseUrl}${cleanPath}`;
+  return `${base}${cleanPath}`;
+}
+
+/**
+ * Backward compatibility alias for resolveAbsoluteLogoUrl.
+ */
+export function getAbsoluteAssetUrl(relativeOrAbsoluteUrl?: string | null): string | null {
+  return resolveAbsoluteLogoUrl(relativeOrAbsoluteUrl);
+}
+
+export interface EmailLogoAttachment {
+  filename: string;
+  path: string;
+  cid: string;
+  contentType?: string;
+}
+
+export interface ResolvedEmailLogoResult {
+  logoImgSrc: string | null;
+  attachments: EmailLogoAttachment[];
+}
+
+/**
+ * Dual Delivery Strategy:
+ * 1. If the brand logo exists on local disk (public/media/..., public/...), attach it as an inline MIME
+ *    attachment with `cid:atelier-brand-logo`. This guarantees display in Gmail even if external images are blocked.
+ * 2. If hosted externally or on cloud S3/R2, resolve to a valid absolute HTTPS URL.
+ */
+export function resolveEmailLogoAndAttachments(logoUrl?: string | null): ResolvedEmailLogoResult {
+  const attachments: EmailLogoAttachment[] = [];
+  if (!logoUrl) {
+    return { logoImgSrc: null, attachments };
+  }
+
+  const trimmed = logoUrl.trim();
+  if (!trimmed) {
+    return { logoImgSrc: null, attachments };
+  }
+
+  // 1. Check if the asset exists on local filesystem
+  if (trimmed.startsWith("/") || !trimmed.startsWith("http")) {
+    const cleanRelative = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+    const candidates = [
+      path.join(process.cwd(), "public", cleanRelative),
+      path.join(process.cwd(), "public", "media", cleanRelative.replace(/^media\//, "")),
+    ];
+
+    for (const cand of candidates) {
+      try {
+        if (fs.existsSync(/*turbopackIgnore: true*/ cand) && fs.statSync(/*turbopackIgnore: true*/ cand).isFile()) {
+          const ext = path.extname(cand).toLowerCase();
+          const contentType =
+            ext === ".png"
+              ? "image/png"
+              : ext === ".jpg" || ext === ".jpeg"
+              ? "image/jpeg"
+              : ext === ".webp"
+              ? "image/webp"
+              : ext === ".svg"
+              ? "image/svg+xml"
+              : "image/png";
+
+          attachments.push({
+            filename: `atelier-logo${ext || ".png"}`,
+            path: cand,
+            cid: "atelier-brand-logo",
+            contentType,
+          });
+
+          return {
+            logoImgSrc: "cid:atelier-brand-logo",
+            attachments,
+          };
+        }
+      } catch (err) {
+        console.warn("[EmailService] Failed checking local logo candidate:", cand, err);
+      }
+    }
+  }
+
+  // 2. Fallback to fully qualified HTTPS URL for remote or cloud-hosted storage
+  const absoluteUrl = resolveAbsoluteLogoUrl(trimmed);
+  return {
+    logoImgSrc: absoluteUrl,
+    attachments,
+  };
 }
 
 /**
@@ -160,22 +264,25 @@ export function wrapBrandedEmailHtml(
     logoUrl?: string | null;
     emailLogoUrl?: string | null;
     emailFooterText?: string | null;
+    logoImgSrc?: string | null;
   }
 ): string {
   const headerTitle = settings.emailHeaderTitle || "Lalita Kapilavai Atelier";
   const headerSubtitle = settings.emailHeaderSubtitle || "Sacred & Traditional Indian Art";
   const footerText = settings.emailFooterText || "Inbound atelier inquiry and archival correspondence.";
 
-  // Single Source of Truth: General tab brand logo, fallback to emailLogoUrl
+  // Prefer explicitly resolved logoImgSrc (which may be cid:atelier-brand-logo)
   const rawLogo = settings.logoUrl || settings.emailLogoUrl;
-  const absoluteLogoUrl = getAbsoluteAssetUrl(rawLogo);
+  const logoSrc = settings.logoImgSrc !== undefined
+    ? settings.logoImgSrc
+    : (rawLogo ? resolveEmailLogoAndAttachments(rawLogo).logoImgSrc : null);
 
-  const logoHtml = absoluteLogoUrl
+  const logoHtml = logoSrc
     ? `<div style="text-align: center; margin-bottom: 16px;">
         <img
-          src="${absoluteLogoUrl}"
+          src="${logoSrc}"
           alt="${headerTitle}"
-          style="max-height: 48px; max-width: 200px; object-fit: contain; display: inline-block; border: 0;"
+          style="max-height: 48px; max-width: 200px; object-fit: contain; display: inline-block; border: none; outline: none;"
         />
       </div>`
     : "";
@@ -295,14 +402,17 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
   let userSent = false;
   let userError: string | undefined;
 
+  // Resolve brand logo and local CID attachments
+  const rawLogo = settings?.logoUrl || settings?.emailLogoUrl;
+  const { logoImgSrc, attachments } = resolveEmailLogoAndAttachments(rawLogo);
+
   // 1. Send Admin Notification Email
   const compiledAdminSubject = interpolateTokens(activeTemplate.adminSubject, tokens);
   const compiledAdminBody = interpolateTokens(activeTemplate.adminBodyTemplate, tokens);
   const adminHtml = wrapBrandedEmailHtml(compiledAdminBody, {
     emailHeaderTitle: settings?.emailHeaderTitle,
     emailHeaderSubtitle: settings?.emailHeaderSubtitle,
-    logoUrl: settings?.logoUrl,
-    emailLogoUrl: settings?.emailLogoUrl,
+    logoImgSrc,
     emailFooterText: settings?.emailFooterText,
   });
 
@@ -314,6 +424,7 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
         replyTo: (data.email as string) || (userEmail as string) || undefined,
         subject: compiledAdminSubject,
         html: adminHtml,
+        attachments,
       });
       adminSent = true;
 
@@ -369,8 +480,7 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
     const userHtml = wrapBrandedEmailHtml(compiledUserBody, {
       emailHeaderTitle: settings?.emailHeaderTitle,
       emailHeaderSubtitle: settings?.emailHeaderSubtitle,
-      logoUrl: settings?.logoUrl,
-      emailLogoUrl: settings?.emailLogoUrl,
+      logoImgSrc,
       emailFooterText: settings?.emailFooterText,
     });
 
@@ -381,6 +491,7 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
           to: targetUserEmail,
           subject: compiledUserSubject,
           html: userHtml,
+          attachments,
         });
         userSent = true;
 

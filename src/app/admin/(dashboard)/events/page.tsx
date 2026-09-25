@@ -71,6 +71,7 @@ interface EventItem {
   id: string;
   title: string;
   slug: string;
+  earmarkText?: string | null;
   eventType: "WORKSHOP" | "ONLINE_CLASSROOM" | "EXHIBITION" | "CONCERT" | "RECITAL" | "PRIVATE_VIEWING" | "OTHER";
   description: string;
   venue: string;
@@ -178,6 +179,7 @@ export default function EventsAdminPage() {
           id: fullEvent.id,
           title: fullEvent.title,
           slug: fullEvent.slug,
+          earmarkText: fullEvent.earmarkText || "Curated Exhibition & Recital",
           eventType: fullEvent.eventType,
           description: fullEvent.description || "",
           venue: fullEvent.venue || fullEvent.venueName || "Lalita Kapilavai Heritage Studio",

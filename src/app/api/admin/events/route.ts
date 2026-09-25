@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     const {
       title,
       slug,
+      earmarkText,
       eventType,
       description,
       venue,
@@ -112,6 +113,7 @@ export async function POST(request: NextRequest) {
         data: {
           title,
           slug: cleanSlug,
+          earmarkText: earmarkText !== undefined && earmarkText !== null ? String(earmarkText).trim() : "Curated Exhibition & Recital",
           eventType: eventType as EventType,
           description: description || "",
           venue: venue || venueName || "Lalita Kapilavai Heritage Studio",

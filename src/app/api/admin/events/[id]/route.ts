@@ -64,6 +64,7 @@ export async function PUT(
     const {
       title,
       slug,
+      earmarkText,
       eventType,
       description,
       venue,
@@ -106,6 +107,7 @@ export async function PUT(
         data: {
           title,
           slug,
+          earmarkText: earmarkText !== undefined ? (earmarkText ? String(earmarkText).trim() : null) : undefined,
           eventType: eventType ? (eventType as EventType) : undefined,
           description,
           venue: venue || venueName,

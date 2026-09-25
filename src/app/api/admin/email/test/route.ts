@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
-import { wrapBrandedEmailHtml } from "@/lib/email-service";
+import { wrapBrandedEmailHtml, resolveEmailLogoAndAttachments } from "@/lib/email-service";
 
 export const dynamic = "force-dynamic";
 
@@ -80,11 +80,13 @@ export async function POST(request: NextRequest) {
       </p>
     `;
 
+    const rawLogo = systemSettings?.logoUrl || systemSettings?.emailLogoUrl;
+    const { logoImgSrc, attachments } = resolveEmailLogoAndAttachments(rawLogo);
+
     const finalHtml = wrapBrandedEmailHtml(bodyHtml, {
       emailHeaderTitle: systemSettings?.emailHeaderTitle,
       emailHeaderSubtitle: systemSettings?.emailHeaderSubtitle,
-      logoUrl: systemSettings?.logoUrl,
-      emailLogoUrl: systemSettings?.emailLogoUrl,
+      logoImgSrc,
       emailFooterText: systemSettings?.emailFooterText,
     });
 
@@ -94,6 +96,7 @@ export async function POST(request: NextRequest) {
       subject: testSubject,
       text: `Greetings from ${systemSettings?.emailHeaderTitle || "Lalita Kapilavai Atelier"}.\n\nYour outbound email delivery system is functioning perfectly.\n\nProvider: ${provider || "SMTP"}\nHost: ${host}:${port}\nUser: ${user}\nTimestamp: ${new Date().toISOString()}`,
       html: finalHtml,
+      attachments,
     });
 
     // Log the test dispatch

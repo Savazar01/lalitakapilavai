@@ -93,6 +93,7 @@ export default async function EventDetailPage({ params }: PageProps) {
     linkTarget: photo.linkTarget,
   }));
   const scheduleFormatted = formatEventSchedule(event.startDate, event.endDate, event.timezone);
+  const earmarkBadge = event.earmarkText || "Curated Exhibition & Recital";
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
@@ -128,10 +129,12 @@ export default async function EventDetailPage({ params }: PageProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-widest text-primary font-semibold flex items-center gap-1.5 mb-1.5">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Curated Exhibition &amp; Recital
-                </span>
+                {earmarkBadge && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-xs font-mono font-semibold tracking-widest uppercase bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/30 backdrop-blur-md mb-2">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>{earmarkBadge}</span>
+                  </div>
+                )}
                 <h1 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground drop-shadow-sm">
                   {event.title}
                 </h1>
@@ -146,10 +149,12 @@ export default async function EventDetailPage({ params }: PageProps) {
           <div className="lg:col-span-7 space-y-8">
             {!banner && (
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-widest text-primary font-semibold flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Curated Exhibition &amp; Classical Schedule
-                </span>
+                {earmarkBadge && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-xs font-mono font-semibold tracking-widest uppercase bg-amber-500/10 text-amber-900 dark:text-amber-300 border border-amber-500/20 mb-2">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>{earmarkBadge}</span>
+                  </div>
+                )}
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-foreground mt-1 mb-4">
                   {event.title}
                 </h1>

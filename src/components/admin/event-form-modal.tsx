@@ -84,6 +84,7 @@ export interface EventFormData {
   id?: string;
   title: string;
   slug: string;
+  earmarkText?: string | null;
   eventType: "WORKSHOP" | "ONLINE_CLASSROOM" | "EXHIBITION" | "CONCERT" | "RECITAL" | "PRIVATE_VIEWING" | "OTHER";
   description: string;
   venue: string;
@@ -184,6 +185,9 @@ function EventFormContent({
   // Form Fields Initial State
   const [title, setTitle] = React.useState(initialEvent?.title || "");
   const [slug, setSlug] = React.useState(initialEvent?.slug || "");
+  const [earmarkText, setEarmarkText] = React.useState(
+    initialEvent?.earmarkText || "Curated Exhibition & Recital"
+  );
   const [eventType, setEventType] = React.useState<EventFormData["eventType"]>(
     initialEvent?.eventType || "EXHIBITION"
   );
@@ -527,6 +531,7 @@ function EventFormContent({
     const payload = {
       title: title.trim(),
       slug: slug.trim(),
+      earmarkText: earmarkText.trim() || "Curated Exhibition & Recital",
       eventType,
       description,
       venue: venueName || venue || "Lalita Kapilavai Heritage Studio",
@@ -662,6 +667,22 @@ function EventFormContent({
                     onChange={(e) => setSlug(e.target.value)}
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground" htmlFor="earmarkText">
+                  Hero Earmark / Subtitle Badge
+                </label>
+                <Input
+                  id="earmarkText"
+                  placeholder="e.g. Curated Exhibition & Recital, Solo Retrospective, Classical Concert"
+                  value={earmarkText}
+                  onChange={(e) => setEarmarkText(e.target.value)}
+                  className="h-9 text-xs"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Displayed as the uppercase badge above the event title on the hero banner.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
