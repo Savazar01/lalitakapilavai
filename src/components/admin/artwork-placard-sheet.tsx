@@ -10,6 +10,13 @@ import {
   Image as ImageIcon,
   CheckSquare,
   Square,
+  Type,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Palette,
+  Sliders,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,9 +37,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { cn } from "@/lib/utils";
-import { printIsolatedElement, getPhysicalDimensions } from "@/lib/print-isolated-html";
+import {
+  printIsolatedElement,
+  getPhysicalDimensions,
+  getFontFamilyCss,
+  type PlacardStylingConfig,
+} from "@/lib/print-isolated-html";
 
 export interface PlacardArtwork {
   id: string;
@@ -43,6 +56,7 @@ export interface PlacardArtwork {
   traditionalSchool?: string;
   yearCreated?: number | string;
   description?: string;
+  additionalNotes?: string;
   category?: { name: string };
   primaryImageUrl?: string;
   watermarkedWebpUrl?: string;
@@ -52,6 +66,7 @@ export interface ArtworkPlacardSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   artworks: PlacardArtwork[];
+  defaultArtistName?: string;
 }
 
 export interface EditablePlacardItem {
@@ -62,34 +77,83 @@ export interface EditablePlacardItem {
   medium: string;
   dimensions: string;
   year: string;
+  additionalNotes?: string;
   thumbnail?: string;
   slug: string;
 }
+
+export const DEFAULT_PLACARD_STYLING: PlacardStylingConfig = {
+  fontFamily: "cormorant",
+  textAlign: "left",
+  cardBgColor: "#ffffff",
+  titleColor: "#111827",
+  textColor: "#374151",
+  headerColor: "#854d0e",
+  borderStyle: "double-fillet",
+  titleScale: "standard",
+  bodyScale: "standard",
+  showThumbnail: true,
+  showQr: true,
+  showCategory: true,
+  showArtist: true,
+  showCropMarks: true,
+};
+
+// Preset Swatches for Quick Customization
+const CARD_BG_SWATCHES = [
+  { label: "Pure White", value: "#ffffff" },
+  { label: "Antique Ivory", value: "#fffff8" },
+  { label: "Parchment Cream", value: "#faf7f2" },
+  { label: "Soft Linen", value: "#f4f0e8" },
+];
+
+const TITLE_COLOR_SWATCHES = [
+  { label: "Obsidian Black", value: "#111827" },
+  { label: "Antique Gold", value: "#854d0e" },
+  { label: "Royal Indigo", value: "#1e1b4b" },
+  { label: "Dark Teak", value: "#3e2723" },
+];
+
+const TEXT_COLOR_SWATCHES = [
+  { label: "Deep Charcoal", value: "#374151" },
+  { label: "Slate Grey", value: "#4b5563" },
+  { label: "Warm Earth", value: "#5d4037" },
+  { label: "Solid Black", value: "#111827" },
+];
+
+const HEADER_COLOR_SWATCHES = [
+  { label: "Temple Gold", value: "#854d0e" },
+  { label: "Terracotta", value: "#9a3412" },
+  { label: "Charcoal", value: "#111827" },
+  { label: "Deep Olive", value: "#3f6212" },
+];
 
 export function ArtworkPlacardSheet({
   open,
   onOpenChange,
   artworks = [],
+  defaultArtistName = "Lalita Kapilavai",
 }: ArtworkPlacardSheetProps) {
-  // Configurator Toggles
+  // Format & Orientation
   const [cardFormat, setCardFormat] = React.useState<"visiting-card" | "museum-placard">("visiting-card");
-  const [orientation, setOrientation] = React.useState<"landscape" | "portrait">("landscape");
-  const [borderStyle, setBorderStyle] = React.useState<"double-fillet" | "single-rule" | "none">("double-fillet");
-  const [showCropMarks, setShowCropMarks] = React.useState(true);
-  const [showThumbnail, setShowThumbnail] = React.useState(true);
-  const [showQrCode, setShowQrCode] = React.useState(true);
-  const [showCategoryHeader, setShowCategoryHeader] = React.useState(true);
-  const [showArtistHeader, setShowArtistHeader] = React.useState(true);
+  const [orientation, setOrientation] = React.useState<"landscape" | "portrait">("portrait");
+
+  // Customizer Studio Styling State
+  const [styling, setStyling] = React.useState<PlacardStylingConfig>(DEFAULT_PLACARD_STYLING);
 
   // Active View Tab: "preview" vs "edit"
   const [activeTab, setActiveTab] = React.useState<"preview" | "edit">("preview");
 
   // Editable In-Modal Card Data Overrides
   const [userOverrides, setUserOverrides] = React.useState<Record<string, Partial<EditablePlacardItem>>>({});
-  const [globalArtistName, setGlobalArtistName] = React.useState("Lalita Kapilavai");
+  const [globalArtistName, setGlobalArtistName] = React.useState(defaultArtistName);
 
   // QR Code batch mapping
   const [qrCodeDataUrls, setQrCodeDataUrls] = React.useState<Record<string, string>>({});
+
+  const updateStyling = <K extends keyof PlacardStylingConfig>(key: K, value: PlacardStylingConfig[K]) => {
+    setStyling((prev) => ({ ...prev, [key]: value }));
+  };
 
   const getItemData = React.useCallback(
     (art: PlacardArtwork): EditablePlacardItem => {
@@ -97,16 +161,17 @@ export function ArtworkPlacardSheet({
       return {
         id: art.id,
         title: over.title ?? art.title ?? "",
-        artistName: over.artistName ?? "Lalita Kapilavai",
-        category: over.category ?? art.traditionalSchool ?? art.category?.name ?? "Thanjavur Traditional",
+        artistName: over.artistName ?? globalArtistName,
+        category: over.category ?? art.traditionalSchool ?? art.category?.name ?? "Traditional Indian Art",
         medium: over.medium ?? art.medium ?? "22k Gold Foil, Gesso, Teak Wood",
         dimensions: over.dimensions ?? art.dimensions ?? "",
         year: over.year ?? (art.yearCreated ? String(art.yearCreated) : ""),
+        additionalNotes: over.additionalNotes ?? art.additionalNotes ?? art.description ?? "",
         thumbnail: over.thumbnail ?? art.watermarkedWebpUrl ?? art.primaryImageUrl,
         slug: over.slug ?? art.slug ?? "",
       };
     },
-    [userOverrides]
+    [userOverrides, globalArtistName]
   );
 
   // Generate QR codes for all artworks in batch
@@ -180,8 +245,9 @@ export function ArtworkPlacardSheet({
           {
             format: cardFormat,
             orientation,
-            borderStyle,
-            showCropMarks,
+            borderStyle: styling.borderStyle,
+            showCropMarks: styling.showCropMarks,
+            styling,
           }
         );
       }, 150);
@@ -196,13 +262,15 @@ export function ArtworkPlacardSheet({
       {
         format: cardFormat,
         orientation,
-        borderStyle,
-        showCropMarks,
+        borderStyle: styling.borderStyle,
+        showCropMarks: styling.showCropMarks,
+        styling,
       }
     );
   };
 
   const dim = getPhysicalDimensions(cardFormat, orientation);
+  const activeFontFamilyCss = getFontFamilyCss(styling.fontFamily);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -215,7 +283,7 @@ export function ArtworkPlacardSheet({
                 Printable Artwork Display Placards &amp; Cards
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                Two-column fine-art exhibition cards with 18mm acrylic stand base margin and live metadata customizer.
+                Balanced editorial fine-art exhibition cards with live typography &amp; styling customizer.
               </DialogDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -263,7 +331,7 @@ export function ArtworkPlacardSheet({
             </div>
           </div>
 
-          {/* Configuration Toolbar */}
+          {/* Primary Quick Controls Toolbar */}
           <div className="no-print grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 pt-3 mt-1 border-t border-border/60">
             {/* Format */}
             <div className="space-y-1">
@@ -277,7 +345,7 @@ export function ArtworkPlacardSheet({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="visiting-card">Visiting Card (3.5 x 2 in)</SelectItem>
-                  <SelectItem value="museum-placard">Museum Placard (4 x 3 in)</SelectItem>
+                  <SelectItem value="museum-placard">Museum Placard (4 x 2.5 in)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -293,8 +361,8 @@ export function ArtworkPlacardSheet({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="landscape">Landscape</SelectItem>
                   <SelectItem value="portrait">Portrait</SelectItem>
+                  <SelectItem value="landscape">Landscape</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -303,15 +371,15 @@ export function ArtworkPlacardSheet({
             <div className="space-y-1">
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Border Style</span>
               <Select
-                value={borderStyle}
-                onValueChange={(val: "double-fillet" | "single-rule" | "none") => setBorderStyle(val)}
+                value={styling.borderStyle}
+                onValueChange={(val: "double-fillet" | "single-rule" | "none") => updateStyling("borderStyle", val)}
               >
                 <SelectTrigger className="h-7 text-xs bg-card">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="double-fillet">Double Gold Fillet</SelectItem>
-                  <SelectItem value="single-rule">Minimal Single Rule</SelectItem>
+                  <SelectItem value="single-rule">Vintage Single Hairline</SelectItem>
                   <SelectItem value="none">Borderless</SelectItem>
                 </SelectContent>
               </Select>
@@ -322,15 +390,16 @@ export function ArtworkPlacardSheet({
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Thumbnail</span>
               <button
                 type="button"
-                onClick={() => setShowThumbnail(!showThumbnail)}
-                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  showThumbnail
+                onClick={() => updateStyling("showThumbnail", !styling.showThumbnail)}
+                className={cn(
+                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
+                  styling.showThumbnail
                     ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
                     : "border-border bg-card text-muted-foreground"
-                }`}
+                )}
               >
                 <span>Image</span>
-                {showThumbnail ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+                {styling.showThumbnail ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
               </button>
             </div>
 
@@ -339,15 +408,16 @@ export function ArtworkPlacardSheet({
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">QR Code</span>
               <button
                 type="button"
-                onClick={() => setShowQrCode(!showQrCode)}
-                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  showQrCode
+                onClick={() => updateStyling("showQr", !styling.showQr)}
+                className={cn(
+                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
+                  styling.showQr
                     ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
                     : "border-border bg-card text-muted-foreground"
-                }`}
+                )}
               >
                 <span>QR Code</span>
-                {showQrCode ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+                {styling.showQr ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
               </button>
             </div>
 
@@ -356,15 +426,16 @@ export function ArtworkPlacardSheet({
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Category</span>
               <button
                 type="button"
-                onClick={() => setShowCategoryHeader(!showCategoryHeader)}
-                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  showCategoryHeader
+                onClick={() => updateStyling("showCategory", !styling.showCategory)}
+                className={cn(
+                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
+                  styling.showCategory
                     ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
                     : "border-border bg-card text-muted-foreground"
-                }`}
+                )}
               >
                 <span>School</span>
-                {showCategoryHeader ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+                {styling.showCategory ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
               </button>
             </div>
 
@@ -373,15 +444,16 @@ export function ArtworkPlacardSheet({
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Artist</span>
               <button
                 type="button"
-                onClick={() => setShowArtistHeader(!showArtistHeader)}
-                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  showArtistHeader
+                onClick={() => updateStyling("showArtist", !styling.showArtist)}
+                className={cn(
+                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
+                  styling.showArtist
                     ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
                     : "border-border bg-card text-muted-foreground"
-                }`}
+                )}
               >
                 <span>Artist</span>
-                {showArtistHeader ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+                {styling.showArtist ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
               </button>
             </div>
 
@@ -390,15 +462,16 @@ export function ArtworkPlacardSheet({
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Crop Marks</span>
               <button
                 type="button"
-                onClick={() => setShowCropMarks(!showCropMarks)}
-                className={`w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer ${
-                  showCropMarks
+                onClick={() => updateStyling("showCropMarks", !styling.showCropMarks)}
+                className={cn(
+                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
+                  styling.showCropMarks
                     ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
                     : "border-border bg-card text-muted-foreground"
-                }`}
+                )}
               >
                 <span>Guides</span>
-                {showCropMarks ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+                {styling.showCropMarks ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
               </button>
             </div>
           </div>
@@ -410,12 +483,13 @@ export function ArtworkPlacardSheet({
             <div
               id="placard-render-cards"
               className={cn(
-                "mx-auto bg-white text-stone-900 shadow-xl print:shadow-none p-6 print:p-0 transition-all",
+                "mx-auto shadow-xl print:shadow-none p-6 print:p-0 transition-all",
                 "flex flex-wrap gap-5 items-start justify-center",
                 cardFormat === "visiting-card"
                   ? "max-w-[780px]"
                   : "max-w-[860px]"
               )}
+              style={{ backgroundColor: styling.cardBgColor }}
             >
               {artworks.map((art, idx) => {
                 const itemData = getItemData(art);
@@ -431,28 +505,35 @@ export function ArtworkPlacardSheet({
                       minHeight: `${dim.heightMm}mm`,
                       maxWidth: `${dim.widthMm}mm`,
                       maxHeight: `${dim.heightMm}mm`,
+                      backgroundColor: styling.cardBgColor,
+                      fontFamily: activeFontFamilyCss,
+                      textAlign: styling.textAlign,
                       pageBreakInside: "avoid",
                       breakInside: "avoid",
                     }}
                     className={cn(
-                      "placard-card-item relative bg-white text-stone-900 border border-stone-200 p-3.5 print:p-3 transition-all flex flex-col justify-between overflow-hidden shrink-0",
-                      // 18mm bottom safety margin so acrylic stands/clips never occlude card typography
-                      "pb-[18mm] print:pb-[18mm]",
-                      showCropMarks && "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1"
+                      "placard-card-item relative border border-stone-200/80 p-3 sm:p-3.5 print:p-2.5 transition-all flex flex-col justify-between overflow-hidden shrink-0 select-none",
+                      styling.showCropMarks && "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1"
                     )}
                   >
                     {/* Border Options */}
-                    {borderStyle === "double-fillet" && (
-                      <div className="absolute inset-1.5 border border-amber-600/35 pointer-events-none rounded-[1px]">
-                        <div className="absolute inset-0.5 border border-amber-600/15 pointer-events-none" />
+                    {styling.borderStyle === "double-fillet" && (
+                      <div
+                        className="absolute inset-1.5 border pointer-events-none rounded-[1px]"
+                        style={{ borderColor: styling.headerColor + "55" }}
+                      >
+                        <div
+                          className="absolute inset-0.5 border pointer-events-none"
+                          style={{ borderColor: styling.headerColor + "25" }}
+                        />
                       </div>
                     )}
-                    {borderStyle === "single-rule" && (
+                    {styling.borderStyle === "single-rule" && (
                       <div className="absolute inset-1.5 border border-stone-300 print:border-black pointer-events-none rounded-[1px]" />
                     )}
 
                     {/* Corner Crop Marks for Professional Trimmer Guides */}
-                    {showCropMarks && (
+                    {styling.showCropMarks && (
                       <>
                         <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-stone-400 print:border-black pointer-events-none" />
                         <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-stone-400 print:border-black pointer-events-none" />
@@ -462,80 +543,221 @@ export function ArtworkPlacardSheet({
                     )}
 
                     {/* Header: Category / Traditional School on Left; Artist Name on Right */}
-                    {(showCategoryHeader || showArtistHeader) && (
-                      <div className="relative z-10 flex items-center justify-between border-b border-amber-600/30 print:border-stone-300 pb-1 mb-1.5">
-                        <span className="font-serif tracking-widest text-[8.5px] sm:text-[9px] uppercase font-bold text-amber-900 print:text-black truncate max-w-[55%]">
-                          {showCategoryHeader ? itemData.category : ""}
+                    {(styling.showCategory || styling.showArtist) && (
+                      <div
+                        className="relative z-10 flex items-center justify-between border-b pb-0.5 mb-1 shrink-0"
+                        style={{
+                          borderColor: styling.headerColor + "40",
+                          color: styling.headerColor,
+                        }}
+                      >
+                        <span className="tracking-widest text-[8px] sm:text-[8.5px] uppercase font-bold truncate max-w-[55%]">
+                          {styling.showCategory ? itemData.category : ""}
                         </span>
-                        <span className="font-serif tracking-wide text-[8.5px] sm:text-[9px] font-semibold text-stone-800 print:text-black shrink-0">
-                          {showArtistHeader ? itemData.artistName : ""}
+                        <span className="tracking-wide text-[8px] sm:text-[8.5px] font-semibold shrink-0">
+                          {styling.showArtist ? itemData.artistName : ""}
                         </span>
                       </div>
                     )}
 
-                    {/* Two-Column Body */}
-                    <div className="relative z-10 flex-1 flex items-stretch justify-between gap-2.5">
-                      {/* Left Column (65%): Artwork Title, Medium & Materials, Dimensions & Year */}
-                      <div className="w-[65%] flex flex-col justify-between pr-1">
-                        <div>
-                          <h3 className="font-serif font-bold text-[13px] sm:text-[14.5px] leading-tight text-stone-950 print:text-black italic">
-                            {itemData.title}
-                          </h3>
+                    {/* ORIENTATION-AWARE EDITORIAL FLOW (Zero Dead Space) */}
+                    {orientation === "portrait" ? (
+                      /* PORTRAIT ORIENTATION: Continuous Vertical Flow */
+                      <div className="relative z-10 flex-1 flex flex-col justify-between overflow-hidden">
+                        {/* Block 1, 2, 3: Title, Medium, Dimensions */}
+                        <div className="space-y-0.5">
+                          <h4
+                            className={cn(
+                              "card-title font-bold leading-tight italic",
+                              styling.titleScale === "compact" && "text-[12px] sm:text-[13px]",
+                              styling.titleScale === "standard" && "text-[13.5px] sm:text-[14.5px]",
+                              styling.titleScale === "large" && "text-[15.5px] sm:text-[16.5px]"
+                            )}
+                            style={{ color: styling.titleColor }}
+                          >
+                            {itemData.title || "Untitled Masterwork"}
+                          </h4>
+
                           {itemData.medium && (
-                            <p className="font-serif italic text-[9.5px] leading-snug text-stone-700 print:text-black mt-1">
+                            <p
+                              className={cn(
+                                "card-medium italic leading-snug",
+                                styling.bodyScale === "compact" && "text-[8px] sm:text-[8.5px]",
+                                styling.bodyScale === "standard" && "text-[9px] sm:text-[9.5px]",
+                                styling.bodyScale === "large" && "text-[10px] sm:text-[10.5px]"
+                              )}
+                              style={{ color: styling.textColor }}
+                            >
                               {itemData.medium}
                             </p>
                           )}
-                        </div>
-                        <p className="font-mono text-[8.5px] text-stone-600 print:text-stone-800 leading-tight mt-1">
-                          {[itemData.dimensions, itemData.year].filter(Boolean).join(" • ")}
-                        </p>
-                      </div>
 
-                      {/* Right Column (35%): Stacked Artwork Thumbnail (top) and Vector QR Code (bottom) */}
-                      <div className="w-[35%] flex flex-col items-center justify-between pl-1 shrink-0">
-                        {showThumbnail && itemData.thumbnail ? (
-                          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded overflow-hidden border border-stone-300 shadow-xs shrink-0">
-                            <img
-                              src={itemData.thumbnail}
-                              alt={itemData.title}
-                              className="w-full h-full object-cover"
-                            />
+                          {itemData.dimensions && (
+                            <p
+                              className="card-dimensions font-mono text-[8px] leading-tight"
+                              style={{ color: styling.textColor + "cc" }}
+                            >
+                              {itemData.dimensions}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Visual Media Cluster: Artwork Thumbnail & Vector QR Code paired side-by-side */}
+                        {(styling.showThumbnail || styling.showQr) && (
+                          <div
+                            className={cn(
+                              "card-media-cluster flex items-center gap-2.5 my-1 shrink-0",
+                              styling.textAlign === "center"
+                                ? "justify-center"
+                                : styling.textAlign === "right"
+                                ? "justify-end"
+                                : "justify-start"
+                            )}
+                          >
+                            {styling.showThumbnail && itemData.thumbnail && (
+                              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded overflow-hidden border border-stone-300 shadow-xs shrink-0">
+                                <img
+                                  src={itemData.thumbnail}
+                                  alt={itemData.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            )}
+
+                            {styling.showQr && qrDataUrl && (
+                              <div className="flex flex-col items-center shrink-0">
+                                <div className="w-11 h-11 bg-white p-0.5 rounded border border-stone-300 shadow-xs print:shadow-none">
+                                  <img
+                                    src={qrDataUrl}
+                                    alt={`QR for ${itemData.title}`}
+                                    className="w-full h-full object-contain block"
+                                  />
+                                </div>
+                                <span className="text-[6.5px] font-sans text-stone-500 tracking-tight mt-0.5 whitespace-nowrap">
+                                  Scan Provenance
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          <div className="h-0" />
                         )}
 
-                        {showQrCode && (
-                          <div className="flex flex-col items-center shrink-0">
-                            <div className="w-11 h-11 bg-white p-0.5 rounded border border-stone-300 shadow-xs print:shadow-none">
-                              {qrDataUrl ? (
-                                <img
-                                  src={qrDataUrl}
-                                  alt={`QR for ${itemData.title}`}
-                                  className="w-full h-full object-contain block"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-[7px] text-stone-400">
-                                  QR
+                        {/* Block 4 & 5: Year Created & Additional Curatorial Notes */}
+                        <div className="space-y-0.5">
+                          {itemData.year && (
+                            <p
+                              className="card-year font-mono text-[8px] leading-tight"
+                              style={{ color: styling.textColor + "cc" }}
+                            >
+                              Year: {itemData.year}
+                            </p>
+                          )}
+
+                          {itemData.additionalNotes && (
+                            <p
+                              className="card-additional-notes text-[8px] italic leading-tight line-clamp-3"
+                              style={{ color: styling.textColor }}
+                            >
+                              {itemData.additionalNotes}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Base Holder Safe Clearance Margin */}
+                        <div className="h-2 shrink-0" />
+                      </div>
+                    ) : (
+                      /* LANDSCAPE ORIENTATION: Balanced Two-Column Proportional Flow */
+                      <div className="relative z-10 flex-1 flex items-stretch justify-between gap-3 overflow-hidden">
+                        {/* Left Column (60%): Title, Medium, Dimensions, Notes */}
+                        <div className="w-[60%] flex flex-col justify-between h-full pr-1 overflow-hidden">
+                          <div className="space-y-0.5">
+                            <h4
+                              className={cn(
+                                "card-title font-bold leading-tight italic",
+                                styling.titleScale === "compact" && "text-[11.5px] sm:text-[12.5px]",
+                                styling.titleScale === "standard" && "text-[13px] sm:text-[14px]",
+                                styling.titleScale === "large" && "text-[14.5px] sm:text-[15.5px]"
+                              )}
+                              style={{ color: styling.titleColor }}
+                            >
+                              {itemData.title || "Untitled Masterwork"}
+                            </h4>
+
+                            {itemData.medium && (
+                              <p
+                                className={cn(
+                                  "card-medium italic leading-snug",
+                                  styling.bodyScale === "compact" && "text-[8px]",
+                                  styling.bodyScale === "standard" && "text-[9px]",
+                                  styling.bodyScale === "large" && "text-[10px]"
+                                )}
+                                style={{ color: styling.textColor }}
+                              >
+                                {itemData.medium}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="space-y-0.5 mt-auto">
+                            <p
+                              className="card-dimensions font-mono text-[8px] leading-tight"
+                              style={{ color: styling.textColor + "cc" }}
+                            >
+                              {[itemData.dimensions, itemData.year ? `Year: ${itemData.year}` : ""].filter(Boolean).join(" • ")}
+                            </p>
+
+                            {itemData.additionalNotes && (
+                              <p
+                                className="card-additional-notes text-[7.5px] italic leading-tight line-clamp-2"
+                                style={{ color: styling.textColor }}
+                              >
+                                {itemData.additionalNotes}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Right Column (40%): Paired Thumbnail & QR with Provenance */}
+                        <div className="w-[40%] flex flex-col items-center justify-center h-full pl-1 shrink-0">
+                          {(styling.showThumbnail || styling.showQr) && (
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {styling.showThumbnail && itemData.thumbnail && (
+                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded overflow-hidden border border-stone-300 shadow-xs shrink-0">
+                                  <img
+                                    src={itemData.thumbnail}
+                                    alt={itemData.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              )}
+
+                              {styling.showQr && qrDataUrl && (
+                                <div className="flex flex-col items-center shrink-0">
+                                  <div className="w-11 h-11 bg-white p-0.5 rounded border border-stone-300 shadow-xs print:shadow-none">
+                                    <img
+                                      src={qrDataUrl}
+                                      alt={`QR for ${itemData.title}`}
+                                      className="w-full h-full object-contain block"
+                                    />
+                                  </div>
+                                  <span className="text-[6px] font-sans text-stone-500 tracking-tight mt-0.5 whitespace-nowrap">
+                                    Scan Provenance
+                                  </span>
                                 </div>
                               )}
                             </div>
-                            <span className="text-[6.5px] font-sans text-stone-500 print:text-black tracking-tight mt-0.5 whitespace-nowrap">
-                              Scan for Provenance
-                            </span>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Acrylic Base Margin Indicator (Subtle UI guide, hidden on print) */}
                     <div
                       data-acrylic-guide="true"
-                      className="absolute bottom-0 inset-x-0 h-[18mm] border-t border-dashed border-stone-200 bg-stone-50/50 print:hidden flex items-center justify-center pointer-events-none"
+                      className="absolute bottom-0 inset-x-0 h-2 border-t border-dashed border-stone-300/60 bg-stone-50/50 print:hidden flex items-center justify-center pointer-events-none"
                     >
-                      <span className="text-[7.5px] uppercase tracking-wider text-stone-400 font-mono">
-                        18mm Stand Base Margin (Kept Clear)
+                      <span className="text-[6px] uppercase tracking-wider text-stone-400 font-mono">
+                        Base Margin
                       </span>
                     </div>
                   </div>
@@ -545,11 +767,268 @@ export function ArtworkPlacardSheet({
           </div>
         )}
 
-        {/* Tab 2: Live In-Modal Card Metadata Customizer */}
+        {/* Tab 2: Placard Design Customizer Studio & Details Editor */}
         {activeTab === "edit" && (
-          <div className="no-print flex-1 overflow-y-auto p-4 sm:p-6 bg-background space-y-4">
-            {/* Global Quick Action Bar */}
-            <div className="p-3.5 rounded-xl border border-amber-500/40 bg-amber-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="no-print flex-1 overflow-y-auto p-4 sm:p-6 bg-background space-y-6">
+            {/* DESIGN & TYPOGRAPHY CUSTOMIZER STUDIO */}
+            <div className="p-4 rounded-xl border border-amber-500/40 bg-card shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <div className="space-y-0.5">
+                  <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                    <Sliders className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    Placard Design &amp; Typography Studio
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    Customize typography, color swatches, alignment, and background palettes in real-time.
+                  </p>
+                </div>
+                <Badge variant="outline" className="border-amber-500/40 text-amber-800 dark:text-amber-300 text-[10px]">
+                  Global Design Config
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {/* 1. Font Family */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                    <Type className="w-3 h-3 text-amber-600" /> Font Family
+                  </Label>
+                  <Select
+                    value={styling.fontFamily}
+                    onValueChange={(val: "cinzel" | "cormorant" | "inter" | "georgia") => updateStyling("fontFamily", val)}
+                  >
+                    <SelectTrigger className="h-8 text-xs bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cormorant" className="font-serif">Cormorant Garamond (Classical Serif)</SelectItem>
+                      <SelectItem value="cinzel" className="font-serif font-semibold">Cinzel (Roman Gilded)</SelectItem>
+                      <SelectItem value="georgia" className="font-serif">Georgia (Heritage Editorial)</SelectItem>
+                      <SelectItem value="inter" className="font-sans">Inter (Modern Clean Sans)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 2. Text Alignment */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Text Alignment
+                  </Label>
+                  <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80">
+                    <button
+                      type="button"
+                      onClick={() => updateStyling("textAlign", "left")}
+                      className={cn(
+                        "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
+                        styling.textAlign === "left"
+                          ? "bg-background text-foreground font-semibold shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <AlignLeft className="w-3.5 h-3.5" /> Left
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateStyling("textAlign", "center")}
+                      className={cn(
+                        "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
+                        styling.textAlign === "center"
+                          ? "bg-background text-foreground font-semibold shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <AlignCenter className="w-3.5 h-3.5" /> Center
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateStyling("textAlign", "right")}
+                      className={cn(
+                        "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
+                        styling.textAlign === "right"
+                          ? "bg-background text-foreground font-semibold shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <AlignRight className="w-3.5 h-3.5" /> Right
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. Title Size Scale */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Title Size Scale
+                  </Label>
+                  <Select
+                    value={styling.titleScale}
+                    onValueChange={(val: "compact" | "standard" | "large") => updateStyling("titleScale", val)}
+                  >
+                    <SelectTrigger className="h-8 text-xs bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="compact">Compact (12px)</SelectItem>
+                      <SelectItem value="standard">Standard (14px)</SelectItem>
+                      <SelectItem value="large">Large (16px)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 4. Body Size Scale */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Body / Medium Size
+                  </Label>
+                  <Select
+                    value={styling.bodyScale}
+                    onValueChange={(val: "compact" | "standard" | "large") => updateStyling("bodyScale", val)}
+                  >
+                    <SelectTrigger className="h-8 text-xs bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="compact">Compact (8.5px)</SelectItem>
+                      <SelectItem value="standard">Standard (9.5px)</SelectItem>
+                      <SelectItem value="large">Large (10.5px)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Color Palettes & Custom Hex Pickers */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-3 border-t border-border/60">
+                {/* Background Color */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                    <span>Card Background</span>
+                    <span className="font-mono text-[9px] text-muted-foreground">{styling.cardBgColor}</span>
+                  </Label>
+                  <div className="flex items-center gap-1.5">
+                    {CARD_BG_SWATCHES.map((swatch) => (
+                      <button
+                        key={swatch.value}
+                        type="button"
+                        onClick={() => updateStyling("cardBgColor", swatch.value)}
+                        title={swatch.label}
+                        className={cn(
+                          "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
+                          styling.cardBgColor.toLowerCase() === swatch.value.toLowerCase()
+                            ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
+                            : "border-stone-300"
+                        )}
+                        style={{ backgroundColor: swatch.value }}
+                      />
+                    ))}
+                    <input
+                      type="color"
+                      value={styling.cardBgColor}
+                      onChange={(e) => updateStyling("cardBgColor", e.target.value)}
+                      className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                      title="Custom Card Background"
+                    />
+                  </div>
+                </div>
+
+                {/* Title Color */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                    <span>Title Color</span>
+                    <span className="font-mono text-[9px] text-muted-foreground">{styling.titleColor}</span>
+                  </Label>
+                  <div className="flex items-center gap-1.5">
+                    {TITLE_COLOR_SWATCHES.map((swatch) => (
+                      <button
+                        key={swatch.value}
+                        type="button"
+                        onClick={() => updateStyling("titleColor", swatch.value)}
+                        title={swatch.label}
+                        className={cn(
+                          "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
+                          styling.titleColor.toLowerCase() === swatch.value.toLowerCase()
+                            ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
+                            : "border-stone-300"
+                        )}
+                        style={{ backgroundColor: swatch.value }}
+                      />
+                    ))}
+                    <input
+                      type="color"
+                      value={styling.titleColor}
+                      onChange={(e) => updateStyling("titleColor", e.target.value)}
+                      className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                      title="Custom Title Color"
+                    />
+                  </div>
+                </div>
+
+                {/* Medium / Body Text Color */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                    <span>Body Text Color</span>
+                    <span className="font-mono text-[9px] text-muted-foreground">{styling.textColor}</span>
+                  </Label>
+                  <div className="flex items-center gap-1.5">
+                    {TEXT_COLOR_SWATCHES.map((swatch) => (
+                      <button
+                        key={swatch.value}
+                        type="button"
+                        onClick={() => updateStyling("textColor", swatch.value)}
+                        title={swatch.label}
+                        className={cn(
+                          "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
+                          styling.textColor.toLowerCase() === swatch.value.toLowerCase()
+                            ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
+                            : "border-stone-300"
+                        )}
+                        style={{ backgroundColor: swatch.value }}
+                      />
+                    ))}
+                    <input
+                      type="color"
+                      value={styling.textColor}
+                      onChange={(e) => updateStyling("textColor", e.target.value)}
+                      className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                      title="Custom Text Color"
+                    />
+                  </div>
+                </div>
+
+                {/* Header Fillet Color */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                    <span>Fillet / Header Color</span>
+                    <span className="font-mono text-[9px] text-muted-foreground">{styling.headerColor}</span>
+                  </Label>
+                  <div className="flex items-center gap-1.5">
+                    {HEADER_COLOR_SWATCHES.map((swatch) => (
+                      <button
+                        key={swatch.value}
+                        type="button"
+                        onClick={() => updateStyling("headerColor", swatch.value)}
+                        title={swatch.label}
+                        className={cn(
+                          "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
+                          styling.headerColor.toLowerCase() === swatch.value.toLowerCase()
+                            ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
+                            : "border-stone-300"
+                        )}
+                        style={{ backgroundColor: swatch.value }}
+                      />
+                    ))}
+                    <input
+                      type="color"
+                      value={styling.headerColor}
+                      onChange={(e) => updateStyling("headerColor", e.target.value)}
+                      className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                      title="Custom Header Fillet Color"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Global Artist Name Action Bar */}
+            <div className="p-3.5 rounded-xl border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
               <div className="space-y-0.5">
                 <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Apply Artist Name to All Cards
@@ -563,7 +1042,7 @@ export function ArtworkPlacardSheet({
                   type="text"
                   value={globalArtistName}
                   onChange={(e) => setGlobalArtistName(e.target.value)}
-                  className="h-8 text-xs w-48 bg-card"
+                  className="h-8 text-xs w-48 bg-background"
                   placeholder="e.g. Lalita Kapilavai"
                 />
                 <Button
@@ -695,6 +1174,20 @@ export function ArtworkPlacardSheet({
                           placeholder="e.g. 2026"
                         />
                       </div>
+                    </div>
+
+                    {/* Block 5: Additional Curatorial Notes */}
+                    <div className="space-y-1 pt-1">
+                      <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                        <FileText className="w-3 h-3 text-amber-600" />
+                        Additional Curatorial Information / Notes
+                      </Label>
+                      <Textarea
+                        value={itemData.additionalNotes || ""}
+                        onChange={(e) => updateCardItem(art.id, "additionalNotes", e.target.value)}
+                        placeholder="Provenance, donor attribution, historical note, or gallery wall placement details..."
+                        className="text-xs min-h-[58px] resize-y"
+                      />
                     </div>
                   </div>
                 );

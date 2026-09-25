@@ -5,12 +5,44 @@
  * Enforces true physical metric/imperial dimensions and anti-splitting page break rules.
  */
 
+export interface PlacardStylingConfig {
+  fontFamily: "cinzel" | "cormorant" | "inter" | "georgia";
+  textAlign: "left" | "center" | "right";
+  cardBgColor: string;
+  titleColor: string;
+  textColor: string;
+  headerColor: string;
+  borderStyle: "double-fillet" | "single-rule" | "none";
+  titleScale: "compact" | "standard" | "large";
+  bodyScale: "compact" | "standard" | "large";
+  showThumbnail: boolean;
+  showQr: boolean;
+  showCategory: boolean;
+  showArtist: boolean;
+  showCropMarks: boolean;
+}
+
 export interface PlacardPrintOptions {
   title?: string;
   format?: "visiting-card" | "museum-placard";
   orientation?: "landscape" | "portrait";
   borderStyle?: "double-fillet" | "single-rule" | "none";
   showCropMarks?: boolean;
+  styling?: PlacardStylingConfig;
+}
+
+export function getFontFamilyCss(font?: string): string {
+  switch (font) {
+    case "cinzel":
+      return "'Cinzel', Georgia, serif";
+    case "cormorant":
+      return "'Cormorant Garamond', Garamond, Georgia, serif";
+    case "inter":
+      return "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    case "georgia":
+    default:
+      return "Georgia, 'Times New Roman', serif";
+  }
 }
 
 export interface PhysicalDimensions {
@@ -133,11 +165,13 @@ export function printIsolatedElement(
             page-break-inside: avoid !important;
             break-inside: avoid !important;
             position: relative !important;
-            background: #ffffff !important;
-            padding: 3.5mm 4mm !important;
+            background-color: ${options.styling?.cardBgColor || "#ffffff"} !important;
+            font-family: ${getFontFamilyCss(options.styling?.fontFamily)} !important;
+            text-align: ${options.styling?.textAlign || "left"} !important;
+            padding: 3mm 3.5mm !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
             overflow: hidden !important;
             box-sizing: border-box !important;
             margin: 0 !important;

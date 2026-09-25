@@ -31,7 +31,9 @@ import {
   Sun,
   Moon,
   RotateCcw,
+  Printer,
 } from "lucide-react";
+import { ArtworkPlacardSheet, type PlacardArtwork } from "@/components/admin/artwork-placard-sheet";
 import {
   ECatalogThemeTokens,
   DEFAULT_CATALOG_THEME_TOKENS,
@@ -428,6 +430,25 @@ export default function AdminCatalogStudioPage() {
   const [plates, setPlates] = React.useState<CatalogPlate[]>([]);
   const [artworkPickerOpen, setArtworkPickerOpen] = React.useState(false);
   const [artworkSearch, setArtworkSearch] = React.useState("");
+
+  // Printable Placard Sheet State
+  const [isPlacardSheetOpen, setIsPlacardSheetOpen] = React.useState(false);
+
+  const catalogPlacardArtworks = React.useMemo<PlacardArtwork[]>(() => {
+    return plates
+      .filter((p) => p && p.artwork)
+      .map((plate) => ({
+        id: plate.artwork.id,
+        title: plate.customTitle || plate.artwork.title,
+        slug: plate.artwork.slug,
+        medium: plate.artwork.medium || undefined,
+        dimensions: plate.artwork.dimensions || undefined,
+        yearCreated: plate.artwork.yearCreated || undefined,
+        category: plate.artwork.category ? { name: plate.artwork.category.name } : undefined,
+        primaryImageUrl: plate.artwork.primaryImageUrl,
+        additionalNotes: plate.curatorialNote || undefined,
+      }));
+  }, [plates]);
 
   // Custom Magazine & Editorial Pages state
   const [customPages, setCustomPages] = React.useState<ECatalogCustomPageItem[]>([]);
@@ -1067,6 +1088,19 @@ export default function AdminCatalogStudioPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsPlacardSheetOpen(true)}
+            disabled={catalogPlacardArtworks.length === 0}
+            className="text-xs h-8.5 gap-1.5 border-amber-300 dark:border-amber-700/60 text-amber-800 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 cursor-pointer"
+            title="Print display placards for all artworks in this catalog"
+          >
+            <Printer className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            <span>Print Catalog Placards ({catalogPlacardArtworks.length})</span>
+          </Button>
+
           <Link
             href={`/catalogs/${slug}`}
             target="_blank"
@@ -3937,6 +3971,15 @@ export default function AdminCatalogStudioPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cross-Module Printable Placards Sheet */}
+      {catalogPlacardArtworks.length > 0 && (
+        <ArtworkPlacardSheet
+          open={isPlacardSheetOpen}
+          onOpenChange={setIsPlacardSheetOpen}
+          artworks={catalogPlacardArtworks}
+        />
+      )}
     </div>
   );
 }

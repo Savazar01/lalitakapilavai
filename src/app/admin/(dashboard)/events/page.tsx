@@ -23,7 +23,9 @@ import {
   Eye,
   EyeOff,
   Home,
+  Printer,
 } from "lucide-react";
+import { ArtworkPlacardSheet, type PlacardArtwork } from "@/components/admin/artwork-placard-sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -134,6 +136,11 @@ export default function EventsAdminPage() {
   const [exhibitionQrTargetUrl, setExhibitionQrTargetUrl] = React.useState<string>("");
   const [exhibitionQrLoading, setExhibitionQrLoading] = React.useState(false);
   const [selectedArtworkForExhibition, setSelectedArtworkForExhibition] = React.useState<string>("");
+
+  // Printable Placards State
+  const [placardSheetOpen, setPlacardSheetOpen] = React.useState(false);
+  const [eventPlacardArtworks, setEventPlacardArtworks] = React.useState<PlacardArtwork[]>([]);
+  const [loadingEventPlacards, setLoadingEventPlacards] = React.useState<string | null>(null);
 
   const reloadEvents = React.useCallback(() => {
     Promise.all([
@@ -350,6 +357,43 @@ export default function EventsAdminPage() {
       toast.error("Failed to generate exhibition artwork QR");
     } finally {
       setExhibitionQrLoading(false);
+    }
+  };
+
+  // Cross-Module Printable Placards Handler
+  const handlePrintEventPlacards = async (ev: EventItem) => {
+    try {
+      setLoadingEventPlacards(ev.id);
+      const res = await fetch(`/api/admin/events/${ev.id}`);
+      if (!res.ok) throw new Error("Failed to load event artworks");
+      const data = await res.json();
+      
+      const artworksList: PlacardArtwork[] = (data.artworks || [])
+        .filter((item: { artwork?: { id: string } }) => Boolean(item && item.artwork))
+        .map((item: { artwork: { id: string; title: string; slug: string; medium?: string; dimensions?: string; yearCreated?: number; primaryImageUrl?: string; category?: { name: string } | null; description?: string } }) => ({
+          id: item.artwork.id,
+          title: item.artwork.title,
+          slug: item.artwork.slug,
+          medium: item.artwork.medium,
+          dimensions: item.artwork.dimensions,
+          yearCreated: item.artwork.yearCreated,
+          category: item.artwork.category ? { name: item.artwork.category.name } : undefined,
+          primaryImageUrl: item.artwork.primaryImageUrl,
+          additionalNotes: undefined,
+        }));
+
+      if (artworksList.length === 0) {
+        toast.info(`No linked artworks found for "${ev.title}". Link artworks using the QR/Artworks button first.`);
+        return;
+      }
+
+      setEventPlacardArtworks(artworksList);
+      setPlacardSheetOpen(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load artworks for placards");
+    } finally {
+      setLoadingEventPlacards(null);
     }
   };
 
@@ -641,6 +685,26 @@ export default function EventsAdminPage() {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => handlePrintEventPlacards(ev)}
+                      disabled={loadingEventPlacards === ev.id}
+                      className="h-7 text-xs px-2 gap-1"
+                      title={
+                        (ev._count?.artworks || 0) > 0
+                          ? `Print Placards for ${ev._count?.artworks} Artworks`
+                          : "Print Placards (Link artworks first)"
+                      }
+                    >
+                      {loadingEventPlacards === ev.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                      ) : (
+                        <Printer className="w-3.5 h-3.5 text-primary" />
+                      )}
+                      Placards ({ev._count?.artworks || 0})
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleOpenExhibitionQR(ev)}
                       className="h-7 text-xs px-2 gap-1"
                       title="Floor QR Codes"
@@ -844,6 +908,15 @@ export default function EventsAdminPage() {
         isDestructive={true}
         onConfirm={handleConfirmDelete}
       />
+
+      {/* Cross-Module Printable Placards Sheet */}
+      {eventPlacardArtworks.length > 0 && (
+        <ArtworkPlacardSheet
+          open={placardSheetOpen}
+          onOpenChange={setPlacardSheetOpen}
+          artworks={eventPlacardArtworks}
+        />
+      )}
     </div>
   );
 }
