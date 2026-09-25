@@ -46,6 +46,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,
@@ -65,6 +66,7 @@ import { SUPPORTED_CURRENCIES } from "@/lib/formatters";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
 import { AdminPortalConfig, DEFAULT_ADMIN_CONFIG } from "@/lib/admin-config";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/sidebar";
+import { MailConfigStudio } from "@/components/admin/mail-config-studio";
 
 interface LegalLinkItem {
   label: string;
@@ -110,6 +112,7 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [logoUploading, setLogoUploading] = React.useState(false);
+  const [emailLogoUploading, setEmailLogoUploading] = React.useState(false);
   const [faviconUploading, setFaviconUploading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
@@ -168,7 +171,11 @@ export default function AdminSettingsPage() {
   const [form, setForm] = React.useState({
     siteName: "",
     siteDescription: "",
-    adminAlertEmail: "",
+    adminAlertEmail: "info@lalitakapilavai.com",
+    emailHeaderTitle: "Lalita Kapilavai Atelier",
+    emailHeaderSubtitle: "Sacred & Traditional Indian Art",
+    emailLogoUrl: "",
+    emailFooterText: "Inbound atelier inquiry and archival correspondence.",
     contactEmail: "",
     contactPhone: "",
     logoUrl: "",
@@ -279,7 +286,11 @@ export default function AdminSettingsPage() {
           setForm({
             siteName: data.siteName || "",
             siteDescription: data.siteDescription || "",
-            adminAlertEmail: data.adminAlertEmail || "",
+            adminAlertEmail: data.adminAlertEmail || "info@lalitakapilavai.com",
+            emailHeaderTitle: data.emailHeaderTitle || "Lalita Kapilavai Atelier",
+            emailHeaderSubtitle: data.emailHeaderSubtitle || "Sacred & Traditional Indian Art",
+            emailLogoUrl: data.emailLogoUrl || "",
+            emailFooterText: data.emailFooterText || "Inbound atelier inquiry and archival correspondence.",
             contactEmail: data.contactEmail || "",
             contactPhone: data.contactPhone || "",
             defaultCurrency: data.defaultCurrency || "INR",
@@ -458,6 +469,34 @@ export default function AdminSettingsPage() {
       toast.error(err instanceof Error ? err.message : "Failed to upload favicon");
     } finally {
       setFaviconUploading(false);
+    }
+  };
+
+  const handleEmailLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setEmailLogoUploading(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("mediaType", "logo");
+    body.append("isArtwork", "false");
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      const url = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
+      setForm((prev) => ({ ...prev, emailLogoUrl: url }));
+      toast.success("Email header logo uploaded successfully!");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload email logo");
+    } finally {
+      setEmailLogoUploading(false);
     }
   };
 
@@ -674,6 +713,12 @@ export default function AdminSettingsPage() {
                 className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
               >
                 <Mail className="w-3.5 h-3.5 mr-1" /> Gmail / SMTP
+              </TabsTrigger>
+              <TabsTrigger
+                value="mail-config"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
+                <Sliders className="w-3.5 h-3.5 mr-1" /> Mail Msg Config
               </TabsTrigger>
               <TabsTrigger
                 value="ai"
@@ -1499,6 +1544,27 @@ export default function AdminSettingsPage() {
                     </p>
                   </div>
 
+                  {/* Dedicated Admin Alert Recipient Email */}
+                  <div className="p-4 rounded-lg border border-amber-500/30 bg-amber-500/5 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-amber-600" /> Admin Alert Recipient Email
+                      </Label>
+                      <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-800 dark:text-amber-300">
+                        Decoupled from Auth
+                      </Badge>
+                    </div>
+                    <Input
+                      value={form.adminAlertEmail}
+                      onChange={(e) => setForm({ ...form, adminAlertEmail: e.target.value })}
+                      placeholder="info@lalitakapilavai.com or alerts@lalitakapilavai.com"
+                      className="text-xs font-mono"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      All inbound website form inquiries, exhibition RSVPs, and private commission requests are dispatched strictly to this verified inbox, never exposing or defaulting to console super-admin login emails.
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <Label className="font-semibold text-foreground">Email Provider</Label>
@@ -1599,6 +1665,71 @@ export default function AdminSettingsPage() {
                     </div>
                   </div>
 
+                  {/* Dynamic Outbound Email Header & Footer Branding */}
+                  <div className="p-4 rounded-lg border border-border/80 bg-card/60 space-y-4">
+                    <h4 className="font-semibold text-foreground flex items-center gap-1.5 text-xs uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Dynamic Email Branding &amp; Design Tokens
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Email Header Title</Label>
+                        <Input
+                          value={form.emailHeaderTitle}
+                          onChange={(e) => setForm({ ...form, emailHeaderTitle: e.target.value })}
+                          placeholder="Lalita Kapilavai Atelier"
+                          className="text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Email Header Subtitle</Label>
+                        <Input
+                          value={form.emailHeaderSubtitle}
+                          onChange={(e) => setForm({ ...form, emailHeaderSubtitle: e.target.value })}
+                          placeholder="Sacred & Traditional Indian Art"
+                          className="text-xs"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Email Header Logo URL</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={form.emailLogoUrl}
+                          onChange={(e) => setForm({ ...form, emailLogoUrl: e.target.value })}
+                          placeholder="https://... or /logo.png"
+                          className="text-xs font-mono"
+                        />
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleEmailLogoUpload}
+                            disabled={emailLogoUploading}
+                            className="hidden"
+                          />
+                          <div className="inline-flex items-center px-3 py-1.5 rounded-md border border-border bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors">
+                            {emailLogoUploading ? (
+                              <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                            ) : (
+                              <Upload className="w-3.5 h-3.5 mr-1.5" />
+                            )}
+                            Upload Logo
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Email Footer Disclaimer / Notice</Label>
+                      <Textarea
+                        value={form.emailFooterText}
+                        onChange={(e) => setForm({ ...form, emailFooterText: e.target.value })}
+                        placeholder="Inbound atelier inquiry and archival correspondence."
+                        rows={2}
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+
                   {/* Connectivity Testing Box */}
                   <div className="p-4 rounded-lg border border-border/80 bg-secondary/30 space-y-3">
                     <h4 className="font-semibold text-foreground flex items-center gap-1.5 text-sm">
@@ -1631,6 +1762,11 @@ export default function AdminSettingsPage() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Tab: Mail Msg Config & Outbound Dispatch Audit */}
+            <TabsContent value="mail-config">
+              <MailConfigStudio />
             </TabsContent>
 
             {/* Tab 6: Universal Multi-Provider AI Assistant */}

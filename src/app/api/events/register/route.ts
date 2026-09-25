@@ -98,6 +98,30 @@ export async function POST(request: NextRequest) {
       return reg;
     });
 
+    // Dispatch outbound administrative alert and attendee confirmation receipt
+    try {
+      const { sendAtelierEmail } = await import("@/lib/email-service");
+      await sendAtelierEmail({
+        triggerType: "event_rsvp",
+        userEmail: attendeeEmail,
+        data: {
+          name: attendeeName,
+          email: attendeeEmail,
+          phone: attendeePhone || "Not specified",
+          subject: `RSVP: ${event.title}`,
+          event_title: event.title,
+          event_date: `${event.startDate.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}${event.venue ? ` — ${event.venue}` : ""}`,
+          guest_count: tickets,
+          message: customAnswersText || `Registration confirmed for ${tickets} attendee(s).`,
+          form_data: customAnswersText
+            ? `<div style="background: #faf7f2; padding: 12px; border-radius: 4px; border: 1px solid #e7e2d9; margin-top: 12px; font-size: 13px;"><strong>Attendee Intake Notes:</strong><br/>${customAnswersText.replace(/\n/g, "<br/>")}</div>`
+            : "",
+        },
+      });
+    } catch (emailErr) {
+      console.warn("Event RSVP outbound notification notice:", emailErr);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Registration confirmed. We look forward to welcoming you!",

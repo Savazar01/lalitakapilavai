@@ -58,6 +58,7 @@ export interface MediaGalleryBlockData {
   autoplayTour?: boolean;
   overviewDwellSeconds?: number;
   showExhibitionBadge?: boolean;
+  maxArtworksPerWall?: number;
   showFrameHeader?: boolean;
   frameHeaderBg?: string;
   frameHeaderTextColor?: string;
@@ -88,6 +89,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const wallLayout = data.wallLayout ?? "salon";
   const autoplayTour = data.autoplayTour ?? true;
   const overviewDwellSeconds = data.overviewDwellSeconds ?? 4;
+  const maxArtworksPerWall = data.maxArtworksPerWall ?? 4;
   const showFrameHeader = data.showFrameHeader ?? false;
   const frameHeaderBg = data.frameHeaderBg ?? "#0F0E0D";
   const frameHeaderTextColor = data.frameHeaderTextColor ?? "#F5EBE1";
@@ -290,6 +292,13 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       overviewDwellSeconds: val,
+    });
+  };
+
+  const handleMaxArtworksPerWallChange = (val: number) => {
+    onChange({
+      ...data,
+      maxArtworksPerWall: val,
     });
   };
 
@@ -664,12 +673,12 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           )}
 
           {/* Autoplay Tour & Dwell Speeds */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-amber-500/20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-amber-500/20">
             <div className="flex items-center justify-between sm:flex-col sm:items-start sm:justify-center gap-1.5">
               <div>
-                <Label className="text-xs font-semibold text-foreground">Autoplay Cinematic Tour</Label>
+                <Label className="text-xs font-semibold text-foreground">Autoplay Tour</Label>
                 <p className="text-[10px] text-muted-foreground">
-                  Cycles camera sequentially between hung pieces.
+                  Cycles camera between walls and pieces.
                 </p>
               </div>
               <button
@@ -691,6 +700,23 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
 
             <div className="space-y-1">
               <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Max Artworks Per Wall</span>
+                <span className="text-primary font-mono text-xs">{maxArtworksPerWall}</span>
+              </Label>
+              <input
+                type="range"
+                min={2}
+                max={8}
+                step={1}
+                value={maxArtworksPerWall}
+                onChange={(e) => handleMaxArtworksPerWallChange(Number(e.target.value))}
+                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+              />
+              <span className="text-[10px] text-muted-foreground">Partitions corridor (2 to 8)</span>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
                 <span>Overview Wall Dwell</span>
                 <span className="text-primary font-mono text-xs">{overviewDwellSeconds}s</span>
               </Label>
@@ -703,7 +729,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 onChange={(e) => handleOverviewDwellSecondsChange(Number(e.target.value))}
                 className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
               />
-              <span className="text-[10px] text-muted-foreground">Panoramic wall hold duration (2s - 10s)</span>
+              <span className="text-[10px] text-muted-foreground">Panoramic wall hold (2s - 10s)</span>
             </div>
 
             <div className="space-y-1">
@@ -720,7 +746,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 onChange={(e) => handleTimerChange(Number(e.target.value))}
                 className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
               />
-              <span className="text-[10px] text-muted-foreground">Focus dwell per masterwork (3s - 15s)</span>
+              <span className="text-[10px] text-muted-foreground">Focus dwell (3s - 15s)</span>
             </div>
           </div>
         </div>

@@ -92,10 +92,16 @@ model SystemSetting {
   id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   siteName          String   @default("Lalita Kapilavai — Sacred Art & Carnatic Music Archive")
   siteDescription   String?  @db.Text
-  adminAlertEmail   String   @default("admin@lalitakapilavai.com")
+  adminAlertEmail   String?  @default("info@lalitakapilavai.com")
   contactEmail      String?
   contactPhone      String?
-  
+
+  // Email Notification & Outbound Branding
+  emailHeaderTitle    String?  @default("Lalita Kapilavai Atelier")
+  emailHeaderSubtitle String?  @default("Sacred & Traditional Indian Art")
+  emailLogoUrl        String?
+  emailFooterText     String?  @default("Inbound atelier inquiry and archival correspondence.")
+
   // Watermark parameters
   watermarkText     String   @default("© Lalita Kapilavai - Sacred Art & Heritage")
   watermarkOpacity  Float    @default(0.4)
@@ -724,3 +730,36 @@ model ECatalogItem {
   @@unique([catalogId, artworkId])
   @@map("e_catalog_items")
 }
+
+// -----------------------------------------------------------------------------
+// Email Template Configuration & Outbound Dispatch Audit Engine
+// -----------------------------------------------------------------------------
+
+model EmailTemplateConfig {
+  id                String   @id @default(cuid())
+  triggerType       String   @unique // "contact", "event_rsvp", "acquisition", "custom_form"
+  name              String
+  adminSubject      String
+  adminBodyTemplate String   @db.Text
+  sendUserReceipt   Boolean  @default(true)
+  userSubject       String?
+  userBodyTemplate  String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("email_template_configs")
+}
+
+model EmailDispatchLog {
+  id           String   @id @default(cuid())
+  recipient    String
+  sender       String
+  triggerType  String
+  subject      String
+  status       String   // "SENT", "FAILED"
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  @@map("email_dispatch_logs")
+}
+

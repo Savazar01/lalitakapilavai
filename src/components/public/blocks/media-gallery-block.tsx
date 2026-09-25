@@ -101,6 +101,7 @@ export interface MediaGalleryBlockProps {
   autoplayTour?: boolean;
   overviewDwellSeconds?: number;
   showExhibitionBadge?: boolean;
+  maxArtworksPerWall?: number;
   showFrameHeader?: boolean;
   frameHeaderBg?: string;
   frameHeaderTextColor?: string;
@@ -305,6 +306,7 @@ export function MediaGalleryBlock({
   autoplayTour = true,
   overviewDwellSeconds = 4,
   showExhibitionBadge = true,
+  maxArtworksPerWall = 4,
   showFrameHeader = false,
   frameHeaderBg = "",
   frameHeaderTextColor = "",
@@ -416,6 +418,7 @@ export function MediaGalleryBlock({
         tourSpeedSeconds={autoplayTimer}
         overviewDwellSeconds={overviewDwellSeconds}
         showExhibitionBadge={showExhibitionBadge}
+        maxArtworksPerWall={maxArtworksPerWall}
         className={className}
       />
     );
