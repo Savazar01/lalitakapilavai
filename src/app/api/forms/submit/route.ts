@@ -84,7 +84,31 @@ export async function POST(req: NextRequest) {
           pageStr.toLowerCase() === "contact" ||
           lowerTitle.includes("general inquiry");
 
-        const triggerType = isAcquisition ? "acquisition" : isContact ? "contact" : "custom_form";
+        const archetypeFallback = isAcquisition ? "acquisition" : isContact ? "contact" : "custom_form";
+
+        let triggerType = (body.triggerType ? String(body.triggerType).trim() : "") || "";
+        const formIdStr = body.formId ? String(body.formId).trim() : null;
+
+        if (!triggerType) {
+          const candidateKeys = [
+            formIdStr ? `page_form_${pageStr}_${formIdStr}` : null,
+            `page_form_${pageStr}`,
+          ].filter(Boolean) as string[];
+
+          if (candidateKeys.length > 0) {
+            const existingCustom = await prisma.emailTemplateConfig.findFirst({
+              where: { triggerType: { in: candidateKeys } },
+              select: { triggerType: true },
+            });
+            if (existingCustom) {
+              triggerType = existingCustom.triggerType;
+            }
+          }
+        }
+
+        if (!triggerType) {
+          triggerType = archetypeFallback;
+        }
 
         let customRows = "";
         if (customFields && typeof customFields === "object" && Object.keys(customFields).length > 0) {

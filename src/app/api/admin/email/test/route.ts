@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
     const finalHtml = wrapBrandedEmailHtml(bodyHtml, {
       emailHeaderTitle: systemSettings?.emailHeaderTitle,
       emailHeaderSubtitle: systemSettings?.emailHeaderSubtitle,
+      logoUrl: systemSettings?.logoUrl,
       emailLogoUrl: systemSettings?.emailLogoUrl,
       emailFooterText: systemSettings?.emailFooterText,
     });

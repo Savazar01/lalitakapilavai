@@ -112,7 +112,6 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [logoUploading, setLogoUploading] = React.useState(false);
-  const [emailLogoUploading, setEmailLogoUploading] = React.useState(false);
   const [faviconUploading, setFaviconUploading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
@@ -469,34 +468,6 @@ export default function AdminSettingsPage() {
       toast.error(err instanceof Error ? err.message : "Failed to upload favicon");
     } finally {
       setFaviconUploading(false);
-    }
-  };
-
-  const handleEmailLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setEmailLogoUploading(true);
-    const body = new FormData();
-    body.append("file", file);
-    body.append("mediaType", "logo");
-    body.append("isArtwork", "false");
-
-    try {
-      const res = await fetch("/api/admin/media/upload", {
-        method: "POST",
-        body,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-
-      const url = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
-      setForm((prev) => ({ ...prev, emailLogoUrl: url }));
-      toast.success("Email header logo uploaded successfully!");
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to upload email logo");
-    } finally {
-      setEmailLogoUploading(false);
     }
   };
 
@@ -1690,32 +1661,10 @@ export default function AdminSettingsPage() {
                         />
                       </div>
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">Email Header Logo URL</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          value={form.emailLogoUrl}
-                          onChange={(e) => setForm({ ...form, emailLogoUrl: e.target.value })}
-                          placeholder="https://... or /logo.png"
-                          className="text-xs font-mono"
-                        />
-                        <label className="cursor-pointer">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleEmailLogoUpload}
-                            disabled={emailLogoUploading}
-                            className="hidden"
-                          />
-                          <div className="inline-flex items-center px-3 py-1.5 rounded-md border border-border bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors">
-                            {emailLogoUploading ? (
-                              <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                            ) : (
-                              <Upload className="w-3.5 h-3.5 mr-1.5" />
-                            )}
-                            Upload Logo
-                          </div>
-                        </label>
+                    <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 flex items-start gap-2.5">
+                      <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                      <div className="text-[11px] text-muted-foreground leading-relaxed">
+                        <strong className="text-foreground font-medium">Brand Logo Single Source of Truth:</strong> Outbound emails automatically resolve and embed the official brand logo uploaded under the <strong className="text-foreground font-medium">General</strong> tab with absolute HTTPS URL formatting, ensuring high-fidelity rendering across all desktop and mobile mail clients (Gmail, Apple Mail, Outlook).
                       </div>
                     </div>
                     <div className="space-y-1.5">

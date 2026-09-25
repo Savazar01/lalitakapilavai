@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     try {
       const { sendAtelierEmail } = await import("@/lib/email-service");
       await sendAtelierEmail({
-        triggerType: "event_rsvp",
+        triggerType: `event_rsvp_${event.slug}`,
         userEmail: attendeeEmail,
         data: {
           name: attendeeName,

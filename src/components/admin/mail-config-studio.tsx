@@ -13,11 +13,14 @@ import {
   AlertCircle,
   Loader2,
   Clock,
+  ExternalLink,
+  Layers,
+  Calendar,
+  Compass,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -34,6 +37,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { EmailTiptapEditor } from "@/components/admin/email-tiptap-editor";
+import { DiscoveredFormCategory, DiscoveredFormItem } from "@/app/api/admin/forms/discover/route";
 import { cn } from "@/lib/utils";
 
 interface EmailTemplate {
@@ -67,14 +72,14 @@ interface Pagination {
 
 const AVAILABLE_TOKENS = [
   { token: "{name}", label: "Name", desc: "Submitter full name" },
-  { token: "{email}", label: "Email", desc: "Submitter email" },
+  { token: "{email}", label: "Email", desc: "Submitter email address" },
   { token: "{phone}", label: "Phone", desc: "Contact number / WhatsApp" },
-  { token: "{subject}", label: "Subject", desc: "Inquiry or artwork title" },
-  { token: "{message}", label: "Message", desc: "Main comment or inquiry copy" },
-  { token: "{form_name}", label: "Form Name", desc: "Title of dynamic form" },
-  { token: "{form_data}", label: "Form Data", desc: "Key-value attributes table" },
+  { token: "{subject}", label: "Subject", desc: "Inquiry or submission subject line" },
+  { token: "{message}", label: "Message", desc: "Main comment or inquiry message" },
+  { token: "{form_name}", label: "Form Name", desc: "Title or category of dynamic form" },
+  { token: "{form_data}", label: "Form Data", desc: "Structured HTML key-value table of all fields" },
   { token: "{event_title}", label: "Event Title", desc: "Recital or exhibition name" },
-  { token: "{event_date}", label: "Event Date", desc: "Date and venue" },
+  { token: "{event_date}", label: "Event Date", desc: "Scheduled date and venue" },
   { token: "{guest_count}", label: "Guest Count", desc: "Number of reserved passes" },
   { token: "{date}", label: "Timestamp", desc: "Current time (IST)" },
 ];
@@ -84,14 +89,17 @@ export function MailConfigStudio() {
 
   // Template State
   const [templates, setTemplates] = React.useState<EmailTemplate[]>([]);
+  const [discoveredCategories, setDiscoveredCategories] = React.useState<DiscoveredFormCategory[]>([]);
+  const [discoveredForms, setDiscoveredForms] = React.useState<DiscoveredFormItem[]>([]);
+  const [activeFormTrigger, setActiveFormTrigger] = React.useState<string>("contact");
+  const [formSearchQuery, setFormSearchQuery] = React.useState("");
+  const [selectedCategoryTab, setSelectedCategoryTab] = React.useState<string>("all");
+
   const [loadingTemplates, setLoadingTemplates] = React.useState(true);
   const [savingTemplates, setSavingTemplates] = React.useState(false);
-  const [selectedTemplateIndex, setSelectedTemplateIndex] = React.useState(0);
 
-  // Active Focused Field for token chip insertion
-  const [activeField, setActiveField] = React.useState<
-    "adminSubject" | "adminBodyTemplate" | "userSubject" | "userBodyTemplate" | null
-  >(null);
+  // Active Subject Input for token insertion
+  const [activeSubjectField, setActiveSubjectField] = React.useState<"adminSubject" | "userSubject" | null>(null);
 
   // Logs State
   const [logs, setLogs] = React.useState<EmailLog[]>([]);
@@ -105,26 +113,42 @@ export function MailConfigStudio() {
   const [logsSearch, setLogsSearch] = React.useState("");
   const [logsTriggerFilter, setLogsTriggerFilter] = React.useState("all");
   const [logsStatusFilter, setLogsStatusFilter] = React.useState("all");
+  const [logsStartDate, setLogsStartDate] = React.useState("");
+  const [logsEndDate, setLogsEndDate] = React.useState("");
   const [selectedErrorLog, setSelectedErrorLog] = React.useState<EmailLog | null>(null);
 
-  // 1. Load Templates
-  const fetchTemplates = React.useCallback(async () => {
+  // 1. Fetch Discovered Forms & Existing Templates
+  const loadStudioData = React.useCallback(async () => {
     setLoadingTemplates(true);
     try {
-      const res = await fetch("/api/admin/email-templates");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load templates");
-      if (Array.isArray(data.templates)) {
-        setTemplates(data.templates);
+      const [tplRes, discRes] = await Promise.all([
+        fetch("/api/admin/email-templates"),
+        fetch("/api/admin/forms/discover"),
+      ]);
+
+      const tplData = await tplRes.json();
+      const discData = await discRes.json();
+
+      if (!tplRes.ok) throw new Error(tplData.error || "Failed to load saved templates");
+      if (!discRes.ok) throw new Error(discData.error || "Failed to discover forms");
+
+      const existingTemplates: EmailTemplate[] = Array.isArray(tplData.templates) ? tplData.templates : [];
+      setTemplates(existingTemplates);
+
+      if (Array.isArray(discData.categories)) {
+        setDiscoveredCategories(discData.categories);
+      }
+      if (Array.isArray(discData.allForms)) {
+        setDiscoveredForms(discData.allForms);
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Error loading templates");
+      toast.error(err instanceof Error ? err.message : "Error loading form discovery & templates");
     } finally {
       setLoadingTemplates(false);
     }
   }, []);
 
-  // 2. Load Logs
+  // 2. Fetch Logs
   const fetchLogs = React.useCallback(
     async (pageToLoad = 1) => {
       setLoadingLogs(true);
@@ -135,6 +159,8 @@ export function MailConfigStudio() {
         if (logsSearch.trim()) params.set("search", logsSearch.trim());
         if (logsTriggerFilter !== "all") params.set("triggerType", logsTriggerFilter);
         if (logsStatusFilter !== "all") params.set("status", logsStatusFilter);
+        if (logsStartDate.trim()) params.set("startDate", logsStartDate.trim());
+        if (logsEndDate.trim()) params.set("endDate", logsEndDate.trim());
 
         const res = await fetch(`/api/admin/email-logs?${params.toString()}`);
         const data = await res.json();
@@ -147,15 +173,15 @@ export function MailConfigStudio() {
         setLoadingLogs(false);
       }
     },
-    [logsSearch, logsTriggerFilter, logsStatusFilter]
+    [logsSearch, logsTriggerFilter, logsStatusFilter, logsStartDate, logsEndDate]
   );
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      fetchTemplates();
+      loadStudioData();
     }, 0);
     return () => clearTimeout(timer);
-  }, [fetchTemplates]);
+  }, [loadStudioData]);
 
   React.useEffect(() => {
     if (subTab === "logs") {
@@ -166,14 +192,87 @@ export function MailConfigStudio() {
     }
   }, [subTab, fetchLogs]);
 
-  // Save Templates
+  // Find or generate active template object
+  const currentDiscoveredForm = React.useMemo(() => {
+    return discoveredForms.find((f) => f.triggerType === activeFormTrigger) || {
+      triggerType: activeFormTrigger,
+      name: "General Inquiry",
+      source: "System Core" as const,
+      url: "/contact",
+    };
+  }, [discoveredForms, activeFormTrigger]);
+
+  const currentTemplate = React.useMemo((): EmailTemplate => {
+    const found = templates.find((t) => t.triggerType === activeFormTrigger);
+    if (found) return found;
+
+    // Generate fallback template for newly selected discovered form
+    const isEvent = activeFormTrigger.startsWith("event_rsvp");
+    const isPageForm = activeFormTrigger.startsWith("page_form");
+
+    if (isEvent) {
+      return {
+        triggerType: activeFormTrigger,
+        name: currentDiscoveredForm.name,
+        adminSubject: `🎫 New RSVP: {event_title} [{name}]`,
+        adminBodyTemplate: `<p>A new RSVP has been received for <strong>{event_title}</strong>.</p><p><strong>Patron:</strong> {name} (<a href="mailto:{email}">{email}</a>)<br/><strong>Contact:</strong> {phone}<br/><strong>Reserved Passes:</strong> {guest_count}</p><p><strong>Additional Notes:</strong><br/>{message}</p>`,
+        sendUserReceipt: true,
+        userSubject: `Your RSVP Confirmation: {event_title}`,
+        userBodyTemplate: `<p>Dear {name},</p><p>Thank you for reserving your attendance for <strong>{event_title}</strong>.</p><p><strong>Event Schedule & Venue:</strong> {event_date}<br/><strong>Confirmed Passes:</strong> {guest_count}</p><p>We look forward to welcoming you.</p><p>Warm regards,<br/><strong>Lalita Kapilavai Atelier</strong></p>`,
+      };
+    }
+
+    if (isPageForm) {
+      return {
+        triggerType: activeFormTrigger,
+        name: currentDiscoveredForm.name,
+        adminSubject: `📝 Inbound Form: ${currentDiscoveredForm.name} [{name}]`,
+        adminBodyTemplate: `<p>A new submission was received on <strong>${currentDiscoveredForm.name}</strong>.</p><p><strong>From:</strong> {name} (<a href="mailto:{email}">{email}</a>)<br/><strong>Contact:</strong> {phone}</p><p><strong>Message:</strong><br/>{message}</p>{form_data}`,
+        sendUserReceipt: true,
+        userSubject: `We received your message — Lalita Kapilavai Atelier`,
+        userBodyTemplate: `<p>Dear {name},</p><p>Thank you for reaching out regarding ${currentDiscoveredForm.name}. We have received your correspondence and will respond shortly.</p><p>Warm regards,<br/><strong>Lalita Kapilavai Atelier</strong></p>`,
+      };
+    }
+
+    return {
+      triggerType: activeFormTrigger,
+      name: currentDiscoveredForm.name,
+      adminSubject: `✨ New Inquiry: {subject} [{name}]`,
+      adminBodyTemplate: `<p>Inbound inquiry received from {name}...</p>`,
+      sendUserReceipt: true,
+      userSubject: `Thank you for contacting Lalita Kapilavai Atelier`,
+      userBodyTemplate: `<p>Dear {name},</p><p>Thank you for contacting us. We have received your message.</p>`,
+    };
+  }, [templates, activeFormTrigger, currentDiscoveredForm]);
+
+  // Mutate current template
+  const updateCurrentTemplate = (patch: Partial<EmailTemplate>) => {
+    setTemplates((prev) => {
+      const idx = prev.findIndex((t) => t.triggerType === activeFormTrigger);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...patch };
+        return next;
+      } else {
+        return [...prev, { ...currentTemplate, ...patch }];
+      }
+    });
+  };
+
+  // Save all templates
   const handleSaveTemplates = async () => {
     setSavingTemplates(true);
     try {
+      // Ensure the current active template is in the array
+      const allToSave = [...templates];
+      if (!allToSave.some((t) => t.triggerType === currentTemplate.triggerType)) {
+        allToSave.push(currentTemplate);
+      }
+
       const res = await fetch("/api/admin/email-templates", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ templates }),
+        body: JSON.stringify({ templates: allToSave }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save email templates");
@@ -186,22 +285,15 @@ export function MailConfigStudio() {
     }
   };
 
-  // Helper to insert token into active input
-  const insertToken = (token: string) => {
-    if (!activeField || !templates[selectedTemplateIndex]) {
-      toast.info(`Click on a subject or message box first, then click "${token}" to insert.`);
+  // Insert token into active subject input
+  const insertTokenIntoSubject = (token: string) => {
+    if (!activeSubjectField) {
+      toast.info(`Click into the Admin Subject or User Subject input to insert ${token}.`);
       return;
     }
-    const current = templates[selectedTemplateIndex];
-    const prevVal = (current[activeField] as string) || "";
-    const updatedVal = prevVal ? `${prevVal} ${token}` : token;
-
-    const updated = [...templates];
-    updated[selectedTemplateIndex] = {
-      ...current,
-      [activeField]: updatedVal,
-    };
-    setTemplates(updated);
+    const prev = currentTemplate[activeSubjectField] || "";
+    const updated = prev ? `${prev} ${token}` : token;
+    updateCurrentTemplate({ [activeSubjectField]: updated });
     toast.success(`Inserted ${token}`);
   };
 
@@ -212,15 +304,37 @@ export function MailConfigStudio() {
     if (logsSearch.trim()) params.set("search", logsSearch.trim());
     if (logsTriggerFilter !== "all") params.set("triggerType", logsTriggerFilter);
     if (logsStatusFilter !== "all") params.set("status", logsStatusFilter);
-    if (logsStartDate) params.set("startDate", logsStartDate);
-    if (logsEndDate) params.set("endDate", logsEndDate);
+    if (logsStartDate.trim()) params.set("startDate", logsStartDate.trim());
+    if (logsEndDate.trim()) params.set("endDate", logsEndDate.trim());
 
     const exportUrl = `/api/admin/email-logs?${params.toString()}`;
     window.open(exportUrl, "_blank");
     toast.success("Generating and downloading CSV audit report...");
   };
 
-  const currentTemplate = templates[selectedTemplateIndex];
+  // Filter discovered forms by search and category
+  const filteredDiscoveredForms = React.useMemo(() => {
+    let list = discoveredForms;
+    if (selectedCategoryTab === "core") {
+      list = list.filter((f) => f.source === "System Core");
+    } else if (selectedCategoryTab === "pages") {
+      list = list.filter((f) => f.source === "Page Builder");
+    } else if (selectedCategoryTab === "events") {
+      list = list.filter((f) => f.source === "Event Registration");
+    }
+
+    if (formSearchQuery.trim()) {
+      const q = formSearchQuery.toLowerCase();
+      list = list.filter(
+        (f) =>
+          f.name.toLowerCase().includes(q) ||
+          f.triggerType.toLowerCase().includes(q) ||
+          (f.description && f.description.toLowerCase().includes(q))
+      );
+    }
+
+    return list;
+  }, [discoveredForms, selectedCategoryTab, formSearchQuery]);
 
   return (
     <div className="space-y-6">
@@ -229,10 +343,10 @@ export function MailConfigStudio() {
         <div>
           <h2 className="text-xl font-serif font-bold text-foreground flex items-center gap-2">
             <Mail className="w-5 h-5 text-amber-600" />
-            Mail Message Configurator &amp; Dispatch Audit
+            Universal Mail Studio &amp; Dispatch Telemetry
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Fine-tune notification subjects, receipts, and view immutable outbound delivery telemetry.
+            Dynamic form discovery, rich Tiptap email editor, and audit log.
           </p>
         </div>
 
@@ -273,256 +387,325 @@ export function MailConfigStudio() {
       </div>
 
       {/* ========================================================================= */}
-      {/* SUB-TAB 1: FORM TEMPLATES MATRIX */}
+      {/* SUB-TAB 1: FORM TEMPLATES MATRIX & DYNAMIC FORM DISCOVERY */}
       {/* ========================================================================= */}
       {subTab === "templates" && (
         <div className="space-y-6">
           {loadingTemplates ? (
             <div className="flex items-center justify-center p-12 text-sm text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mr-2 text-primary" />
-              Loading email templates matrix...
+              Scanning dynamic forms &amp; loading email templates...
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: Form Trigger Selector */}
+              {/* Left Column: Discovered Forms Directory */}
               <div className="lg:col-span-4 space-y-3">
-                <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider block">
-                  Submission Types
-                </Label>
-                <div className="space-y-2">
-                  {templates.map((tpl, idx) => {
-                    const isSelected = idx === selectedTemplateIndex;
-                    return (
-                      <button
-                        key={tpl.triggerType}
-                        type="button"
-                        onClick={() => setSelectedTemplateIndex(idx)}
-                        className={cn(
-                          "w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer relative group",
-                          isSelected
-                            ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-100 shadow-xs ring-1 ring-amber-500/30"
-                            : "border-border bg-card/60 hover:bg-card text-foreground"
-                        )}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">
-                            {tpl.name}
-                          </span>
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              "text-[10px] font-mono",
-                              isSelected ? "border-amber-500/50 text-amber-800 dark:text-amber-300" : ""
-                            )}
-                          >
-                            {tpl.triggerType}
-                          </Badge>
-                        </div>
-                        <p className="text-[11px] text-muted-foreground truncate">
-                          {tpl.adminSubject}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/40 text-[10px] text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <span
-                              className={cn(
-                                "w-1.5 h-1.5 rounded-full",
-                                tpl.sendUserReceipt ? "bg-emerald-500" : "bg-slate-400"
-                              )}
-                            />
-                            {tpl.sendUserReceipt ? "User Receipt Active" : "No User Receipt"}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider block">
+                    Discovered Forms ({discoveredForms.length})
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={loadStudioData}
+                    className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    <RefreshCw className="w-3 h-3 mr-1" /> Re-scan
+                  </Button>
                 </div>
 
-                {/* Dynamic Token Palette */}
-                <div className="p-4 rounded-xl border border-border/80 bg-card/40 space-y-3 mt-4">
+                {/* Category Filter Pills */}
+                <div className="flex items-center gap-1 overflow-x-auto pb-1">
+                  {[
+                    { id: "all", label: "All Forms", count: discoveredForms.length },
+                    {
+                      id: "core",
+                      label: "Core",
+                      count: discoveredForms.filter((f) => f.source === "System Core").length,
+                    },
+                    {
+                      id: "pages",
+                      label: "Pages",
+                      count: discoveredForms.filter((f) => f.source === "Page Builder").length,
+                    },
+                    {
+                      id: "events",
+                      label: "Events",
+                      count: discoveredForms.filter((f) => f.source === "Event Registration").length,
+                    },
+                  ].map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSelectedCategoryTab(cat.id)}
+                      className={cn(
+                        "px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer border",
+                        selectedCategoryTab === cat.id
+                          ? "bg-slate-900 text-white border-slate-900 dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100 shadow-xs"
+                          : "bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700 hover:bg-slate-200"
+                      )}
+                    >
+                      {cat.label} ({cat.count})
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search input for forms */}
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={formSearchQuery}
+                    onChange={(e) => setFormSearchQuery(e.target.value)}
+                    placeholder="Filter forms by name or trigger..."
+                    className="text-xs pl-8 h-8 font-mono"
+                  />
+                </div>
+
+                {/* Form Items List */}
+                <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+                  {filteredDiscoveredForms.length === 0 ? (
+                    <div className="p-4 rounded-xl border border-dashed border-border text-center text-xs text-muted-foreground">
+                      No forms discovered matching your search.
+                    </div>
+                  ) : (
+                    filteredDiscoveredForms.map((item) => {
+                      const isSelected = item.triggerType === activeFormTrigger;
+                      const hasSavedTemplate = templates.some((t) => t.triggerType === item.triggerType);
+
+                      return (
+                        <button
+                          key={item.triggerType}
+                          type="button"
+                          onClick={() => setActiveFormTrigger(item.triggerType)}
+                          className={cn(
+                            "w-full text-left p-3 rounded-xl border transition-all cursor-pointer relative group",
+                            isSelected
+                              ? "border-amber-600 dark:border-amber-400 bg-amber-500/10 text-amber-950 dark:text-amber-100 shadow-xs ring-1 ring-amber-500/30"
+                              : "border-border bg-card/70 hover:bg-card text-foreground"
+                          )}
+                        >
+                          <div className="flex items-start justify-between gap-1 mb-1">
+                            <span className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                              {item.name}
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "text-[9px] shrink-0 font-mono py-0",
+                                item.source === "System Core"
+                                  ? "border-blue-500/40 text-blue-700 dark:text-blue-300"
+                                  : item.source === "Event Registration"
+                                  ? "border-purple-500/40 text-purple-700 dark:text-purple-300"
+                                  : "border-emerald-500/40 text-emerald-700 dark:text-emerald-300"
+                              )}
+                            >
+                              {item.source === "System Core"
+                                ? "Core"
+                                : item.source === "Event Registration"
+                                ? "Event"
+                                : "Page"}
+                            </Badge>
+                          </div>
+
+                          <p className="text-[11px] text-muted-foreground line-clamp-1 font-mono">
+                            {item.triggerType}
+                          </p>
+
+                          <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-border/40 text-[10px] text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <span
+                                className={cn(
+                                  "w-1.5 h-1.5 rounded-full",
+                                  hasSavedTemplate ? "bg-emerald-500" : "bg-amber-400"
+                                )}
+                              />
+                              {hasSavedTemplate ? "Configured" : "Default Inherited"}
+                            </span>
+                            {item.url && (
+                              <span className="text-[10px] font-mono text-muted-foreground/80 truncate max-w-[120px]">
+                                {item.url}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Subject Token Chips */}
+                <div className="p-3.5 rounded-xl border border-border/80 bg-card/40 space-y-2 mt-4">
                   <div className="flex items-center justify-between">
                     <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Dynamic Tokens
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Subject Tokens
                     </Label>
-                    <span className="text-[10px] text-muted-foreground">Click to insert</span>
+                    <span className="text-[10px] text-muted-foreground">Insert into subject</span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {AVAILABLE_TOKENS.map((item) => (
+                  <div className="flex flex-wrap gap-1">
+                    {AVAILABLE_TOKENS.slice(0, 8).map((item) => (
                       <button
                         key={item.token}
                         type="button"
-                        onClick={() => insertToken(item.token)}
+                        onClick={() => insertTokenIntoSubject(item.token)}
                         title={item.desc}
-                        className="px-2 py-1 rounded bg-secondary/80 hover:bg-amber-500/20 hover:text-amber-900 dark:hover:text-amber-200 border border-border text-[11px] font-mono transition-colors cursor-pointer"
+                        className="px-2 py-0.5 rounded bg-secondary/80 hover:bg-amber-500/20 hover:text-amber-900 dark:hover:text-amber-200 border border-border text-[10px] font-mono transition-colors cursor-pointer"
                       >
                         {item.token}
                       </button>
                     ))}
                   </div>
                   <p className="text-[10px] text-muted-foreground leading-normal">
-                    Tokens are automatically compiled at runtime using the incoming submission payload.
+                    Tip: The rich text editor below also includes its own dedicated token chips bar.
                   </p>
                 </div>
               </div>
 
               {/* Right Column: Template Configuration Editor */}
-              {currentTemplate && (
-                <div className="lg:col-span-8 space-y-6">
-                  <Card className="border border-border/80 shadow-xs">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between">
-                        <div>
+              <div className="lg:col-span-8 space-y-6">
+                <Card className="border border-border/80 shadow-xs">
+                  <CardHeader className="pb-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
                           <CardTitle className="text-base font-serif font-bold text-foreground">
                             {currentTemplate.name}
                           </CardTitle>
-                          <CardDescription className="text-xs">
-                            Trigger Type: <code className="text-primary font-mono">{currentTemplate.triggerType}</code>
-                          </CardDescription>
-                        </div>
-                        <Button
-                          type="button"
-                          onClick={handleSaveTemplates}
-                          disabled={savingTemplates}
-                          size="sm"
-                          className="cursor-pointer"
-                        >
-                          {savingTemplates ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                          ) : (
-                            <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
-                          )}
-                          Save Templates
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-6 text-xs">
-                      {/* Section 1: Admin Alert Config */}
-                      <div className="space-y-3 p-4 rounded-xl border border-border/80 bg-secondary/20">
-                        <div className="flex items-center justify-between">
-                          <Label className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                            <Send className="w-3.5 h-3.5 text-amber-600" />
-                            1. Admin Alert Notification (Atelier Desk)
-                          </Label>
-                          <Badge variant="outline" className="text-[10px]">
-                            Dispatched to adminAlertEmail
+                          <Badge variant="outline" className="text-[10px] font-mono">
+                            {currentTemplate.triggerType}
                           </Badge>
                         </div>
-
-                        <div className="space-y-1.5">
-                          <Label className="font-semibold text-foreground">Admin Subject Template</Label>
-                          <Input
-                            value={currentTemplate.adminSubject}
-                            onFocus={() => setActiveField("adminSubject")}
-                            onChange={(e) => {
-                              const updated = [...templates];
-                              updated[selectedTemplateIndex] = {
-                                ...currentTemplate,
-                                adminSubject: e.target.value,
-                              };
-                              setTemplates(updated);
-                            }}
-                            placeholder="✨ New Inquiry: {subject} [{name}]"
-                            className="text-xs font-mono"
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <Label className="font-semibold text-foreground">Admin Email Body Copy (HTML / Tokens)</Label>
-                          <Textarea
-                            value={currentTemplate.adminBodyTemplate}
-                            onFocus={() => setActiveField("adminBodyTemplate")}
-                            onChange={(e) => {
-                              const updated = [...templates];
-                              updated[selectedTemplateIndex] = {
-                                ...currentTemplate,
-                                adminBodyTemplate: e.target.value,
-                              };
-                              setTemplates(updated);
-                            }}
-                            rows={6}
-                            placeholder="<p>Inbound inquiry received from {name}...</p>"
-                            className="text-xs font-mono"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Section 2: User Confirmation Receipt */}
-                      <div className="space-y-4 p-4 rounded-xl border border-border/80 bg-secondary/20">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                              <Mail className="w-3.5 h-3.5 text-amber-600" />
-                              2. Patron Confirmation Receipt (Auto-Responder)
-                            </Label>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">
-                              Sends an immediate confirmation email to the visitor who submitted the form.
-                            </p>
-                          </div>
-
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <span className="text-xs font-semibold text-foreground">
-                              {currentTemplate.sendUserReceipt ? "Enabled" : "Disabled"}
+                        <CardDescription className="text-xs mt-1 flex items-center gap-2 flex-wrap">
+                          <span>Source: <strong>{currentDiscoveredForm.source}</strong></span>
+                          {currentDiscoveredForm.url && (
+                            <a
+                              href={currentDiscoveredForm.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary hover:underline inline-flex items-center gap-1 font-mono text-[11px]"
+                            >
+                              <span>{currentDiscoveredForm.url}</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                          {currentDiscoveredForm.eventDate && (
+                            <span className="text-muted-foreground">
+                              • {currentDiscoveredForm.eventDate}
                             </span>
-                            <input
-                              type="checkbox"
-                              checked={currentTemplate.sendUserReceipt}
-                              onChange={(e) => {
-                                const updated = [...templates];
-                                updated[selectedTemplateIndex] = {
-                                  ...currentTemplate,
-                                  sendUserReceipt: e.target.checked,
-                                };
-                                setTemplates(updated);
-                              }}
-                              className="w-4 h-4 accent-amber-600 rounded cursor-pointer"
-                            />
-                          </label>
+                          )}
+                        </CardDescription>
+                      </div>
+
+                      <Button
+                        type="button"
+                        onClick={handleSaveTemplates}
+                        disabled={savingTemplates}
+                        size="sm"
+                        className="cursor-pointer shrink-0"
+                      >
+                        {savingTemplates ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                        ) : (
+                          <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                        )}
+                        Save Configuration
+                      </Button>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-6 text-xs">
+                    {/* Section 1: Admin Alert Config */}
+                    <div className="space-y-3.5 p-4 rounded-xl border border-border/80 bg-secondary/20">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                          <Send className="w-3.5 h-3.5 text-amber-600" />
+                          1. Admin Alert Notification (Atelier Desk)
+                        </Label>
+                        <Badge variant="outline" className="text-[10px]">
+                          Delivered to adminAlertEmail
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Admin Subject Template</Label>
+                        <Input
+                          value={currentTemplate.adminSubject}
+                          onFocus={() => setActiveSubjectField("adminSubject")}
+                          onChange={(e) => updateCurrentTemplate({ adminSubject: e.target.value })}
+                          placeholder="✨ New Inquiry: {subject} [{name}]"
+                          className="text-xs font-mono"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">
+                          Admin Notification Copy (Universal Tiptap WYSIWYG)
+                        </Label>
+                        <EmailTiptapEditor
+                          content={currentTemplate.adminBodyTemplate}
+                          onChange={(html) => updateCurrentTemplate({ adminBodyTemplate: html })}
+                          tokens={AVAILABLE_TOKENS}
+                          placeholder="Compose admin alert notice..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Section 2: User Confirmation Receipt */}
+                    <div className="space-y-4 p-4 rounded-xl border border-border/80 bg-secondary/20">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                            <Mail className="w-3.5 h-3.5 text-amber-600" />
+                            2. Patron Confirmation Receipt (Auto-Responder)
+                          </Label>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            Sends an immediate branded confirmation email to the visitor who submitted the form.
+                          </p>
                         </div>
 
-                        {currentTemplate.sendUserReceipt && (
-                          <div className="space-y-3 pt-2 border-t border-border/50">
-                            <div className="space-y-1.5">
-                              <Label className="font-semibold text-foreground">User Confirmation Subject</Label>
-                              <Input
-                                value={currentTemplate.userSubject || ""}
-                                onFocus={() => setActiveField("userSubject")}
-                                onChange={(e) => {
-                                  const updated = [...templates];
-                                  updated[selectedTemplateIndex] = {
-                                    ...currentTemplate,
-                                    userSubject: e.target.value,
-                                  };
-                                  setTemplates(updated);
-                                }}
-                                placeholder="Thank you for contacting Lalita Kapilavai Atelier"
-                                className="text-xs"
-                              />
-                            </div>
-
-                            <div className="space-y-1.5">
-                              <Label className="font-semibold text-foreground">User Confirmation Body Copy (HTML / Tokens)</Label>
-                              <Textarea
-                                value={currentTemplate.userBodyTemplate || ""}
-                                onFocus={() => setActiveField("userBodyTemplate")}
-                                onChange={(e) => {
-                                  const updated = [...templates];
-                                  updated[selectedTemplateIndex] = {
-                                    ...currentTemplate,
-                                    userBodyTemplate: e.target.value,
-                                  };
-                                  setTemplates(updated);
-                                }}
-                                rows={6}
-                                placeholder="<p>Dear {name}, thank you for contacting us...</p>"
-                                className="text-xs font-mono"
-                              />
-                            </div>
-                          </div>
-                        )}
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <span className="text-xs font-semibold text-foreground">
+                            {currentTemplate.sendUserReceipt ? "Active" : "Disabled"}
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={currentTemplate.sendUserReceipt}
+                            onChange={(e) => updateCurrentTemplate({ sendUserReceipt: e.target.checked })}
+                            className="w-4 h-4 accent-amber-600 rounded cursor-pointer"
+                          />
+                        </label>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
+
+                      {currentTemplate.sendUserReceipt && (
+                        <div className="space-y-3.5 pt-2 border-t border-border/50">
+                          <div className="space-y-1.5">
+                            <Label className="font-semibold text-foreground">User Confirmation Subject</Label>
+                            <Input
+                              value={currentTemplate.userSubject || ""}
+                              onFocus={() => setActiveSubjectField("userSubject")}
+                              onChange={(e) => updateCurrentTemplate({ userSubject: e.target.value })}
+                              placeholder="Thank you for contacting Lalita Kapilavai Atelier"
+                              className="text-xs"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label className="font-semibold text-foreground">
+                              User Confirmation Copy (Universal Tiptap WYSIWYG)
+                            </Label>
+                            <EmailTiptapEditor
+                              content={currentTemplate.userBodyTemplate || ""}
+                              onChange={(html) => updateCurrentTemplate({ userBodyTemplate: html })}
+                              tokens={AVAILABLE_TOKENS}
+                              placeholder="Compose patron confirmation message..."
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           )}
         </div>
@@ -536,7 +719,7 @@ export function MailConfigStudio() {
           {/* Controls Bar */}
           <Card className="border border-border/80 shadow-xs">
             <CardContent className="p-4 space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
                 {/* Search */}
                 <div className="space-y-1 md:col-span-2">
                   <Label className="text-[11px] font-semibold text-foreground">Search Telemetry</Label>
@@ -546,7 +729,7 @@ export function MailConfigStudio() {
                       value={logsSearch}
                       onChange={(e) => setLogsSearch(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && fetchLogs(1)}
-                      placeholder="Search recipient, subject, or sender..."
+                      placeholder="Search recipient, subject, sender..."
                       className="text-xs pl-8 h-8 font-mono"
                     />
                   </div>
@@ -585,6 +768,17 @@ export function MailConfigStudio() {
                   </Select>
                 </div>
 
+                {/* Start Date */}
+                <div className="space-y-1">
+                  <Label className="text-[11px] font-semibold text-foreground">Start Date</Label>
+                  <Input
+                    type="date"
+                    value={logsStartDate}
+                    onChange={(e) => setLogsStartDate(e.target.value)}
+                    className="h-8 text-xs bg-card"
+                  />
+                </div>
+
                 {/* Action Buttons */}
                 <div className="flex items-end gap-2">
                   <Button
@@ -606,7 +800,7 @@ export function MailConfigStudio() {
                     className="h-8 text-xs shrink-0 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5 mr-1" />
-                    Export CSV
+                    CSV
                   </Button>
                 </div>
               </div>
@@ -740,7 +934,7 @@ export function MailConfigStudio() {
             </div>
           </div>
 
-          {/* Error Details Modal / Drawer */}
+          {/* Error Details Modal */}
           {selectedErrorLog && (
             <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
               <div className="bg-card border border-border rounded-xl max-w-lg w-full p-6 space-y-4 shadow-xl">

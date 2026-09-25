@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import prisma from "@/lib/prisma";
 
 export interface EmailDispatchOptions {
-  triggerType: "contact" | "event_rsvp" | "acquisition" | "custom_form" | "test";
+  triggerType: string;
   userEmail?: string | null;
   recipientOverride?: string;
   data: {
@@ -130,6 +130,26 @@ export function interpolateTokens(template: string, tokens: Record<string, unkno
 }
 
 /**
+ * Converts relative asset URLs (/media/public/...) to absolute HTTPS URLs
+ * so external mail clients (Gmail, Apple Mail, Outlook) can resolve and render them.
+ */
+export function getAbsoluteAssetUrl(relativeOrAbsoluteUrl?: string | null): string | null {
+  if (!relativeOrAbsoluteUrl) return null;
+  const trimmed = relativeOrAbsoluteUrl.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.COOLIFY_FQDN ? `https://${process.env.COOLIFY_FQDN}` : "https://lalitakapilavai.com")
+  ).replace(/\/$/, "");
+
+  const cleanPath = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  return `${baseUrl}${cleanPath}`;
+}
+
+/**
  * Wraps compiled email body with dynamic branded header, logo, and footer.
  */
 export function wrapBrandedEmailHtml(
@@ -137,6 +157,7 @@ export function wrapBrandedEmailHtml(
   settings: {
     emailHeaderTitle?: string | null;
     emailHeaderSubtitle?: string | null;
+    logoUrl?: string | null;
     emailLogoUrl?: string | null;
     emailFooterText?: string | null;
   }
@@ -144,8 +165,19 @@ export function wrapBrandedEmailHtml(
   const headerTitle = settings.emailHeaderTitle || "Lalita Kapilavai Atelier";
   const headerSubtitle = settings.emailHeaderSubtitle || "Sacred & Traditional Indian Art";
   const footerText = settings.emailFooterText || "Inbound atelier inquiry and archival correspondence.";
-  const logoHtml = settings.emailLogoUrl
-    ? `<div style="margin-bottom: 12px;"><img src="${settings.emailLogoUrl}" alt="${headerTitle}" style="max-height: 48px; border: 0;" /></div>`
+
+  // Single Source of Truth: General tab brand logo, fallback to emailLogoUrl
+  const rawLogo = settings.logoUrl || settings.emailLogoUrl;
+  const absoluteLogoUrl = getAbsoluteAssetUrl(rawLogo);
+
+  const logoHtml = absoluteLogoUrl
+    ? `<div style="text-align: center; margin-bottom: 16px;">
+        <img
+          src="${absoluteLogoUrl}"
+          alt="${headerTitle}"
+          style="max-height: 48px; max-width: 200px; object-fit: contain; display: inline-block; border: 0;"
+        />
+      </div>`
     : "";
 
   return `
@@ -213,23 +245,26 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
 }> {
   const { triggerType, userEmail, recipientOverride, data } = options;
 
-  const defaultTemplate =
-    DEFAULT_EMAIL_TEMPLATES.find((t) => t.triggerType === triggerType) || DEFAULT_EMAIL_TEMPLATES[0];
-
   let dbTemplate = await prisma.emailTemplateConfig.findUnique({
     where: { triggerType },
   });
 
-  // If template not found in DB, fallback to default and seed it
+  // If specific template not found (e.g. dynamic page_form_... or event_rsvp_...), check parent category
   if (!dbTemplate) {
-    try {
-      dbTemplate = await prisma.emailTemplateConfig.create({
-        data: defaultTemplate,
-      });
-    } catch {
-      // Ignored
-    }
+    let fallbackTrigger = "custom_form";
+    if (triggerType.startsWith("event_rsvp")) fallbackTrigger = "event_rsvp";
+    else if (triggerType.includes("acquisition") || triggerType.includes("commission")) fallbackTrigger = "acquisition";
+    else if (triggerType.includes("contact")) fallbackTrigger = "contact";
+
+    dbTemplate = await prisma.emailTemplateConfig.findUnique({
+      where: { triggerType: fallbackTrigger },
+    });
   }
+
+  const defaultTemplate =
+    DEFAULT_EMAIL_TEMPLATES.find((t) => t.triggerType === triggerType) ||
+    DEFAULT_EMAIL_TEMPLATES.find((t) => triggerType.startsWith(t.triggerType)) ||
+    DEFAULT_EMAIL_TEMPLATES[0];
 
   const activeTemplate = dbTemplate || defaultTemplate;
 
@@ -266,6 +301,7 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
   const adminHtml = wrapBrandedEmailHtml(compiledAdminBody, {
     emailHeaderTitle: settings?.emailHeaderTitle,
     emailHeaderSubtitle: settings?.emailHeaderSubtitle,
+    logoUrl: settings?.logoUrl,
     emailLogoUrl: settings?.emailLogoUrl,
     emailFooterText: settings?.emailFooterText,
   });
@@ -333,6 +369,7 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
     const userHtml = wrapBrandedEmailHtml(compiledUserBody, {
       emailHeaderTitle: settings?.emailHeaderTitle,
       emailHeaderSubtitle: settings?.emailHeaderSubtitle,
+      logoUrl: settings?.logoUrl,
       emailLogoUrl: settings?.emailLogoUrl,
       emailFooterText: settings?.emailFooterText,
     });
