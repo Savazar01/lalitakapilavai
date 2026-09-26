@@ -25,13 +25,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = isBuilding
     ? null
     : await prisma.systemSetting.findFirst().catch(() => null);
-  const title = settings?.siteName || "Lalita Kapilavai — Sacred Art & Carnatic Music Archive";
+  const title = settings?.siteName || "SavazAI WebApps — Digital Atelier & Cultural Archive";
   const description =
     settings?.siteDescription ||
-    "Living digital archive of traditional Indian Tanjore paintings with 22k gold leaf, Mysore classical fine art, and Carnatic classical vocal recitals.";
+    "Enterprise multi-tenant digital atelier, spatial exhibition corridor, and museum publishing system.";
 
   const baseUrl = await getServerBaseUrl();
-  const appUrl = baseUrl || process.env.NEXT_PUBLIC_APP_URL || "https://lalitakapilavai.com";
+  const appUrl = baseUrl || process.env.NEXT_PUBLIC_APP_URL || "https://savazar.com";
 
   return {
     metadataBase: new URL(appUrl),

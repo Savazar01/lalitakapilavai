@@ -1,4 +1,4 @@
-// Prisma Schema for Lalita Kapilavai Portfolio & Cultural Archive Platform
+// Prisma Schema for SavazAI WebApps Platform & Cultural Archive
 // Configured with PostgreSQL 17, pgvector, RBAC, Dynamic Layouts & Cultural Graph
 
 datasource db {
@@ -90,20 +90,20 @@ model Verification {
 
 model SystemSetting {
   id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  siteName          String   @default("Lalita Kapilavai — Sacred Art & Carnatic Music Archive")
+  siteName          String   @default("SavazAI WebApps — Digital Atelier & Cultural Archive")
   siteDescription   String?  @db.Text
-  adminAlertEmail   String?  @default("info@lalitakapilavai.com")
+  adminAlertEmail   String?  @default("alerts@savazar.com")
   contactEmail      String?
   contactPhone      String?
 
   // Email Notification & Outbound Branding
-  emailHeaderTitle    String?  @default("Lalita Kapilavai Atelier")
-  emailHeaderSubtitle String?  @default("Sacred & Traditional Indian Art")
+  emailHeaderTitle    String?  @default("SavazAI Atelier")
+  emailHeaderSubtitle String?  @default("Fine Art & Cultural Archive")
   emailLogoUrl        String?
   emailFooterText     String?  @default("Inbound atelier inquiry and archival correspondence.")
 
   // Watermark parameters
-  watermarkText     String   @default("© Lalita Kapilavai - Sacred Art & Heritage")
+  watermarkText     String   @default("© SavazAI WebApps | All Rights Reserved")
   watermarkOpacity  Float    @default(0.4)
   watermarkFontSize Int      @default(32)
   watermarkStyle    String?  @default("REPEAT_DIAGONAL") // REPEAT_DIAGONAL, BANNER, CORNER, BOTH
@@ -111,8 +111,8 @@ model SystemSetting {
   // Cloudflare R2 / AWS S3 storage settings
   storageProvider   String   @default("R2") // R2, S3, CUSTOM
   r2AccountId       String?
-  r2BucketName      String?  @default("lalitakapilavai-media")
-  r2PublicUrl       String?  @default("https://media.lalitakapilavai.com")
+  r2BucketName      String?  @default("savazai-media-vault")
+  r2PublicUrl       String?  @default("/media")
   s3Region          String?  @default("ap-south-1")
   s3BucketName      String?
   s3Endpoint        String?
@@ -382,7 +382,7 @@ model Composition {
   ragaId      String    @db.Uuid
   tala        String    // Adi, Rupaka, etc.
   composer    String    // Tyagaraja, Dikshitar, etc.
-  vocalist    String    @default("Lalita Kapilavai")
+  vocalist    String    @default("Atelier Master")
   audioUrl    String
   lyrics      String?   @db.Text
   translation String?   @db.Text
@@ -539,7 +539,7 @@ model BlogPost {
   excerpt          String    @db.Text
   content          String    @db.Text
   featuredImageUrl String?
-  author           String    @default("Lalita Kapilavai")
+  author           String    @default("Curatorial Team")
   tags             String[]
   metaTitle        String?
   metaDescription  String?

@@ -565,7 +565,7 @@ export default function UserManagementPage() {
                 <Input
                   required
                   type="email"
-                  placeholder="ananya@lalitakapilavai.com"
+                  placeholder="user@savazar.com"
                   value={createEmail}
                   onChange={(e) => setCreateEmail(e.target.value)}
                   className="text-xs"

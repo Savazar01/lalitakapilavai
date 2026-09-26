@@ -88,7 +88,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       image: featuredImageUrl || existing.featuredImageUrl || undefined,
       author: {
         "@type": "Person",
-        name: author || existing.author || "Lalita Kapilavai",
+        name: author || existing.author || "Atelier Author",
       },
       keywords: tagArray.join(", "),
       datePublished:

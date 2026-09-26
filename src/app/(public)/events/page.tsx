@@ -12,11 +12,16 @@ import { formatEventSchedule } from "@/lib/geo-timezone";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Exhibitions, Concerts & Workshops — Lalita Kapilavai",
-  description:
-    "Explore upcoming Tanjore gold leaf exhibitions, Carnatic classical vocal recitals, and traditional iconography workshops.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await prisma.systemSetting.findFirst();
+  const siteName = settings?.siteName || "SavazAI WebApps";
+
+  return {
+    title: `Exhibitions, Concerts & Masterclasses — ${siteName}`,
+    description:
+      "Explore upcoming fine art exhibitions, recitals, and curatorial workshops.",
+  };
+}
 
 export default async function EventsPage() {
   const [events, pageData] = await Promise.all([

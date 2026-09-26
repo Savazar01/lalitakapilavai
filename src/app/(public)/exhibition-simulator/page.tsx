@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Architectural 3D Exhibition Wall Simulator — Lalita Kapilavai",
+  title: "Architectural 3D WebGL Exhibition Salon Wall — SavazAI WebApps",
   description:
-    "Mount traditional Thanjavur and Mysore fine art masterworks in authentic Indian temple sanctums, Mysore royal darbars, and contemporary museum halls.",
+    "Mount traditional fine art masterworks in authentic architectural spaces and contemporary museum galleries.",
 };
 
 export default function ExhibitionSimulatorPage() {

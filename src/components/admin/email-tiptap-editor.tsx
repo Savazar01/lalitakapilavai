@@ -446,7 +446,7 @@ export function EmailTiptapEditor({
               <Input
                 value={linkUrl}
                 onChange={(e) => setLinkUrl(e.target.value)}
-                placeholder="https://lalitakapilavai.com/gallery"
+                placeholder="https://savazar.com/gallery"
                 className="text-xs font-mono"
                 autoFocus
               />

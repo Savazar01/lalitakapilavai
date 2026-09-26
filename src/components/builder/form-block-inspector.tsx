@@ -73,7 +73,7 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
   const formTitle = data.formTitle ?? "Send Curatorial Inquiry";
   const formSubtitle =
     data.formSubtitle ??
-    "Direct correspondence with the atelier desk of Lalita Kapilavai.";
+    "Direct correspondence with the curatorial atelier desk.";
   const submitButtonText = data.submitButtonText ?? "Submit Inquiry";
   const successMessage =
     data.successMessage ??
@@ -260,7 +260,7 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
             onChange={(e) => updateConfig({ formSubtitle: e.target.value })}
             rows={2}
             className="text-xs leading-relaxed"
-            placeholder="Direct correspondence with Lalita Kapilavai studio..."
+            placeholder="Direct correspondence with the curatorial atelier desk..."
           />
         </div>
 
@@ -305,7 +305,7 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
                 <Input
                   value={recipientEmails}
                   onChange={(e) => updateConfig({ recipientEmails: e.target.value })}
-                  placeholder="e.g. curator@lalitakapilavai.com, sales@lalitakapilavai.com"
+                  placeholder="e.g. curator@savazar.com, sales@savazar.com"
                   className="text-xs font-mono"
                 />
                 <p className="text-[10px] text-muted-foreground">

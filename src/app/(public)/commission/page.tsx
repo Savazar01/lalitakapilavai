@@ -7,33 +7,41 @@ import { DynamicFormBlock } from "@/components/public/blocks/dynamic-form-block"
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Commissions & Contact — Lalita Kapilavai",
-  description:
-    "Direct correspondence and bespoke artwork commissioning with the atelier desk of Lalita Kapilavai.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await prisma.systemSetting.findFirst();
+  const siteName = settings?.siteName || "SavazAI WebApps";
+
+  return {
+    title: `Commissions & Contact — ${siteName}`,
+    description:
+      "Direct correspondence and bespoke artwork commissioning with the atelier desk.",
+  };
+}
 
 export default async function CommissionPage() {
-  const pageData = await prisma.page
-    .findFirst({
-      where: {
-        slug: { in: ["commission", "contact"] },
-        isActive: true,
-        isDeleted: false,
-      },
-      orderBy: { updatedAt: "desc" },
-      include: {
-        sections: {
-          orderBy: { orderIndex: "asc" },
-          include: {
-            subSections: {
-              orderBy: { orderIndex: "asc" },
+  const [pageData, settings] = await Promise.all([
+    prisma.page
+      .findFirst({
+        where: {
+          slug: { in: ["commission", "contact"] },
+          isActive: true,
+          isDeleted: false,
+        },
+        orderBy: { updatedAt: "desc" },
+        include: {
+          sections: {
+            orderBy: { orderIndex: "asc" },
+            include: {
+              subSections: {
+                orderBy: { orderIndex: "asc" },
+              },
             },
           },
         },
-      },
-    })
-    .catch(() => null);
+      })
+      .catch(() => null),
+    prisma.systemSetting.findFirst(),
+  ]);
 
   const hasSections = pageData && pageData.sections && pageData.sections.length > 0;
 
@@ -50,7 +58,7 @@ export default async function CommissionPage() {
               formTitle={pageData?.title || "Contact Us"}
               formSubtitle={
                 pageData?.metaDescription ||
-                "Direct correspondence with the atelier desk of Lalita Kapilavai."
+                `Direct correspondence with the atelier desk of ${settings?.siteName || "SavazAI WebApps"}.`
               }
               submitButtonText="Submit Inquiry"
               pageSlug="commission"

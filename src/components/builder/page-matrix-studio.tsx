@@ -411,7 +411,7 @@ export function PageMatrixStudio({
       ...(type === "FORM_BLOCK"
         ? {
             formTitle: "Send Curatorial Inquiry",
-            formSubtitle: "Direct correspondence with the atelier desk of Lalita Kapilavai.",
+            formSubtitle: "Direct correspondence with the curatorial atelier desk.",
             submitButtonText: "Submit Inquiry",
             successMessage: "Thank you for your correspondence. The curatorial desk will respond shortly.",
             fields: [

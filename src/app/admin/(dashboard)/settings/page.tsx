@@ -170,8 +170,8 @@ export default function AdminSettingsPage() {
   const [form, setForm] = React.useState({
     siteName: "",
     siteDescription: "",
-    adminAlertEmail: "info@lalitakapilavai.com",
-    emailHeaderTitle: "Lalita Kapilavai Atelier",
+    adminAlertEmail: "alerts@savazar.com",
+    emailHeaderTitle: "SavazAI Atelier",
     emailHeaderSubtitle: "Sacred & Traditional Indian Art",
     emailLogoUrl: "",
     emailFooterText: "Inbound atelier inquiry and archival correspondence.",
@@ -181,7 +181,7 @@ export default function AdminSettingsPage() {
     faviconUrl: "",
     defaultCurrency: "INR",
     defaultTimezone: "Asia/Kolkata",
-    watermarkText: "© Lalita Kapilavai - Sacred Art & Heritage",
+    watermarkText: "© SavazAI WebApps | All Rights Reserved",
     watermarkOpacity: 0.35,
     watermarkFontSize: 28,
     watermarkStyle: "REPEAT_DIAGONAL",
@@ -189,10 +189,10 @@ export default function AdminSettingsPage() {
     showFoilEarmark: true,
     storageProvider: "R2",
     r2AccountId: "",
-    r2BucketName: "lalitakapilavai-media",
-    r2PublicUrl: "https://media.lalitakapilavai.com",
+    r2BucketName: "savazai-media-vault",
+    r2PublicUrl: "https://media.savazar.com",
     s3Region: "ap-south-1",
-    s3BucketName: "lalitakapilavai-backup",
+    s3BucketName: "savazai-backup-vault",
     s3Endpoint: "",
     s3AccessKey: "",
     s3SecretKey: "",
@@ -206,10 +206,10 @@ export default function AdminSettingsPage() {
   // Dedicated Footer Config State
   const [footerConfig, setFooterConfig] = React.useState<FooterConfig>({
     aboutText:
-      "Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.",
-    contactEmail: "contact@lalitakapilavai.com",
+      "Living digital archive documenting classical fine art collections, 22k gold leaf relief sacred paintings, traditional heritage artwork, and classical vocal recitals.",
+    contactEmail: "contact@savazar.com",
     contactPhone: "+91 98450 12345",
-    copyrightText: "© 2026 Lalita Kapilavai. All sacred rights reserved.",
+    copyrightText: "© 2026 SavazAI WebApps Platform. All rights reserved.",
     socialLinks: [
       { platform: "Instagram", url: "", isVisible: false },
       { platform: "YouTube", url: "", isVisible: false },
@@ -232,8 +232,8 @@ export default function AdminSettingsPage() {
     smtpPort: 587,
     smtpUser: "",
     smtpPassword: "",
-    fromEmail: "contact@lalitakapilavai.com",
-    fromName: "Lalita Kapilavai Archive",
+    fromEmail: "contact@savazar.com",
+    fromName: "SavazAI Atelier",
     isEnabled: false,
   });
 
@@ -285,8 +285,8 @@ export default function AdminSettingsPage() {
           setForm({
             siteName: data.siteName || "",
             siteDescription: data.siteDescription || "",
-            adminAlertEmail: data.adminAlertEmail || "info@lalitakapilavai.com",
-            emailHeaderTitle: data.emailHeaderTitle || "Lalita Kapilavai Atelier",
+            adminAlertEmail: data.adminAlertEmail || "alerts@savazar.com",
+            emailHeaderTitle: data.emailHeaderTitle || "SavazAI Atelier",
             emailHeaderSubtitle: data.emailHeaderSubtitle || "Sacred & Traditional Indian Art",
             emailLogoUrl: data.emailLogoUrl || "",
             emailFooterText: data.emailFooterText || "Inbound atelier inquiry and archival correspondence.",
@@ -294,7 +294,7 @@ export default function AdminSettingsPage() {
             contactPhone: data.contactPhone || "",
             defaultCurrency: data.defaultCurrency || "INR",
             defaultTimezone: data.defaultTimezone || "Asia/Kolkata",
-            watermarkText: data.watermarkText || "© Lalita Kapilavai - Sacred Art & Heritage",
+            watermarkText: data.watermarkText || "© SavazAI WebApps | All Rights Reserved",
             watermarkOpacity: data.watermarkOpacity ?? 0.35,
             watermarkFontSize: data.watermarkFontSize ?? 28,
             watermarkStyle: data.watermarkStyle || "REPEAT_DIAGONAL",
@@ -302,8 +302,8 @@ export default function AdminSettingsPage() {
             showFoilEarmark: data.watermarkConfig?.showFoilEarmark !== false,
             storageProvider: data.storageProvider || "R2",
             r2AccountId: data.r2AccountId || "",
-            r2BucketName: data.r2BucketName || "lalitakapilavai-media",
-            r2PublicUrl: data.r2PublicUrl || "https://media.lalitakapilavai.com",
+            r2BucketName: data.r2BucketName || "savazai-media-vault",
+            r2PublicUrl: data.r2PublicUrl || "https://media.savazar.com",
             s3Region: data.s3Region || "ap-south-1",
             s3BucketName: data.s3BucketName || "",
             s3Endpoint: data.s3Endpoint || "",
@@ -930,7 +930,7 @@ export default function AdminSettingsPage() {
                           onChange={(e) =>
                             setAdminConfig({ ...adminConfig, sidebarBrandTitle: e.target.value })
                           }
-                          placeholder="Lalita Kapilavai"
+                          placeholder="SavazAI Atelier"
                           className="text-xs font-serif"
                         />
                         <p className="text-[10px] text-muted-foreground">Primary artist/institution name</p>
@@ -1319,7 +1319,7 @@ export default function AdminSettingsPage() {
                         value={form.r2PublicUrl}
                         onChange={(e) => setForm({ ...form, r2PublicUrl: e.target.value })}
                         className="text-xs font-mono"
-                        placeholder="https://media.lalitakapilavai.com or /media"
+                        placeholder="https://media.savazar.com or /media"
                       />
                     </div>
                   </div>
@@ -1528,7 +1528,7 @@ export default function AdminSettingsPage() {
                     <Input
                       value={form.adminAlertEmail}
                       onChange={(e) => setForm({ ...form, adminAlertEmail: e.target.value })}
-                      placeholder="info@lalitakapilavai.com or alerts@lalitakapilavai.com"
+                      placeholder="alerts@savazar.com"
                       className="text-xs font-mono"
                     />
                     <p className="text-[10px] text-muted-foreground">
@@ -1620,7 +1620,7 @@ export default function AdminSettingsPage() {
                       <Input
                         value={emailConfig.fromEmail}
                         onChange={(e) => setEmailConfig({ ...emailConfig, fromEmail: e.target.value })}
-                        placeholder="contact@lalitakapilavai.com"
+                        placeholder="contact@savazar.com"
                         className="text-xs font-mono"
                       />
                     </div>
@@ -1630,7 +1630,7 @@ export default function AdminSettingsPage() {
                       <Input
                         value={emailConfig.fromName}
                         onChange={(e) => setEmailConfig({ ...emailConfig, fromName: e.target.value })}
-                        placeholder="Lalita Kapilavai Archive"
+                        placeholder="SavazAI Atelier"
                         className="text-xs"
                       />
                     </div>
@@ -1647,7 +1647,7 @@ export default function AdminSettingsPage() {
                         <Input
                           value={form.emailHeaderTitle}
                           onChange={(e) => setForm({ ...form, emailHeaderTitle: e.target.value })}
-                          placeholder="Lalita Kapilavai Atelier"
+                          placeholder="SavazAI Atelier"
                           className="text-xs"
                         />
                       </div>
@@ -1892,7 +1892,7 @@ export default function AdminSettingsPage() {
                       <Input
                         value={form.instagramUrl}
                         onChange={(e) => setForm({ ...form, instagramUrl: e.target.value })}
-                        placeholder="https://instagram.com/lalitakapilavai"
+                        placeholder="https://instagram.com/savazar"
                         className="text-xs"
                       />
                     </div>
@@ -1902,7 +1902,7 @@ export default function AdminSettingsPage() {
                       <Input
                         value={form.youtubeUrl}
                         onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })}
-                        placeholder="https://youtube.com/@lalitakapilavai"
+                        placeholder="https://youtube.com/@savazar"
                         className="text-xs"
                       />
                     </div>
@@ -1914,7 +1914,7 @@ export default function AdminSettingsPage() {
                       <Input
                         value={form.facebookUrl}
                         onChange={(e) => setForm({ ...form, facebookUrl: e.target.value })}
-                        placeholder="https://facebook.com/lalitakapilavai"
+                        placeholder="https://facebook.com/savazar"
                         className="text-xs"
                       />
                     </div>
@@ -1924,7 +1924,7 @@ export default function AdminSettingsPage() {
                       <Input
                         value={form.pinterestUrl}
                         onChange={(e) => setForm({ ...form, pinterestUrl: e.target.value })}
-                        placeholder="https://pinterest.com/lalitakapilavai"
+                        placeholder="https://pinterest.com/savazar"
                         className="text-xs"
                       />
                     </div>
@@ -2472,7 +2472,7 @@ export default function AdminSettingsPage() {
                               fontFamily: `'${themeConfig.common.fontHeading}', Georgia, serif`,
                             }}
                           >
-                            Lalita Kapilavai — Sacred Art Archive
+                            SavazAI WebApps — Digital Atelier
                           </h4>
                           <p
                             style={{
@@ -2670,7 +2670,7 @@ export default function AdminSettingsPage() {
                               fontFamily: `'${themeConfig.common.fontHeading}', Georgia, serif`,
                             }}
                           >
-                            Lalita Kapilavai — Sacred Art Archive
+                            SavazAI WebApps — Digital Atelier
                           </h4>
                           <p
                             style={{

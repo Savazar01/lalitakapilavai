@@ -10,11 +10,16 @@ import { DynamicPageSections } from "@/components/public/dynamic-page-sections";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Sacred Art Disciplines & Schools — Lalita Kapilavai",
-  description:
-    "Explore classical South Indian artistic disciplines spanning Thanjavur 22k gold foil embossments, Mysore traditional paintings, temple murals, and Carnatic music traditions.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await prisma.systemSetting.findFirst();
+  const siteName = settings?.siteName || "SavazAI WebApps";
+
+  return {
+    title: `Fine Art Disciplines & Curatorial Collections — ${siteName}`,
+    description:
+      "Explore fine art disciplines spanning traditional gold foil embossments, classical oil paintings, temple murals, and cultural heritage.",
+  };
+}
 
 export default async function CategoriesPage() {
   const [categories, pageData] = await Promise.all([

@@ -17,21 +17,26 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { categorySlug } = await params;
-  const category = await prisma.artCategory.findUnique({
-    where: { slug: categorySlug },
-  });
+  const [category, settings] = await Promise.all([
+    prisma.artCategory.findUnique({
+      where: { slug: categorySlug },
+    }),
+    prisma.systemSetting.findFirst(),
+  ]);
+  const siteName = settings?.siteName || "SavazAI WebApps";
+  const artistName = settings?.emailHeaderTitle || "the Atelier";
 
   if (!category) {
-    return { title: "Category Not Found — Lalita Kapilavai" };
+    return { title: `Category Not Found — ${siteName}` };
   }
 
   const titleText = category.heroTitle || category.name;
 
   return {
-    title: `${titleText} — Classical Indian Art Collection | Lalita Kapilavai`,
+    title: `${titleText} — Fine Art Collection | ${siteName}`,
     description:
       category.description ||
-      `Explore authentic masterworks of ${category.name} crafted by Lalita Kapilavai using traditional techniques and 22k gold leaf relief.`,
+      `Explore authentic masterworks of ${category.name} curated by ${artistName} using traditional techniques.`,
   };
 }
 

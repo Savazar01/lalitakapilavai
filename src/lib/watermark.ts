@@ -1,5 +1,5 @@
 /**
- * Watermark SVG Generation Engine for Lalita Kapilavai Fine Art & Archive
+ * Watermark SVG Generation Engine for SavazAI WebApps Digital Atelier
  * Provides responsive, cross-platform SVG overlays with robust Unicode encoding and Linux system fonts.
  */
 
@@ -40,7 +40,7 @@ export function generateWatermarkSvg(options: WatermarkOptions): string {
       ? "REPEAT_DIAGONAL"
       : "REPEAT_DIAGONAL";
 
-  const safeText = escapeXml(text || "© Lalita Kapilavai | lalitakapilavai.com");
+  const safeText = escapeXml(text || "© SavazAI WebApps | All Rights Reserved");
 
   // Proportional font sizing
   const computedFontSize =

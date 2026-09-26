@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     // Send test email with dynamic branding from settings
     const sender = fromName ? `"${fromName}" <${fromEmail || user}>` : fromEmail || user;
-    const testSubject = `✨ [${systemSettings?.emailHeaderTitle || "Lalita Kapilavai Platform"}] SMTP / Gmail Connectivity Test`;
+    const testSubject = `✨ [${systemSettings?.emailHeaderTitle || "SavazAI WebApps Platform"}] SMTP / Gmail Connectivity Test`;
 
     const bodyHtml = `
       <p style="font-size: 15px; line-height: 1.6; margin-top: 0;">
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
       from: sender,
       to: recipient,
       subject: testSubject,
-      text: `Greetings from ${systemSettings?.emailHeaderTitle || "Lalita Kapilavai Atelier"}.\n\nYour outbound email delivery system is functioning perfectly.\n\nProvider: ${provider || "SMTP"}\nHost: ${host}:${port}\nUser: ${user}\nTimestamp: ${new Date().toISOString()}`,
+      text: `Greetings from ${systemSettings?.emailHeaderTitle || "SavazAI Atelier"}.\n\nYour outbound email delivery system is functioning perfectly.\n\nProvider: ${provider || "SMTP"}\nHost: ${host}:${port}\nUser: ${user}\nTimestamp: ${new Date().toISOString()}`,
       html: finalHtml,
       attachments,
     });

@@ -1001,7 +1001,7 @@ export function CatalogMatrixStudio({
                   contrast={baseContrast}
                   content={footerHtml || ""}
                   onChange={(_, html) => onChange({ footerHtml: html })}
-                  placeholder="e.g. Published by the Atelier of Lalita Kapilavai • All rights reserved."
+                  placeholder="e.g. Published by the Fine Art Atelier • All rights reserved."
                   className="min-h-[120px]"
                 />
               </div>

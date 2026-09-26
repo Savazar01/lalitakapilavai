@@ -335,7 +335,7 @@ function SortableSection({
       ...(type === "FORM_BLOCK"
         ? {
             formTitle: "Send Curatorial Inquiry",
-            formSubtitle: "Direct correspondence with the atelier desk of Lalita Kapilavai.",
+            formSubtitle: "Direct correspondence with the curatorial atelier desk.",
             submitButtonText: "Submit Inquiry",
             successMessage: "Thank you for your correspondence. The curatorial desk will respond shortly.",
             fields: [
@@ -1083,7 +1083,7 @@ function SortableSection({
                               <label className="text-[10px] text-muted-foreground block mb-1">Catalog / Document Title</label>
                               <input
                                 type="text"
-                                placeholder="e.g. Lalita Kapilavai Tanjore Retrospective Catalog"
+                                placeholder="e.g. Fine Art Retrospective Catalog"
                                 value={block.title || ""}
                                 onChange={(e) => updateBlock(colIdx, block.id, { title: e.target.value })}
                                 className="w-full text-xs p-1.5 rounded border border-border bg-background text-foreground"

@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     if (!setting) {
       setting = await prisma.systemSetting.create({
         data: {
-          siteName: "Lalita Kapilavai — Sacred Art & Carnatic Music Archive",
+          siteName: "SavazAI WebApps — Digital Atelier & Cultural Archive",
         },
       });
     }

@@ -6,7 +6,7 @@ import { Footer } from "@/components/public/footer";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Deployment & Infrastructure Status — Lalita Kapilavai",
+  title: "Deployment & Infrastructure Status — SavazAI WebApps",
   description: "Live system architecture, runtime environments, and database diagnostic matrix.",
 };
 

@@ -46,14 +46,19 @@ const getArtworkBySlug = cache(async (slug: string) => {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const artwork = await getArtworkBySlug(slug);
+  const [artwork, settings] = await Promise.all([
+    getArtworkBySlug(slug),
+    prisma.systemSetting.findFirst(),
+  ]);
+  const siteName = settings?.siteName || "SavazAI WebApps";
+  const artistName = settings?.emailHeaderTitle || "Master Artist";
 
   if (!artwork) {
-    return { title: "Artwork Not Found — Lalita Kapilavai" };
+    return { title: `Artwork Not Found — ${siteName}` };
   }
 
   return {
-    title: `${artwork.title} (${artwork.yearCreated}) — Sacred Art by Lalita Kapilavai`,
+    title: `${artwork.title} (${artwork.yearCreated}) — Fine Art by ${artistName}`,
     description: `${artwork.medium}. ${artwork.description.slice(0, 160)}...`,
     openGraph: {
       title: artwork.title,
@@ -73,7 +78,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
 
   const baseUrl = await getServerBaseUrl();
   const settings = await prisma.systemSetting.findFirst({
-    select: { watermarkConfig: true },
+    select: { watermarkConfig: true, emailHeaderTitle: true, siteName: true },
   });
   const watermarkConfig = (settings?.watermarkConfig as Record<string, unknown>) || {};
   const defaultFoilText = (watermarkConfig.defaultFoilEarmarkText as string) || "Gold Foil";
@@ -136,6 +141,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               customFoilLabel={artwork.customFoilLabel || undefined}
               defaultFoilText={defaultFoilText}
               yearCreated={artwork.yearCreated}
+              artistName={settings?.emailHeaderTitle || "Master Artist"}
             />
 
             {/* Copyright & Provenance Notice */}
@@ -145,7 +151,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
                 <span className="font-serif font-bold text-foreground block mb-0.5">
                   Archival Provenance &amp; Copyright Notice
                 </span>
-                Original hand-crafted masterwork by Lalita Kapilavai. Layered on unblemished teakwood planks, gilded with certified {artwork.customFoilLabel || artwork.goldPurity || defaultFoilText || "authentic gold foil"}, and finished with semi-precious gemstones. Unauthorized reproduction or digital harvesting is prohibited.
+                Original hand-crafted masterwork by {settings?.emailHeaderTitle || "the master artist"}. Layered on unblemished teakwood planks, gilded with certified {artwork.customFoilLabel || artwork.goldPurity || defaultFoilText || "authentic gold foil"}, and finished with semi-precious gemstones. Unauthorized reproduction or digital harvesting is prohibited.
               </div>
             </div>
           </div>

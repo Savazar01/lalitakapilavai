@@ -61,14 +61,18 @@ const getEventBySlug = cache(async (slug: string) => {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const [event, settings] = await Promise.all([
+    getEventBySlug(slug),
+    prisma.systemSetting.findFirst(),
+  ]);
+  const siteName = settings?.siteName || "SavazAI WebApps";
 
   if (!event) {
-    return { title: "Event Not Found — Lalita Kapilavai" };
+    return { title: `Event Not Found — ${siteName}` };
   }
 
   return {
-    title: `${event.title} (${event.eventType}) — Lalita Kapilavai`,
+    title: `${event.title} (${event.eventType}) — ${siteName}`,
     description: `${event.venue}, ${event.city}. ${event.description ? event.description.slice(0, 160) : ""}...`,
   };
 }

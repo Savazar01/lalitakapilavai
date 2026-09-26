@@ -47,7 +47,7 @@ export function proxy(request: NextRequest) {
     if (origin && host) {
       try {
         const originUrl = new URL(origin);
-        if (originUrl.host !== host && !originUrl.host.endsWith("lalitakapilavai.com") && !originUrl.host.endsWith("savazar.com")) {
+        if (originUrl.host !== host && !originUrl.host.endsWith("savazar.com")) {
           return NextResponse.json(
             { error: "Cross-Origin Request Blocked" },
             { status: 403 }
@@ -62,7 +62,7 @@ export function proxy(request: NextRequest) {
     } else if (referer && host) {
       try {
         const refererUrl = new URL(referer);
-        if (refererUrl.host !== host && !refererUrl.host.endsWith("lalitakapilavai.com") && !refererUrl.host.endsWith("savazar.com")) {
+        if (refererUrl.host !== host && !refererUrl.host.endsWith("savazar.com")) {
           return NextResponse.json(
             { error: "Cross-Origin Referer Blocked" },
             { status: 403 }

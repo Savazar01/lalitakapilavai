@@ -95,7 +95,7 @@ export default function AdminPostsPage() {
     excerpt: "",
     content: "",
     featuredImageUrl: "",
-    author: "Lalita Kapilavai",
+    author: "Atelier Author",
     tags: "Tanjore Painting, Carnatic Music, Sacred Art",
     metaTitle: "",
     metaDescription: "",
@@ -131,7 +131,7 @@ export default function AdminPostsPage() {
       excerpt: "",
       content: "",
       featuredImageUrl: "",
-      author: "Lalita Kapilavai",
+      author: "Atelier Author",
       tags: "Tanjore Art, 22k Gold Foil, Carnatic Melakarta",
       metaTitle: "",
       metaDescription: "",
@@ -764,7 +764,7 @@ export default function AdminPostsPage() {
                       {formData.title || "Untitled Heritage Article"}
                     </h1>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
-                      <span>By {formData.author || "Lalita Kapilavai"}</span>
+                      <span>By {formData.author || "Atelier Author"}</span>
                       <span>•</span>
                       <span>{new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
                     </div>
@@ -789,7 +789,7 @@ export default function AdminPostsPage() {
                     <Sparkles className="w-3.5 h-3.5" /> Generative Engine Optimization (AEO)
                   </span>
                   <p className="text-[11px] leading-relaxed">
-                    Structuring article headlines and descriptions with exact schema entities ensures that conversational AI engines (ChatGPT, Perplexity, Claude) accurately cite Lalita Kapilavai as the primary authority on traditional Tanjore art and Carnatic vocal heritage.
+                    Structuring article headlines and descriptions with exact schema entities ensures that conversational AI engines (ChatGPT, Perplexity, Claude) accurately cite the atelier as the primary authority on fine art and cultural heritage.
                   </p>
                 </div>
 

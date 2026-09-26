@@ -218,7 +218,7 @@ export function MailConfigStudio() {
         adminBodyTemplate: `<p>A new RSVP has been received for <strong>{event_title}</strong>.</p><p><strong>Patron:</strong> {name} (<a href="mailto:{email}">{email}</a>)<br/><strong>Contact:</strong> {phone}<br/><strong>Reserved Passes:</strong> {guest_count}</p><p><strong>Additional Notes:</strong><br/>{message}</p>`,
         sendUserReceipt: true,
         userSubject: `Your RSVP Confirmation: {event_title}`,
-        userBodyTemplate: `<p>Dear {name},</p><p>Thank you for reserving your attendance for <strong>{event_title}</strong>.</p><p><strong>Event Schedule & Venue:</strong> {event_date}<br/><strong>Confirmed Passes:</strong> {guest_count}</p><p>We look forward to welcoming you.</p><p>Warm regards,<br/><strong>Lalita Kapilavai Atelier</strong></p>`,
+        userBodyTemplate: `<p>Dear {name},</p><p>Thank you for reserving your attendance for <strong>{event_title}</strong>.</p><p><strong>Event Schedule & Venue:</strong> {event_date}<br/><strong>Confirmed Passes:</strong> {guest_count}</p><p>We look forward to welcoming you.</p><p>Warm regards,<br/><strong>SavazAI Atelier</strong></p>`,
       };
     }
 
@@ -229,8 +229,8 @@ export function MailConfigStudio() {
         adminSubject: `📝 Inbound Form: ${currentDiscoveredForm.name} [{name}]`,
         adminBodyTemplate: `<p>A new submission was received on <strong>${currentDiscoveredForm.name}</strong>.</p><p><strong>From:</strong> {name} (<a href="mailto:{email}">{email}</a>)<br/><strong>Contact:</strong> {phone}</p><p><strong>Message:</strong><br/>{message}</p>{form_data}`,
         sendUserReceipt: true,
-        userSubject: `We received your message — Lalita Kapilavai Atelier`,
-        userBodyTemplate: `<p>Dear {name},</p><p>Thank you for reaching out regarding ${currentDiscoveredForm.name}. We have received your correspondence and will respond shortly.</p><p>Warm regards,<br/><strong>Lalita Kapilavai Atelier</strong></p>`,
+        userSubject: `We received your message — SavazAI Atelier`,
+        userBodyTemplate: `<p>Dear {name},</p><p>Thank you for reaching out regarding ${currentDiscoveredForm.name}. We have received your correspondence and will respond shortly.</p><p>Warm regards,<br/><strong>SavazAI Atelier</strong></p>`,
       };
     }
 
@@ -240,7 +240,7 @@ export function MailConfigStudio() {
       adminSubject: `✨ New Inquiry: {subject} [{name}]`,
       adminBodyTemplate: `<p>Inbound inquiry received from {name}...</p>`,
       sendUserReceipt: true,
-      userSubject: `Thank you for contacting Lalita Kapilavai Atelier`,
+      userSubject: `Thank you for contacting SavazAI Atelier`,
       userBodyTemplate: `<p>Dear {name},</p><p>Thank you for contacting us. We have received your message.</p>`,
     };
   }, [templates, activeFormTrigger, currentDiscoveredForm]);
@@ -684,7 +684,7 @@ export function MailConfigStudio() {
                               value={currentTemplate.userSubject || ""}
                               onFocus={() => setActiveSubjectField("userSubject")}
                               onChange={(e) => updateCurrentTemplate({ userSubject: e.target.value })}
-                              placeholder="Thank you for contacting Lalita Kapilavai Atelier"
+                              placeholder="Thank you for contacting SavazAI Atelier"
                               className="text-xs"
                             />
                           </div>

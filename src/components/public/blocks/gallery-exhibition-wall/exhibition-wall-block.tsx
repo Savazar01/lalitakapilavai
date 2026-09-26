@@ -94,7 +94,7 @@ function calculateFrameSize(aspectRatio: number, maxDim = 1.7): { width: number;
 
 /**
  * Computes architectural multi-wall corridor coordinates replicating the
- * King Charles London School of Arts / Lalita MA Salon Wall.
+ * Classical Fine Art / Salon Wall Architecture.
  * Partitions items across sequential walls (wallSpacing = 14.0).
  */
 function computePlacements(
@@ -1197,7 +1197,7 @@ export function ExhibitionWallBlock({
                 className="font-serif text-[8.5px] sm:text-[9.5px] tracking-wide font-semibold shrink-0"
                 style={{ color: "#374151" }}
               >
-                Lalita Kapilavai
+                Master Artist
               </span>
             </div>
 

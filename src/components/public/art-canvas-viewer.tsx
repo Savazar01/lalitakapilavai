@@ -21,6 +21,7 @@ export interface ArtCanvasViewerProps {
   goldPurity?: string;
   customFoilLabel?: string;
   defaultFoilText?: string;
+  artistName?: string;
   yearCreated?: number;
   className?: string;
 }
@@ -34,6 +35,7 @@ export function ArtCanvasViewer({
   goldPurity,
   customFoilLabel,
   defaultFoilText,
+  artistName,
   yearCreated,
   className = "",
 }: ArtCanvasViewerProps) {
@@ -101,10 +103,10 @@ export function ArtCanvasViewer({
       {/* Notice displayed solely during print attempts */}
       <div className="print-copyright-notice">
         <h2 className="text-xl font-bold font-serif mb-2">
-          {title} — Lalita Kapilavai
+          {title} — {artistName || "SavazAI Atelier"}
         </h2>
         <p className="text-sm">
-          © Lalita Kapilavai. Sacred Art & Carnatic Music Archive.
+          © {artistName || "SavazAI Atelier"}. Digital Atelier &amp; Cultural Archive.
           Digital reproduction, automated screen captures, and unauthorized printings
           are strictly prohibited.
         </p>

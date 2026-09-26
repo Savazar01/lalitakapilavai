@@ -3,12 +3,21 @@
 # Full glibc binary compatibility for Sharp (libvips), Prisma query engines, and native add-ons
 
 FROM node:22-bookworm-slim AS base
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
 WORKDIR /app
 
-# Consolidate all required system packages and fonts in base layer once
+# Consolidate all required system packages and fonts in base layer once (noninteractive, cleaned caches)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openssl ca-certificates netcat-openbsd fonts-dejavu-core fonts-freefont-ttf fontconfig libheif-dev && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+      openssl \
+      ca-certificates \
+      netcat-openbsd \
+      fonts-dejavu-core \
+      fontconfig \
+      libheif-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Stage 1: Install dependencies with npm cache mount
 FROM base AS deps

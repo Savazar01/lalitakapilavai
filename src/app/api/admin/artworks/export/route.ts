@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     });
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = "Lalita Kapilavai Cultural Archive";
+    workbook.creator = "SavazAI WebApps Platform";
     workbook.lastModifiedBy = session.user.name || "Curatorial Admin";
     workbook.created = new Date();
     workbook.modified = new Date();
@@ -229,7 +229,7 @@ export async function GET(request: NextRequest) {
     const fileBuffer = await workbook.xlsx.writeBuffer();
     const nodeBuffer = Buffer.from(fileBuffer);
 
-    const filename = `lalita-artworks-catalog-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    const filename = `savazai-artworks-catalog-${new Date().toISOString().slice(0, 10)}.xlsx`;
 
     return new NextResponse(nodeBuffer, {
       status: 200,

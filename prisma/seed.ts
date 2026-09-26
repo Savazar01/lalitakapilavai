@@ -4,12 +4,12 @@ import { hashPassword } from "better-auth/crypto";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Starting Lalita Kapilavai database seed...");
+  console.log("🌱 Starting SavazAI WebApps Platform database seed...");
 
   // 1. Provision Superadmin User
-  const adminEmail = (process.env.ADMIN_EMAIL || "admin@lalitakapilavai.com").trim().toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL || "admin@savazar.com").trim().toLowerCase();
   const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || "AdminPassword2026!";
-  const adminName = process.env.ADMIN_NAME || "Lalita Kapilavai Admin";
+  const adminName = process.env.ADMIN_NAME || "SavazAI Platform Admin";
 
   let superadmin = await prisma.user.findUnique({
     where: { email: adminEmail },
@@ -68,31 +68,31 @@ async function main() {
   if (!existingSettings) {
     await prisma.systemSetting.create({
       data: {
-        siteName: "Lalita Kapilavai — Sacred Art & Carnatic Music Archive",
+        siteName: "SavazAI WebApps — Digital Atelier & Cultural Archive",
         siteDescription:
-          "Living digital archive of traditional Indian Tanjore paintings with 22k gold leaf, Mysore classical fine art, and Carnatic classical vocal recitals.",
+          "Enterprise multi-tenant digital atelier, spatial exhibition corridor, and museum publishing system.",
         adminAlertEmail: adminEmail,
-        contactEmail: "contact@lalitakapilavai.com",
+        contactEmail: "contact@savazar.com",
         contactPhone: "+91 98450 12345",
-        watermarkText: process.env.WATERMARK_TEXT || "© Lalita Kapilavai - Sacred Art & Heritage",
+        watermarkText: process.env.WATERMARK_TEXT || "© SavazAI WebApps | All Rights Reserved",
         watermarkOpacity: parseFloat(process.env.WATERMARK_OPACITY || "0.35"),
         watermarkFontSize: 28,
         r2AccountId: process.env.S3_ENDPOINT || process.env.R2_ACCOUNT_ID || "cloudflare-r2-account-id",
-        r2BucketName: process.env.S3_BUCKET_NAME || "lalitakapilavai-media",
-        r2PublicUrl: process.env.S3_PUBLIC_DOMAIN || "https://media.lalitakapilavai.com",
+        r2BucketName: process.env.S3_BUCKET_NAME || "savazai-media-vault",
+        r2PublicUrl: process.env.S3_PUBLIC_DOMAIN || "/media",
         s3Region: process.env.S3_REGION || "ap-south-1",
-        s3BucketName: process.env.S3_BUCKET_NAME || "lalitakapilavai-masters-backup",
-        instagramUrl: "https://instagram.com/lalitakapilavai",
-        youtubeUrl: "https://youtube.com/@lalitakapilavai",
+        s3BucketName: process.env.S3_BUCKET_NAME || "savazai-media-vault",
+        instagramUrl: "https://instagram.com/savazai",
+        youtubeUrl: "https://youtube.com/@savazai",
         footerConfig: {
           aboutText:
-            "Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.",
-          contactEmail: "contact@lalitakapilavai.com",
+            "Enterprise digital publishing, cultural archiving, and spatial 3D exhibition suite for fine art masters, traditional heritage artists, and museum collections.",
+          contactEmail: "contact@savazar.com",
           contactPhone: "+91 98450 12345",
-          copyrightText: "© 2026 Lalita Kapilavai. All sacred rights reserved.",
+          copyrightText: "© 2026 SavazAI WebApps Platform. All rights reserved.",
           socialLinks: [
-            { platform: "Instagram", url: "https://instagram.com/lalitakapilavai", isVisible: true },
-            { platform: "YouTube", url: "https://youtube.com/@lalitakapilavai", isVisible: true },
+            { platform: "Instagram", url: "https://instagram.com/savazai", isVisible: true },
+            { platform: "YouTube", url: "https://youtube.com/@savazai", isVisible: true },
           ],
           legalLinks: [
             { label: "Privacy Policy", url: "/privacy", isVisible: true },
@@ -107,8 +107,8 @@ async function main() {
           smtpPort: 587,
           smtpUser: "",
           smtpPassword: "",
-          fromEmail: "contact@lalitakapilavai.com",
-          fromName: "Lalita Kapilavai Archive",
+          fromEmail: "contact@savazar.com",
+          fromName: "SavazAI WebApps Platform",
           isEnabled: false,
         },
         aiConfig: {
@@ -127,13 +127,13 @@ async function main() {
     if (!existingSettings.footerConfig) {
       updates.footerConfig = {
         aboutText:
-          "Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.",
-        contactEmail: existingSettings.contactEmail || "contact@lalitakapilavai.com",
+          "Enterprise digital publishing, cultural archiving, and spatial 3D exhibition suite for fine art masters, traditional heritage artists, and museum collections.",
+        contactEmail: existingSettings.contactEmail || "contact@savazar.com",
         contactPhone: existingSettings.contactPhone || "+91 98450 12345",
-        copyrightText: "© 2026 Lalita Kapilavai. All sacred rights reserved.",
+        copyrightText: "© 2026 SavazAI WebApps Platform. All rights reserved.",
         socialLinks: [
-          { platform: "Instagram", url: existingSettings.instagramUrl || "https://instagram.com/lalitakapilavai", isVisible: true },
-          { platform: "YouTube", url: existingSettings.youtubeUrl || "https://youtube.com/@lalitakapilavai", isVisible: true },
+          { platform: "Instagram", url: existingSettings.instagramUrl || "https://instagram.com/savazai", isVisible: true },
+          { platform: "YouTube", url: existingSettings.youtubeUrl || "https://youtube.com/@savazai", isVisible: true },
         ],
         legalLinks: [
           { label: "Privacy Policy", url: "/privacy", isVisible: true },
@@ -334,7 +334,7 @@ async function main() {
         title: "Sacred Art & Classical Carnatic Music",
         slug: "home",
         metaDescription:
-          "Living digital archive of traditional Indian Tanjore paintings with 22k gold leaf, Mysore classical fine art, and Carnatic classical vocal recitals by Lalita Kapilavai.",
+          "Enterprise digital archive and exhibition corridor presenting traditional fine art with 22k gold leaf, classical heritage paintings, and curated cultural recitals.",
         isPublished: true,
         publishedAt: new Date(),
         sections: {
@@ -545,9 +545,9 @@ async function main() {
     {
       title: "Sacred Art & Cultural Chronicle",
       slug: "blogs",
-      metaTitle: "Sacred Art & Cultural Chronicle — Lalita Kapilavai",
+      metaTitle: "Sacred Art & Cultural Chronicle — SavazAI WebApps",
       metaDescription:
-        "Explore authoritative writings on 22k gold Tanjore painting techniques, Mysore traditional iconography, and Carnatic musical synesthesia by Lalita Kapilavai.",
+        "Explore authoritative writings on fine art painting techniques, classical iconography, and multi-modal artistic traditions.",
       isPublished: true,
       sectionTitle: "Curatorial Insights Hero",
       content: {
@@ -594,7 +594,7 @@ async function main() {
     {
       title: "Traditional Art Gallery",
       slug: "gallery",
-      metaTitle: "Fine Art Gallery & Tanjore Archive — Lalita Kapilavai",
+      metaTitle: "Fine Art Gallery & Cultural Archive — SavazAI WebApps",
       metaDescription:
         "Five centuries of classical sacred painting traditions preserved through authentic 22-carat gold foil relief work, purified gesso, and semi-precious Jaipur gemstones.",
       isPublished: true,
@@ -643,7 +643,7 @@ async function main() {
     {
       title: "Exhibitions & Events",
       slug: "events",
-      metaTitle: "Exhibitions, Concerts & Workshops — Lalita Kapilavai",
+      metaTitle: "Exhibitions, Concerts & Workshops — SavazAI WebApps",
       metaDescription:
         "Experience the divine resonance of Carnatic ragas and witness museum-grade Thanjavur gold leaf masterworks in person.",
       eyebrowTag: "Cultural Calendar & Recitals",
@@ -712,7 +712,7 @@ async function main() {
     {
       title: "Traditional Art Disciplines",
       slug: "categories",
-      metaTitle: "Sacred Art Disciplines — Lalita Kapilavai",
+      metaTitle: "Sacred Art Disciplines — SavazAI WebApps",
       metaDescription:
         "Explore classical South Indian artistic disciplines spanning Thanjavur 22k gold foil embossments, Mysore traditional paintings, temple murals, and Carnatic music traditions.",
       isPublished: true,

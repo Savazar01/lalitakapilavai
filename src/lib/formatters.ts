@@ -1,5 +1,5 @@
 /**
- * Lalita Kapilavai Cultural Archive — Internationalization (i18n) & Localization (l10n)
+ * SavazAI WebApps Digital Atelier — Internationalization (i18n) & Localization (l10n)
  * Multi-Currency & Ordinal Timezone-Aware Date Formatters
  */
 

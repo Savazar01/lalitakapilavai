@@ -151,7 +151,7 @@ export function BlogGridEmbed({ limit = 4 }: { limit?: number }) {
 
                 <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs mt-auto">
                   <span className="text-[11px] font-medium text-foreground/80">
-                    {post.author || "Lalita Kapilavai"}
+                    {post.author || "Atelier Author"}
                   </span>
                   <span className="text-primary font-semibold text-[11px] inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                     Read Article <ArrowRight className="w-3 h-3" />

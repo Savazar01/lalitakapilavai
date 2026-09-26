@@ -135,8 +135,8 @@ export default async function AdminDashboardPage() {
       <div className="rounded-xl border border-border bg-card p-6 sm:p-8 relative overflow-hidden shadow-sm">
         <EditablePageHeader
           sectionKey="overview"
-          defaultTitle="Welcome to Lalita Kapilavai Archive"
-          defaultSubtitle="Manage your sacred artwork catalog with 22k gold specifications, dynamic watermarked assets, exhibitions, physical QR scan leads, and Carnatic music synesthetic models."
+          defaultTitle="Welcome to SavazAI WebApps Atelier"
+          defaultSubtitle="Manage your fine art catalog, dynamic watermarked assets, exhibitions, physical QR scan leads, and cultural archive collections."
           badgeLabel="Administrative Overview"
           className="border-b-0 pb-0"
         >

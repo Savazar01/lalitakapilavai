@@ -18,20 +18,20 @@ export async function GET(request: NextRequest) {
     if (!settings) {
       settings = await prisma.systemSetting.create({
         data: {
-          siteName: "Lalita Kapilavai — Sacred Art & Carnatic Music Archive",
+          siteName: "SavazAI WebApps — Digital Atelier & Cultural Archive",
           siteDescription:
-            "Living digital archive of traditional Indian Tanjore paintings with 22k gold leaf, Mysore classical fine art, and Carnatic classical vocal recitals.",
-          adminAlertEmail: "admin@lalitakapilavai.com",
-          contactEmail: "contact@lalitakapilavai.com",
+            "Living digital atelier and high-fidelity cultural archive platform engineered by Savazar.",
+          adminAlertEmail: "alerts@savazar.com",
+          contactEmail: "contact@savazar.com",
           contactPhone: "+91 98450 12345",
-          watermarkText: "© Lalita Kapilavai - Sacred Art & Heritage",
+          watermarkText: "© SavazAI WebApps | All Rights Reserved",
           watermarkOpacity: 0.35,
           watermarkFontSize: 28,
           defaultCurrency: "INR",
           defaultTimezone: "Asia/Kolkata",
           storageProvider: "R2",
-          r2BucketName: "lalitakapilavai-media",
-          r2PublicUrl: "https://media.lalitakapilavai.com",
+          r2BucketName: "savazai-media-vault",
+          r2PublicUrl: "https://media.savazar.com",
         },
       });
     }

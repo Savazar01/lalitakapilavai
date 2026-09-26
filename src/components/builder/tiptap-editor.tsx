@@ -1196,7 +1196,7 @@ export function TiptapEditor({
                     <span class="text-xl">🎵</span>
                     <div>
                       <h4 class="font-serif font-bold text-sm text-foreground">Carnatic Raga Meditation: Kalyani</h4>
-                      <p class="text-xs text-muted-foreground">Adi Tala • Tyagaraja Kriti • Rendition by Lalita Kapilavai</p>
+                      <p class="text-xs text-muted-foreground">Adi Tala • Tyagaraja Kriti • Classical Rendition</p>
                     </div>
                   </div>`
                 )
@@ -1303,7 +1303,7 @@ export function TiptapEditor({
                       <span class="text-base">📄</span>
                       <div>
                         <div class="font-serif font-bold text-xs text-foreground">Curatorial Catalog &amp; Provenance Dossier</div>
-                        <div class="text-[10px] text-muted-foreground">Archival PDF • Atelier Lalita Kapilavai</div>
+                        <div class="text-[10px] text-muted-foreground">Archival PDF • Atelier Master Collection</div>
                       </div>
                     </div>
                     <a href="#" class="text-xs font-mono text-primary font-semibold hover:underline">Download Archive</a>
@@ -1370,7 +1370,7 @@ export function TiptapEditor({
                 Insert / Edit Hyperlink
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground">
-                Enter target destination (e.g. /gallery, https://lalitakapilavai.com/about)
+                Enter target destination (e.g. /gallery, https://savazar.com/about)
               </DialogDescription>
             </DialogHeader>
 

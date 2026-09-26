@@ -80,7 +80,7 @@ export async function Navbar() {
           {settings?.logoUrl ? (
             <img
               src={settings.logoUrl}
-              alt={settings.siteName || "Lalita Kapilavai"}
+              alt={settings.siteName || "SavazAI WebApps"}
               className="h-11 w-auto max-w-[160px] object-contain group-hover:scale-105 transition-transform"
             />
           ) : (
@@ -92,14 +92,14 @@ export async function Navbar() {
             <span className="font-serif font-bold text-lg tracking-tight text-foreground group-hover:text-primary transition-colors">
               {settings?.siteName
                 ? settings.siteName.includes("—")
-                  ? settings.siteName.split("—")[0].trim()
-                  : settings.siteName
-                : "Lalita Kapilavai"}
+                ? settings.siteName.split("—")[0].trim()
+                : settings.siteName
+                : "SavazAI WebApps"}
             </span>
             <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
               {settings?.siteName?.includes("—")
                 ? settings.siteName.split("—").slice(1).join("—").trim()
-                : "Sacred Art & Carnatic Archive"}
+                : "Digital Atelier & Cultural Archive"}
             </span>
           </div>
         </Link>
@@ -226,7 +226,7 @@ export async function Navbar() {
                     ? settings.siteName.includes("—")
                       ? settings.siteName.split("—")[0].trim()
                       : settings.siteName
-                    : "Lalita Kapilavai"}
+                    : "SavazAI WebApps"}
                 </SheetTitle>
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">
                   {settings?.siteName?.includes("—")

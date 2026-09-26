@@ -189,7 +189,7 @@ export default function AdminProfilePage() {
                     required
                     value={name}
                     onChange={(e) => setCustomName(e.target.value)}
-                    placeholder="Lalita Kapilavai Superadmin"
+                    placeholder="SavazAI Superadmin"
                     className="text-xs"
                   />
                 </div>

@@ -49,7 +49,7 @@ export interface HeroShowcaseBlockProps {
 export function HeroShowcaseBlock({
   archetype = "split-showcase",
   title = "Sacred Tanjore & Carnatic Archival Opus",
-  subtitle = "Masterworks in 22k gold relief and divine musicological synesthesia by Lalita Kapilavai.",
+  subtitle = "Masterworks in 22k gold relief and divine musicological synesthesia.",
   eyebrow = "Curatorial Monograph & Living Archive",
   curatorialQuote = "“Every brushstroke is a silent prayer; every 22k gold embellishment vibrates in unison with the ancient microtones of Carnatic ragas.”",
   imageUrl = "/images/artworks/sample-tanjore.jpg",

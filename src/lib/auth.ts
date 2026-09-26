@@ -9,7 +9,8 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3060",
   secret: process.env.BETTER_AUTH_SECRET || "dev-insecure-secret-key-at-least-32-chars-long",
   trustedOrigins: [
-    "https://lalitakapilavai.savazar.com",
+    "https://savazar.com",
+    "https://*.savazar.com",
     "http://localhost:3060",
     ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
     ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
@@ -18,6 +19,7 @@ export const auth = betterAuth({
     database: {
       generateId: false,
     },
+    useSecureCookies: process.env.NODE_ENV === "production",
   },
   emailAndPassword: {
     enabled: true,

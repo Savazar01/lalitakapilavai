@@ -416,14 +416,14 @@ export default function AdminCatalogStudioPage() {
   const [endPageConfig, setEndPageConfig] = React.useState<ECatalogEndPageConfig>({
     isEnabled: true,
     title: "Colophon & Atelier Heritage",
-    contentHtml: "<p>Published by the Atelier of Lalita Kapilavai. Specializing in classical Tanjore 22k gold leaf iconography and Carnatic musicianship.</p><p>For acquisitions, private viewing recitals, or scholarly monograph requests, contact the studio directly.</p>",
+    contentHtml: "<p>Published by SavazAI Atelier. Specializing in classical fine art, 22k gold leaf iconography and classical musicianship.</p><p>For acquisitions, private viewing recitals, or scholarly monograph requests, contact the studio directly.</p>",
     backgroundImage: "",
     backgroundColor: "#FAF7F2",
     endPageBgColor: "#FAF7F2",
     colophonTitleColor: "#0F172A",
     colophonTextColor: "#334155",
     frameStyle: "gold-fillet",
-    contactDetails: "Email: contact@lalitakapilavai.com | Web: lalitakapilavai.com",
+    contactDetails: "Email: contact@savazar.com | Web: savazar.com",
   });
 
   // Artwork plates state
@@ -2007,7 +2007,7 @@ export default function AdminCatalogStudioPage() {
                       onChange={(e) =>
                         setCoverConfig((prev) => ({ ...prev, coverFooterNote: e.target.value }))
                       }
-                      placeholder="e.g. Published by the Atelier of Lalita Kapilavai • Sacred Art & Heritage"
+                      placeholder="e.g. Published by SavazAI Atelier • Sacred Art & Heritage"
                       className="text-xs"
                     />
                     <p className="text-[10px] text-muted-foreground">
@@ -2687,7 +2687,7 @@ export default function AdminCatalogStudioPage() {
                 <Input
                   value={forewordBy}
                   onChange={(e) => setForewordBy(e.target.value)}
-                  placeholder="e.g. Lalita Kapilavai & Dr. R. Swaminathan (Art Historian)"
+                  placeholder="e.g. Master Artist & Dr. R. Swaminathan (Art Historian)"
                   className="text-xs"
                 />
               </div>
@@ -3762,7 +3762,7 @@ export default function AdminCatalogStudioPage() {
                     onChange={(e) =>
                       setEndPageConfig((prev) => ({ ...prev, contactDetails: e.target.value }))
                     }
-                    placeholder="e.g. Atelier of Lalita Kapilavai | contact@lalitakapilavai.com | All rights reserved."
+                    placeholder="e.g. SavazAI Atelier | contact@savazar.com | All rights reserved."
                     className="text-xs font-mono"
                   />
                 </div>

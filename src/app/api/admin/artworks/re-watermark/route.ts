@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     const { artworkId } = body;
 
     const systemSettings = await prisma.systemSetting.findFirst().catch(() => null);
-    const defaultText = systemSettings?.watermarkText || "© Lalita Kapilavai | lalitakapilavai.com";
+    const defaultText = systemSettings?.watermarkText || "© SavazAI WebApps | All Rights Reserved";
     const defaultOpacity = systemSettings?.watermarkOpacity ?? 0.85;
     const defaultStyle = (systemSettings?.watermarkStyle || "REPEAT_DIAGONAL") as
       | "REPEAT_DIAGONAL"

@@ -132,7 +132,7 @@ export function ArtworkPlacardSheet({
   open,
   onOpenChange,
   artworks = [],
-  defaultArtistName = "Lalita Kapilavai",
+  defaultArtistName = "Master Artist",
 }: ArtworkPlacardSheetProps) {
   // Format & Orientation
   const [cardFormat, setCardFormat] = React.useState<"visiting-card" | "museum-placard">("visiting-card");
@@ -1043,7 +1043,7 @@ export function ArtworkPlacardSheet({
                   value={globalArtistName}
                   onChange={(e) => setGlobalArtistName(e.target.value)}
                   className="h-8 text-xs w-48 bg-background"
-                  placeholder="e.g. Lalita Kapilavai"
+                  placeholder="e.g. Master Artist"
                 />
                 <Button
                   type="button"

@@ -14,7 +14,7 @@ export interface AdminPortalConfig {
 
 export const DEFAULT_ADMIN_CONFIG: AdminPortalConfig = {
   dashboardTitle: "Archive & Platform Dashboard",
-  sidebarBrandTitle: "Lalita Kapilavai",
+  sidebarBrandTitle: "SavazAI Atelier",
   sidebarBrandSubtitle: "Control Center",
   sidebarLabels: {
     overview: "Overview",
@@ -32,8 +32,8 @@ export const DEFAULT_ADMIN_CONFIG: AdminPortalConfig = {
   pageHeadings: {
     overview: {
       badge: "Administrative Overview",
-      title: "Welcome to Lalita Kapilavai Archive",
-      subtitle: "Manage your sacred artwork catalog with 22k gold specifications, dynamic watermarked assets, exhibitions, physical QR scan leads, and Carnatic music synesthetic models.",
+      title: "Welcome to SavazAI WebApps Atelier",
+      subtitle: "Manage your fine art catalog, dynamic watermarked assets, exhibitions, physical QR scan leads, and cultural archive collections.",
     },
     pages: {
       badge: "Visual Page Builder",

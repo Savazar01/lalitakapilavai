@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
           earmarkText: earmarkText !== undefined && earmarkText !== null ? String(earmarkText).trim() : "Curated Exhibition & Recital",
           eventType: eventType as EventType,
           description: description || "",
-          venue: venue || venueName || "Lalita Kapilavai Heritage Studio",
+          venue: venue || venueName || "SavazAI Heritage Studio",
           venueName: venueName || venue || null,
           streetAddress: streetAddress || null,
           city: city || "Bengaluru",

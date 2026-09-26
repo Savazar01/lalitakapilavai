@@ -198,10 +198,10 @@ function EventFormContent({
   const [startDate, setStartDate] = React.useState(initialEvent?.startDate || "");
   const [endDate, setEndDate] = React.useState(initialEvent?.endDate || "");
   const [venue, setVenue] = React.useState(
-    initialEvent?.venue || initialEvent?.venueName || "Lalita Kapilavai Heritage Studio"
+    initialEvent?.venue || initialEvent?.venueName || "SavazAI Heritage Studio"
   );
   const [venueName, setVenueName] = React.useState(
-    initialEvent?.venueName || initialEvent?.venue || "Lalita Kapilavai Heritage Studio"
+    initialEvent?.venueName || initialEvent?.venue || "SavazAI Heritage Studio"
   );
   const [streetAddress, setStreetAddress] = React.useState(initialEvent?.streetAddress || "");
   const [city, setCity] = React.useState(initialEvent?.city || "Bengaluru");
@@ -228,10 +228,10 @@ function EventFormContent({
   const [showOnHomepage, setShowOnHomepage] = React.useState(initialEvent?.showOnHomepage === true);
   const [sortOrder, setSortOrder] = React.useState<number>(initialEvent?.sortOrder || 0);
   const [contactName, setContactName] = React.useState(
-    initialEvent?.contactName || "Smt. Lalita Kapilavai"
+    initialEvent?.contactName || "Curatorial Director"
   );
   const [contactEmail, setContactEmail] = React.useState(
-    initialEvent?.contactEmail || "events@lalitakapilavai.com"
+    initialEvent?.contactEmail || "events@savazar.com"
   );
   const [contactPhone, setContactPhone] = React.useState(
     initialEvent?.contactPhone || "+91 98450 00000"
@@ -534,8 +534,8 @@ function EventFormContent({
       earmarkText: earmarkText.trim() || "Curated Exhibition & Recital",
       eventType,
       description,
-      venue: venueName || venue || "Lalita Kapilavai Heritage Studio",
-      venueName: venueName || venue || "Lalita Kapilavai Heritage Studio",
+      venue: venueName || venue || "SavazAI Heritage Studio",
+      venueName: venueName || venue || "SavazAI Heritage Studio",
       streetAddress: streetAddress || null,
       city: city.trim() || "Bengaluru",
       stateProvince: stateProvince || null,
@@ -944,7 +944,7 @@ function EventFormContent({
                   <label className="text-xs font-semibold text-foreground">Venue / Gallery Hall *</label>
                   <Input
                     required
-                    placeholder="e.g. Lalita Kapilavai Heritage Studio or Carnegie Hall"
+                    placeholder="e.g. SavazAI Heritage Studio or Carnegie Hall"
                     value={venueName}
                     onChange={(e) => {
                       setVenueName(e.target.value);
@@ -1036,7 +1036,7 @@ function EventFormContent({
                     Contact Person / Curator
                   </label>
                   <Input
-                    placeholder="e.g. Smt. Lalita Kapilavai"
+                    placeholder="e.g. Curatorial Director"
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
                   />
@@ -1049,7 +1049,7 @@ function EventFormContent({
                   </label>
                   <Input
                     type="email"
-                    placeholder="e.g. events@lalitakapilavai.com"
+                    placeholder="e.g. events@savazar.com"
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                   />

@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const newLead = await prisma.lead.create({
       data: {
         name,
-        email: email || "exhibition-visitor@lalitakapilavai.com",
+        email: email || "visitor@savazar.com",
         phone: phone || null,
         sourceArtworkId: sourceArtworkId || null,
         sourceEventId: sourceEventId || null,

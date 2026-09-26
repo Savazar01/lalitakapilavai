@@ -7,11 +7,16 @@ import { Sparkles, Palette } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Fine Art Gallery & Tanjore Archive — Lalita Kapilavai",
-  description:
-    "Explore authentic 22k gold foil Tanjore paintings, classical Mysore traditional art, and sacred Indian iconography by Lalita Kapilavai.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await prisma.systemSetting.findFirst();
+  const siteName = settings?.siteName || "SavazAI WebApps";
+
+  return {
+    title: `Fine Art Gallery & Exhibition Archive — ${siteName}`,
+    description:
+      "Explore authentic traditional fine art paintings, classical collections, and cultural heritage.",
+  };
+}
 
 export default async function GalleryPage() {
   const firstCategory =

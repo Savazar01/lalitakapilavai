@@ -229,7 +229,7 @@ export default function ArtworksAdminPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `lalita-artworks-catalog-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.download = `savazai-artworks-catalog-${new Date().toISOString().slice(0, 10)}.xlsx`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -1606,7 +1606,7 @@ export default function ArtworksAdminPage() {
                       <Input
                         value={customWatermarkText}
                         onChange={(e) => setCustomWatermarkText(e.target.value)}
-                        placeholder="© Lalita Kapilavai"
+                        placeholder="© SavazAI WebApps"
                         className="h-8 text-xs"
                       />
                     </div>

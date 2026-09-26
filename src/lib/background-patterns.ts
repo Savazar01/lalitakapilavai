@@ -1,5 +1,5 @@
 /**
- * Authentic Sacred Art & Heritage Patterns for Lalita Kapilavai Portfolio
+ * Authentic Fine Art & Heritage Patterns for SavazAI WebApps Digital Atelier
  * High-elegance SVG patterns with subtle gold accents and modular CSS data URIs.
  */
 

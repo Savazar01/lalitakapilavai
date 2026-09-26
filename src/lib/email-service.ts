@@ -40,11 +40,11 @@ export const DEFAULT_EMAIL_TEMPLATES = [
 </div>
 {form_data}`,
     sendUserReceipt: true,
-    userSubject: "Thank you for contacting Lalita Kapilavai Atelier",
+    userSubject: "Thank you for contacting the Atelier",
     userBodyTemplate: `<p>Dear {name},</p>
-<p>Thank you for reaching out to the Lalita Kapilavai Atelier. We have received your inquiry regarding <strong>{subject}</strong>.</p>
+<p>Thank you for reaching out to the Atelier. We have received your inquiry regarding <strong>{subject}</strong>.</p>
 <p>Our curatorial desk will review your correspondence and respond promptly.</p>
-<p style="margin-top: 24px;">With warm regards,<br/><strong>Lalita Kapilavai Atelier</strong><br/><span style="font-size: 12px; color: #6b7280;">Sacred Art &amp; Carnatic Classical Vocal Heritage</span></p>`,
+<p style="margin-top: 24px;">With warm regards,<br/><strong>Atelier Administration</strong><br/><span style="font-size: 12px; color: #6b7280;">Fine Art &amp; Cultural Archive</span></p>`,
   },
   {
     triggerType: "event_rsvp",
@@ -64,9 +64,9 @@ export const DEFAULT_EMAIL_TEMPLATES = [
     userSubject: "Attendance Confirmed: {event_title}",
     userBodyTemplate: `<p>Dear {name},</p>
 <p>Your attendance reservation for <strong>{event_title}</strong> on {event_date} has been confirmed.</p>
-<p>We look forward to welcoming you to this celebration of sacred art and classical Carnatic music.</p>
+<p>We look forward to welcoming you to this celebration of fine art and cultural heritage.</p>
 <p>Please present this confirmation email upon arrival at the venue reception.</p>
-<p style="margin-top: 24px;">Warm regards,<br/><strong>Lalita Kapilavai Archive</strong></p>`,
+<p style="margin-top: 24px;">Warm regards,<br/><strong>Atelier Administration</strong></p>`,
   },
   {
     triggerType: "acquisition",
@@ -85,11 +85,11 @@ export const DEFAULT_EMAIL_TEMPLATES = [
 </div>
 {form_data}`,
     sendUserReceipt: true,
-    userSubject: "Private Acquisition Inquiry Received — Lalita Kapilavai",
+    userSubject: "Private Acquisition Inquiry Received",
     userBodyTemplate: `<p>Dear {name},</p>
-<p>Thank you for expressing interest in acquiring or commissioning an authentic traditional Tanjore or Mysore masterwork from Lalita Kapilavai Atelier.</p>
+<p>Thank you for expressing interest in acquiring or commissioning an authentic masterwork from our atelier collection.</p>
 <p>Our curatorial team is reviewing your requirements and will contact you with provenance details, dimensions, and schedule availability.</p>
-<p style="margin-top: 24px;">With respectful regards,<br/><strong>Lalita Kapilavai Curatorial Desk</strong></p>`,
+<p style="margin-top: 24px;">With respectful regards,<br/><strong>Atelier Curatorial Desk</strong></p>`,
   },
   {
     triggerType: "custom_form",
@@ -111,7 +111,7 @@ export const DEFAULT_EMAIL_TEMPLATES = [
     userSubject: "Confirmation: Your submission to {form_name}",
     userBodyTemplate: `<p>Dear {name},</p>
 <p>Thank you for submitting your details via <strong>{form_name}</strong>. Your correspondence has been securely logged with our administration.</p>
-<p style="margin-top: 24px;">With warm regards,<br/><strong>Lalita Kapilavai Atelier</strong></p>`,
+<p style="margin-top: 24px;">With warm regards,<br/><strong>Atelier Administration</strong></p>`,
   },
 ];
 
@@ -150,7 +150,7 @@ export function getBaseAppUrl(): string {
         : `https://${fqdn.replace(/\/$/, "")}`;
     }
   }
-  return "https://lalitakapilavai.com";
+  return "https://savazar.com";
 }
 
 /**
@@ -267,7 +267,7 @@ export function wrapBrandedEmailHtml(
     logoImgSrc?: string | null;
   }
 ): string {
-  const headerTitle = settings.emailHeaderTitle || "Lalita Kapilavai Atelier";
+  const headerTitle = settings.emailHeaderTitle || "SavazAI Atelier";
   const headerSubtitle = settings.emailHeaderSubtitle || "Sacred & Traditional Indian Art";
   const footerText = settings.emailFooterText || "Inbound atelier inquiry and archival correspondence.";
 
@@ -315,8 +315,8 @@ export async function getTransporter() {
   const port = Number(emailConfig.smtpPort) || 587;
   const user = (emailConfig.smtpUser as string) || "";
   const pass = (emailConfig.smtpPassword as string) || "";
-  const fromEmail = (emailConfig.fromEmail as string) || user || "contact@lalitakapilavai.com";
-  const fromName = (emailConfig.fromName as string) || "Lalita Kapilavai Archive";
+  const fromEmail = (emailConfig.fromEmail as string) || user || "contact@savazar.com";
+  const fromName = (emailConfig.fromName as string) || "SavazAI Atelier";
 
   if (!user || !pass) {
     return { transporter: null, settings, fromEmail, fromName };
@@ -395,7 +395,7 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
   };
 
   const senderString = `"${fromName}" <${fromEmail}>`;
-  const adminRecipient = recipientOverride || settings?.adminAlertEmail || "info@lalitakapilavai.com";
+  const adminRecipient = recipientOverride || settings?.adminAlertEmail || "alerts@savazar.com";
 
   let adminSent = false;
   let adminError: string | undefined;

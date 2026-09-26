@@ -108,15 +108,15 @@ export async function POST(request: NextRequest) {
       image: featuredImageUrl || undefined,
       author: {
         "@type": "Person",
-        name: author || "Lalita Kapilavai",
-        jobTitle: "Traditional Indian Fine Artist & Carnatic Classical Vocalist",
+        name: author || "Atelier Author",
+        jobTitle: "Fine Art Master & Cultural Archivist",
       },
       publisher: {
         "@type": "Organization",
-        name: "Lalita Kapilavai Archive",
+        name: "SavazAI WebApps Atelier",
         logo: {
           "@type": "ImageObject",
-          url: "https://media.lalitakapilavai.com/logo.png",
+          url: "https://media.savazar.com/logo.png",
         },
       },
       keywords: tagArray.join(", "),
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         excerpt: excerpt || "",
         content: content || "",
         featuredImageUrl: featuredImageUrl || null,
-        author: author || "Lalita Kapilavai",
+        author: author || "Atelier Author",
         tags: tagArray,
         metaTitle: metaTitle || null,
         metaDescription: metaDescription || null,

@@ -396,42 +396,50 @@ function CatalogBackgroundLayer({
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const catalog = await prisma.eCatalog.findUnique({
-    where: { slug },
-  });
+  const [catalog, settings] = await Promise.all([
+    prisma.eCatalog.findUnique({
+      where: { slug },
+    }),
+    prisma.systemSetting.findFirst(),
+  ]);
+  const siteName = settings?.siteName || "SavazAI WebApps";
+  const artistName = settings?.emailHeaderTitle || "the Atelier";
 
   if (!catalog) {
-    return { title: "Catalog Not Found — Lalita Kapilavai" };
+    return { title: `Catalog Not Found — ${siteName}` };
   }
 
   return {
-    title: `${catalog.title} — Digital Exhibition e-Catalog | Lalita Kapilavai`,
+    title: `${catalog.title} — Digital Exhibition e-Catalog | ${siteName}`,
     description:
       catalog.subtitle ||
-      `Explore the digital exhibition catalog and curated plates of ${catalog.title} featuring traditional fine art by Lalita Kapilavai.`,
+      `Explore the digital exhibition catalog and curated plates of ${catalog.title} featuring traditional fine art by ${artistName}.`,
   };
 }
 
 export default async function ECatalogReaderPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const catalog = await prisma.eCatalog.findUnique({
-    where: { slug },
-    include: {
-      event: true,
-      customPages: {
-        orderBy: { pageNumber: "asc" },
-      },
-      items: {
-        orderBy: { pageNumber: "asc" },
-        include: {
-          artwork: {
-            include: { category: true },
+  const [catalog, settings] = await Promise.all([
+    prisma.eCatalog.findUnique({
+      where: { slug },
+      include: {
+        event: true,
+        customPages: {
+          orderBy: { pageNumber: "asc" },
+        },
+        items: {
+          orderBy: { pageNumber: "asc" },
+          include: {
+            artwork: {
+              include: { category: true },
+            },
           },
         },
       },
-    },
-  });
+    }),
+    prisma.systemSetting.findFirst(),
+  ]);
 
   if (!catalog || !catalog.isActive || catalog.isDeleted || (!catalog.isPublished && process.env.NODE_ENV === "production")) {
     notFound();
@@ -520,7 +528,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
 
   const coverFooterNote =
     (coverConfig.coverFooterNote as string) ||
-    "Published by the Atelier of Lalita Kapilavai • Sacred Art & Heritage";
+    `Published by the Atelier • ${settings?.siteName || "SavazAI WebApps"}`;
 
   const coverScope = resolveContainerThemeScope({
     backgroundType: coverBgType,
@@ -1535,7 +1543,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
 
                 {/* Bottom Footer Stamp */}
                 <div className="text-[10px] text-muted-foreground/70 text-center border-t border-primary/20 pt-2 mt-auto flex items-center justify-between">
-                  <span>{(catalog as unknown as { archiveStampText?: string }).archiveStampText || `© ${catalog.title} • Lalita Kapilavai Sacred Art Archive`}</span>
+                  <span>{(catalog as unknown as { archiveStampText?: string }).archiveStampText || `© ${catalog.title} • ${settings?.siteName || "SavazAI"} Fine Art Archive`}</span>
                   {showPlateNumber ? (
                     <span className="font-mono text-[9px] uppercase tracking-wider">
                       Plate {item.pageNumber || idx + 1}
@@ -1666,7 +1674,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               >
                 <p>
                   {(endPageConfig.contactDetails as string) ||
-                    "Atelier of Lalita Kapilavai • contact@lalitakapilavai.com • All rights reserved."}
+                    `Atelier Fine Art Publishing • ${settings?.contactEmail || "contact@savazar.com"} • All rights reserved.`}
                 </p>
                 <p className="text-[10px] opacity-75">
                   {colophonLegalNotice}
@@ -1749,7 +1757,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       />
                     ) : (
                       <p>
-                        Published by the Atelier of Lalita Kapilavai. Dedicated to the preservation of authentic gold foil Thanjavur art and classical Carnatic musicianship.
+                        Published by the Atelier of Fine Art. Dedicated to the preservation of authentic cultural heritage and sacred iconography.
                       </p>
                     )}
                   </div>
@@ -1765,7 +1773,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 >
                   <p>
                     {(endPageConfig.contactDetails as string) ||
-                      "Atelier of Lalita Kapilavai • contact@lalitakapilavai.com • All rights reserved."}
+                      `Atelier Fine Art Publishing • ${settings?.contactEmail || "contact@savazar.com"} • All rights reserved.`}
                   </p>
                   <p className="text-[10px] opacity-75">
                     {colophonLegalNotice}

@@ -33,8 +33,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const ALLOWED_MIME_TYPES = new Set([
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+      "image/avif",
+      "image/heic",
+      "image/heif",
+      "image/heic-sequence",
+      "image/tiff",
+      "image/gif",
+      "application/pdf",
+    ]);
+
+    const ALLOWED_EXTENSIONS = new Set([
+      "jpg",
+      "jpeg",
+      "png",
+      "webp",
+      "avif",
+      "heic",
+      "heics",
+      "heif",
+      "tif",
+      "tiff",
+      "gif",
+      "pdf",
+    ]);
+
+    const fileExt = file.name.split(".").pop()?.toLowerCase() || "";
+    const isMimeAllowed =
+      (file.type && ALLOWED_MIME_TYPES.has(file.type.toLowerCase())) ||
+      ALLOWED_EXTENSIONS.has(fileExt);
+
+    if (!isMimeAllowed) {
+      return NextResponse.json(
+        {
+          error: `Unsupported media type (${file.type || fileExt}). Only JPEG, PNG, WebP, AVIF, HEIC, TIFF, and PDF are permitted.`,
+        },
+        { status: 415 }
+      );
+    }
+
     const arrayBuffer = await file.arrayBuffer();
-    const inputBuffer = Buffer.from(arrayBuffer);
+    const MAX_IMAGE_SIZE = 25 * 1024 * 1024; // 25 MB
+    const MAX_DOCUMENT_SIZE = 100 * 1024 * 1024; // 100 MB
 
     // 2b. PDF Document Upload Bypass (Curatorial Monographs, Exhibition Catalogs, CVs)
     const isPdf =
@@ -42,9 +86,27 @@ export async function POST(request: NextRequest) {
       file.name.toLowerCase().endsWith(".pdf") ||
       formData.get("mediaType") === "document";
 
+    if (isPdf && arrayBuffer.byteLength > MAX_DOCUMENT_SIZE) {
+      return NextResponse.json(
+        { error: "Document payload exceeds maximum allowed size of 100MB" },
+        { status: 413 }
+      );
+    }
+
+    if (!isPdf && arrayBuffer.byteLength > MAX_IMAGE_SIZE) {
+      return NextResponse.json(
+        { error: "Image payload exceeds maximum allowed size of 25MB" },
+        { status: 413 }
+      );
+    }
+
+    const inputBuffer = Buffer.from(arrayBuffer);
+
     if (isPdf) {
       const assetId = crypto.randomUUID();
-      const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const sanitizedName = file.name
+        .replace(/[^a-zA-Z0-9._-]/g, "_")
+        .replace(/\.{2,}/g, "_");
       const docKey = `documents/${assetId}_${sanitizedName}`;
       const uploadResult = await uploadBuffer(
         inputBuffer,
@@ -198,7 +260,7 @@ export async function POST(request: NextRequest) {
     const watermarkText =
       customWatermark ||
       systemSettings?.watermarkText ||
-      "© Lalita Kapilavai | lalitakapilavai.com";
+      "© SavazAI WebApps | All Rights Reserved";
     const opacity =
       customOpacity !== null && !isNaN(customOpacity)
         ? customOpacity

@@ -48,7 +48,7 @@ export async function getStorageConfig(): Promise<StorageConfig> {
     dbSettings?.r2BucketName ||
     process.env.R2_BUCKET_NAME ||
     process.env.S3_BUCKET_NAME ||
-    "lalitakapilavai-media";
+    "savazai-media-vault";
   const publicUrl =
     dbSettings?.r2PublicUrl ||
     process.env.R2_PUBLIC_URL ||

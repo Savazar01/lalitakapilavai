@@ -209,10 +209,10 @@ export function BlogArchiveClient({ initialPosts }: { initialPosts: BlogPostData
                       <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs mt-auto">
                         <div className="flex items-center gap-2">
                           <div className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-serif font-bold">
-                            {post.author ? post.author.charAt(0) : "L"}
+                            {post.author ? post.author.charAt(0) : "A"}
                           </div>
                           <span className="text-[11px] font-medium text-foreground/80 truncate max-w-[110px]">
-                            {post.author || "Lalita Kapilavai"}
+                            {post.author || "Atelier Author"}
                           </span>
                         </div>
                         <span className="text-primary font-semibold text-[11px] inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform shrink-0">

@@ -23,19 +23,21 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await prisma.blogPost.findUnique({
-    where: { slug },
-  });
+  const [post, settings] = await Promise.all([
+    prisma.blogPost.findUnique({ where: { slug } }),
+    prisma.systemSetting.findFirst(),
+  ]);
+  const siteName = settings?.siteName || "SavazAI WebApps";
 
   if (!post) {
-    return { title: "Article Not Found — Lalita Kapilavai" };
+    return { title: `Article Not Found — ${siteName}` };
   }
 
-  const title = post.metaTitle || `${post.title} — Lalita Kapilavai`;
+  const title = post.metaTitle || `${post.title} — ${siteName}`;
   const description =
     post.metaDescription ||
     post.excerpt ||
-    "Authoritative writings on classical Tanjore art and Carnatic music heritage.";
+    "Authoritative writings on classical art, techniques, and cultural heritage.";
 
   return {
     title,
@@ -57,9 +59,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BlogDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = await prisma.blogPost.findUnique({
-    where: { slug },
-  });
+  const [post, settings] = await Promise.all([
+    prisma.blogPost.findUnique({ where: { slug } }),
+    prisma.systemSetting.findFirst(),
+  ]);
 
   if (!post || !post.isPublished) {
     notFound();
@@ -80,6 +83,15 @@ export default async function BlogDetailPage({ params }: PageProps) {
   const wordCount = post.content ? post.content.split(/\s+/).length : 300;
   const readMinutes = Math.max(1, Math.round(wordCount / 200));
 
+  const siteName = settings?.siteName || "SavazAI WebApps";
+  const artistName = post.author || "Atelier Author";
+  const authorInitials = (post.author || "AA")
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "AA";
+
   // Generative Engine Optimization (AEO) JSON-LD Schema
   const jsonLd = post.structuredJsonLd || {
     "@context": "https://schema.org",
@@ -92,21 +104,22 @@ export default async function BlogDetailPage({ params }: PageProps) {
     author: {
       "@type": "Person",
       name: post.author,
-      jobTitle: "Traditional Indian Fine Artist & Carnatic Classical Vocalist",
-      url: "https://lalitakapilavai.com",
+      jobTitle: settings?.emailHeaderSubtitle || "Fine Artist & Cultural Scholar",
     },
     publisher: {
       "@type": "Organization",
-      name: "Lalita Kapilavai Digital Archive",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://lalitakapilavai.com/logo.png",
-      },
+      name: `${siteName} Digital Archive`,
+      logo: settings?.logoUrl
+        ? {
+            "@type": "ImageObject",
+            url: settings.logoUrl,
+          }
+        : undefined,
     },
     keywords: post.tags.join(", "),
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://lalitakapilavai.com/blogs/${post.slug}`,
+      "@id": `/blogs/${post.slug}`,
     },
   };
 
@@ -194,14 +207,14 @@ export default async function BlogDetailPage({ params }: PageProps) {
         <div className="mt-16 pt-8 border-t border-border/70 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-serif font-bold text-sm">
-              LK
+              {authorInitials}
             </div>
             <div>
               <p className="text-xs font-serif font-bold text-foreground">
-                Lalita Kapilavai
+                {post.author || artistName}
               </p>
               <p className="text-[11px] text-muted-foreground">
-                Thanjavur Fine Artist &amp; Carnatic Vocalist
+                {settings?.emailHeaderSubtitle || "Fine Artist & Cultural Scholar"}
               </p>
             </div>
           </div>

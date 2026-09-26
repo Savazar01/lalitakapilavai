@@ -32,19 +32,24 @@ const getPageBySlug = cache(async (slug: string) => {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const page = await getPageBySlug(slug);
+  const [page, settings] = await Promise.all([
+    getPageBySlug(slug),
+    prisma.systemSetting.findFirst(),
+  ]);
+  const siteName = settings?.siteName || "SavazAI WebApps";
 
   if (!page) {
     return {
-      title: "Page Not Found — Lalita Kapilavai",
+      title: `Page Not Found — ${siteName}`,
     };
   }
 
   return {
-    title: `${page.title} — Lalita Kapilavai`,
+    title: `${page.title} — ${siteName}`,
     description:
       page.metaDescription ||
-      "Sacred Tanjore gold leaf paintings, Mysore classical fine art, and Carnatic music archives.",
+      settings?.siteDescription ||
+      "Traditional gold leaf paintings, classical fine art exhibitions, and cultural heritage archives.",
   };
 }
 

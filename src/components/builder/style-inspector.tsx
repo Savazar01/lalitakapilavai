@@ -445,7 +445,7 @@ export function StyleInspector({
                 <Input
                   value={style.audioUrl || ""}
                   onChange={(e) => update("audioUrl", e.target.value)}
-                  placeholder="https://media.lalitakapilavai.com/audio/..."
+                  placeholder="https://media.savazar.com/audio/..."
                   className="text-xs font-mono"
                 />
               </div>
@@ -668,7 +668,7 @@ export function StyleInspector({
                     backgroundImageUrl: e.target.value,
                   });
                 }}
-                placeholder="https://media.lalitakapilavai.com/..."
+                placeholder="https://media.savazar.com/..."
                 className="text-xs font-mono"
               />
             </div>

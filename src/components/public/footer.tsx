@@ -41,12 +41,12 @@ export async function Footer() {
 
   const siteName =
     settings?.siteName ||
-    "Lalita Kapilavai — Sacred Art & Carnatic Music Archive";
+    "SavazAI WebApps — Digital Atelier & Cultural Archive";
   const watermarkText =
-    settings?.watermarkText || "© Lalita Kapilavai - Sacred Art & Heritage";
+    settings?.watermarkText || "© SavazAI WebApps | All Rights Reserved";
 
   const contactEmail =
-    footerConfig?.contactEmail || settings?.contactEmail || "contact@lalitakapilavai.com";
+    footerConfig?.contactEmail || settings?.contactEmail || "contact@savazar.com";
   const contactPhone =
     footerConfig?.contactPhone || settings?.contactPhone || "+91 98450 12345";
   const aboutText =
@@ -139,7 +139,7 @@ export async function Footer() {
                     ? settings.siteName.includes("—")
                       ? settings.siteName.split("—")[0].trim()
                       : settings.siteName
-                    : "Lalita Kapilavai"}
+                    : "SavazAI WebApps"}
                 </span>
                 {settings?.siteName?.includes("—") && (
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">

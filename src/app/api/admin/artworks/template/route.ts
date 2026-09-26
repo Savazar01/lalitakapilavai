@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = "Lalita Kapilavai Cultural Archive";
+    workbook.creator = "SavazAI WebApps Platform";
     workbook.created = new Date();
 
     const worksheet = workbook.addWorksheet("Artwork Bulk Import Template", {
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
       headers: {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "Content-Disposition": 'attachment; filename="lalita-artworks-import-template.xlsx"',
+        "Content-Disposition": 'attachment; filename="savazai-artworks-import-template.xlsx"',
       },
     });
   } catch (error: unknown) {

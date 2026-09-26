@@ -5,7 +5,7 @@ export async function GET() {
     {
       status: "healthy",
       timestamp: new Date().toISOString(),
-      service: "lalitakapilavai-platform",
+      service: "savazai-webapps-platform",
       version: "0.1.0",
     },
     { status: 200 }

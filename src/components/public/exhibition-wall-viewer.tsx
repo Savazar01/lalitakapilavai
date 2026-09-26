@@ -464,7 +464,7 @@ export function ExhibitionWallViewer({
                       className="text-[9px] font-mono uppercase tracking-widest font-bold"
                       style={{ color: "#854D0E" }}
                     >
-                      Atelier Lalita Kapilavai
+                      SavazAI Atelier
                     </span>
                     <QrCode className="w-4 h-4 text-stone-500 shrink-0" />
                   </div>

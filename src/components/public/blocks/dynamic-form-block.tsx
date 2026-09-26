@@ -60,7 +60,7 @@ export interface DynamicFormBlockProps {
 export function DynamicFormBlock({
   formConfig,
   formTitle = "Send Curatorial Inquiry",
-  formSubtitle = "Direct correspondence with the atelier desk of Lalita Kapilavai.",
+  formSubtitle = "Direct correspondence with the curatorial atelier desk.",
   submitButtonText = "Submit Inquiry",
   successMessage = "Thank you for your correspondence. The curatorial desk will respond shortly.",
   notifyEmail = true,
@@ -415,7 +415,7 @@ export function DynamicFormBlock({
             className="text-[11px] text-center text-slate-600 dark:text-slate-400 mt-2.5 font-mono"
             style={{ color: "var(--form-placeholder-color, var(--muted-foreground))" }}
           >
-            Directly encrypted and dispatched to Lalita Kapilavai curatorial records.
+            Directly encrypted and dispatched to atelier curatorial records.
           </p>
         </div>
       </form>

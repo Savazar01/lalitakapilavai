@@ -697,7 +697,7 @@ function renderMediaBlock(media: MediaBlockConfig): React.ReactNode {
               Carnatic Classical Recital
             </span>
             <span className="font-serif font-bold text-sm text-foreground">
-              {media.audioTitle || "Lalita Kapilavai Vocal Performance"}
+              {media.audioTitle || "Classical Vocal Performance"}
             </span>
           </div>
         </div>

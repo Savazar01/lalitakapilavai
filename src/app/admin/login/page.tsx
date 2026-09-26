@@ -65,7 +65,7 @@ function LoginForm() {
           Restricted Access
         </span>
         <CardTitle className="text-2xl mt-1 text-foreground font-serif">
-          Lalita Kapilavai Admin
+          SavazAI Atelier Admin
         </CardTitle>
         <CardDescription className="text-xs">
           Sign in with your authorized administrative credentials.
@@ -96,7 +96,7 @@ function LoginForm() {
               id="email"
               name="email"
               type="email"
-              placeholder="admin@lalitakapilavai.com"
+              placeholder="admin@savazar.com"
               autoComplete="email"
               required
               value={email}

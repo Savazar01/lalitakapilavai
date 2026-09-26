@@ -9,14 +9,19 @@ import { DynamicPageSections } from "@/components/public/dynamic-page-sections";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Sacred Art & Cultural Chronicle — Lalita Kapilavai",
-  description:
-    "Explore authoritative writings on 22k gold Tanjore painting techniques, Mysore traditional iconography, and Carnatic musical synesthesia by Lalita Kapilavai.",
-  alternates: {
-    canonical: "/blogs",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await prisma.systemSetting.findFirst();
+  const siteName = settings?.siteName || "SavazAI WebApps";
+  const artistName = settings?.emailHeaderTitle || "the Atelier";
+
+  return {
+    title: `Cultural Chronicle & Curatorial Essays — ${siteName}`,
+    description: `Explore authoritative writings on fine art techniques, classical iconography, and cultural heritage by ${artistName}.`,
+    alternates: {
+      canonical: "/blogs",
+    },
+  };
+}
 
 export default async function BlogsPage() {
   const [rawPosts, pageData] = await Promise.all([

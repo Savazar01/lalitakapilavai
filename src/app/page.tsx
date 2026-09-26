@@ -11,7 +11,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function generateMetadata(): Promise<Metadata> {
+  let settings = null;
   try {
+    settings = await prisma.systemSetting.findFirst();
     const page = await prisma.page.findFirst({
       where: {
         OR: [{ slug: "home" }, { slug: "index" }],
@@ -21,24 +23,29 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     });
 
+    const archiveTitle = settings?.siteName || "SavazAI WebApps";
+
     if (page) {
       return {
-        title: page.title.includes("Lalita Kapilavai")
+        title: page.title.includes(archiveTitle)
           ? page.title
-          : `${page.title} — Lalita Kapilavai`,
+          : `${page.title} — ${archiveTitle}`,
         description:
           page.metaDescription ||
-          "Sacred Tanjore 22k gold leaf paintings, Mysore classical fine art, and Carnatic music archives.",
+          settings?.siteDescription ||
+          "Fine art masterworks, high-fidelity cultural archives, and classical musical recitals.",
       };
     }
   } catch (error) {
     console.warn("Could not query metadata for home page:", error);
   }
 
+  const defaultBrand = settings?.siteName || "SavazAI WebApps";
   return {
-    title: "Lalita Kapilavai — Sacred Art & Classical Carnatic Music",
+    title: `${defaultBrand} — Digital Atelier & Cultural Archive`,
     description:
-      "Living digital archive of traditional Indian Tanjore paintings with 22k gold foil, Mysore classical fine art, and Carnatic classical vocal recitals.",
+      settings?.siteDescription ||
+      "Living digital atelier and high-fidelity cultural archive platform engineered by Savazar.",
   };
 }
 
@@ -105,8 +112,8 @@ export default async function HomePage() {
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
-              Explore authentic Thanjavur gold embossed paintings, Mysore traditional devotional art, 
-              and classical Carnatic music recitals by Lalita Kapilavai.
+              Explore authentic traditional gold embossed paintings, classical heritage fine art, 
+              and timeless vocal and instrumental recitals.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">

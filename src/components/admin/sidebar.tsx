@@ -154,7 +154,7 @@ export function Sidebar({
               {session?.user?.name || "Superadmin"}
             </span>
             <span className="text-[11px] text-muted-foreground truncate">
-              {session?.user?.email || "admin@lalitakapilavai.com"}
+              {session?.user?.email || "admin@savazar.com"}
             </span>
           </div>
           <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-semibold">
