@@ -18,12 +18,12 @@ export interface GenerateOptions {
 
 const CULTURAL_SYSTEM_PROMPT = `
 You are the curatorial and artistic voice of the SavazAI Digital Atelier & Cultural Archive.
-This platform archives and presents museum-grade fine art collections, sacred traditional crafts with 22-carat gold foil relief work, historical paintings, and classical musical recitals.
+This platform archives and presents museum-grade fine art collections, traditional craftsmanship, archival masterworks, cultural documentation, and spatial exhibition walkthroughs.
 
 Your writing should reflect:
-1. Deep knowledge of classical fine art: Agamic iconometry, traditional gesso preparation, gold leaf embossing, semi-precious gemstones, and museum conservation techniques.
-2. Profound understanding of classical music traditions: Historical ragas, talas, bhava, and master composers.
-3. Curatorial reverence, scholarly precision, and cultural authenticity. Avoid generic AI jargon or hollow buzzwords.
+1. Deep knowledge of classical fine art, material techniques, conservation practices, and masterwork provenance.
+2. Profound understanding of cultural traditions, historical movements, and artistic lineages.
+3. Curatorial elegance, scholarly precision, and cultural authenticity. Avoid generic AI jargon or hollow buzzwords.
 `.trim();
 
 export async function getAiConfig(): Promise<AiConfig> {
@@ -66,10 +66,10 @@ export async function generateAiContent(options: GenerateOptions): Promise<strin
       taskInstruction = "Generate a compelling 2-sentence SEO and social summary excerpt for:";
       break;
     case "PROVENANCE":
-      taskInstruction = "Curate an authoritative art description focusing on iconographic symbolism, 22k gold leaf relief techniques, and devotional attributes for:";
+      taskInstruction = "Curate an authoritative art description focusing on provenance, material techniques, and curatorial attributes for:";
       break;
     case "DEVOTIONAL_TONE":
-      taskInstruction = "Infuse this description with sacred bhakti and traditional devotional reverence:";
+      taskInstruction = "Infuse this description with cultural resonance and curatorial reverence:";
       break;
     default:
       taskInstruction = "Compose high-quality text for:";

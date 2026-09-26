@@ -216,11 +216,11 @@ export default function PagesAdminPage() {
         upcomingTitle: page.config?.upcomingTitle || "Upcoming Exhibitions & Events",
         upcomingSubtitle:
           page.config?.upcomingSubtitle ||
-          "Discover forthcoming sacred Tanjore exhibitions, classical gallery showcases, and Carnatic music recitals.",
+          "Discover forthcoming exhibitions, showcase events, and curated programming.",
         upcomingEmptyTitle: page.config?.upcomingEmptyTitle || "No Upcoming Exhibitions Scheduled",
         upcomingEmptySubtitle:
           page.config?.upcomingEmptySubtitle ||
-          "New sacred art exhibitions and recital programs will be announced soon. Explore our past retrospectives below.",
+          "New exhibitions and showcase programs will be announced soon. Explore our past retrospectives below.",
         pastBadge: page.config?.pastBadge || "Archival Showcase",
         pastTitle: page.config?.pastTitle || "Past Exhibitions & Retrospectives",
         pastSubtitle:
@@ -334,7 +334,7 @@ export default function PagesAdminPage() {
                     Page Title
                   </label>
                   <Input
-                    placeholder="e.g. Tanjore Technique & Heritage"
+                    placeholder="e.g. Organization Overview"
                     value={title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     required
@@ -348,7 +348,7 @@ export default function PagesAdminPage() {
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-muted-foreground font-mono">/</span>
                     <Input
-                      placeholder="tanjore-technique"
+                      placeholder="overview"
                       value={slug}
                       onChange={(e) => setSlug(e.target.value)}
                       required
@@ -361,7 +361,7 @@ export default function PagesAdminPage() {
                     Meta Description (Optional)
                   </label>
                   <Input
-                    placeholder="Brief description for search engines..."
+                    placeholder="Concise summary for search engine indexing and social cards..."
                     value={metaDescription}
                     onChange={(e) => setMetaDescription(e.target.value)}
                   />
@@ -578,7 +578,7 @@ export default function PagesAdminPage() {
                       Eyebrow Tag / Badge
                     </label>
                     <Input
-                      placeholder="e.g. SACRED EXHIBITIONS"
+                      placeholder="e.g. CURATED SHOWCASE"
                       value={settingsForm.eyebrowTag}
                       onChange={(e) => setSettingsForm((f) => ({ ...f, eyebrowTag: e.target.value }))}
                     />
@@ -590,7 +590,7 @@ export default function PagesAdminPage() {
                     Hero Main Heading
                   </label>
                   <Input
-                    placeholder="e.g. Sacred Exhibitions & Classical Recitals"
+                    placeholder="e.g. Curated Exhibitions & Public Showcases"
                     value={settingsForm.heroTitle}
                     onChange={(e) => setSettingsForm((f) => ({ ...f, heroTitle: e.target.value }))}
                   />
@@ -709,7 +709,7 @@ export default function PagesAdminPage() {
                               config: { ...f.config, upcomingSubtitle: e.target.value },
                             }))
                           }
-                          placeholder="Discover forthcoming sacred Tanjore exhibitions..."
+                          placeholder="Discover forthcoming exhibitions and events..."
                         />
                       </div>
 
@@ -783,7 +783,7 @@ export default function PagesAdminPage() {
                               config: { ...f.config, pastSubtitle: e.target.value },
                             }))
                           }
-                          placeholder="A curated retrospective of past masterwork exhibitions..."
+                          placeholder="A curated retrospective of past exhibitions and archival collections..."
                         />
                       </div>
                     </div>

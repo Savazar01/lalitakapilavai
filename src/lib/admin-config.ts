@@ -21,11 +21,11 @@ export const DEFAULT_ADMIN_CONFIG: AdminPortalConfig = {
     pages: "Page Layouts",
     navigation: "Navigation Menus",
     posts: "Blogs & AEO Posts",
-    categories: "Categories",
-    artworks: "Artwork Catalog",
-    catalogs: "e-Catalogs",
-    events: "Exhibitions & Events",
-    leads: "Leads & QR Scans",
+    categories: "Categories & Taxonomies",
+    artworks: "Catalog & Assets",
+    catalogs: "Digital e-Catalogs",
+    events: "Events & Showcases",
+    leads: "CRM Leads & Tracking",
     settings: "System Settings",
     users: "User Administration",
   },
@@ -33,7 +33,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminPortalConfig = {
     overview: {
       badge: "Administrative Overview",
       title: "Welcome to SavazAI WebApps Atelier",
-      subtitle: "Manage your fine art catalog, dynamic watermarked assets, exhibitions, physical QR scan leads, and cultural archive collections.",
+      subtitle: "Manage your collection catalog, dynamic watermarked assets, exhibitions, physical QR scan leads, and cultural archive.",
     },
     pages: {
       badge: "Visual Page Builder",
@@ -48,17 +48,17 @@ export const DEFAULT_ADMIN_CONFIG: AdminPortalConfig = {
     posts: {
       badge: "Content Engine",
       title: "Blogs & AEO Posts",
-      subtitle: "Craft search-engine and AI-optimized essays, art retrospectives, and cultural documentation.",
+      subtitle: "Craft search-engine and AI-optimized essays, retrospectives, and cultural documentation.",
     },
     categories: {
-      badge: "Artistic Lineages",
-      title: "Traditional Art Disciplines",
-      subtitle: "Manage Tanjore, Mysore, and classical school categories and descriptions.",
+      badge: "Classifications & Lineages",
+      title: "Categories & Taxonomies",
+      subtitle: "Manage collection categories, stylistic schools, and discipline descriptions.",
     },
     artworks: {
       badge: "Vault & Catalog Management",
-      title: "Artwork Catalog",
-      subtitle: "Curate Tanjore gold relief masterpieces, Mysore classical schools, dimensions, and exhibition QR scans.",
+      title: "Catalog & Assets",
+      subtitle: "Curate collection assets, master records, dimensions, and exhibition QR scans.",
     },
     catalogs: {
       badge: "Digital Publications",
@@ -66,14 +66,14 @@ export const DEFAULT_ADMIN_CONFIG: AdminPortalConfig = {
       subtitle: "Design publication-ready digital exhibition catalogs, retrospective monographs, and collector portfolios.",
     },
     events: {
-      badge: "Cultural Calendar & Recitals",
-      title: "Exhibitions, Recitals & Workshops",
+      badge: "Showcase Calendar",
+      title: "Events, Showcases & Programs",
       subtitle: "Curate international schedules, venue coordinates, timezones, and masterwork exhibition linkages.",
     },
     leads: {
       badge: "Inbound Inquiries & QR Scans",
-      title: "Inbound Leads & QR CRM",
-      subtitle: "Track collector inquiries, exhibition floor scans, and custom commissioning requests.",
+      title: "CRM Leads & Tracking",
+      subtitle: "Track patron inquiries, exhibition floor scans, and custom commissioning requests.",
     },
     settings: {
       badge: "Platform Infrastructure",

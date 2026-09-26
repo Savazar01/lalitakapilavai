@@ -502,7 +502,7 @@ export default function AdminCategoriesPage() {
                   required
                   value={formData.name}
                   onChange={(e) => handleAutoSlug(e.target.value)}
-                  placeholder="e.g. Tanjore Paintings"
+                  placeholder="e.g. Fine Art & Sculptural Masterworks"
                   className="text-xs"
                 />
               </div>
@@ -513,7 +513,7 @@ export default function AdminCategoriesPage() {
                   required
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="e.g. tanjore-paintings"
+                  placeholder="e.g. fine-art-sculptural-masterworks"
                   className="text-xs font-mono"
                 />
               </div>
@@ -525,7 +525,7 @@ export default function AdminCategoriesPage() {
                   onValueChange={(val) => setFormData({ ...formData, parentId: val })}
                 >
                   <SelectTrigger className="text-xs">
-                    <SelectValue placeholder="Root Fine Art School" />
+                    <SelectValue placeholder="Root Classification / Level" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None (Root Category)</SelectItem>
@@ -554,7 +554,7 @@ export default function AdminCategoriesPage() {
                   <Input
                     value={formData.badgeLabel}
                     onChange={(e) => setFormData({ ...formData, badgeLabel: e.target.value })}
-                    placeholder="e.g. Traditional Fine Art School"
+                    placeholder="e.g. Primary Collection Classification"
                     className="text-xs"
                   />
                   <span className="text-[10px] text-muted-foreground">Appears above the hero title in an illuminated badge.</span>
@@ -726,7 +726,7 @@ export default function AdminCategoriesPage() {
                       description: prev.description || html.replace(/<[^>]+>/g, "").slice(0, 180),
                     }))
                   }
-                  placeholder="Elaborate on classical school heritage, gold foil application, natural mineral pigments, and iconography..."
+                  placeholder="Elaborate on category classification, historical background, materials, and curatorial context..."
                   className="min-h-[160px]"
                 />
               </div>

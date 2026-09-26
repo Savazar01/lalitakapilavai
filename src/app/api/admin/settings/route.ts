@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
             "Living digital atelier and high-fidelity cultural archive platform engineered by Savazar.",
           adminAlertEmail: "alerts@savazar.com",
           contactEmail: "contact@savazar.com",
-          contactPhone: "+91 98450 12345",
+          contactPhone: null,
           watermarkText: "© SavazAI WebApps | All Rights Reserved",
           watermarkOpacity: 0.35,
           watermarkFontSize: 28,
@@ -64,8 +64,8 @@ export async function PUT(request: NextRequest) {
       emailHeaderSubtitle: body.emailHeaderSubtitle,
       emailLogoUrl: body.emailLogoUrl,
       emailFooterText: body.emailFooterText,
-      contactEmail: body.contactEmail,
-      contactPhone: body.contactPhone,
+      contactEmail: body.contactEmail !== undefined ? (body.contactEmail ? String(body.contactEmail).trim() : null) : undefined,
+      contactPhone: body.contactPhone !== undefined ? (body.contactPhone ? String(body.contactPhone).trim() : null) : undefined,
       watermarkText: body.watermarkText,
       watermarkOpacity:
         body.watermarkOpacity !== undefined
@@ -94,7 +94,11 @@ export async function PUT(request: NextRequest) {
       pinterestUrl: body.pinterestUrl,
       logoUrl: body.logoUrl,
       faviconUrl: body.faviconUrl,
-      footerConfig: body.footerConfig !== undefined ? body.footerConfig : undefined,
+      footerConfig: body.footerConfig !== undefined ? {
+        ...body.footerConfig,
+        contactEmail: body.footerConfig?.contactEmail !== undefined ? String(body.footerConfig.contactEmail).trim() : undefined,
+        contactPhone: body.footerConfig?.contactPhone !== undefined ? String(body.footerConfig.contactPhone).trim() : undefined,
+      } : undefined,
       emailConfig: body.emailConfig !== undefined ? body.emailConfig : undefined,
       aiConfig: body.aiConfig !== undefined ? body.aiConfig : undefined,
       adminConfig: body.adminConfig !== undefined ? body.adminConfig : undefined,

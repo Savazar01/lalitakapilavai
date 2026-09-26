@@ -268,7 +268,7 @@ export function wrapBrandedEmailHtml(
   }
 ): string {
   const headerTitle = settings.emailHeaderTitle || "SavazAI Atelier";
-  const headerSubtitle = settings.emailHeaderSubtitle || "Sacred & Traditional Indian Art";
+  const headerSubtitle = settings.emailHeaderSubtitle || "Digital Atelier & Cultural Archive";
   const footerText = settings.emailFooterText || "Inbound atelier inquiry and archival correspondence.";
 
   // Prefer explicitly resolved logoImgSrc (which may be cid:atelier-brand-logo)

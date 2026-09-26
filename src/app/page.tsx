@@ -101,30 +101,30 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold uppercase tracking-widest text-primary mb-6">
               <Sparkles className="w-3.5 h-3.5" />
-              Sacred Heritage & Living Fine Art Archive
+              Living Digital Archive &amp; Cultural Atelier
             </div>
 
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-bold tracking-tight text-foreground max-w-4xl mx-auto leading-tight">
-              Preserving Sacred Heritage Through{" "}
+              Preserving Cultural Heritage Through{" "}
               <span className="text-primary underline decoration-primary/40 underline-offset-8">
-                22k Gold Foil & Ragas
+                Masterworks &amp; Digital Curation
               </span>
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
-              Explore authentic traditional gold embossed paintings, classical heritage fine art, 
-              and timeless vocal and instrumental recitals.
+              Explore high-fidelity archival collections, physical gallery publishing, 
+              and immersive 3D spatial exhibition walkthroughs.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Button asChild size="lg" className="font-serif">
                 <Link href="/gallery" className="flex items-center gap-2">
-                  Explore Art Catalog
+                  Explore Catalog
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="font-serif border-border hover:border-primary">
-                <Link href="/blogs">Read Sacred Chronicle</Link>
+                <Link href="/blogs">Curatorial Essays</Link>
               </Button>
             </div>
           </div>
@@ -139,10 +139,10 @@ export default async function HomePage() {
                   <Palette className="w-6 h-6" />
                 </div>
                 <h2 className="text-xl font-serif font-semibold text-foreground">
-                  Tanjore & Mysore Fine Art
+                  Archival Collections &amp; Masterworks
                 </h2>
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                  Authentic 22-carat gold foil relief work, semi-precious Jaipur gemstones, and hand-crafted teakwood frames.
+                  High-resolution digital cataloging, provenance records, and physical museum placard automation.
                 </p>
               </div>
               <Link href="/gallery" className="mt-6 text-sm font-semibold text-primary flex items-center gap-1 hover:underline">
@@ -156,14 +156,14 @@ export default async function HomePage() {
                   <Music className="w-6 h-6" />
                 </div>
                 <h2 className="text-xl font-serif font-semibold text-foreground">
-                  Carnatic Vocal Recitals
+                  Events &amp; Spatial Showcases
                 </h2>
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                  Devotional synesthesia linking traditional iconography to ragas composed by Tyagaraja, Dikshitar, and Syama Sastri.
+                  Interactive exhibitions, gallery walkthroughs, and digital e-catalog publication monographs.
                 </p>
               </div>
               <Link href="/events" className="mt-6 text-sm font-semibold text-primary flex items-center gap-1 hover:underline">
-                Upcoming Recitals <ArrowRight className="w-3.5 h-3.5" />
+                Upcoming Events <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
@@ -173,10 +173,10 @@ export default async function HomePage() {
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <h2 className="text-xl font-serif font-semibold text-foreground">
-                  Sacred Chronicle
+                  Curatorial Essays &amp; Insights
                 </h2>
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                  Authoritative essays exploring traditional gesso preparation, iconometric talamana, and spiritual symbolism.
+                  Authoritative documentation exploring artistic traditions, techniques, and cultural lineages.
                 </p>
               </div>
               <Link href="/blogs" className="mt-6 text-sm font-semibold text-primary flex items-center gap-1 hover:underline">

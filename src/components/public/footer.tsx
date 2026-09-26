@@ -19,6 +19,7 @@ interface FooterConfig {
   contactEmail?: string;
   contactPhone?: string;
   copyrightText?: string;
+  copyrightNotice?: string;
   socialLinks?: SocialLinkItem[];
   legalLinks?: LegalLinkItem[];
 }
@@ -42,20 +43,15 @@ export async function Footer() {
   const siteName =
     settings?.siteName ||
     "SavazAI WebApps — Digital Atelier & Cultural Archive";
-  const watermarkText =
-    settings?.watermarkText || "© SavazAI WebApps | All Rights Reserved";
 
-  const contactEmail =
-    footerConfig?.contactEmail || settings?.contactEmail || "contact@savazar.com";
-  const contactPhone =
-    footerConfig?.contactPhone || settings?.contactPhone || "+91 98450 12345";
-  const aboutText =
-    footerConfig?.aboutText ||
-    settings?.siteDescription ||
-    "Living digital archive documenting classical South Indian Thanjavur (Tanjore) 22k gold leaf relief sacred paintings, Mysore traditional artwork, and Carnatic classical vocal recitals.";
+  const contactEmail = (footerConfig?.contactEmail ?? settings?.contactEmail ?? "").trim();
+  const contactPhone = (footerConfig?.contactPhone ?? settings?.contactPhone ?? "").trim();
+  const aboutText = (footerConfig?.aboutText ?? settings?.siteDescription ?? "").trim();
+  const brandNotice = (footerConfig?.copyrightNotice ?? "").trim();
   const copyrightText =
-    footerConfig?.copyrightText ||
-    `© ${new Date().getFullYear()} ${siteName}. All sacred rights reserved.`;
+    footerConfig?.copyrightText?.trim() ||
+    brandNotice ||
+    `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`;
 
   // Strict Zero-Fallback Social Channels Extraction:
   // Direct setting values strictly govern the standard channels. If empty/blank, they MUST NOT render.
@@ -148,12 +144,16 @@ export async function Footer() {
                 )}
               </div>
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md">
-              {aboutText}
-            </p>
-            <p className="text-xs font-mono text-primary font-semibold">
-              {watermarkText}
-            </p>
+            {aboutText.length > 0 && (
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md">
+                {aboutText}
+              </p>
+            )}
+            {brandNotice.length > 0 && (
+              <p className="text-xs font-mono text-primary font-semibold">
+                {brandNotice}
+              </p>
+            )}
           </div>
 
           {/* Dynamic Navigation Links (Synchronized with Header & Navigation Manager) */}
@@ -208,16 +208,22 @@ export async function Footer() {
               Studio &amp; Inquiries
             </h4>
             <ul className="space-y-2 text-xs text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-primary shrink-0" />
-                <a href={`mailto:${contactEmail}`} className="hover:text-primary transition-colors truncate">
-                  {contactEmail}
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-primary shrink-0" />
-                <span>{contactPhone}</span>
-              </li>
+              {contactEmail.length > 0 && (
+                <li className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <a href={`mailto:${contactEmail}`} className="hover:text-primary transition-colors truncate">
+                    {contactEmail}
+                  </a>
+                </li>
+              )}
+              {contactPhone.length > 0 && (
+                <li className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <a href={`tel:${contactPhone}`} className="hover:text-primary transition-colors">
+                    {contactPhone}
+                  </a>
+                </li>
+              )}
               {activeSocials.map((s) => (
                 <li key={s.platform}>
                   <a

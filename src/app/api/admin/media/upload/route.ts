@@ -44,6 +44,9 @@ export async function POST(request: NextRequest) {
       "image/heic-sequence",
       "image/tiff",
       "image/gif",
+      "image/x-icon",
+      "image/vnd.microsoft.icon",
+      "image/svg+xml",
       "application/pdf",
     ]);
 
@@ -59,6 +62,8 @@ export async function POST(request: NextRequest) {
       "tif",
       "tiff",
       "gif",
+      "ico",
+      "svg",
       "pdf",
     ]);
 
@@ -70,7 +75,7 @@ export async function POST(request: NextRequest) {
     if (!isMimeAllowed) {
       return NextResponse.json(
         {
-          error: `Unsupported media type (${file.type || fileExt}). Only JPEG, PNG, WebP, AVIF, HEIC, TIFF, and PDF are permitted.`,
+          error: `Unsupported media type (${file.type || fileExt}). Only JPEG, PNG, WebP, AVIF, HEIC, TIFF, ICO, SVG, and PDF are permitted.`,
         },
         { status: 415 }
       );
@@ -126,8 +131,58 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 2c. Intercept Apple HEIC / HEICS Images and Transcode to High-Fidelity JPEG
     const fileNameLower = file.name.toLowerCase();
+
+    // 2c. Favicon (.ico) and Vector Graphics (.svg) Bypass
+    // Multi-resolution ICOs and scalable SVG vectors must bypass Sharp rasterization/WebP conversion
+    const isIco =
+      file.type === "image/x-icon" ||
+      file.type === "image/vnd.microsoft.icon" ||
+      fileNameLower.endsWith(".ico") ||
+      fileExt === "ico";
+
+    const isSvg =
+      file.type === "image/svg+xml" ||
+      fileNameLower.endsWith(".svg") ||
+      fileExt === "svg";
+
+    if (isIco || isSvg) {
+      const assetId = crypto.randomUUID();
+      const sanitizedName = file.name
+        .replace(/[^a-zA-Z0-9._-]/g, "_")
+        .replace(/\.{2,}/g, "_");
+      const folder = isIco ? "icons" : "vectors";
+      const mime = isIco ? "image/x-icon" : "image/svg+xml";
+      const ext = isIco ? "ico" : "svg";
+      const mediaType = isIco ? "favicon" : "vector";
+      const storageKey = `${folder}/${assetId}_${sanitizedName}`;
+
+      const uploadResult = await uploadBuffer(
+        inputBuffer,
+        storageKey,
+        mime,
+        false
+      );
+
+      return NextResponse.json({
+        success: true,
+        assetId,
+        publicUrl: uploadResult.publicUrl,
+        watermarkedUrl: uploadResult.publicUrl,
+        primaryImageUrl: uploadResult.publicUrl,
+        isWatermarked: false,
+        mediaType,
+        width: isIco ? 32 : 512,
+        height: isIco ? 32 : 512,
+        format: ext,
+        originalFormat: ext,
+        convertedFromHeic: false,
+        originalSizeBytes: inputBuffer.length,
+        optimizedSizeBytes: inputBuffer.length,
+      });
+    }
+
+    // 2d. Intercept Apple HEIC / HEICS Images and Transcode to High-Fidelity JPEG
     const isHeic =
       file.type === "image/heic" ||
       file.type === "image/heif" ||

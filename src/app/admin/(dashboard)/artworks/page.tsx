@@ -690,8 +690,8 @@ export default function ArtworksAdminPage() {
       {/* Header */}
       <EditablePageHeader
         sectionKey="artworks"
-        defaultTitle="Artwork Catalog"
-        defaultSubtitle="Curate Tanjore gold relief masterpieces, Mysore classical schools, dimensions, and exhibition QR scans."
+        defaultTitle="Catalog & Assets"
+        defaultSubtitle="Curate collection assets, master records, dimensions, and exhibition QR scans."
         badgeLabel="Vault & Catalog Management"
       >
         <Button
@@ -882,12 +882,12 @@ export default function ArtworksAdminPage() {
             <Palette className="w-6 h-6 text-primary" />
           </div>
           <h3 className="font-serif font-bold text-base text-foreground">
-            No Artworks Found
+            No Catalog Items Found
           </h3>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1 mb-4">
             {searchQuery
-              ? "No artworks match your query."
-              : "Begin cataloging masterworks with 22k gold leaf relief details."}
+              ? "No catalog items match your query."
+              : "Begin cataloging collection items and archival master records."}
           </p>
           <Button
             size="sm"
@@ -895,7 +895,7 @@ export default function ArtworksAdminPage() {
             className="h-9 px-4 text-xs font-serif bg-amber-600 hover:bg-amber-700 text-white border border-amber-700 shadow-sm shrink-0 gap-1.5 cursor-pointer font-medium"
           >
             <Plus className="w-3.5 h-3.5 mr-1 text-white" />
-            Catalog First Artwork
+            Catalog First Item
           </Button>
         </Card>
       ) : viewMode === "grid" ? (
@@ -1188,10 +1188,10 @@ export default function ArtworksAdminPage() {
           <form onSubmit={handleSaveArtwork}>
             <DialogHeader>
               <DialogTitle>
-                {editingArtwork ? "Edit Masterwork" : "Catalog New Masterwork"}
+                {editingArtwork ? "Edit Catalog Item" : "Catalog New Item / Asset"}
               </DialogTitle>
               <DialogDescription>
-                Define provenance, 22k gold leaf specifications, dimensions, and upload high-res imagery.
+                Define provenance, materials, dimensions, and upload high-res imagery.
               </DialogDescription>
             </DialogHeader>
 
@@ -1200,7 +1200,7 @@ export default function ArtworksAdminPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold uppercase tracking-wider text-foreground">
-                    Masterwork Image (JPEG, PNG, WebP, GIF, TIFF)
+                    Catalog Item Image (JPEG, PNG, WebP, GIF, TIFF)
                   </label>
                   <div className="flex items-center gap-2">
                     <Button
@@ -1343,7 +1343,7 @@ export default function ArtworksAdminPage() {
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">Title</label>
                   <Input
-                    placeholder="e.g. Navaneetha Krishna with Yashoda"
+                    placeholder="e.g. Archival Master Record No. 1"
                     value={title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     required
@@ -1353,7 +1353,7 @@ export default function ArtworksAdminPage() {
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">URL Slug</label>
                   <Input
-                    placeholder="navaneetha-krishna"
+                    placeholder="archival-master-record-1"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                     required
@@ -1373,7 +1373,7 @@ export default function ArtworksAdminPage() {
                     className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                     required
                   >
-                    <option value="" disabled>Select a Category (Required) *</option>
+                    <option value="" disabled>Select Classification / Department (Required) *</option>
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
@@ -1398,7 +1398,7 @@ export default function ArtworksAdminPage() {
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">Medium Used</label>
                   <Input
-                    placeholder="Gold Foil, Teakwood, Semi-Precious Gemstones"
+                    placeholder="e.g. Archival canvas, titanium alloy, hand-woven silk, or composite media"
                     value={medium}
                     onChange={(e) => setMedium(e.target.value)}
                     required
@@ -1434,16 +1434,16 @@ export default function ArtworksAdminPage() {
                     className="rounded border-border text-primary focus:ring-primary h-4 w-4 cursor-pointer"
                   />
                   <label htmlFor="hasGoldFoil" className="text-xs font-semibold text-foreground cursor-pointer select-none">
-                    Includes Authentic Gold / Silver Foil Work
+                    Includes Authentic Embellishment / Foil Work
                   </label>
                 </div>
 
                 {hasGoldFoil && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                     <div className="space-y-1">
-                      <label className="text-xs font-medium text-foreground">Custom Foil Earmark Badge (Optional)</label>
+                      <label className="text-xs font-medium text-foreground">Custom Foil / Accent Badge (Optional)</label>
                       <Input
-                        placeholder="e.g. Gold Foil, 24K Gold Leaf"
+                        placeholder="e.g. Gold Foil, 24K Leaf, Archival Relief"
                         value={customFoilLabel}
                         onChange={(e) => setCustomFoilLabel(e.target.value)}
                         className="text-xs"
@@ -1453,9 +1453,9 @@ export default function ArtworksAdminPage() {
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-medium text-foreground">Gold Purity / Certification Spec</label>
+                      <label className="text-xs font-medium text-foreground">Material Purity / Specification Spec</label>
                       <Input
-                        placeholder="e.g. 22 Carat Jaipur Gold Leaf"
+                        placeholder="e.g. 22 Karat Leaf, Archival Titanium White, Certified Pigment"
                         value={goldPurity}
                         onChange={(e) => setGoldPurity(e.target.value)}
                         className="text-xs"
@@ -1668,7 +1668,7 @@ export default function ArtworksAdminPage() {
                   <TiptapEditor
                     content={description}
                     onChange={(_, html) => setDescription(html)}
-                    placeholder="Detailed iconographic description, spiritual symbolism, and Carnatic raga links..."
+                    placeholder="Detailed curatorial description, historical context, and technical notes..."
                     className="min-h-[140px]"
                   />
                 </div>

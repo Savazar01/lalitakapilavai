@@ -233,7 +233,7 @@ export default function AdminLeadsPage() {
         <div className="relative w-full md:w-72">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search collector name, email, phone..."
+            placeholder="Search patron name, email, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 text-xs"
@@ -245,7 +245,7 @@ export default function AdminLeadsPage() {
       <Card className="border border-border/80 shadow-sm overflow-hidden">
         <CardHeader className="py-3 px-4 bg-muted/20 border-b border-border flex flex-row items-center justify-between">
           <CardTitle className="text-xs font-serif uppercase tracking-wider text-muted-foreground">
-            Captured Collector Leads ({leads.length})
+            Captured Leads &amp; Inquiries ({leads.length})
           </CardTitle>
         </CardHeader>
 
@@ -270,7 +270,7 @@ export default function AdminLeadsPage() {
               <table className="w-full text-xs text-left">
                 <thead className="bg-muted/40 text-muted-foreground uppercase text-[10px] tracking-wider border-b border-border">
                   <tr>
-                    <th className="py-3 px-4">Collector Details</th>
+                    <th className="py-3 px-4">Patron Details</th>
                     <th className="py-3 px-4">Source / Origin</th>
                     <th className="py-3 px-4">Subject & Message</th>
                     <th className="py-3 px-4">Status</th>
@@ -352,7 +352,7 @@ export default function AdminLeadsPage() {
 
                       <td className="py-3 px-4 max-w-xs">
                         <div className="font-medium text-foreground truncate">
-                          {lead.subject || "General Acquisition Inquiry"}
+                          {lead.subject || "General Inquiry"}
                         </div>
                         <p className="text-muted-foreground truncate text-[11px]">
                           {lead.message}
@@ -531,13 +531,13 @@ export default function AdminLeadsPage() {
                   Subject
                 </span>
                 <p className="font-medium text-foreground">
-                  {selectedLead.subject || "General Acquisition Inquiry"}
+                  {selectedLead.subject || "General Inquiry"}
                 </p>
               </div>
 
               <div className="space-y-1">
                 <span className="text-[10px] text-muted-foreground uppercase font-semibold">
-                  Collector Message / Notes
+                  Inquiry Message / Notes
                 </span>
                 <div className="p-3 rounded-md bg-card border border-border text-foreground leading-relaxed whitespace-pre-wrap">
                   {selectedLead.message}

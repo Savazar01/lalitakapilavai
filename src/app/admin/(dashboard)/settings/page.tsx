@@ -206,9 +206,9 @@ export default function AdminSettingsPage() {
   // Dedicated Footer Config State
   const [footerConfig, setFooterConfig] = React.useState<FooterConfig>({
     aboutText:
-      "Living digital archive documenting classical fine art collections, 22k gold leaf relief sacred paintings, traditional heritage artwork, and classical vocal recitals.",
+      "Digital archive and publishing platform documenting high-fidelity cultural collections, masterworks, and multi-tenant exhibition portfolios.",
     contactEmail: "contact@savazar.com",
-    contactPhone: "+91 98450 12345",
+    contactPhone: "",
     copyrightText: "© 2026 SavazAI WebApps Platform. All rights reserved.",
     socialLinks: [
       { platform: "Instagram", url: "", isVisible: false },
@@ -450,7 +450,7 @@ export default function AdminSettingsPage() {
     setFaviconUploading(true);
     const body = new FormData();
     body.append("file", file);
-    body.append("mediaType", "logo");
+    body.append("mediaType", "favicon");
     body.append("isArtwork", "false");
 
     try {
@@ -809,7 +809,7 @@ export default function AdminSettingsPage() {
                           <label className="cursor-pointer">
                             <input
                               type="file"
-                              accept="image/x-icon,image/png,image/svg+xml"
+                              accept=".ico,image/x-icon,image/vnd.microsoft.icon,image/png,image/svg+xml"
                               onChange={handleFaviconUpload}
                               disabled={faviconUploading}
                               className="hidden"
@@ -824,6 +824,9 @@ export default function AdminSettingsPage() {
                             </div>
                           </label>
                         </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          Upload official website favicon (.ico, .png, or .svg, recommended 32x32px or 64x64px).
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -2462,7 +2465,7 @@ export default function AdminSettingsPage() {
                                 borderColor: themeConfig.light.badgeBorder,
                               }}
                             >
-                              ✨ Tanjore Classical Plate
+                              ✨ Archival Master Record
                             </span>
                           </div>
                           <h4
@@ -2482,7 +2485,7 @@ export default function AdminSettingsPage() {
                               lineHeight: themeConfig.common.lineHeight,
                             }}
                           >
-                            Tanjore traditional iconography with authentic 22k gold foil relief, paired with timeless South Indian Carnatic vocal traditions.
+                            High-fidelity cultural archive and museum-grade digital atelier, paired with spatial 3D exhibition corridors and physical placard automation.
                           </p>
                           <p
                             className="text-xs"
@@ -2491,7 +2494,7 @@ export default function AdminSettingsPage() {
                               fontFamily: `'${themeConfig.common.fontBody}', sans-serif`,
                             }}
                           >
-                            Catalog ref: #LK-2026-TANJORE • 48 Artworks Curated
+                            Catalog ref: #SZ-2026-ARCHIVE • 48 Masterworks Curated
                           </p>
 
                           {/* Pills */}
@@ -2660,7 +2663,7 @@ export default function AdminSettingsPage() {
                                 borderColor: themeConfig.dark.badgeBorder,
                               }}
                             >
-                              ✨ Tanjore Classical Plate
+                              ✨ Archival Master Record
                             </span>
                           </div>
                           <h4
@@ -2680,7 +2683,7 @@ export default function AdminSettingsPage() {
                               lineHeight: themeConfig.common.lineHeight,
                             }}
                           >
-                            Tanjore traditional iconography with authentic 22k gold foil relief, paired with timeless South Indian Carnatic vocal traditions.
+                            High-fidelity cultural archive and museum-grade digital atelier, paired with spatial 3D exhibition corridors and physical placard automation.
                           </p>
                           <p
                             className="text-xs"
@@ -2689,7 +2692,7 @@ export default function AdminSettingsPage() {
                               fontFamily: `'${themeConfig.common.fontBody}', sans-serif`,
                             }}
                           >
-                            Catalog ref: #LK-2026-TANJORE • 48 Artworks Curated
+                            Catalog ref: #SZ-2026-ARCHIVE • 48 Masterworks Curated
                           </p>
 
                           {/* Pills */}

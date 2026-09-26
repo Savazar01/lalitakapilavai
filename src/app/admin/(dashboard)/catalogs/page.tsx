@@ -441,7 +441,7 @@ export default function AdminCatalogsPage() {
           <DialogHeader>
             <DialogTitle className="font-serif text-xl">Create Digital e-Catalog</DialogTitle>
             <DialogDescription className="text-xs">
-              Initialize a publication volume. You can curate editorial forewords and sequence artwork plates in the studio.
+              Initialize a publication volume. Curate editorial forewords, sequence plates and asset records, and export digital lookbooks.
             </DialogDescription>
           </DialogHeader>
 
@@ -458,7 +458,7 @@ export default function AdminCatalogsPage() {
                 required
                 value={newTitle}
                 onChange={(e) => handleAutoSlug(e.target.value)}
-                placeholder="e.g. Swarna Bindu: Sacred Tanjore Masterworks"
+                placeholder="e.g. Annual Collection Volume I"
                 className="text-xs"
               />
             </div>
@@ -469,29 +469,29 @@ export default function AdminCatalogsPage() {
                 required
                 value={newSlug}
                 onChange={(e) => setNewSlug(e.target.value)}
-                placeholder="e.g. swarna-bindu-tanjore-masterworks"
+                placeholder="e.g. annual-collection-volume-1"
                 className="text-xs font-mono"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Subtitle / Monograph Theme</label>
+              <label className="text-xs font-semibold text-foreground">Subtitle / Publication Theme</label>
               <Input
                 value={newSubtitle}
                 onChange={(e) => setNewSubtitle(e.target.value)}
-                placeholder="e.g. An Exhibition Monograph on 22k Gold Foil Iconography"
+                placeholder="e.g. Curated Showcase & Comprehensive Documentation"
                 className="text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Booklet Cover Artwork</label>
+              <label className="text-xs font-semibold text-foreground">Publication Cover Image</label>
               <MediaUploader
                 value={newCoverImage}
                 onUploadComplete={(url) => setNewCoverImage(url)}
                 onRemove={() => setNewCoverImage("")}
                 mediaType="general"
-                description="High-resolution image for the gold-embossed catalog front cover."
+                description="High-resolution cover image for the digital publication and downloadable PDF."
               />
             </div>
 

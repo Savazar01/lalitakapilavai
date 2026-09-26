@@ -322,7 +322,7 @@ export function UniversalMediaDialog({
               <div className="relative flex-1 w-full">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search by title, filename, or traditional school..."
+                  placeholder="Search by title, filename, or category..."
                   value={vaultSearch}
                   onChange={(e) => setVaultSearch(e.target.value)}
                   className="pl-9 text-xs h-9"
@@ -504,7 +504,7 @@ export function UniversalMediaDialog({
                   Asset Title / Label (Optional)
                 </label>
                 <Input
-                  placeholder="e.g. Traditional Tanjore Gold Leaf Detail"
+                  placeholder="e.g. High-Resolution Archival Detail"
                   value={remoteTitle}
                   onChange={(e) => setRemoteTitle(e.target.value)}
                   className="text-xs"

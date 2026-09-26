@@ -96,7 +96,7 @@ export default function AdminPostsPage() {
     content: "",
     featuredImageUrl: "",
     author: "Atelier Author",
-    tags: "Tanjore Painting, Carnatic Music, Sacred Art",
+    tags: "Archival Preservation, Curatorial Research, Fine Art",
     metaTitle: "",
     metaDescription: "",
     isPublished: false,
@@ -132,7 +132,7 @@ export default function AdminPostsPage() {
       content: "",
       featuredImageUrl: "",
       author: "Atelier Author",
-      tags: "Tanjore Art, 22k Gold Foil, Carnatic Melakarta",
+      tags: "Archival Preservation, Curatorial Research, Fine Art",
       metaTitle: "",
       metaDescription: "",
       isPublished: false,
@@ -268,11 +268,11 @@ export default function AdminPostsPage() {
         .chain()
         .focus()
         .setBlockquote()
-        .insertContent("Sacred iconography is the visual manifestation of nada brahma — eternal contemplation made visible.")
+        .insertContent("Archival curation is the enduring manifestation of cultural heritage and master craftsmanship.")
         .run();
       toast.info("Callout quote block inserted");
     } else {
-      const quote = `\n\n> "Sacred iconography is the visual manifestation of nada brahma — eternal contemplation made visible."\n\n`;
+      const quote = `\n\n> "Archival curation is the enduring manifestation of cultural heritage and master craftsmanship."\n\n`;
       setFormData((prev) => ({ ...prev, content: `${prev.content || ""}${quote}` }));
       toast.info("Callout quote block inserted");
     }
@@ -554,7 +554,7 @@ export default function AdminPostsPage() {
                     required
                     value={formData.title}
                     onChange={(e) => handleAutoSlug(e.target.value)}
-                    placeholder="e.g. The Sacred Science of 22k Gold Foil in Tanjore Iconography"
+                    placeholder="e.g. Perspectives on Modern Archival Preservation and Curatorial Documentation"
                     className="text-xs font-medium"
                   />
                 </div>
@@ -566,7 +566,7 @@ export default function AdminPostsPage() {
                       required
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                      placeholder="e.g. sacred-science-22k-gold-foil"
+                      placeholder="e.g. perspectives-on-modern-archival-preservation"
                       className="text-xs font-mono"
                     />
                   </div>
@@ -717,7 +717,7 @@ export default function AdminPostsPage() {
                             content: JSON.stringify(json),
                           }));
                         }}
-                        placeholder="Compose your sacred art reflection, raga analysis, or exhibition commentary..."
+                        placeholder="Compose your article, curatorial reflection, historical analysis, or exhibition commentary..."
                       />
                     </div>
                   ) : (
@@ -737,7 +737,7 @@ export default function AdminPostsPage() {
                   <Input
                     value={formData.tags}
                     onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    placeholder="Tanjore, Gold Leaf, Mysore, Carnatic Ragas"
+                    placeholder="Fine Art, Archival, Curation, Cultural Heritage"
                     className="text-xs"
                   />
                 </div>
@@ -831,7 +831,7 @@ export default function AdminPostsPage() {
                       author: {
                         "@type": "Person",
                         name: formData.author,
-                        jobTitle: "Traditional Indian Fine Artist & Carnatic Classical Vocalist",
+                        jobTitle: "Cultural Heritage Specialist & Master Archivist",
                       },
                       keywords: formData.tags,
                       datePublished: formData.isPublished ? new Date().toISOString() : "On Publish",

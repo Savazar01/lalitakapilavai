@@ -17,6 +17,7 @@ The **SavazAI WebApps Platform** is an enterprise-grade digital publishing, arch
 - **Synesthetic Knowledge Graph & Semantic Vector Engine**: PostgreSQL 17 with `pgvector` powering multi-modal exploration across visual motifs, provenance tags, and audio-visual archives.
 - **Unified CRM Leads & Acquisition Funnel**: Multichannel inquiry capture linking physical placard QR scans, bespoke commission intakes, and dynamic event RSVP registrations.
 - **Multi-Tenant White-Label Administration**: Complete brand decoupling with dynamic system settings, theme studio (featuring the signature "Imperial Atelier" palette), and Better-Auth administrative access control.
+- **Brand Identity & Native Media Engine**: Full `.ico` and `.svg` bypass upload engine preserving multi-resolution favicons and scalable vector graphics, paired with zero-fallback conditional phone suppression and dynamic footer brand governance.
 
 ---
 

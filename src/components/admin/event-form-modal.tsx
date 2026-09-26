@@ -186,7 +186,7 @@ function EventFormContent({
   const [title, setTitle] = React.useState(initialEvent?.title || "");
   const [slug, setSlug] = React.useState(initialEvent?.slug || "");
   const [earmarkText, setEarmarkText] = React.useState(
-    initialEvent?.earmarkText || "Curated Exhibition & Recital"
+    initialEvent?.earmarkText || "Curated Showcase & Event"
   );
   const [eventType, setEventType] = React.useState<EventFormData["eventType"]>(
     initialEvent?.eventType || "EXHIBITION"
@@ -252,7 +252,7 @@ function EventFormContent({
     initialEvent?.brochurePdfUrl || ""
   );
   const [brochureTitle, setBrochureTitle] = React.useState<string>(
-    initialEvent?.brochureTitle || "Exhibition Monograph & Program Brochure"
+    initialEvent?.brochureTitle || "Event Program & Publication Brochure"
   );
   const [brochureDownloadable, setBrochureDownloadable] = React.useState<boolean>(
     initialEvent?.brochureDownloadable !== false
@@ -460,7 +460,7 @@ function EventFormContent({
 
       const pdfUrl = data.publicUrl || data.rawUrl;
       setBrochurePdfUrl(pdfUrl);
-      if (!brochureTitle || brochureTitle === "Exhibition Monograph & Program Brochure") {
+      if (!brochureTitle || brochureTitle === "Event Program & Publication Brochure" || brochureTitle === "Exhibition Monograph & Program Brochure") {
         setBrochureTitle(file.name.replace(/\.[^/.]+$/, ""));
       }
       toast.success("PDF Brochure uploaded successfully");
@@ -531,7 +531,7 @@ function EventFormContent({
     const payload = {
       title: title.trim(),
       slug: slug.trim(),
-      earmarkText: earmarkText.trim() || "Curated Exhibition & Recital",
+      earmarkText: earmarkText.trim() || "Curated Showcase & Event",
       eventType,
       description,
       venue: venueName || venue || "SavazAI Heritage Studio",
@@ -551,7 +551,7 @@ function EventFormContent({
       galleryDisplayMode,
       galleryAutoplayTimer,
       brochurePdfUrl: brochurePdfUrl.trim() || null,
-      brochureTitle: brochureTitle.trim() || "Exhibition Monograph & Program Brochure",
+      brochureTitle: brochureTitle.trim() || "Event Program & Publication Brochure",
       brochureDownloadable,
       maxCapacity: maxCapacity ? parseInt(maxCapacity, 10) : null,
       registrationFee: registrationFee ? parseFloat(registrationFee) : 0,
@@ -652,7 +652,7 @@ function EventFormContent({
                   <label className="text-xs font-semibold text-foreground">Event Title *</label>
                   <Input
                     required
-                    placeholder="e.g. NYC Madison Art Exhibition"
+                    placeholder="e.g. Annual Symposium & Showcase 2026"
                     value={title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                   />
@@ -662,7 +662,7 @@ function EventFormContent({
                   <label className="text-xs font-semibold text-foreground">URL Slug *</label>
                   <Input
                     required
-                    placeholder="e.g. nyc-madison-art-exhibition"
+                    placeholder="e.g. annual-symposium-showcase-2026"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                   />
@@ -675,7 +675,7 @@ function EventFormContent({
                 </label>
                 <Input
                   id="earmarkText"
-                  placeholder="e.g. Curated Exhibition & Recital, Solo Retrospective, Classical Concert"
+                  placeholder="e.g. Curated Showcase, Keynote Presentation, or Public Exhibition"
                   value={earmarkText}
                   onChange={(e) => setEarmarkText(e.target.value)}
                   className="h-9 text-xs"
@@ -694,9 +694,9 @@ function EventFormContent({
                     className="w-full bg-card border border-border text-foreground text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-primary focus:outline-none"
                   >
                     <option value="EXHIBITION">EXHIBITION (Gallery Floor)</option>
-                    <option value="CONCERT">CONCERT (Classical Vocal Recital)</option>
-                    <option value="RECITAL">RECITAL (Solo Chamber Concert)</option>
-                    <option value="WORKSHOP">WORKSHOP (Tanjore 22k Gold Masterclass)</option>
+                    <option value="CONCERT">CONCERT (Keynote / Performance)</option>
+                    <option value="RECITAL">RECITAL (Chamber / Session)</option>
+                    <option value="WORKSHOP">WORKSHOP (Hands-on Masterclass)</option>
                     <option value="PRIVATE_VIEWING">PRIVATE VIEWING (Collector Salon)</option>
                     <option value="ONLINE_CLASSROOM">ONLINE CLASSROOM (Virtual Archive)</option>
                     <option value="OTHER">OTHER (Special Cultural Gathering)</option>
@@ -780,7 +780,7 @@ function EventFormContent({
                   <TiptapEditor
                     content={description}
                     onChange={(_, html) => setDescription(html)}
-                    placeholder="Provide curatorial background, featured ragas, traditional techniques, or collector notes..."
+                    placeholder="Provide curatorial background, program agenda, presentation techniques, or attendee notes..."
                     className="min-h-[160px]"
                   />
                 </div>
@@ -944,7 +944,7 @@ function EventFormContent({
                   <label className="text-xs font-semibold text-foreground">Venue / Gallery Hall *</label>
                   <Input
                     required
-                    placeholder="e.g. SavazAI Heritage Studio or Carnegie Hall"
+                    placeholder="e.g. Main Auditorium, Pavilion Hall, or Virtual Stream"
                     value={venueName}
                     onChange={(e) => {
                       setVenueName(e.target.value);
@@ -1562,10 +1562,10 @@ function EventFormContent({
                 <FileText className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <span className="font-semibold text-foreground block text-sm">
-                    Exhibition Monograph &amp; Event Brochure Engine
+                    Event Brochure &amp; Publication Engine
                   </span>
                   <p className="text-muted-foreground leading-relaxed text-xs">
-                    Upload a high-fidelity archival PDF catalog, concert program, or exhibition monograph. An interactive document viewer with download capabilities will be embedded directly into the public event page.
+                    Upload a high-fidelity archival PDF catalog, event program, or publication brochure. An interactive document viewer with download capabilities will be embedded directly into the public event page.
                   </p>
                 </div>
               </div>
@@ -1613,7 +1613,7 @@ function EventFormContent({
                       Document Title
                     </label>
                     <Input
-                      placeholder="e.g. Exhibition Monograph & Program Brochure"
+                      placeholder="e.g. Event Program & Publication Brochure"
                       value={brochureTitle}
                       onChange={(e) => setBrochureTitle(e.target.value)}
                     />
@@ -1654,7 +1654,7 @@ function EventFormContent({
                       </div>
                       <div>
                         <h4 className="font-serif font-bold text-sm text-foreground">
-                          {brochureTitle || "Exhibition Monograph"}
+                          {brochureTitle || "Event Brochure"}
                         </h4>
                         <span className="text-[11px] text-muted-foreground font-mono truncate max-w-md block">
                           {brochurePdfUrl}
@@ -1744,7 +1744,7 @@ function EventFormContent({
                 <div className="relative flex-1">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    placeholder="Search by artwork title, medium, school, or slug..."
+                    placeholder="Search by catalog title, medium, category, or slug..."
                     value={artworkSearchQuery}
                     onChange={(e) => setArtworkSearchQuery(e.target.value)}
                     className="pl-9 text-xs h-8 bg-card"
@@ -1932,8 +1932,8 @@ function EventFormContent({
         allowMultiple={false}
         onSelect={(item) => {
           setBrochurePdfUrl(item.url);
-          if (!brochureTitle || brochureTitle === "Exhibition Monograph & Program Brochure") {
-            const docName = (item.originalFileName || item.title || "Exhibition Monograph")
+          if (!brochureTitle || brochureTitle === "Event Program & Publication Brochure" || brochureTitle === "Exhibition Monograph & Program Brochure") {
+            const docName = (item.originalFileName || item.title || "Event Brochure")
               .replace(/\.[^/.]+$/, "")
               .replace(/[-_]/g, " ");
             setBrochureTitle(docName);

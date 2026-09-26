@@ -179,7 +179,7 @@ export default function EventsAdminPage() {
           id: fullEvent.id,
           title: fullEvent.title,
           slug: fullEvent.slug,
-          earmarkText: fullEvent.earmarkText || "Curated Exhibition & Recital",
+          earmarkText: fullEvent.earmarkText || "Curated Showcase & Event",
           eventType: fullEvent.eventType,
           description: fullEvent.description || "",
           venue: fullEvent.venue || fullEvent.venueName || "SavazAI Heritage Studio",
@@ -199,7 +199,7 @@ export default function EventsAdminPage() {
           galleryDisplayMode: fullEvent.galleryDisplayMode || "CAROUSEL",
           galleryAutoplayTimer: fullEvent.galleryAutoplayTimer !== undefined ? fullEvent.galleryAutoplayTimer : 4,
           brochurePdfUrl: fullEvent.brochurePdfUrl || "",
-          brochureTitle: fullEvent.brochureTitle || "Exhibition Monograph & Program Brochure",
+          brochureTitle: fullEvent.brochureTitle || "Event Program & Publication Brochure",
           brochureDownloadable: fullEvent.brochureDownloadable !== false,
           maxCapacity: fullEvent.maxCapacity,
           registrationFee: fullEvent.registrationFee ? Number(fullEvent.registrationFee) : 0,
@@ -429,9 +429,9 @@ export default function EventsAdminPage() {
       {/* Reusable In-Place Editable Header */}
       <EditablePageHeader
         sectionKey="events"
-        defaultTitle="Exhibitions, Recitals & Workshops"
-        defaultSubtitle="Curate international schedules, venue coordinates, timezones, and masterwork exhibition linkages."
-        badgeLabel="Cultural Calendar & Recitals"
+        defaultTitle="Events & Showcases"
+        defaultSubtitle="Curate international schedules, venue coordinates, timezones, and showcase asset linkages."
+        badgeLabel="Showcase Calendar"
       >
         <Button onClick={handleOpenCreate} variant="default" className="gap-2 text-xs">
           <Plus className="w-4 h-4" />
@@ -502,7 +502,7 @@ export default function EventsAdminPage() {
           <CardDescription className="text-xs mt-1">
             {activeSegment === "upcoming"
               ? "All existing events have concluded or are set as past. Schedule a new exhibition."
-              : "Create your first Tanjore exhibition, classical concert, or workshop masterclass."}
+              : "Create your first showcase event, exhibition, or masterclass."}
           </CardDescription>
           <Button onClick={handleOpenCreate} variant="default" size="sm" className="mt-4 gap-1">
             <Plus className="w-3.5 h-3.5" />
