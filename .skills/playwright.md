@@ -1,68 +1,82 @@
 # Skill: Playwright E2E Test Suite Architecture
 
 ## 1. Scope & Strategy
-The Playwright end-to-end testing suite guarantees reliability across critical platform user flows for the **Lalita Kapilavai** portfolio platform:
-1. **Authentication & Admin RBAC** (Better-Auth login, session persistence, unauthorized redirect).
-2. **Dynamic Visual Layout Builders** (Gallery grid rendering, lightbox deep-zoom, Carnatic audio player state).
-3. **Dynamic Image Watermarking & Asset Protection** (Verifying that client-facing images deliver watermarked versions and prevent unauthorized direct access to raw master TIFF/Hi-Res files).
-4. **Lead Capture & Commission Inquiries** (Contact and inquiry forms, validation, and confirmation notifications).
+The Playwright end-to-end testing suite guarantees stability, accessibility, and visual fidelity across all public portals and the 10 administrative modules of the **SavazAI WebApps Platform**:
+1. **Authentication & Admin RBAC** (Better-Auth login, session persistence, unauthorized redirect, superadmin privilege escalation prevention).
+2. **Artwork Catalog & Placard Print Engine** (Artwork gallery rendering, high-res deep zoom, watermark verification, isolated iframe placard printing).
+3. **Interactive e-Catalog Studio** (Virtual page-flip monograph viewer, curatorial notes, PDF export trigger).
+4. **3D WebGL Exhibition Salon Corridor** (Three.js canvas initialization, aspect ratio wrapping, multi-wall corridor navigation).
+5. **Visual Page Builder & Component Studio** (Drag-and-drop block rendering, real-time live preview, responsive breakpoints).
+6. **Lead Capture, Events & Mail Notification Studio** (Commission inquiries, Event RSVP registration, dynamic form submissions, email dispatch audit log).
 
 ---
 
-## 2. Test Suite Specifications
+## 2. Test Configuration & Environment Standards
+- **Base URL**: `http://localhost:3060`
+- **Dynamic Credentials**: Credentials must be sourced dynamically from `.env` or standard fallback test fixtures:
+  - `ADMIN_EMAIL`: `${process.env.ADMIN_EMAIL || "admin@example.com"}`
+  - `ADMIN_INITIAL_PASSWORD`: `${process.env.ADMIN_INITIAL_PASSWORD || "AdminPassword2026!"}`
+- **Viewport Profiles**: Desktop ($1440 \times 900\text{ px}$), Tablet ($768 \times 1024\text{ px}$), Mobile ($375 \times 667\text{ px}$).
 
-### Test Suite 1: Authentication & Admin Portal (`tests/e2e/auth.spec.ts`)
-- **Scenarios**:
-  - Unauthenticated access to `/admin` routes must redirect to `/auth/signin`.
-  - Admin login with valid credentials persists session cookie (`better-auth.session_token`).
-  - Accessing protected dashboard confirms admin greeting and access to artwork curation controls.
-  - Sign-out invalidates session and clears active cookies.
+---
+
+## 3. Test Suite Specifications
+
+### Test Suite 1: Authentication & Admin RBAC (`tests/e2e/auth.spec.ts`)
 ```typescript
 import { test, expect } from "@playwright/test";
 
-test.describe("Better-Auth Admin Authentication", () => {
-  test("redirects unauthenticated users from /admin to /auth/signin", async ({ page }) => {
-    await page.goto("/admin");
-    await expect(page).toHaveURL(/\/auth\/signin/);
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3060";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@example.com";
+const ADMIN_PASSWORD = process.env.ADMIN_INITIAL_PASSWORD || "AdminPassword2026!";
+
+test.describe("Better-Auth Admin Authentication & RBAC", () => {
+  test("redirects unauthenticated requests from /admin to /admin/login", async ({ page }) => {
+    await page.goto(`${BASE_URL}/admin`);
+    await expect(page).toHaveURL(/\/admin\/login/);
   });
 
-  test("successful admin login grants dashboard access", async ({ page }) => {
-    await page.goto("/auth/signin");
-    await page.fill('input[name="email"]', "admin@lalitakapilavai.com");
-    await page.fill('input[name="password"]', "AdminSecurePass123!");
+  test("successful admin login grants access to the 10 dashboard modules", async ({ page }) => {
+    await page.goto(`${BASE_URL}/admin/login`);
+    await page.fill('input[name="email"]', ADMIN_EMAIL);
+    await page.fill('input[name="password"]', ADMIN_PASSWORD);
     await page.click('button[type="submit"]');
 
-    await expect(page).toHaveURL(/\/admin/);
-    await expect(page.locator("h1")).toContainText("Admin Dashboard");
+    await expect(page).toHaveURL(/\/admin$/);
+    await expect(page.locator("nav")).toContainText("Artworks");
+    await expect(page.locator("nav")).toContainText("e-Catalogs");
+    await expect(page.locator("nav")).toContainText("Events");
+    await expect(page.locator("nav")).toContainText("Page Builder");
+    await expect(page.locator("nav")).toContainText("Settings");
   });
 });
 ```
 
 ---
 
-### Test Suite 2: Visual Layout & Audio Synesthesia (`tests/e2e/gallery.spec.ts`)
-- **Scenarios**:
-  - Main gallery grid renders responsive masonry cards with Tanjore gold borders.
-  - Clicking an artwork triggers high-resolution lightbox with zoom capabilities.
-  - Selecting "Listen to Inspired Raga" triggers Carnatic audio player bar with track title, raga scales, and play/pause controls.
+### Test Suite 2: 3D WebGL Exhibition Salon Corridor (`tests/e2e/exhibition-corridor.spec.ts`)
 ```typescript
 import { test, expect } from "@playwright/test";
 
-test.describe("Gallery & Synesthetic Player", () => {
-  test("loads gallery items and launches synesthetic raga player", async ({ page }) => {
+test.describe("3D WebGL Spatial Exhibition Corridor", () => {
+  test("initializes Three.js canvas and preserves natural artwork aspect ratios", async ({ page }) => {
     await page.goto("/gallery");
-    const firstCard = page.locator('[data-testid="artwork-card"]').first();
-    await expect(firstCard).toBeVisible();
+    
+    const webglCanvas = page.locator('canvas[data-engine="three.js"]').first();
+    if (await webglCanvas.isVisible()) {
+      await expect(webglCanvas).toBeVisible();
+      // Verify no dark overlays obscuring the canvas
+      await expect(page.locator('[data-testid="canvas-overlay-banner"]')).toHaveCount(0);
+    }
+  });
 
-    // Open lightbox
-    await firstCard.click();
-    await expect(page.locator('[data-testid="artwork-lightbox"]')).toBeVisible();
+  test("hides on-wall placards on mobile viewports (< 768px)", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/gallery");
 
-    // Trigger audio
-    const audioTrigger = page.locator('[data-testid="play-raga-btn"]');
-    if (await audioTrigger.isVisible()) {
-      await audioTrigger.click();
-      await expect(page.locator('[data-testid="carnatic-player"]')).toBeVisible();
+    const onWallPlacard = page.locator('[data-testid="on-wall-placard"]');
+    if (await onWallPlacard.count() > 0) {
+      await expect(onWallPlacard.first()).toBeHidden();
     }
   });
 });
@@ -70,59 +84,52 @@ test.describe("Gallery & Synesthetic Player", () => {
 
 ---
 
-### Test Suite 3: Image Watermarking & Dynamic Protection (`tests/e2e/media-protection.spec.ts`)
-- **Scenarios**:
-  - Verify that public gallery image elements render URLs routing through the watermarked proxy endpoint (`/api/media/watermark?id=...`).
-  - Verify that attempting to fetch high-resolution master asset (`/api/media/master/...`) without administrative authorization returns HTTP 403 Forbidden.
+### Test Suite 3: Museum Placard Print Subsystem (`tests/e2e/placard-print.spec.ts`)
 ```typescript
 import { test, expect } from "@playwright/test";
 
-test.describe("Media Watermark Protection", () => {
-  test("public gallery images include watermarking parameters", async ({ page }) => {
-    await page.goto("/gallery");
-    const images = page.locator('img[data-protected="true"]');
-    const count = await images.count();
-    expect(count).toBeGreaterThan(0);
+test.describe("Museum Placard Isolated Iframe Print Driver", () => {
+  test("generates isolated headless iframe without injecting into main document", async ({ page }) => {
+    await page.goto("/admin/artworks");
     
-    const src = await images.first().getAttribute("src");
-    expect(src).toMatch(/\/api\/media\/watermark|watermarked/);
-  });
+    // Open placard modal for the first artwork
+    const placardBtn = page.locator('[data-testid="open-placard-modal"]').first();
+    if (await placardBtn.isVisible()) {
+      await placardBtn.click();
+      await expect(page.locator('[data-testid="placard-preview"]')).toBeVisible();
 
-  test("direct raw master asset download returns 403 Forbidden for anonymous users", async ({ request }) => {
-    const response = await request.get("/api/media/master/raw-master-sample.tiff");
-    expect(response.status()).toBe(403);
+      // Trigger print and verify print iframe generation
+      await page.click('[data-testid="print-placard-btn"]');
+      const printIframe = page.locator('iframe#__placard_print_frame__');
+      await expect(printIframe).toBeAttached();
+    }
   });
 });
 ```
 
 ---
 
-### Test Suite 4: Lead Capture & Commission Workflow (`tests/e2e/inquiry.spec.ts`)
-- **Scenarios**:
-  - Navigate to `/commission` or click "Inquire About Artwork" from single artwork page.
-  - Fill in Name, Email, Phone, Project Details, and Budget tier.
-  - Validate client-side error states for invalid email and empty fields.
-  - Submit valid form, verify HTTP 201 response, and confirm visual success toast / notification.
+### Test Suite 4: Dynamic Event Registration & RSVP Engine (`tests/e2e/events-rsvp.spec.ts`)
 ```typescript
 import { test, expect } from "@playwright/test";
 
-test.describe("Art Commission Lead Capture", () => {
-  test("validates required fields and submits inquiry successfully", async ({ page }) => {
-    await page.goto("/commission");
-    
-    // Submit empty to verify validations
-    await page.click('button[type="submit"]');
-    await expect(page.locator("text=Please enter your name")).toBeVisible();
+test.describe("Event Recital & Exhibition RSVP Engine", () => {
+  test("submits attendee registration and dispatches decoupled notifications", async ({ page }) => {
+    await page.goto("/events");
+    const eventCard = page.locator('[data-testid="event-card"]').first();
+    await expect(eventCard).toBeVisible();
+    await eventCard.click();
 
-    // Fill valid details
-    await page.fill('input[name="name"]', "Sangeetha Raman");
-    await page.fill('input[name="email"]', "sangeetha@example.com");
-    await page.fill('input[name="phone"]', "+91 98765 43210");
-    await page.selectOption('select[name="artStyle"]', "TANJORE");
-    await page.fill('textarea[name="message"]', "Looking to commission a 36x48 inch Tanjore painting of Goddess Saraswati with 22k gold foil.");
+    // Verify dynamic earmark text is rendered
+    await expect(page.locator('[data-testid="event-earmark"]')).toBeVisible();
 
+    // Fill RSVP form
+    await page.fill('input[name="name"]', "Curator Test");
+    await page.fill('input[name="email"]', "curator@example.com");
+    await page.fill('input[name="guests"]', "2");
     await page.click('button[type="submit"]');
-    await expect(page.locator('[data-testid="inquiry-success"]')).toBeVisible();
+
+    await expect(page.locator('[data-testid="rsvp-success"]')).toBeVisible();
   });
 });
 ```

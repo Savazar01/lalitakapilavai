@@ -29,12 +29,12 @@
 
 ## 3. Zero-FOUC Theming & Hydration Safeguards
 - In `src/app/layout.tsx`, add `suppressHydrationWarning` to `<html>` to accommodate client-side theme class injection (`dark` / `light`).
-- Configure `<ThemeProvider>` with:
+- Configure `<ThemeProvider>` adhering to the **Strict Binary Theme Invariant** (`enableSystem={false}`):
   ```tsx
   <ThemeProvider 
     attribute="class" 
-    defaultTheme="system" 
-    enableSystem 
+    defaultTheme="light" 
+    enableSystem={false} 
     disableTransitionOnChange
   >
     {children}

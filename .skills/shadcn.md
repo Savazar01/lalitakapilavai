@@ -1,7 +1,7 @@
 # Skill: Shadcn UI Architecture & Design Tokens
 
 ## Overview
-This skill defines the token architecture, color spaces, component elevations, and styling rules tailored for the **Lalita Kapilavai** digital portfolio. The visual aesthetic reflects traditional Indian fine art (Tanjore gold leaf, Mysore natural pigments) and classical Carnatic music heritage.
+This skill defines the token architecture, color spaces, component elevations, and styling rules tailored for the **SavazAI WebApps Platform**. The flagship Imperial Atelier preset reflects traditional fine art (burnished gold leaf, natural pigments) and classical performing arts heritage.
 
 ---
 
@@ -106,7 +106,7 @@ The design system operates on two harmonious modes:
 
 ## 4. Component Rules
 1. **Gold Foil Framing**:
-   Cards displaying Tanjore and Mysore artworks use an inner 1px gold border with subtle radial sheen:
+   Cards displaying fine art masterworks use an inner 1px gold border with subtle radial sheen:
    `border border-primary/30 hover:border-primary/80 transition-all duration-300`
 2. **Audio Visualizer**:
    Carnatic player component styled with brass and gold accents, displaying dynamic frequency waves alongside Raga scales.

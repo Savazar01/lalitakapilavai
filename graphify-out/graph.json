@@ -1133,7 +1133,7 @@
       "source_file": "src/app/layout.tsx",
       "source_location": "L1",
       "id": "src_app_layout_tsx",
-      "community": 88,
+      "community": 43,
       "norm_label": "layout.tsx"
     },
     {
@@ -1142,7 +1142,7 @@
       "source_file": "src/app/layout.tsx",
       "source_location": "L10",
       "id": "app_layout_geistsans",
-      "community": 88,
+      "community": 43,
       "norm_label": "geistsans"
     },
     {
@@ -1151,7 +1151,7 @@
       "source_file": "src/app/layout.tsx",
       "source_location": "L15",
       "id": "app_layout_geistmono",
-      "community": 88,
+      "community": 43,
       "norm_label": "geistmono"
     },
     {
@@ -1160,7 +1160,7 @@
       "source_file": "src/app/layout.tsx",
       "source_location": "L20",
       "id": "app_layout_generatemetadata",
-      "community": 88,
+      "community": 43,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1169,7 +1169,7 @@
       "source_file": "src/app/layout.tsx",
       "source_location": "L50",
       "id": "app_layout_rootlayout",
-      "community": 88,
+      "community": 43,
       "norm_label": "rootlayout()"
     },
     {
@@ -1178,7 +1178,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L1",
       "id": "src_app_page_tsx",
-      "community": 69,
+      "community": 88,
       "norm_label": "page.tsx"
     },
     {
@@ -1187,7 +1187,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L13",
       "id": "app_page_generatemetadata",
-      "community": 69,
+      "community": 88,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1196,7 +1196,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L45",
       "id": "app_page_homepage",
-      "community": 69,
+      "community": 88,
       "norm_label": "homepage()"
     },
     {
@@ -1205,7 +1205,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_artwork_slug_page_tsx",
-      "community": 82,
+      "community": 43,
       "norm_label": "page.tsx"
     },
     {
@@ -1214,7 +1214,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L26",
       "id": "src_app_public_artwork_slug_page_tsx_slug_page_pageprops",
-      "community": 82,
+      "community": 43,
       "norm_label": "pageprops"
     },
     {
@@ -1223,7 +1223,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L32",
       "id": "slug_page_getartworkbyslug",
-      "community": 82,
+      "community": 43,
       "norm_label": "getartworkbyslug"
     },
     {
@@ -1232,7 +1232,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L47",
       "id": "src_app_public_artwork_slug_page_tsx_slug_page_generatemetadata",
-      "community": 82,
+      "community": 43,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1241,7 +1241,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L66",
       "id": "slug_page_artworkdetailpage",
-      "community": 82,
+      "community": 43,
       "norm_label": "artworkdetailpage()"
     },
     {
@@ -1313,7 +1313,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_catalogs_slug_page_tsx",
-      "community": 4,
+      "community": 57,
       "norm_label": "page.tsx"
     },
     {
@@ -1322,7 +1322,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L40",
       "id": "src_app_public_catalogs_slug_page_tsx_slug_page_pageprops",
-      "community": 4,
+      "community": 57,
       "norm_label": "pageprops"
     },
     {
@@ -1340,7 +1340,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L59",
       "id": "slug_page_getmagazinegridclass",
-      "community": 4,
+      "community": 57,
       "norm_label": "getmagazinegridclass()"
     },
     {
@@ -1349,7 +1349,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L81",
       "id": "slug_page_spinedecoratorslotview",
-      "community": 59,
+      "community": 57,
       "norm_label": "spinedecoratorslotview()"
     },
     {
@@ -1358,7 +1358,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L162",
       "id": "slug_page_catalogsingleplateview",
-      "community": 59,
+      "community": 57,
       "norm_label": "catalogsingleplateview()"
     },
     {
@@ -1367,7 +1367,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L292",
       "id": "slug_page_catalogbackgroundlayer",
-      "community": 44,
+      "community": 57,
       "norm_label": "catalogbackgroundlayer()"
     },
     {
@@ -1376,7 +1376,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L397",
       "id": "src_app_public_catalogs_slug_page_tsx_slug_page_generatemetadata",
-      "community": 4,
+      "community": 57,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1421,7 +1421,7 @@
       "source_file": "src/app/(public)/commission/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_commission_page_tsx",
-      "community": 8,
+      "community": 92,
       "norm_label": "page.tsx"
     },
     {
@@ -1430,7 +1430,7 @@
       "source_file": "src/app/(public)/commission/page.tsx",
       "source_location": "L10",
       "id": "commission_page_metadata",
-      "community": 8,
+      "community": 92,
       "norm_label": "metadata"
     },
     {
@@ -1439,7 +1439,7 @@
       "source_file": "src/app/(public)/commission/page.tsx",
       "source_location": "L16",
       "id": "commission_page_commissionpage",
-      "community": 8,
+      "community": 92,
       "norm_label": "commissionpage()"
     },
     {
@@ -1475,7 +1475,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_events_page_tsx",
-      "community": 8,
+      "community": 48,
       "norm_label": "page.tsx"
     },
     {
@@ -1484,7 +1484,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L15",
       "id": "events_page_metadata",
-      "community": 8,
+      "community": 48,
       "norm_label": "metadata"
     },
     {
@@ -1493,7 +1493,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L21",
       "id": "events_page_eventspage",
-      "community": 8,
+      "community": 48,
       "norm_label": "eventspage()"
     },
     {
@@ -1502,7 +1502,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_events_slug_page_tsx",
-      "community": 79,
+      "community": 59,
       "norm_label": "page.tsx"
     },
     {
@@ -1511,7 +1511,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L29",
       "id": "src_app_public_events_slug_page_tsx_slug_page_pageprops",
-      "community": 79,
+      "community": 59,
       "norm_label": "pageprops"
     },
     {
@@ -1520,7 +1520,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L35",
       "id": "slug_page_galleryphoto",
-      "community": 79,
+      "community": 59,
       "norm_label": "galleryphoto"
     },
     {
@@ -1529,7 +1529,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L45",
       "id": "slug_page_geteventbyslug",
-      "community": 79,
+      "community": 59,
       "norm_label": "geteventbyslug"
     },
     {
@@ -1538,7 +1538,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L62",
       "id": "src_app_public_events_slug_page_tsx_slug_page_generatemetadata",
-      "community": 79,
+      "community": 59,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1547,7 +1547,7 @@
       "source_file": "src/app/(public)/events/[slug]/page.tsx",
       "source_location": "L76",
       "id": "slug_page_eventdetailpage",
-      "community": 79,
+      "community": 59,
       "norm_label": "eventdetailpage()"
     },
     {
@@ -1556,7 +1556,7 @@
       "source_file": "src/app/(public)/exhibition-simulator/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_exhibition_simulator_page_tsx",
-      "community": 18,
+      "community": 8,
       "norm_label": "page.tsx"
     },
     {
@@ -1565,7 +1565,7 @@
       "source_file": "src/app/(public)/exhibition-simulator/page.tsx",
       "source_location": "L9",
       "id": "exhibition_simulator_page_metadata",
-      "community": 18,
+      "community": 8,
       "norm_label": "metadata"
     },
     {
@@ -1574,7 +1574,7 @@
       "source_file": "src/app/(public)/exhibition-simulator/page.tsx",
       "source_location": "L15",
       "id": "exhibition_simulator_page_exhibitionsimulatorpage",
-      "community": 18,
+      "community": 8,
       "norm_label": "exhibitionsimulatorpage()"
     },
     {
@@ -1808,7 +1808,7 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_catalogs_page_tsx",
-      "community": 49,
+      "community": 32,
       "norm_label": "page.tsx"
     },
     {
@@ -1817,7 +1817,7 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/page.tsx",
       "source_location": "L39",
       "id": "catalogs_page_ecataloglistitem",
-      "community": 49,
+      "community": 32,
       "norm_label": "ecataloglistitem"
     },
     {
@@ -1826,7 +1826,7 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/page.tsx",
       "source_location": "L64",
       "id": "catalogs_page_admincatalogspage",
-      "community": 49,
+      "community": 32,
       "norm_label": "admincatalogspage()"
     },
     {
@@ -1898,7 +1898,7 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L190",
       "id": "id_page_ecatalogthemeconfig",
-      "community": 4,
+      "community": 33,
       "norm_label": "ecatalogthemeconfig"
     },
     {
@@ -1934,7 +1934,7 @@
       "source_file": "src/app/admin/(dashboard)/catalogs/[id]/page.tsx",
       "source_location": "L291",
       "id": "id_page_ecatalogcustompageitem",
-      "community": 47,
+      "community": 33,
       "norm_label": "ecatalogcustompageitem"
     },
     {
@@ -1961,7 +1961,7 @@
       "source_file": "src/app/admin/(dashboard)/categories/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_categories_page_tsx",
-      "community": 33,
+      "community": 32,
       "norm_label": "page.tsx"
     },
     {
@@ -1970,7 +1970,7 @@
       "source_file": "src/app/admin/(dashboard)/categories/page.tsx",
       "source_location": "L53",
       "id": "categories_page_artcategoryitem",
-      "community": 33,
+      "community": 32,
       "norm_label": "artcategoryitem"
     },
     {
@@ -1979,7 +1979,7 @@
       "source_file": "src/app/admin/(dashboard)/categories/page.tsx",
       "source_location": "L87",
       "id": "categories_page_admincategoriespage",
-      "community": 33,
+      "community": 32,
       "norm_label": "admincategoriespage()"
     },
     {
@@ -2069,7 +2069,7 @@
       "source_file": "src/app/admin/(dashboard)/navigation/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_navigation_page_tsx",
-      "community": 49,
+      "community": 32,
       "norm_label": "page.tsx"
     },
     {
@@ -2078,7 +2078,7 @@
       "source_file": "src/app/admin/(dashboard)/navigation/page.tsx",
       "source_location": "L40",
       "id": "navigation_page_menuitemnode",
-      "community": 49,
+      "community": 32,
       "norm_label": "menuitemnode"
     },
     {
@@ -2087,7 +2087,7 @@
       "source_file": "src/app/admin/(dashboard)/navigation/page.tsx",
       "source_location": "L51",
       "id": "navigation_page_positions",
-      "community": 49,
+      "community": 32,
       "norm_label": "positions"
     },
     {
@@ -2096,7 +2096,7 @@
       "source_file": "src/app/admin/(dashboard)/navigation/page.tsx",
       "source_location": "L59",
       "id": "navigation_page_navigationmanagerpage",
-      "community": 49,
+      "community": 32,
       "norm_label": "navigationmanagerpage()"
     },
     {
@@ -2240,7 +2240,7 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_posts_page_tsx",
-      "community": 49,
+      "community": 32,
       "norm_label": "page.tsx"
     },
     {
@@ -2249,7 +2249,7 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L53",
       "id": "posts_page_blogpostitem",
-      "community": 49,
+      "community": 32,
       "norm_label": "blogpostitem"
     },
     {
@@ -2258,7 +2258,7 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L71",
       "id": "posts_page_adminpostspage",
-      "community": 49,
+      "community": 32,
       "norm_label": "adminpostspage()"
     },
     {
@@ -2267,7 +2267,7 @@
       "source_file": "src/app/admin/(dashboard)/profile/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_profile_page_tsx",
-      "community": 32,
+      "community": 21,
       "norm_label": "page.tsx"
     },
     {
@@ -2276,7 +2276,7 @@
       "source_file": "src/app/admin/(dashboard)/profile/page.tsx",
       "source_location": "L30",
       "id": "profile_page_adminprofilepage",
-      "community": 32,
+      "community": 21,
       "norm_label": "adminprofilepage()"
     },
     {
@@ -2375,7 +2375,7 @@
       "source_file": "src/app/admin/login/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_login_page_tsx",
-      "community": 32,
+      "community": 79,
       "norm_label": "page.tsx"
     },
     {
@@ -2384,7 +2384,7 @@
       "source_file": "src/app/admin/login/page.tsx",
       "source_location": "L19",
       "id": "login_page_loginform",
-      "community": 32,
+      "community": 79,
       "norm_label": "loginform()"
     },
     {
@@ -2393,7 +2393,7 @@
       "source_file": "src/app/admin/login/page.tsx",
       "source_location": "L156",
       "id": "login_page_adminloginpage",
-      "community": 32,
+      "community": 79,
       "norm_label": "adminloginpage()"
     },
     {
@@ -2447,7 +2447,7 @@
       "source_file": "src/app/api/admin/artworks/export/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_artworks_export_route_ts",
-      "community": 29,
+      "community": 95,
       "norm_label": "route.ts"
     },
     {
@@ -2456,7 +2456,7 @@
       "source_file": "src/app/api/admin/artworks/export/route.ts",
       "source_location": "L16",
       "id": "export_route_fetchthumbnailbuffer",
-      "community": 29,
+      "community": 95,
       "norm_label": "fetchthumbnailbuffer()"
     },
     {
@@ -2465,7 +2465,7 @@
       "source_file": "src/app/api/admin/artworks/export/route.ts",
       "source_location": "L55",
       "id": "export_route_get",
-      "community": 29,
+      "community": 95,
       "norm_label": "get()"
     },
     {
@@ -2582,7 +2582,7 @@
       "source_file": "src/app/api/admin/artworks/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_artworks_id_route_ts",
-      "community": 29,
+      "community": 93,
       "norm_label": "route.ts"
     },
     {
@@ -2591,7 +2591,7 @@
       "source_file": "src/app/api/admin/artworks/[id]/route.ts",
       "source_location": "L5",
       "id": "src_app_api_admin_artworks_id_route_ts_id_route_get",
-      "community": 29,
+      "community": 93,
       "norm_label": "get()"
     },
     {
@@ -2600,7 +2600,7 @@
       "source_file": "src/app/api/admin/artworks/[id]/route.ts",
       "source_location": "L51",
       "id": "src_app_api_admin_artworks_id_route_ts_id_route_put",
-      "community": 29,
+      "community": 93,
       "norm_label": "put()"
     },
     {
@@ -2609,7 +2609,7 @@
       "source_file": "src/app/api/admin/artworks/[id]/route.ts",
       "source_location": "L137",
       "id": "src_app_api_admin_artworks_id_route_ts_id_route_delete",
-      "community": 29,
+      "community": 93,
       "norm_label": "delete()"
     },
     {
@@ -2771,7 +2771,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_categories_route_ts",
-      "community": 29,
+      "community": 89,
       "norm_label": "route.ts"
     },
     {
@@ -2780,7 +2780,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L5",
       "id": "categories_route_get",
-      "community": 29,
+      "community": 89,
       "norm_label": "get()"
     },
     {
@@ -2789,7 +2789,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L40",
       "id": "categories_route_post",
-      "community": 29,
+      "community": 89,
       "norm_label": "post()"
     },
     {
@@ -2798,7 +2798,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L130",
       "id": "categories_route_put",
-      "community": 29,
+      "community": 89,
       "norm_label": "put()"
     },
     {
@@ -2807,7 +2807,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L209",
       "id": "categories_route_delete",
-      "community": 29,
+      "community": 89,
       "norm_label": "delete()"
     },
     {
@@ -2816,7 +2816,7 @@
       "source_file": "src/app/api/admin/email/test/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_email_test_route_ts",
-      "community": 51,
+      "community": 34,
       "norm_label": "route.ts"
     },
     {
@@ -2825,7 +2825,7 @@
       "source_file": "src/app/api/admin/email/test/route.ts",
       "source_location": "L9",
       "id": "test_route_post",
-      "community": 51,
+      "community": 34,
       "norm_label": "post()"
     },
     {
@@ -2906,7 +2906,7 @@
       "source_file": "src/app/api/admin/events/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_events_id_route_ts",
-      "community": 29,
+      "community": 94,
       "norm_label": "route.ts"
     },
     {
@@ -2915,7 +2915,7 @@
       "source_file": "src/app/api/admin/events/[id]/route.ts",
       "source_location": "L6",
       "id": "src_app_api_admin_events_id_route_ts_id_route_get",
-      "community": 29,
+      "community": 94,
       "norm_label": "get()"
     },
     {
@@ -2924,7 +2924,7 @@
       "source_file": "src/app/api/admin/events/[id]/route.ts",
       "source_location": "L49",
       "id": "src_app_api_admin_events_id_route_ts_id_route_put",
-      "community": 29,
+      "community": 94,
       "norm_label": "put()"
     },
     {
@@ -2933,7 +2933,7 @@
       "source_file": "src/app/api/admin/events/[id]/route.ts",
       "source_location": "L173",
       "id": "src_app_api_admin_events_id_route_ts_id_route_delete",
-      "community": 29,
+      "community": 94,
       "norm_label": "delete()"
     },
     {
@@ -2942,7 +2942,7 @@
       "source_file": "src/app/api/admin/forms/discover/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_forms_discover_route_ts",
-      "community": 29,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -2951,7 +2951,7 @@
       "source_file": "src/app/api/admin/forms/discover/route.ts",
       "source_location": "L7",
       "id": "discover_route_discoveredformitem",
-      "community": 29,
+      "community": 18,
       "norm_label": "discoveredformitem"
     },
     {
@@ -2960,7 +2960,7 @@
       "source_file": "src/app/api/admin/forms/discover/route.ts",
       "source_location": "L21",
       "id": "discover_route_discoveredformcategory",
-      "community": 29,
+      "community": 18,
       "norm_label": "discoveredformcategory"
     },
     {
@@ -2969,7 +2969,7 @@
       "source_file": "src/app/api/admin/forms/discover/route.ts",
       "source_location": "L28",
       "id": "discover_route_get",
-      "community": 29,
+      "community": 18,
       "norm_label": "get()"
     },
     {
@@ -2996,7 +2996,7 @@
       "source_file": "src/app/api/admin/leads/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_leads_id_route_ts",
-      "community": 29,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -3005,7 +3005,7 @@
       "source_file": "src/app/api/admin/leads/[id]/route.ts",
       "source_location": "L6",
       "id": "src_app_api_admin_leads_id_route_ts_id_route_routeparams",
-      "community": 29,
+      "community": 18,
       "norm_label": "routeparams"
     },
     {
@@ -3014,7 +3014,7 @@
       "source_file": "src/app/api/admin/leads/[id]/route.ts",
       "source_location": "L10",
       "id": "src_app_api_admin_leads_id_route_ts_id_route_patch",
-      "community": 29,
+      "community": 18,
       "norm_label": "patch()"
     },
     {
@@ -3023,7 +3023,7 @@
       "source_file": "src/app/api/admin/leads/[id]/route.ts",
       "source_location": "L40",
       "id": "src_app_api_admin_leads_id_route_ts_id_route_delete",
-      "community": 29,
+      "community": 18,
       "norm_label": "delete()"
     },
     {
@@ -3275,7 +3275,7 @@
       "source_file": "src/app/api/admin/qr/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_qr_route_ts",
-      "community": 43,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -3347,7 +3347,7 @@
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_settings_theme_route_ts",
-      "community": 87,
+      "community": 39,
       "norm_label": "route.ts"
     },
     {
@@ -3356,7 +3356,7 @@
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L7",
       "id": "theme_route_get",
-      "community": 87,
+      "community": 39,
       "norm_label": "get()"
     },
     {
@@ -3365,7 +3365,7 @@
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L19",
       "id": "theme_route_put",
-      "community": 87,
+      "community": 39,
       "norm_label": "put()"
     },
     {
@@ -3428,7 +3428,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_widgets_route_ts",
-      "community": 29,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -3437,7 +3437,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L7",
       "id": "widgets_route_get",
-      "community": 29,
+      "community": 18,
       "norm_label": "get()"
     },
     {
@@ -3446,7 +3446,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L71",
       "id": "widgets_route_post",
-      "community": 29,
+      "community": 18,
       "norm_label": "post()"
     },
     {
@@ -3455,7 +3455,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L116",
       "id": "widgets_route_put",
-      "community": 29,
+      "community": 18,
       "norm_label": "put()"
     },
     {
@@ -3464,7 +3464,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_widgets_id_route_ts",
-      "community": 29,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -3473,7 +3473,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L7",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_routeparams",
-      "community": 29,
+      "community": 18,
       "norm_label": "routeparams"
     },
     {
@@ -3482,7 +3482,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L11",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_patch",
-      "community": 29,
+      "community": 18,
       "norm_label": "patch()"
     },
     {
@@ -3491,7 +3491,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L50",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_delete",
-      "community": 29,
+      "community": 18,
       "norm_label": "delete()"
     },
     {
@@ -3518,7 +3518,7 @@
       "source_file": "src/app/api/blogs/route.ts",
       "source_location": "L1",
       "id": "src_app_api_blogs_route_ts",
-      "community": 29,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -3527,7 +3527,7 @@
       "source_file": "src/app/api/blogs/route.ts",
       "source_location": "L4",
       "id": "blogs_route_get",
-      "community": 29,
+      "community": 18,
       "norm_label": "get()"
     },
     {
@@ -3554,7 +3554,7 @@
       "source_file": "src/app/api/forms/submit/route.ts",
       "source_location": "L1",
       "id": "src_app_api_forms_submit_route_ts",
-      "community": 43,
+      "community": 34,
       "norm_label": "route.ts"
     },
     {
@@ -3563,7 +3563,7 @@
       "source_file": "src/app/api/forms/submit/route.ts",
       "source_location": "L8",
       "id": "src_app_api_forms_submit_route_ts_submit_route_post",
-      "community": 43,
+      "community": 34,
       "norm_label": "post()"
     },
     {
@@ -3653,7 +3653,7 @@
       "source_file": "src/components/theme-provider.tsx",
       "source_location": "L1",
       "id": "src_components_theme_provider_tsx",
-      "community": 88,
+      "community": 43,
       "norm_label": "theme-provider.tsx"
     },
     {
@@ -3662,7 +3662,7 @@
       "source_file": "src/components/theme-provider.tsx",
       "source_location": "L20",
       "id": "components_theme_provider_themeprovider",
-      "community": 88,
+      "community": 43,
       "norm_label": "themeprovider()"
     },
     {
@@ -3671,7 +3671,7 @@
       "source_file": "src/components/admin/ai-assistant-modal.tsx",
       "source_location": "L1",
       "id": "src_components_admin_ai_assistant_modal_tsx",
-      "community": 49,
+      "community": 36,
       "norm_label": "ai-assistant-modal.tsx"
     },
     {
@@ -3680,7 +3680,7 @@
       "source_file": "src/components/admin/ai-assistant-modal.tsx",
       "source_location": "L25",
       "id": "admin_ai_assistant_modal_aiassistantmodalprops",
-      "community": 49,
+      "community": 36,
       "norm_label": "aiassistantmodalprops"
     },
     {
@@ -3698,7 +3698,7 @@
       "source_file": "src/components/admin/artwork-bulk-import-modal.tsx",
       "source_location": "L1",
       "id": "src_components_admin_artwork_bulk_import_modal_tsx",
-      "community": 49,
+      "community": 50,
       "norm_label": "artwork-bulk-import-modal.tsx"
     },
     {
@@ -3707,7 +3707,7 @@
       "source_file": "src/components/admin/artwork-bulk-import-modal.tsx",
       "source_location": "L25",
       "id": "admin_artwork_bulk_import_modal_importaudititem",
-      "community": 49,
+      "community": 50,
       "norm_label": "importaudititem"
     },
     {
@@ -3716,7 +3716,7 @@
       "source_file": "src/components/admin/artwork-bulk-import-modal.tsx",
       "source_location": "L33",
       "id": "admin_artwork_bulk_import_modal_importauditresult",
-      "community": 49,
+      "community": 50,
       "norm_label": "importauditresult"
     },
     {
@@ -3725,7 +3725,7 @@
       "source_file": "src/components/admin/artwork-bulk-import-modal.tsx",
       "source_location": "L43",
       "id": "admin_artwork_bulk_import_modal_artworkbulkimportmodalprops",
-      "community": 49,
+      "community": 50,
       "norm_label": "artworkbulkimportmodalprops"
     },
     {
@@ -3734,7 +3734,7 @@
       "source_file": "src/components/admin/artwork-bulk-import-modal.tsx",
       "source_location": "L49",
       "id": "admin_artwork_bulk_import_modal_artworkbulkimportmodal",
-      "community": 49,
+      "community": 50,
       "norm_label": "artworkbulkimportmodal()"
     },
     {
@@ -3743,7 +3743,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L1",
       "id": "src_components_admin_artwork_placard_sheet_tsx",
-      "community": 48,
+      "community": 36,
       "norm_label": "artwork-placard-sheet.tsx"
     },
     {
@@ -3752,7 +3752,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L50",
       "id": "admin_artwork_placard_sheet_placardartwork",
-      "community": 48,
+      "community": 36,
       "norm_label": "placardartwork"
     },
     {
@@ -3761,7 +3761,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L65",
       "id": "admin_artwork_placard_sheet_artworkplacardsheetprops",
-      "community": 48,
+      "community": 36,
       "norm_label": "artworkplacardsheetprops"
     },
     {
@@ -3770,7 +3770,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L72",
       "id": "admin_artwork_placard_sheet_editableplacarditem",
-      "community": 48,
+      "community": 36,
       "norm_label": "editableplacarditem"
     },
     {
@@ -3779,7 +3779,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L85",
       "id": "admin_artwork_placard_sheet_default_placard_styling",
-      "community": 48,
+      "community": 36,
       "norm_label": "default_placard_styling"
     },
     {
@@ -3788,7 +3788,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L103",
       "id": "admin_artwork_placard_sheet_card_bg_swatches",
-      "community": 48,
+      "community": 36,
       "norm_label": "card_bg_swatches"
     },
     {
@@ -3797,7 +3797,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L110",
       "id": "admin_artwork_placard_sheet_title_color_swatches",
-      "community": 48,
+      "community": 36,
       "norm_label": "title_color_swatches"
     },
     {
@@ -3806,7 +3806,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L117",
       "id": "admin_artwork_placard_sheet_text_color_swatches",
-      "community": 48,
+      "community": 36,
       "norm_label": "text_color_swatches"
     },
     {
@@ -3815,7 +3815,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L124",
       "id": "admin_artwork_placard_sheet_header_color_swatches",
-      "community": 48,
+      "community": 36,
       "norm_label": "header_color_swatches"
     },
     {
@@ -3833,7 +3833,7 @@
       "source_file": "src/components/admin/catalog-background-control.tsx",
       "source_location": "L1",
       "id": "src_components_admin_catalog_background_control_tsx",
-      "community": 33,
+      "community": 82,
       "norm_label": "catalog-background-control.tsx"
     },
     {
@@ -3842,7 +3842,7 @@
       "source_file": "src/components/admin/catalog-background-control.tsx",
       "source_location": "L16",
       "id": "admin_catalog_background_control_catalogbackgroundconfig",
-      "community": 33,
+      "community": 82,
       "norm_label": "catalogbackgroundconfig"
     },
     {
@@ -3851,7 +3851,7 @@
       "source_file": "src/components/admin/catalog-background-control.tsx",
       "source_location": "L26",
       "id": "admin_catalog_background_control_catalogbackgroundcontrolprops",
-      "community": 33,
+      "community": 82,
       "norm_label": "catalogbackgroundcontrolprops"
     },
     {
@@ -3860,7 +3860,7 @@
       "source_file": "src/components/admin/catalog-background-control.tsx",
       "source_location": "L34",
       "id": "admin_catalog_background_control_heritage_color_presets",
-      "community": 33,
+      "community": 82,
       "norm_label": "heritage_color_presets"
     },
     {
@@ -3869,7 +3869,7 @@
       "source_file": "src/components/admin/catalog-background-control.tsx",
       "source_location": "L43",
       "id": "admin_catalog_background_control_catalogbackgroundcontrol",
-      "community": 33,
+      "community": 82,
       "norm_label": "catalogbackgroundcontrol()"
     },
     {
@@ -3887,7 +3887,7 @@
       "source_file": "src/components/admin/catalog-matrix-studio.tsx",
       "source_location": "L48",
       "id": "admin_catalog_matrix_studio_matrixcellsegment",
-      "community": 47,
+      "community": 33,
       "norm_label": "matrixcellsegment"
     },
     {
@@ -3914,7 +3914,7 @@
       "source_file": "src/components/admin/catalog-matrix-studio.tsx",
       "source_location": "L101",
       "id": "admin_catalog_matrix_studio_catalogmatrixstudioprops",
-      "community": 1,
+      "community": 44,
       "norm_label": "catalogmatrixstudioprops"
     },
     {
@@ -3941,7 +3941,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L1",
       "id": "src_components_admin_catalog_single_plate_editor_tsx",
-      "community": 33,
+      "community": 84,
       "norm_label": "catalog-single-plate-editor.tsx"
     },
     {
@@ -3959,7 +3959,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L47",
       "id": "admin_catalog_single_plate_editor_catalogsingleplateeditorprops",
-      "community": 33,
+      "community": 84,
       "norm_label": "catalogsingleplateeditorprops"
     },
     {
@@ -3968,7 +3968,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L54",
       "id": "admin_catalog_single_plate_editor_matting_presets",
-      "community": 33,
+      "community": 84,
       "norm_label": "matting_presets"
     },
     {
@@ -3977,7 +3977,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L63",
       "id": "admin_catalog_single_plate_editor_catalogsingleplateeditor",
-      "community": 33,
+      "community": 84,
       "norm_label": "catalogsingleplateeditor()"
     },
     {
@@ -3986,7 +3986,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L705",
       "id": "admin_catalog_single_plate_editor_editorialmodeswitcher",
-      "community": 33,
+      "community": 84,
       "norm_label": "editorialmodeswitcher()"
     },
     {
@@ -4031,7 +4031,7 @@
       "source_file": "src/components/admin/editable-page-header.tsx",
       "source_location": "L1",
       "id": "src_components_admin_editable_page_header_tsx",
-      "community": 36,
+      "community": 32,
       "norm_label": "editable-page-header.tsx"
     },
     {
@@ -4040,7 +4040,7 @@
       "source_file": "src/components/admin/editable-page-header.tsx",
       "source_location": "L12",
       "id": "admin_editable_page_header_editablepageheaderprops",
-      "community": 36,
+      "community": 32,
       "norm_label": "editablepageheaderprops"
     },
     {
@@ -4049,7 +4049,7 @@
       "source_file": "src/components/admin/editable-page-header.tsx",
       "source_location": "L22",
       "id": "admin_editable_page_header_editablepageheader",
-      "community": 50,
+      "community": 32,
       "norm_label": "editablepageheader()"
     },
     {
@@ -4058,7 +4058,7 @@
       "source_file": "src/components/admin/email-tiptap-editor.tsx",
       "source_location": "L1",
       "id": "src_components_admin_email_tiptap_editor_tsx",
-      "community": 36,
+      "community": 79,
       "norm_label": "email-tiptap-editor.tsx"
     },
     {
@@ -4067,7 +4067,7 @@
       "source_file": "src/components/admin/email-tiptap-editor.tsx",
       "source_location": "L43",
       "id": "admin_email_tiptap_editor_emailtiptapeditorprops",
-      "community": 36,
+      "community": 79,
       "norm_label": "emailtiptapeditorprops"
     },
     {
@@ -4076,7 +4076,7 @@
       "source_file": "src/components/admin/email-tiptap-editor.tsx",
       "source_location": "L51",
       "id": "admin_email_tiptap_editor_emailtiptapeditor",
-      "community": 36,
+      "community": 79,
       "norm_label": "emailtiptapeditor()"
     },
     {
@@ -4166,7 +4166,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L1",
       "id": "src_components_admin_mail_config_studio_tsx",
-      "community": 36,
+      "community": 79,
       "norm_label": "mail-config-studio.tsx"
     },
     {
@@ -4175,7 +4175,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L44",
       "id": "admin_mail_config_studio_emailtemplate",
-      "community": 36,
+      "community": 79,
       "norm_label": "emailtemplate"
     },
     {
@@ -4184,7 +4184,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L55",
       "id": "admin_mail_config_studio_emaillog",
-      "community": 36,
+      "community": 79,
       "norm_label": "emaillog"
     },
     {
@@ -4193,7 +4193,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L66",
       "id": "admin_mail_config_studio_pagination",
-      "community": 36,
+      "community": 79,
       "norm_label": "pagination"
     },
     {
@@ -4202,7 +4202,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L73",
       "id": "admin_mail_config_studio_available_tokens",
-      "community": 36,
+      "community": 79,
       "norm_label": "available_tokens"
     },
     {
@@ -4220,7 +4220,7 @@
       "source_file": "src/components/admin/media-uploader.tsx",
       "source_location": "L1",
       "id": "src_components_admin_media_uploader_tsx",
-      "community": 33,
+      "community": 79,
       "norm_label": "media-uploader.tsx"
     },
     {
@@ -4229,7 +4229,7 @@
       "source_file": "src/components/admin/media-uploader.tsx",
       "source_location": "L19",
       "id": "admin_media_uploader_mediauploaderprops",
-      "community": 33,
+      "community": 79,
       "norm_label": "mediauploaderprops"
     },
     {
@@ -4238,7 +4238,7 @@
       "source_file": "src/components/admin/media-uploader.tsx",
       "source_location": "L31",
       "id": "admin_media_uploader_mediauploader",
-      "community": 33,
+      "community": 82,
       "norm_label": "mediauploader()"
     },
     {
@@ -4247,7 +4247,7 @@
       "source_file": "src/components/admin/media-vault-dialog.tsx",
       "source_location": "L1",
       "id": "src_components_admin_media_vault_dialog_tsx",
-      "community": 36,
+      "community": 48,
       "norm_label": "media-vault-dialog.tsx"
     },
     {
@@ -4256,7 +4256,7 @@
       "source_file": "src/components/admin/media-vault-dialog.tsx",
       "source_location": "L18",
       "id": "admin_media_vault_dialog_mediavaultitem",
-      "community": 36,
+      "community": 48,
       "norm_label": "mediavaultitem"
     },
     {
@@ -4265,7 +4265,7 @@
       "source_file": "src/components/admin/media-vault-dialog.tsx",
       "source_location": "L28",
       "id": "admin_media_vault_dialog_mediavaultdialogprops",
-      "community": 36,
+      "community": 48,
       "norm_label": "mediavaultdialogprops"
     },
     {
@@ -4373,7 +4373,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L1",
       "id": "src_components_admin_universal_media_dialog_tsx",
-      "community": 21,
+      "community": 79,
       "norm_label": "universal-media-dialog.tsx"
     },
     {
@@ -4382,7 +4382,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L29",
       "id": "admin_universal_media_dialog_universalmediaitem",
-      "community": 21,
+      "community": 79,
       "norm_label": "universalmediaitem"
     },
     {
@@ -4391,7 +4391,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L42",
       "id": "admin_universal_media_dialog_universalmediadialogprops",
-      "community": 21,
+      "community": 79,
       "norm_label": "universalmediadialogprops"
     },
     {
@@ -4400,7 +4400,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L54",
       "id": "admin_universal_media_dialog_vaultitem",
-      "community": 21,
+      "community": 79,
       "norm_label": "vaultitem"
     },
     {
@@ -4409,7 +4409,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L71",
       "id": "admin_universal_media_dialog_universalmediadialog",
-      "community": 33,
+      "community": 79,
       "norm_label": "universalmediadialog()"
     },
     {
@@ -4418,7 +4418,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L1",
       "id": "src_components_builder_form_block_inspector_tsx",
-      "community": 49,
+      "community": 36,
       "norm_label": "form-block-inspector.tsx"
     },
     {
@@ -4445,7 +4445,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L58",
       "id": "builder_form_block_inspector_formblockinspectorprops",
-      "community": 49,
+      "community": 36,
       "norm_label": "formblockinspectorprops"
     },
     {
@@ -4454,7 +4454,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L63",
       "id": "builder_form_block_inspector_field_type_labels",
-      "community": 49,
+      "community": 36,
       "norm_label": "field_type_labels"
     },
     {
@@ -4544,7 +4544,7 @@
       "source_file": "src/components/builder/page-matrix-studio.tsx",
       "source_location": "L1",
       "id": "src_components_builder_page_matrix_studio_tsx",
-      "community": 21,
+      "community": 44,
       "norm_label": "page-matrix-studio.tsx"
     },
     {
@@ -4571,7 +4571,7 @@
       "source_file": "src/components/builder/page-matrix-studio.tsx",
       "source_location": "L94",
       "id": "builder_page_matrix_studio_pagetemplateitem",
-      "community": 21,
+      "community": 44,
       "norm_label": "pagetemplateitem"
     },
     {
@@ -4580,7 +4580,7 @@
       "source_file": "src/components/builder/page-matrix-studio.tsx",
       "source_location": "L113",
       "id": "builder_page_matrix_studio_pagematrixstudioprops",
-      "community": 1,
+      "community": 44,
       "norm_label": "pagematrixstudioprops"
     },
     {
@@ -4598,7 +4598,7 @@
       "source_file": "src/components/builder/page-matrix-studio.tsx",
       "source_location": "L220",
       "id": "builder_page_matrix_studio_pagematrixstudio",
-      "community": 57,
+      "community": 44,
       "norm_label": "pagematrixstudio()"
     },
     {
@@ -4607,7 +4607,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L1",
       "id": "src_components_builder_style_inspector_tsx",
-      "community": 59,
+      "community": 21,
       "norm_label": "style-inspector.tsx"
     },
     {
@@ -4625,7 +4625,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L78",
       "id": "builder_style_inspector_styleinspectorprops",
-      "community": 59,
+      "community": 21,
       "norm_label": "styleinspectorprops"
     },
     {
@@ -4634,7 +4634,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L84",
       "id": "builder_style_inspector_colorpresets",
-      "community": 59,
+      "community": 21,
       "norm_label": "colorpresets"
     },
     {
@@ -4643,7 +4643,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L95",
       "id": "builder_style_inspector_artisticborderpresets",
-      "community": 59,
+      "community": 21,
       "norm_label": "artisticborderpresets"
     },
     {
@@ -4652,7 +4652,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L103",
       "id": "builder_style_inspector_fontfamilies",
-      "community": 59,
+      "community": 21,
       "norm_label": "fontfamilies"
     },
     {
@@ -4661,7 +4661,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L111",
       "id": "builder_style_inspector_availableicons",
-      "community": 59,
+      "community": 21,
       "norm_label": "availableicons"
     },
     {
@@ -4670,7 +4670,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L125",
       "id": "builder_style_inspector_styleinspector",
-      "community": 59,
+      "community": 44,
       "norm_label": "styleinspector()"
     },
     {
@@ -4679,7 +4679,7 @@
       "source_file": "src/components/builder/timeline-inspector.tsx",
       "source_location": "L1",
       "id": "src_components_builder_timeline_inspector_tsx",
-      "community": 49,
+      "community": 1,
       "norm_label": "timeline-inspector.tsx"
     },
     {
@@ -4697,7 +4697,7 @@
       "source_file": "src/components/builder/timeline-inspector.tsx",
       "source_location": "L64",
       "id": "builder_timeline_inspector_common_timezones",
-      "community": 49,
+      "community": 1,
       "norm_label": "common_timezones"
     },
     {
@@ -4886,7 +4886,7 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L396",
       "id": "builder_tiptap_floating_layer_node_floatinglayernode",
-      "community": 36,
+      "community": 21,
       "norm_label": "floatinglayernode"
     },
     {
@@ -4895,7 +4895,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L1",
       "id": "src_components_builder_tiptap_image_node_tsx",
-      "community": 31,
+      "community": 87,
       "norm_label": "tiptap-image-node.tsx"
     },
     {
@@ -4904,7 +4904,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L21",
       "id": "builder_tiptap_image_node_imagelayoutmode",
-      "community": 31,
+      "community": 87,
       "norm_label": "imagelayoutmode"
     },
     {
@@ -4913,7 +4913,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L22",
       "id": "builder_tiptap_image_node_imageaspectratio",
-      "community": 31,
+      "community": 87,
       "norm_label": "imageaspectratio"
     },
     {
@@ -4922,7 +4922,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L24",
       "id": "builder_tiptap_image_node_customimageattributes",
-      "community": 31,
+      "community": 87,
       "norm_label": "customimageattributes"
     },
     {
@@ -4931,7 +4931,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L34",
       "id": "builder_tiptap_image_node_layout_modes",
-      "community": 31,
+      "community": 87,
       "norm_label": "layout_modes"
     },
     {
@@ -4940,7 +4940,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L42",
       "id": "builder_tiptap_image_node_aspect_ratios",
-      "community": 31,
+      "community": 87,
       "norm_label": "aspect_ratios"
     },
     {
@@ -4949,7 +4949,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L51",
       "id": "builder_tiptap_image_node_imageviewcomponent",
-      "community": 31,
+      "community": 87,
       "norm_label": "imageviewcomponent()"
     },
     {
@@ -4958,7 +4958,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L275",
       "id": "builder_tiptap_image_node_customimagenode",
-      "community": 31,
+      "community": 87,
       "norm_label": "customimagenode"
     },
     {
@@ -5219,7 +5219,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L1",
       "id": "src_components_public_animated_section_tsx",
-      "community": 69,
+      "community": 88,
       "norm_label": "animated-section.tsx"
     },
     {
@@ -5228,7 +5228,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L6",
       "id": "public_animated_section_animatedsectionprops",
-      "community": 69,
+      "community": 88,
       "norm_label": "animatedsectionprops"
     },
     {
@@ -5237,7 +5237,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L12",
       "id": "public_animated_section_animatedsection",
-      "community": 69,
+      "community": 88,
       "norm_label": "animatedsection()"
     },
     {
@@ -5246,7 +5246,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L1",
       "id": "src_components_public_art_canvas_viewer_tsx",
-      "community": 36,
+      "community": 48,
       "norm_label": "art-canvas-viewer.tsx"
     },
     {
@@ -5255,7 +5255,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L15",
       "id": "public_art_canvas_viewer_artcanvasviewerprops",
-      "community": 36,
+      "community": 48,
       "norm_label": "artcanvasviewerprops"
     },
     {
@@ -5264,7 +5264,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L28",
       "id": "public_art_canvas_viewer_artcanvasviewer",
-      "community": 82,
+      "community": 43,
       "norm_label": "artcanvasviewer()"
     },
     {
@@ -5381,7 +5381,7 @@
       "source_file": "src/components/public/catalog-print-button.tsx",
       "source_location": "L1",
       "id": "src_components_public_catalog_print_button_tsx",
-      "community": 4,
+      "community": 57,
       "norm_label": "catalog-print-button.tsx"
     },
     {
@@ -5390,7 +5390,7 @@
       "source_file": "src/components/public/catalog-print-button.tsx",
       "source_location": "L7",
       "id": "public_catalog_print_button_catalogprintbuttonprops",
-      "community": 4,
+      "community": 57,
       "norm_label": "catalogprintbuttonprops"
     },
     {
@@ -5399,7 +5399,7 @@
       "source_file": "src/components/public/catalog-print-button.tsx",
       "source_location": "L11",
       "id": "public_catalog_print_button_catalogprintbutton",
-      "community": 4,
+      "community": 57,
       "norm_label": "catalogprintbutton()"
     },
     {
@@ -5408,7 +5408,7 @@
       "source_file": "src/components/public/catalog-qr-modal.tsx",
       "source_location": "L1",
       "id": "src_components_public_catalog_qr_modal_tsx",
-      "community": 49,
+      "community": 32,
       "norm_label": "catalog-qr-modal.tsx"
     },
     {
@@ -5417,7 +5417,7 @@
       "source_file": "src/components/public/catalog-qr-modal.tsx",
       "source_location": "L14",
       "id": "public_catalog_qr_modal_catalogqrmodalprops",
-      "community": 49,
+      "community": 32,
       "norm_label": "catalogqrmodalprops"
     },
     {
@@ -5426,7 +5426,7 @@
       "source_file": "src/components/public/catalog-qr-modal.tsx",
       "source_location": "L20",
       "id": "public_catalog_qr_modal_catalogqrmodal",
-      "community": 49,
+      "community": 32,
       "norm_label": "catalogqrmodal()"
     },
     {
@@ -5507,7 +5507,7 @@
       "source_file": "src/components/public/dynamic-page-sections.tsx",
       "source_location": "L42",
       "id": "public_dynamic_page_sections_dynamicpagesections",
-      "community": 8,
+      "community": 92,
       "norm_label": "dynamicpagesections()"
     },
     {
@@ -5552,7 +5552,7 @@
       "source_file": "src/components/public/event-rsvp-form.tsx",
       "source_location": "L43",
       "id": "public_event_rsvp_form_eventrsvpform",
-      "community": 79,
+      "community": 59,
       "norm_label": "eventrsvpform()"
     },
     {
@@ -5561,7 +5561,7 @@
       "source_file": "src/components/public/exhibition-qr-modal.tsx",
       "source_location": "L1",
       "id": "src_components_public_exhibition_qr_modal_tsx",
-      "community": 49,
+      "community": 79,
       "norm_label": "exhibition-qr-modal.tsx"
     },
     {
@@ -5570,7 +5570,7 @@
       "source_file": "src/components/public/exhibition-qr-modal.tsx",
       "source_location": "L19",
       "id": "public_exhibition_qr_modal_exhibitionqrmodalprops",
-      "community": 49,
+      "community": 79,
       "norm_label": "exhibitionqrmodalprops"
     },
     {
@@ -5579,7 +5579,7 @@
       "source_file": "src/components/public/exhibition-qr-modal.tsx",
       "source_location": "L24",
       "id": "public_exhibition_qr_modal_exhibitionqrmodal",
-      "community": 82,
+      "community": 43,
       "norm_label": "exhibitionqrmodal()"
     },
     {
@@ -5588,7 +5588,7 @@
       "source_file": "src/components/public/exhibition-simulator-modal.tsx",
       "source_location": "L1",
       "id": "src_components_public_exhibition_simulator_modal_tsx",
-      "community": 18,
+      "community": 43,
       "norm_label": "exhibition-simulator-modal.tsx"
     },
     {
@@ -5597,7 +5597,7 @@
       "source_file": "src/components/public/exhibition-simulator-modal.tsx",
       "source_location": "L9",
       "id": "public_exhibition_simulator_modal_exhibitionsimulatormodalprops",
-      "community": 18,
+      "community": 43,
       "norm_label": "exhibitionsimulatormodalprops"
     },
     {
@@ -5606,7 +5606,7 @@
       "source_file": "src/components/public/exhibition-simulator-modal.tsx",
       "source_location": "L17",
       "id": "public_exhibition_simulator_modal_exhibitionsimulatormodal",
-      "community": 18,
+      "community": 43,
       "norm_label": "exhibitionsimulatormodal()"
     },
     {
@@ -5615,7 +5615,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L1",
       "id": "src_components_public_exhibition_wall_viewer_tsx",
-      "community": 18,
+      "community": 43,
       "norm_label": "exhibition-wall-viewer.tsx"
     },
     {
@@ -5624,7 +5624,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L30",
       "id": "public_exhibition_wall_viewer_wallenvironmentid",
-      "community": 18,
+      "community": 43,
       "norm_label": "wallenvironmentid"
     },
     {
@@ -5633,7 +5633,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L39",
       "id": "public_exhibition_wall_viewer_wallenvironment",
-      "community": 18,
+      "community": 43,
       "norm_label": "wallenvironment"
     },
     {
@@ -5642,7 +5642,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L52",
       "id": "public_exhibition_wall_viewer_wall_environments",
-      "community": 18,
+      "community": 43,
       "norm_label": "wall_environments"
     },
     {
@@ -5651,7 +5651,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L168",
       "id": "public_exhibition_wall_viewer_wallframestyle",
-      "community": 18,
+      "community": 43,
       "norm_label": "wallframestyle"
     },
     {
@@ -5660,7 +5660,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L170",
       "id": "public_exhibition_wall_viewer_wallframeoption",
-      "community": 18,
+      "community": 43,
       "norm_label": "wallframeoption"
     },
     {
@@ -5669,7 +5669,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L179",
       "id": "public_exhibition_wall_viewer_wall_frames",
-      "community": 18,
+      "community": 43,
       "norm_label": "wall_frames"
     },
     {
@@ -5678,7 +5678,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L215",
       "id": "public_exhibition_wall_viewer_mountedartwork",
-      "community": 18,
+      "community": 43,
       "norm_label": "mountedartwork"
     },
     {
@@ -5687,7 +5687,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L226",
       "id": "public_exhibition_wall_viewer_preset_artworks",
-      "community": 18,
+      "community": 43,
       "norm_label": "preset_artworks"
     },
     {
@@ -5696,7 +5696,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L259",
       "id": "public_exhibition_wall_viewer_exhibitionwallviewerprops",
-      "community": 18,
+      "community": 43,
       "norm_label": "exhibitionwallviewerprops"
     },
     {
@@ -5705,7 +5705,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L265",
       "id": "public_exhibition_wall_viewer_exhibitionwallviewer",
-      "community": 18,
+      "community": 43,
       "norm_label": "exhibitionwallviewer()"
     },
     {
@@ -5903,7 +5903,7 @@
       "source_file": "src/components/public/tiptap-renderer.tsx",
       "source_location": "L95",
       "id": "public_tiptap_renderer_sanitizeadaptivethemehtml",
-      "community": 45,
+      "community": 43,
       "norm_label": "sanitizeadaptivethemehtml()"
     },
     {
@@ -5966,7 +5966,7 @@
       "source_file": "src/components/public/tiptap-renderer.tsx",
       "source_location": "L1006",
       "id": "public_tiptap_renderer_tiptaprenderer",
-      "community": 45,
+      "community": 57,
       "norm_label": "tiptaprenderer()"
     },
     {
@@ -6011,7 +6011,7 @@
       "source_file": "src/components/public/blocks/dynamic-form-block.tsx",
       "source_location": "L60",
       "id": "blocks_dynamic_form_block_dynamicformblock",
-      "community": 8,
+      "community": 45,
       "norm_label": "dynamicformblock()"
     },
     {
@@ -6164,7 +6164,7 @@
       "source_file": "src/components/public/blocks/media-gallery-block.tsx",
       "source_location": "L285",
       "id": "blocks_media_gallery_block_mediagalleryblock",
-      "community": 59,
+      "community": 44,
       "norm_label": "mediagalleryblock()"
     },
     {
@@ -6254,7 +6254,7 @@
       "source_file": "src/components/public/blocks/timeline-block.tsx",
       "source_location": "L579",
       "id": "blocks_timeline_block_alternatingtimelinelist",
-      "community": 1,
+      "community": 59,
       "norm_label": "alternatingtimelinelist()"
     },
     {
@@ -6452,7 +6452,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L1",
       "id": "src_components_ui_badge_tsx",
-      "community": 32,
+      "community": 48,
       "norm_label": "badge.tsx"
     },
     {
@@ -6461,7 +6461,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L5",
       "id": "ui_badge_badgevariants",
-      "community": 32,
+      "community": 48,
       "norm_label": "badgevariants"
     },
     {
@@ -6470,7 +6470,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L29",
       "id": "ui_badge_badgeprops",
-      "community": 32,
+      "community": 48,
       "norm_label": "badgeprops"
     },
     {
@@ -6479,7 +6479,7 @@
       "source_file": "src/components/ui/badge.tsx",
       "source_location": "L33",
       "id": "ui_badge_badge",
-      "community": 32,
+      "community": 48,
       "norm_label": "badge()"
     },
     {
@@ -6488,7 +6488,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L1",
       "id": "src_components_ui_button_tsx",
-      "community": 36,
+      "community": 79,
       "norm_label": "button.tsx"
     },
     {
@@ -6497,7 +6497,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L6",
       "id": "ui_button_buttonvariants",
-      "community": 36,
+      "community": 79,
       "norm_label": "buttonvariants"
     },
     {
@@ -6506,7 +6506,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L37",
       "id": "ui_button_buttonprops",
-      "community": 36,
+      "community": 79,
       "norm_label": "buttonprops"
     },
     {
@@ -6515,7 +6515,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L43",
       "id": "ui_button_button",
-      "community": 36,
+      "community": 79,
       "norm_label": "button"
     },
     {
@@ -6578,7 +6578,7 @@
       "source_file": "src/components/ui/card.tsx",
       "source_location": "L66",
       "id": "ui_card_cardfooter",
-      "community": 32,
+      "community": 79,
       "norm_label": "cardfooter"
     },
     {
@@ -6587,7 +6587,7 @@
       "source_file": "src/components/ui/confirm-dialog.tsx",
       "source_location": "L1",
       "id": "src_components_ui_confirm_dialog_tsx",
-      "community": 49,
+      "community": 32,
       "norm_label": "confirm-dialog.tsx"
     },
     {
@@ -6596,7 +6596,7 @@
       "source_file": "src/components/ui/confirm-dialog.tsx",
       "source_location": "L15",
       "id": "ui_confirm_dialog_confirmdialogprops",
-      "community": 49,
+      "community": 32,
       "norm_label": "confirmdialogprops"
     },
     {
@@ -6605,7 +6605,7 @@
       "source_file": "src/components/ui/confirm-dialog.tsx",
       "source_location": "L27",
       "id": "ui_confirm_dialog_confirmdialog",
-      "community": 49,
+      "community": 32,
       "norm_label": "confirmdialog()"
     },
     {
@@ -6614,7 +6614,7 @@
       "source_file": "src/components/ui/dialog.tsx",
       "source_location": "L1",
       "id": "src_components_ui_dialog_tsx",
-      "community": 49,
+      "community": 32,
       "norm_label": "dialog.tsx"
     },
     {
@@ -6623,7 +6623,7 @@
       "source_file": "src/components/ui/dialog.tsx",
       "source_location": "L11",
       "id": "ui_dialog_dialogoverlay",
-      "community": 49,
+      "community": 32,
       "norm_label": "dialogoverlay"
     },
     {
@@ -6632,7 +6632,7 @@
       "source_file": "src/components/ui/dialog.tsx",
       "source_location": "L26",
       "id": "ui_dialog_dialogcontent",
-      "community": 49,
+      "community": 32,
       "norm_label": "dialogcontent"
     },
     {
@@ -6641,7 +6641,7 @@
       "source_file": "src/components/ui/dialog.tsx",
       "source_location": "L50",
       "id": "ui_dialog_dialogheader",
-      "community": 49,
+      "community": 32,
       "norm_label": "dialogheader()"
     },
     {
@@ -6650,7 +6650,7 @@
       "source_file": "src/components/ui/dialog.tsx",
       "source_location": "L64",
       "id": "ui_dialog_dialogfooter",
-      "community": 49,
+      "community": 50,
       "norm_label": "dialogfooter()"
     },
     {
@@ -6659,7 +6659,7 @@
       "source_file": "src/components/ui/dialog.tsx",
       "source_location": "L78",
       "id": "ui_dialog_dialogtitle",
-      "community": 49,
+      "community": 32,
       "norm_label": "dialogtitle"
     },
     {
@@ -6668,7 +6668,7 @@
       "source_file": "src/components/ui/dialog.tsx",
       "source_location": "L93",
       "id": "ui_dialog_dialogdescription",
-      "community": 49,
+      "community": 32,
       "norm_label": "dialogdescription"
     },
     {
@@ -6758,7 +6758,7 @@
       "source_file": "src/components/ui/input.tsx",
       "source_location": "L1",
       "id": "src_components_ui_input_tsx",
-      "community": 33,
+      "community": 79,
       "norm_label": "input.tsx"
     },
     {
@@ -6767,7 +6767,7 @@
       "source_file": "src/components/ui/input.tsx",
       "source_location": "L4",
       "id": "ui_input_input",
-      "community": 33,
+      "community": 79,
       "norm_label": "input"
     },
     {
@@ -6803,7 +6803,7 @@
       "source_file": "src/components/ui/label.tsx",
       "source_location": "L13",
       "id": "ui_label_label",
-      "community": 49,
+      "community": 36,
       "norm_label": "label"
     },
     {
@@ -6902,7 +6902,7 @@
       "source_file": "src/components/ui/separator.tsx",
       "source_location": "L1",
       "id": "src_components_ui_separator_tsx",
-      "community": 59,
+      "community": 21,
       "norm_label": "separator.tsx"
     },
     {
@@ -6911,7 +6911,7 @@
       "source_file": "src/components/ui/separator.tsx",
       "source_location": "L5",
       "id": "ui_separator_separator",
-      "community": 59,
+      "community": 21,
       "norm_label": "separator"
     },
     {
@@ -6992,7 +6992,7 @@
       "source_file": "src/components/ui/sonner.tsx",
       "source_location": "L1",
       "id": "src_components_ui_sonner_tsx",
-      "community": 88,
+      "community": 43,
       "norm_label": "sonner.tsx"
     },
     {
@@ -7001,7 +7001,7 @@
       "source_file": "src/components/ui/sonner.tsx",
       "source_location": "L6",
       "id": "ui_sonner_toaster",
-      "community": 88,
+      "community": 43,
       "norm_label": "toaster()"
     },
     {
@@ -7289,7 +7289,7 @@
       "source_file": "src/lib/auth-client.ts",
       "source_location": "L1",
       "id": "src_lib_auth_client_ts",
-      "community": 32,
+      "community": 50,
       "norm_label": "auth-client.ts"
     },
     {
@@ -7298,7 +7298,7 @@
       "source_file": "src/lib/auth-client.ts",
       "source_location": "L3",
       "id": "lib_auth_client_authclient",
-      "community": 32,
+      "community": 50,
       "norm_label": "authclient"
     },
     {
@@ -7334,7 +7334,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L1",
       "id": "src_lib_background_patterns_ts",
-      "community": 44,
+      "community": 82,
       "norm_label": "background-patterns.ts"
     },
     {
@@ -7343,7 +7343,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L6",
       "id": "lib_background_patterns_backgroundpattern",
-      "community": 44,
+      "community": 82,
       "norm_label": "backgroundpattern"
     },
     {
@@ -7352,7 +7352,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L33",
       "id": "lib_background_patterns_background_patterns",
-      "community": 33,
+      "community": 82,
       "norm_label": "background_patterns"
     },
     {
@@ -7361,7 +7361,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L84",
       "id": "lib_background_patterns_getpatternbyid",
-      "community": 44,
+      "community": 57,
       "norm_label": "getpatternbyid()"
     },
     {
@@ -7370,7 +7370,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L89",
       "id": "lib_background_patterns_getpatternstyle",
-      "community": 44,
+      "community": 82,
       "norm_label": "getpatternstyle()"
     },
     {
@@ -7397,7 +7397,7 @@
       "source_file": "src/lib/catalog-editor-context.tsx",
       "source_location": "L14",
       "id": "lib_catalog_editor_context_usecatalogeditorcontext",
-      "community": 31,
+      "community": 87,
       "norm_label": "usecatalogeditorcontext()"
     },
     {
@@ -7469,7 +7469,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L106",
       "id": "lib_catalog_geometry_getcatalogdimensions",
-      "community": 45,
+      "community": 57,
       "norm_label": "getcatalogdimensions()"
     },
     {
@@ -7523,7 +7523,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L1",
       "id": "src_lib_email_service_ts",
-      "community": 51,
+      "community": 34,
       "norm_label": "email-service.ts"
     },
     {
@@ -7532,7 +7532,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L6",
       "id": "lib_email_service_emaildispatchoptions",
-      "community": 51,
+      "community": 34,
       "norm_label": "emaildispatchoptions"
     },
     {
@@ -7550,7 +7550,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L122",
       "id": "lib_email_service_interpolatetokens",
-      "community": 51,
+      "community": 34,
       "norm_label": "interpolatetokens()"
     },
     {
@@ -7559,7 +7559,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L138",
       "id": "lib_email_service_getbaseappurl",
-      "community": 51,
+      "community": 34,
       "norm_label": "getbaseappurl()"
     },
     {
@@ -7568,7 +7568,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L159",
       "id": "lib_email_service_resolveabsolutelogourl",
-      "community": 51,
+      "community": 34,
       "norm_label": "resolveabsolutelogourl()"
     },
     {
@@ -7577,7 +7577,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L174",
       "id": "lib_email_service_getabsoluteasseturl",
-      "community": 51,
+      "community": 34,
       "norm_label": "getabsoluteasseturl()"
     },
     {
@@ -7586,7 +7586,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L178",
       "id": "lib_email_service_emaillogoattachment",
-      "community": 51,
+      "community": 34,
       "norm_label": "emaillogoattachment"
     },
     {
@@ -7595,7 +7595,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L185",
       "id": "lib_email_service_resolvedemaillogoresult",
-      "community": 51,
+      "community": 34,
       "norm_label": "resolvedemaillogoresult"
     },
     {
@@ -7604,7 +7604,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L196",
       "id": "lib_email_service_resolveemaillogoandattachments",
-      "community": 51,
+      "community": 34,
       "norm_label": "resolveemaillogoandattachments()"
     },
     {
@@ -7613,7 +7613,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L259",
       "id": "lib_email_service_wrapbrandedemailhtml",
-      "community": 51,
+      "community": 34,
       "norm_label": "wrapbrandedemailhtml()"
     },
     {
@@ -7622,7 +7622,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L310",
       "id": "lib_email_service_gettransporter",
-      "community": 51,
+      "community": 34,
       "norm_label": "gettransporter()"
     },
     {
@@ -7631,7 +7631,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L347",
       "id": "lib_email_service_sendatelieremail",
-      "community": 51,
+      "community": 34,
       "norm_label": "sendatelieremail()"
     },
     {
@@ -7640,7 +7640,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L1",
       "id": "src_lib_formatters_ts",
-      "community": 79,
+      "community": 59,
       "norm_label": "formatters.ts"
     },
     {
@@ -7658,7 +7658,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L17",
       "id": "lib_formatters_supportedcurrency",
-      "community": 79,
+      "community": 59,
       "norm_label": "supportedcurrency"
     },
     {
@@ -7667,7 +7667,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L22",
       "id": "lib_formatters_formatcurrency",
-      "community": 79,
+      "community": 43,
       "norm_label": "formatcurrency()"
     },
     {
@@ -7676,7 +7676,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L78",
       "id": "lib_formatters_getordinalsuffix",
-      "community": 79,
+      "community": 59,
       "norm_label": "getordinalsuffix()"
     },
     {
@@ -7685,7 +7685,7 @@
       "source_file": "src/lib/formatters.ts",
       "source_location": "L96",
       "id": "lib_formatters_formatlocalizeddatetime",
-      "community": 79,
+      "community": 59,
       "norm_label": "formatlocalizeddatetime()"
     },
     {
@@ -7793,7 +7793,7 @@
       "source_file": "src/lib/geo-timezone.ts",
       "source_location": "L422",
       "id": "lib_geo_timezone_formateventschedule",
-      "community": 79,
+      "community": 59,
       "norm_label": "formateventschedule()"
     },
     {
@@ -7802,7 +7802,7 @@
       "source_file": "src/lib/get-base-url-client.ts",
       "source_location": "L1",
       "id": "src_lib_get_base_url_client_ts",
-      "community": 48,
+      "community": 43,
       "norm_label": "get-base-url-client.ts"
     },
     {
@@ -7811,7 +7811,7 @@
       "source_file": "src/lib/get-base-url-client.ts",
       "source_location": "L5",
       "id": "lib_get_base_url_client_getclientbaseurl",
-      "community": 48,
+      "community": 43,
       "norm_label": "getclientbaseurl()"
     },
     {
@@ -7910,7 +7910,7 @@
       "source_file": "src/lib/prisma.ts",
       "source_location": "L1",
       "id": "src_lib_prisma_ts",
-      "community": 29,
+      "community": 18,
       "norm_label": "prisma.ts"
     },
     {
@@ -7919,7 +7919,7 @@
       "source_file": "src/lib/prisma.ts",
       "source_location": "L3",
       "id": "lib_prisma_globalforprisma",
-      "community": 29,
+      "community": 18,
       "norm_label": "globalforprisma"
     },
     {
@@ -7928,7 +7928,7 @@
       "source_file": "src/lib/prisma.ts",
       "source_location": "L5",
       "id": "lib_prisma_getdatabaseurl",
-      "community": 29,
+      "community": 18,
       "norm_label": "getdatabaseurl()"
     },
     {
@@ -8351,7 +8351,7 @@
       "source_file": "src/lib/theme-contrast.ts",
       "source_location": "L156",
       "id": "lib_theme_contrast_contrastmode",
-      "community": 1,
+      "community": 44,
       "norm_label": "contrastmode"
     },
     {
@@ -8396,7 +8396,7 @@
       "source_file": "src/lib/theme-contrast.ts",
       "source_location": "L291",
       "id": "lib_theme_contrast_getcontrasttypographyclasses",
-      "community": 44,
+      "community": 57,
       "norm_label": "getcontrasttypographyclasses()"
     },
     {
@@ -8531,7 +8531,7 @@
       "source_file": "src/types/catalog.ts",
       "source_location": "L36",
       "id": "types_catalog_universalpageconfig",
-      "community": 47,
+      "community": 33,
       "norm_label": "universalpageconfig"
     },
     {
@@ -8576,7 +8576,7 @@
       "source_file": "src/types/catalog.ts",
       "source_location": "L121",
       "id": "types_catalog_ecatalogthemetokens",
-      "community": 4,
+      "community": 33,
       "norm_label": "ecatalogthemetokens"
     },
     {
@@ -8742,10 +8742,19 @@
       "norm_label": "3. universal autonomous agent lifecycle & quality gates"
     },
     {
-      "label": "Step 1: Local-First Validation (Zero Remote Regressions)",
+      "label": "Step 0: Knowledge Graph First Invariant (Mandatory Pre-Task Inspection)",
       "file_type": "document",
       "source_file": "AGENTS.md",
       "source_location": "L50",
+      "id": "lalitakapilavai_agents_step_0_knowledge_graph_first_invariant_mandatory_pre_task_inspection",
+      "community": 9,
+      "norm_label": "step 0: knowledge graph first invariant (mandatory pre-task inspection)"
+    },
+    {
+      "label": "Step 1: Local-First Validation (Zero Remote Regressions)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L55",
       "id": "lalitakapilavai_agents_step_1_local_first_validation_zero_remote_regressions",
       "community": 9,
       "norm_label": "step 1: local-first validation (zero remote regressions)"
@@ -8754,7 +8763,7 @@
       "label": "code:bash (# 1. Regenerate database client)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L52",
+      "source_location": "L57",
       "id": "lalitakapilavai_agents_codeblock_1",
       "community": 9,
       "norm_label": "code:bash (# 1. regenerate database client)"
@@ -8763,7 +8772,7 @@
       "label": "Step 2: Container Environment Validation",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L66",
+      "source_location": "L71",
       "id": "lalitakapilavai_agents_step_2_container_environment_validation",
       "community": 9,
       "norm_label": "step 2: container environment validation"
@@ -8772,25 +8781,25 @@
       "label": "code:bash (docker compose -f docker-compose.dev.yml up -d)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L68",
+      "source_location": "L73",
       "id": "lalitakapilavai_agents_codeblock_2",
       "community": 9,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml up -d)"
     },
     {
-      "label": "Step 3: Knowledge Graph Synchronization",
+      "label": "Step 3: Knowledge Graph Synchronization (Mandatory Post-Workflow Sync)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L74",
-      "id": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization",
+      "source_location": "L79",
+      "id": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization_mandatory_post_workflow_sync",
       "community": 9,
-      "norm_label": "step 3: knowledge graph synchronization"
+      "norm_label": "step 3: knowledge graph synchronization (mandatory post-workflow sync)"
     },
     {
       "label": "code:bash (graphify update .)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L76",
+      "source_location": "L81",
       "id": "lalitakapilavai_agents_codeblock_3",
       "community": 9,
       "norm_label": "code:bash (graphify update .)"
@@ -8799,7 +8808,7 @@
       "label": "Step 4: Persistent DevPlans Archiving Rule",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L80",
+      "source_location": "L86",
       "id": "lalitakapilavai_agents_step_4_persistent_devplans_archiving_rule",
       "community": 9,
       "norm_label": "step 4: persistent devplans archiving rule"
@@ -8808,7 +8817,7 @@
       "label": "Step 5: Git Commit & Remote Deployment Pipeline",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L87",
+      "source_location": "L93",
       "id": "lalitakapilavai_agents_step_5_git_commit_remote_deployment_pipeline",
       "community": 9,
       "norm_label": "step 5: git commit & remote deployment pipeline"
@@ -8817,7 +8826,7 @@
       "label": "code:bash (git add .)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L89",
+      "source_location": "L95",
       "id": "lalitakapilavai_agents_codeblock_4",
       "community": 9,
       "norm_label": "code:bash (git add .)"
@@ -8826,7 +8835,7 @@
       "label": "4. Living Document Governance Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L98",
+      "source_location": "L104",
       "id": "lalitakapilavai_agents_4_living_document_governance_invariant",
       "community": 9,
       "norm_label": "4. living document governance invariant"
@@ -8835,7 +8844,7 @@
       "label": "5. Enterprise Skill Manuals (`.skills/`)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L111",
+      "source_location": "L117",
       "id": "lalitakapilavai_agents_5_enterprise_skill_manuals_skills",
       "community": 9,
       "norm_label": "5. enterprise skill manuals (`.skills/`)"
@@ -8844,7 +8853,7 @@
       "label": "6. Architectural Invariants & Specialized Core Engines",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L123",
+      "source_location": "L129",
       "id": "lalitakapilavai_agents_6_architectural_invariants_specialized_core_engines",
       "community": 9,
       "norm_label": "6. architectural invariants & specialized core engines"
@@ -8853,7 +8862,7 @@
       "label": "A. Physical Placard Print Engine (Isolated Iframe Driver)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L125",
+      "source_location": "L131",
       "id": "lalitakapilavai_agents_a_physical_placard_print_engine_isolated_iframe_driver",
       "community": 9,
       "norm_label": "a. physical placard print engine (isolated iframe driver)"
@@ -8862,7 +8871,7 @@
       "label": "B. 3D WebGL Exhibition Salon Wall Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L137",
+      "source_location": "L143",
       "id": "lalitakapilavai_agents_b_3d_webgl_exhibition_salon_wall_engine",
       "community": 9,
       "norm_label": "b. 3d webgl exhibition salon wall engine"
@@ -8871,7 +8880,7 @@
       "label": "C. Universal Email Notification & Form Dispatch Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L150",
+      "source_location": "L156",
       "id": "lalitakapilavai_agents_c_universal_email_notification_form_dispatch_engine",
       "community": 9,
       "norm_label": "c. universal email notification & form dispatch engine"
@@ -8880,7 +8889,7 @@
       "label": "D. Strict Binary Theme & Contrast Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L159",
+      "source_location": "L165",
       "id": "lalitakapilavai_agents_d_strict_binary_theme_contrast_invariant",
       "community": 9,
       "norm_label": "d. strict binary theme & contrast invariant"
@@ -8934,7 +8943,7 @@
       "label": "2. Technology Stack & Modern Architectural Standards",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L21",
+      "source_location": "L23",
       "id": "lalitakapilavai_readme_2_technology_stack_modern_architectural_standards",
       "community": 40,
       "norm_label": "2. technology stack & modern architectural standards"
@@ -8943,61 +8952,142 @@
       "label": "3. High-Level Modular Architecture",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L40",
+      "source_location": "L42",
       "id": "lalitakapilavai_readme_3_high_level_modular_architecture",
-      "community": 40,
+      "community": 3,
       "norm_label": "3. high-level modular architecture"
     },
     {
       "label": "code:block1 (SavazAI WebApps Platform)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L42",
+      "source_location": "L44",
       "id": "lalitakapilavai_readme_codeblock_1",
-      "community": 40,
+      "community": 3,
       "norm_label": "code:block1 (savazai webapps platform)"
     },
     {
-      "label": "4. Key Platform Features & Engines",
+      "label": "4. Full Platform Feature & Engine Catalog",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L70",
-      "id": "lalitakapilavai_readme_4_key_platform_features_engines",
-      "community": 40,
-      "norm_label": "4. key platform features & engines"
+      "source_location": "L97",
+      "id": "lalitakapilavai_readme_4_full_platform_feature_engine_catalog",
+      "community": 49,
+      "norm_label": "4. full platform feature & engine catalog"
     },
     {
-      "label": "A. 3D WebGL Exhibition Salon Wall",
+      "label": "A. Public Web Experiences",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L72",
-      "id": "lalitakapilavai_readme_a_3d_webgl_exhibition_salon_wall",
-      "community": 40,
-      "norm_label": "a. 3d webgl exhibition salon wall"
+      "source_location": "L99",
+      "id": "lalitakapilavai_readme_a_public_web_experiences",
+      "community": 49,
+      "norm_label": "a. public web experiences"
     },
     {
-      "label": "B. Physical Gallery Placard & Label Generator",
+      "label": "B. Admin Control Center (10 Core Operational Modules)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L77",
-      "id": "lalitakapilavai_readme_b_physical_gallery_placard_label_generator",
-      "community": 40,
-      "norm_label": "b. physical gallery placard & label generator"
+      "source_location": "L127",
+      "id": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "community": 49,
+      "norm_label": "b. admin control center (10 core operational modules)"
     },
     {
-      "label": "C. Dynamic Mail Message Studio & Dispatch Engine",
+      "label": "1. Artwork Vault & Catalog Manager (`/admin/artworks`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L83",
-      "id": "lalitakapilavai_readme_c_dynamic_mail_message_studio_dispatch_engine",
-      "community": 40,
-      "norm_label": "c. dynamic mail message studio & dispatch engine"
+      "source_location": "L129",
+      "id": "lalitakapilavai_readme_1_artwork_vault_catalog_manager_admin_artworks",
+      "community": 49,
+      "norm_label": "1. artwork vault & catalog manager (`/admin/artworks`)"
+    },
+    {
+      "label": "2. Museum Placard Print Studio (`src/lib/print-isolated-html.ts`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L135",
+      "id": "lalitakapilavai_readme_2_museum_placard_print_studio_src_lib_print_isolated_html_ts",
+      "community": 49,
+      "norm_label": "2. museum placard print studio (`src/lib/print-isolated-html.ts`)"
+    },
+    {
+      "label": "3. Visual Drag-and-Drop Page Builder (`/admin/pages/[id]/builder`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L142",
+      "id": "lalitakapilavai_readme_3_visual_drag_and_drop_page_builder_admin_pages_id_builder",
+      "community": 49,
+      "norm_label": "3. visual drag-and-drop page builder (`/admin/pages/[id]/builder`)"
+    },
+    {
+      "label": "4. Interactive e-Catalog Studio (`/admin/catalogs`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L147",
+      "id": "lalitakapilavai_readme_4_interactive_e_catalog_studio_admin_catalogs",
+      "community": 49,
+      "norm_label": "4. interactive e-catalog studio (`/admin/catalogs`)"
+    },
+    {
+      "label": "5. Events & Concerts Studio (`/admin/events`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L152",
+      "id": "lalitakapilavai_readme_5_events_concerts_studio_admin_events",
+      "community": 49,
+      "norm_label": "5. events & concerts studio (`/admin/events`)"
+    },
+    {
+      "label": "6. Dynamic Mail Message Studio & Audit Telemetry (`/admin/settings` -> Mail Msg Config)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L157",
+      "id": "lalitakapilavai_readme_6_dynamic_mail_message_studio_audit_telemetry_admin_settings_mail_msg_config",
+      "community": 49,
+      "norm_label": "6. dynamic mail message studio & audit telemetry (`/admin/settings` -> mail msg config)"
+    },
+    {
+      "label": "7. Unified CRM Leads & Acquisition Inbox (`/admin/leads`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L164",
+      "id": "lalitakapilavai_readme_7_unified_crm_leads_acquisition_inbox_admin_leads",
+      "community": 49,
+      "norm_label": "7. unified crm leads & acquisition inbox (`/admin/leads`)"
+    },
+    {
+      "label": "8. Curatorial Posts & Blog Publisher (`/admin/posts`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L169",
+      "id": "lalitakapilavai_readme_8_curatorial_posts_blog_publisher_admin_posts",
+      "community": 49,
+      "norm_label": "8. curatorial posts & blog publisher (`/admin/posts`)"
+    },
+    {
+      "label": "9. White-Label Theme & System Studio (`/admin/settings`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L173",
+      "id": "lalitakapilavai_readme_9_white_label_theme_system_studio_admin_settings",
+      "community": 49,
+      "norm_label": "9. white-label theme & system studio (`/admin/settings`)"
+    },
+    {
+      "label": "10. Security, Better-Auth RBAC & User Administration (`/admin/users`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L179",
+      "id": "lalitakapilavai_readme_10_security_better_auth_rbac_user_administration_admin_users",
+      "community": 49,
+      "norm_label": "10. security, better-auth rbac & user administration (`/admin/users`)"
     },
     {
       "label": "5. Quickstart & Local Development",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L92",
+      "source_location": "L186",
       "id": "lalitakapilavai_readme_5_quickstart_local_development",
       "community": 3,
       "norm_label": "5. quickstart & local development"
@@ -9006,7 +9096,7 @@
       "label": "Prerequisites",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L94",
+      "source_location": "L188",
       "id": "lalitakapilavai_readme_prerequisites",
       "community": 3,
       "norm_label": "prerequisites"
@@ -9015,7 +9105,7 @@
       "label": "Step 1: Clone and Configure Environment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L99",
+      "source_location": "L193",
       "id": "lalitakapilavai_readme_step_1_clone_and_configure_environment",
       "community": 3,
       "norm_label": "step 1: clone and configure environment"
@@ -9024,7 +9114,7 @@
       "label": "code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L100",
+      "source_location": "L194",
       "id": "lalitakapilavai_readme_codeblock_2",
       "community": 3,
       "norm_label": "code:bash (git clone https://github.com/savazar01/lalitakapilavai.git)"
@@ -9033,7 +9123,7 @@
       "label": "Step 2: Launch Local Multi-Container Stack",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L106",
+      "source_location": "L200",
       "id": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
       "community": 3,
       "norm_label": "step 2: launch local multi-container stack"
@@ -9042,7 +9132,7 @@
       "label": "code:bash (docker compose -f docker-compose.dev.yml up -d)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L108",
+      "source_location": "L202",
       "id": "lalitakapilavai_readme_codeblock_3",
       "community": 3,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml up -d)"
@@ -9051,7 +9141,7 @@
       "label": "code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L113",
+      "source_location": "L207",
       "id": "lalitakapilavai_readme_codeblock_4",
       "community": 3,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p)"
@@ -9060,7 +9150,7 @@
       "label": "Step 3: Initialize Database & Run Idempotent Seed",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L117",
+      "source_location": "L211",
       "id": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed",
       "community": 3,
       "norm_label": "step 3: initialize database & run idempotent seed"
@@ -9069,7 +9159,7 @@
       "label": "code:bash (npx prisma generate)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L118",
+      "source_location": "L212",
       "id": "lalitakapilavai_readme_codeblock_5",
       "community": 3,
       "norm_label": "code:bash (npx prisma generate)"
@@ -9078,7 +9168,7 @@
       "label": "Step 4: Access Endpoints",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L124",
+      "source_location": "L218",
       "id": "lalitakapilavai_readme_step_4_access_endpoints",
       "community": 3,
       "norm_label": "step 4: access endpoints"
@@ -9087,7 +9177,7 @@
       "label": "6. Zero-Touch Coolify VPS Deployment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L132",
+      "source_location": "L226",
       "id": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment",
       "community": 40,
       "norm_label": "6. zero-touch coolify vps deployment"
@@ -9096,7 +9186,7 @@
       "label": "Deployment Runbook",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L136",
+      "source_location": "L230",
       "id": "lalitakapilavai_readme_deployment_runbook",
       "community": 40,
       "norm_label": "deployment runbook"
@@ -9105,7 +9195,7 @@
       "label": "7. Production Environment Variables Template",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L152",
+      "source_location": "L247",
       "id": "lalitakapilavai_readme_7_production_environment_variables_template",
       "community": 80,
       "norm_label": "7. production environment variables template"
@@ -9114,7 +9204,7 @@
       "label": "code:bash (# ==========================================================)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L154",
+      "source_location": "L249",
       "id": "lalitakapilavai_readme_codeblock_6",
       "community": 80,
       "norm_label": "code:bash (# ==========================================================)"
@@ -9123,7 +9213,7 @@
       "label": "8. Architectural Documentation & Living Governance",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L193",
+      "source_location": "L288",
       "id": "lalitakapilavai_readme_8_architectural_documentation_living_governance",
       "community": 40,
       "norm_label": "8. architectural documentation & living governance"
@@ -9831,13 +9921,13 @@
       "norm_label": "cloudflare-security.md"
     },
     {
-      "label": "Skill: Cloudflare Edge Security, WAF & R2 Media Protection",
+      "label": "Skill: Cloudflare Edge Security, WAF & R2 Media Vault Protection",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
       "source_location": "L1",
-      "id": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
+      "id": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_vault_protection",
       "community": 10,
-      "norm_label": "skill: cloudflare edge security, waf & r2 media protection"
+      "norm_label": "skill: cloudflare edge security, waf & r2 media vault protection"
     },
     {
       "label": "1. Security Architecture Overview",
@@ -9849,37 +9939,37 @@
       "norm_label": "1. security architecture overview"
     },
     {
-      "label": "2. Content Security Policy (CSP) Configuration",
+      "label": "2. Content Security Policy (CSP) Directives",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
       "source_location": "L8",
-      "id": "skills_cloudflare_security_2_content_security_policy_csp_configuration",
+      "id": "skills_cloudflare_security_2_content_security_policy_csp_directives",
       "community": 10,
-      "norm_label": "2. content security policy (csp) configuration"
+      "norm_label": "2. content security policy (csp) directives"
     },
     {
-      "label": "code:typescript (const cspHeader = `)",
+      "label": "code:typescript (export const cspHeader = `)",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
       "source_location": "L11",
       "id": "skills_cloudflare_security_codeblock_1",
       "community": 10,
-      "norm_label": "code:typescript (const cspheader = `)"
+      "norm_label": "code:typescript (export const cspheader = `)"
     },
     {
-      "label": "3. Cloudflare WAF & Edge Rate Limiting Rules",
+      "label": "3. Cloudflare WAF & Edge Rate Limiting Policies",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L30",
-      "id": "skills_cloudflare_security_3_cloudflare_waf_edge_rate_limiting_rules",
+      "source_location": "L31",
+      "id": "skills_cloudflare_security_3_cloudflare_waf_edge_rate_limiting_policies",
       "community": 10,
-      "norm_label": "3. cloudflare waf & edge rate limiting rules"
+      "norm_label": "3. cloudflare waf & edge rate limiting policies"
     },
     {
       "label": "Edge Rate Limiting Policies",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L32",
+      "source_location": "L33",
       "id": "skills_cloudflare_security_edge_rate_limiting_policies",
       "community": 10,
       "norm_label": "edge rate limiting policies"
@@ -9888,25 +9978,25 @@
       "label": "WAF Managed Rulesets",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L40",
+      "source_location": "L42",
       "id": "skills_cloudflare_security_waf_managed_rulesets",
       "community": 10,
       "norm_label": "waf managed rulesets"
     },
     {
-      "label": "4. Cloudflare R2 Media Security & Storage Headers",
+      "label": "4. Multi-Tenant Media Vault & Storage Headers",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L47",
-      "id": "skills_cloudflare_security_4_cloudflare_r2_media_security_storage_headers",
+      "source_location": "L49",
+      "id": "skills_cloudflare_security_4_multi_tenant_media_vault_storage_headers",
       "community": 10,
-      "norm_label": "4. cloudflare r2 media security & storage headers"
+      "norm_label": "4. multi-tenant media vault & storage headers"
     },
     {
       "label": "Bucket Access Policy",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L49",
+      "source_location": "L51",
       "id": "skills_cloudflare_security_bucket_access_policy",
       "community": 10,
       "norm_label": "bucket access policy"
@@ -9915,7 +10005,7 @@
       "label": "code:typescript (import { S3Client, GetObjectCommand } from \"@aws-sdk/client-)",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L52",
+      "source_location": "L54",
       "id": "skills_cloudflare_security_codeblock_2",
       "community": 10,
       "norm_label": "code:typescript (import { s3client, getobjectcommand } from \"@aws-sdk/client-)"
@@ -9924,7 +10014,7 @@
       "label": "HTTP Headers for Public Media Delivery",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L75",
+      "source_location": "L77",
       "id": "skills_cloudflare_security_http_headers_for_public_media_delivery",
       "community": 10,
       "norm_label": "http headers for public media delivery"
@@ -9933,7 +10023,7 @@
       "label": "code:http (Cache-Control: public, max-age=31536000, immutable)",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L77",
+      "source_location": "L79",
       "id": "skills_cloudflare_security_codeblock_3",
       "community": 10,
       "norm_label": "code:http (cache-control: public, max-age=31536000, immutable)"
@@ -9942,7 +10032,7 @@
       "label": "5. Deployment Hardening Checklist",
       "file_type": "document",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L86",
+      "source_location": "L88",
       "id": "skills_cloudflare_security_5_deployment_hardening_checklist",
       "community": 10,
       "norm_label": "5. deployment hardening checklist"
@@ -9975,19 +10065,46 @@
       "norm_label": "1. scope & domain context"
     },
     {
-      "label": "2. Cultural & Domain Entity Relationship Graph",
+      "label": "2. Mandatory Agent Operating Protocol (Knowledge Graph First Invariant)",
       "file_type": "document",
       "source_file": ".skills/graphify.md",
       "source_location": "L10",
-      "id": "skills_graphify_2_cultural_domain_entity_relationship_graph",
+      "id": "skills_graphify_2_mandatory_agent_operating_protocol_knowledge_graph_first_invariant",
       "community": 14,
-      "norm_label": "2. cultural & domain entity relationship graph"
+      "norm_label": "2. mandatory agent operating protocol (knowledge graph first invariant)"
+    },
+    {
+      "label": "Phase 1: Pre-Modification Inspection (Mandatory)",
+      "file_type": "document",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L13",
+      "id": "skills_graphify_phase_1_pre_modification_inspection_mandatory",
+      "community": 14,
+      "norm_label": "phase 1: pre-modification inspection (mandatory)"
+    },
+    {
+      "label": "Phase 2: Post-Workflow Synchronization (Non-Negotiable)",
+      "file_type": "document",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L18",
+      "id": "skills_graphify_phase_2_post_workflow_synchronization_non_negotiable",
+      "community": 14,
+      "norm_label": "phase 2: post-workflow synchronization (non-negotiable)"
+    },
+    {
+      "label": "3. Cultural & Domain Entity Relationship Graph",
+      "file_type": "document",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L25",
+      "id": "skills_graphify_3_cultural_domain_entity_relationship_graph",
+      "community": 14,
+      "norm_label": "3. cultural & domain entity relationship graph"
     },
     {
       "label": "code:mermaid (graph TD)",
       "file_type": "document",
       "source_file": ".skills/graphify.md",
-      "source_location": "L12",
+      "source_location": "L27",
       "id": "skills_graphify_codeblock_1",
       "community": 14,
       "norm_label": "code:mermaid (graph td)"
@@ -9996,43 +10113,43 @@
       "label": "Relational Topology",
       "file_type": "document",
       "source_file": ".skills/graphify.md",
-      "source_location": "L35",
+      "source_location": "L50",
       "id": "skills_graphify_relational_topology",
       "community": 14,
       "norm_label": "relational topology"
     },
     {
-      "label": "3. Hybrid Relational + pgvector Semantic Search",
+      "label": "4. Hybrid Relational + pgvector Semantic Search",
       "file_type": "document",
       "source_file": ".skills/graphify.md",
-      "source_location": "L44",
-      "id": "skills_graphify_3_hybrid_relational_pgvector_semantic_search",
+      "source_location": "L59",
+      "id": "skills_graphify_4_hybrid_relational_pgvector_semantic_search",
       "community": 14,
-      "norm_label": "3. hybrid relational + pgvector semantic search"
+      "norm_label": "4. hybrid relational + pgvector semantic search"
     },
     {
       "label": "code:sql (-- Find artworks aesthetically and thematically closest to a)",
       "file_type": "document",
       "source_file": ".skills/graphify.md",
-      "source_location": "L47",
+      "source_location": "L62",
       "id": "skills_graphify_codeblock_2",
       "community": 14,
       "norm_label": "code:sql (-- find artworks aesthetically and thematically closest to a)"
     },
     {
-      "label": "4. Codebase Architecture Graph",
+      "label": "5. Codebase Architecture Graph",
       "file_type": "document",
       "source_file": ".skills/graphify.md",
-      "source_location": "L64",
-      "id": "skills_graphify_4_codebase_architecture_graph",
+      "source_location": "L79",
+      "id": "skills_graphify_5_codebase_architecture_graph",
       "community": 14,
-      "norm_label": "4. codebase architecture graph"
+      "norm_label": "5. codebase architecture graph"
     },
     {
       "label": "code:mermaid (graph LR)",
       "file_type": "document",
       "source_file": ".skills/graphify.md",
-      "source_location": "L66",
+      "source_location": "L81",
       "id": "skills_graphify_codeblock_3",
       "community": 14,
       "norm_label": "code:mermaid (graph lr)"
@@ -10065,82 +10182,91 @@
       "norm_label": "1. scope & strategy"
     },
     {
-      "label": "2. Test Suite Specifications",
-      "file_type": "document",
-      "source_file": ".skills/playwright.md",
-      "source_location": "L12",
-      "id": "skills_playwright_2_test_suite_specifications",
-      "community": 11,
-      "norm_label": "2. test suite specifications"
-    },
-    {
-      "label": "Test Suite 1: Authentication & Admin Portal (`tests/e2e/auth.spec.ts`)",
+      "label": "2. Test Configuration & Environment Standards",
       "file_type": "document",
       "source_file": ".skills/playwright.md",
       "source_location": "L14",
-      "id": "skills_playwright_test_suite_1_authentication_admin_portal_tests_e2e_auth_spec_ts",
+      "id": "skills_playwright_2_test_configuration_environment_standards",
       "community": 11,
-      "norm_label": "test suite 1: authentication & admin portal (`tests/e2e/auth.spec.ts`)"
+      "norm_label": "2. test configuration & environment standards"
+    },
+    {
+      "label": "3. Test Suite Specifications",
+      "file_type": "document",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L23",
+      "id": "skills_playwright_3_test_suite_specifications",
+      "community": 11,
+      "norm_label": "3. test suite specifications"
+    },
+    {
+      "label": "Test Suite 1: Authentication & Admin RBAC (`tests/e2e/auth.spec.ts`)",
+      "file_type": "document",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L25",
+      "id": "skills_playwright_test_suite_1_authentication_admin_rbac_tests_e2e_auth_spec_ts",
+      "community": 11,
+      "norm_label": "test suite 1: authentication & admin rbac (`tests/e2e/auth.spec.ts`)"
     },
     {
       "label": "code:typescript (import { test, expect } from \"@playwright/test\";)",
       "file_type": "document",
       "source_file": ".skills/playwright.md",
-      "source_location": "L20",
+      "source_location": "L26",
       "id": "skills_playwright_codeblock_1",
       "community": 11,
       "norm_label": "code:typescript (import { test, expect } from \"@playwright/test\";)"
     },
     {
-      "label": "Test Suite 2: Visual Layout & Audio Synesthesia (`tests/e2e/gallery.spec.ts`)",
+      "label": "Test Suite 2: 3D WebGL Exhibition Salon Corridor (`tests/e2e/exhibition-corridor.spec.ts`)",
       "file_type": "document",
       "source_file": ".skills/playwright.md",
-      "source_location": "L43",
-      "id": "skills_playwright_test_suite_2_visual_layout_audio_synesthesia_tests_e2e_gallery_spec_ts",
+      "source_location": "L57",
+      "id": "skills_playwright_test_suite_2_3d_webgl_exhibition_salon_corridor_tests_e2e_exhibition_corridor_spec_ts",
       "community": 11,
-      "norm_label": "test suite 2: visual layout & audio synesthesia (`tests/e2e/gallery.spec.ts`)"
+      "norm_label": "test suite 2: 3d webgl exhibition salon corridor (`tests/e2e/exhibition-corridor.spec.ts`)"
     },
     {
       "label": "code:typescript (import { test, expect } from \"@playwright/test\";)",
       "file_type": "document",
       "source_file": ".skills/playwright.md",
-      "source_location": "L48",
+      "source_location": "L58",
       "id": "skills_playwright_codeblock_2",
       "community": 11,
       "norm_label": "code:typescript (import { test, expect } from \"@playwright/test\";)"
     },
     {
-      "label": "Test Suite 3: Image Watermarking & Dynamic Protection (`tests/e2e/media-protection.spec.ts`)",
+      "label": "Test Suite 3: Museum Placard Print Subsystem (`tests/e2e/placard-print.spec.ts`)",
       "file_type": "document",
       "source_file": ".skills/playwright.md",
-      "source_location": "L73",
-      "id": "skills_playwright_test_suite_3_image_watermarking_dynamic_protection_tests_e2e_media_protection_spec_ts",
+      "source_location": "L87",
+      "id": "skills_playwright_test_suite_3_museum_placard_print_subsystem_tests_e2e_placard_print_spec_ts",
       "community": 11,
-      "norm_label": "test suite 3: image watermarking & dynamic protection (`tests/e2e/media-protection.spec.ts`)"
+      "norm_label": "test suite 3: museum placard print subsystem (`tests/e2e/placard-print.spec.ts`)"
     },
     {
       "label": "code:typescript (import { test, expect } from \"@playwright/test\";)",
       "file_type": "document",
       "source_file": ".skills/playwright.md",
-      "source_location": "L77",
+      "source_location": "L88",
       "id": "skills_playwright_codeblock_3",
       "community": 11,
       "norm_label": "code:typescript (import { test, expect } from \"@playwright/test\";)"
     },
     {
-      "label": "Test Suite 4: Lead Capture & Commission Workflow (`tests/e2e/inquiry.spec.ts`)",
+      "label": "Test Suite 4: Dynamic Event Registration & RSVP Engine (`tests/e2e/events-rsvp.spec.ts`)",
       "file_type": "document",
       "source_file": ".skills/playwright.md",
-      "source_location": "L100",
-      "id": "skills_playwright_test_suite_4_lead_capture_commission_workflow_tests_e2e_inquiry_spec_ts",
+      "source_location": "L112",
+      "id": "skills_playwright_test_suite_4_dynamic_event_registration_rsvp_engine_tests_e2e_events_rsvp_spec_ts",
       "community": 11,
-      "norm_label": "test suite 4: lead capture & commission workflow (`tests/e2e/inquiry.spec.ts`)"
+      "norm_label": "test suite 4: dynamic event registration & rsvp engine (`tests/e2e/events-rsvp.spec.ts`)"
     },
     {
       "label": "code:typescript (import { test, expect } from \"@playwright/test\";)",
       "file_type": "document",
       "source_file": ".skills/playwright.md",
-      "source_location": "L106",
+      "source_location": "L113",
       "id": "skills_playwright_codeblock_4",
       "community": 11,
       "norm_label": "code:typescript (import { test, expect } from \"@playwright/test\";)"
@@ -10254,13 +10380,13 @@
       "norm_label": "ui-ux-pro-max.md"
     },
     {
-      "label": "Skill: UI-UX-Pro-Max \u2014 Classical Fine Art & Music Aesthetic Standard",
+      "label": "Skill: SavazAI WebApps Design System \u2014 Classical Fine Art, Cultural Archive & Spatial Exhibition Standards",
       "file_type": "document",
       "source_file": ".skills/ui-ux-pro-max.md",
       "source_location": "L1",
-      "id": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard",
+      "id": "skills_ui_ux_pro_max_skill_savazai_webapps_design_system_classical_fine_art_cultural_archive_spatial_exhibition_standards",
       "community": 15,
-      "norm_label": "skill: ui-ux-pro-max \u2014 classical fine art & music aesthetic standard"
+      "norm_label": "skill: savazai webapps design system \u2014 classical fine art, cultural archive & spatial exhibition standards"
     },
     {
       "label": "1. Philosophy & Aesthetic Direction",
@@ -10272,19 +10398,19 @@
       "norm_label": "1. philosophy & aesthetic direction"
     },
     {
-      "label": "2. Master Color Tokens (Dual Theme)",
+      "label": "2. Flagship Preset: \"Imperial Atelier\" (White-Label Theme Studio)",
       "file_type": "document",
       "source_file": ".skills/ui-ux-pro-max.md",
       "source_location": "L8",
-      "id": "skills_ui_ux_pro_max_2_master_color_tokens_dual_theme",
+      "id": "skills_ui_ux_pro_max_2_flagship_preset_imperial_atelier_white_label_theme_studio",
       "community": 15,
-      "norm_label": "2. master color tokens (dual theme)"
+      "norm_label": "2. flagship preset: \"imperial atelier\" (white-label theme studio)"
     },
     {
       "label": "Light Mode (\"Sacred Parchment & Antique Gold\")",
       "file_type": "document",
       "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L10",
+      "source_location": "L11",
       "id": "skills_ui_ux_pro_max_light_mode_sacred_parchment_antique_gold",
       "community": 15,
       "norm_label": "light mode (\"sacred parchment & antique gold\")"
@@ -10293,46 +10419,55 @@
       "label": "Dark Mode (\"Sanctum Obsidian & Luminous Gold\")",
       "file_type": "document",
       "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L19",
+      "source_location": "L20",
       "id": "skills_ui_ux_pro_max_dark_mode_sanctum_obsidian_luminous_gold",
       "community": 15,
       "norm_label": "dark mode (\"sanctum obsidian & luminous gold\")"
     },
     {
-      "label": "3. Typography Architecture",
+      "label": "3. Strict Binary Theme & Contrast Invariants",
       "file_type": "document",
       "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L30",
-      "id": "skills_ui_ux_pro_max_3_typography_architecture",
+      "source_location": "L31",
+      "id": "skills_ui_ux_pro_max_3_strict_binary_theme_contrast_invariants",
       "community": 15,
-      "norm_label": "3. typography architecture"
+      "norm_label": "3. strict binary theme & contrast invariants"
     },
     {
-      "label": "4. Critical UX Rules (Priority-Ranked)",
-      "file_type": "document",
-      "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L37",
-      "id": "skills_ui_ux_pro_max_4_critical_ux_rules_priority_ranked",
-      "community": 15,
-      "norm_label": "4. critical ux rules (priority-ranked)"
-    },
-    {
-      "label": "Priority 1: Accessibility (CRITICAL)",
+      "label": "4. Typography Architecture",
       "file_type": "document",
       "source_file": ".skills/ui-ux-pro-max.md",
       "source_location": "L39",
-      "id": "skills_ui_ux_pro_max_priority_1_accessibility_critical",
+      "id": "skills_ui_ux_pro_max_4_typography_architecture",
       "community": 15,
-      "norm_label": "priority 1: accessibility (critical)"
+      "norm_label": "4. typography architecture"
     },
     {
-      "label": "Priority 2: Interaction & Responsive Layout",
+      "label": "5. Critical UI/UX Rules (Priority-Ranked)",
       "file_type": "document",
       "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L45",
-      "id": "skills_ui_ux_pro_max_priority_2_interaction_responsive_layout",
+      "source_location": "L46",
+      "id": "skills_ui_ux_pro_max_5_critical_ui_ux_rules_priority_ranked",
       "community": 15,
-      "norm_label": "priority 2: interaction & responsive layout"
+      "norm_label": "5. critical ui/ux rules (priority-ranked)"
+    },
+    {
+      "label": "Priority 1: Accessibility & Contrast (CRITICAL)",
+      "file_type": "document",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L48",
+      "id": "skills_ui_ux_pro_max_priority_1_accessibility_contrast_critical",
+      "community": 15,
+      "norm_label": "priority 1: accessibility & contrast (critical)"
+    },
+    {
+      "label": "Priority 2: Spatial Exhibition & Media Interaction",
+      "file_type": "document",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L53",
+      "id": "skills_ui_ux_pro_max_priority_2_spatial_exhibition_media_interaction",
+      "community": 15,
+      "norm_label": "priority 2: spatial exhibition & media interaction"
     },
     {
       "label": "vercel-react-best-practices.md",
@@ -10765,6 +10900,213 @@
       "id": "lib_auth_client_signin_signout_usesession_getsession_changepassword_updateuser",
       "community": 41,
       "norm_label": "{\n  signin,\n  signout,\n  usesession,\n  getsession,\n  changepassword,\n  updateuser,\n}"
+    },
+    {
+      "label": "Step 3: Knowledge Graph Synchronization",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L74",
+      "community": 9,
+      "norm_label": "step 3: knowledge graph synchronization",
+      "id": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization"
+    },
+    {
+      "label": "4. Key Platform Features & Engines",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L70",
+      "community": 40,
+      "norm_label": "4. key platform features & engines",
+      "id": "lalitakapilavai_readme_4_key_platform_features_engines"
+    },
+    {
+      "label": "A. 3D WebGL Exhibition Salon Wall",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L72",
+      "community": 40,
+      "norm_label": "a. 3d webgl exhibition salon wall",
+      "id": "lalitakapilavai_readme_a_3d_webgl_exhibition_salon_wall"
+    },
+    {
+      "label": "B. Physical Gallery Placard & Label Generator",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L77",
+      "community": 40,
+      "norm_label": "b. physical gallery placard & label generator",
+      "id": "lalitakapilavai_readme_b_physical_gallery_placard_label_generator"
+    },
+    {
+      "label": "C. Dynamic Mail Message Studio & Dispatch Engine",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L83",
+      "community": 40,
+      "norm_label": "c. dynamic mail message studio & dispatch engine",
+      "id": "lalitakapilavai_readme_c_dynamic_mail_message_studio_dispatch_engine"
+    },
+    {
+      "label": "Skill: Cloudflare Edge Security, WAF & R2 Media Protection",
+      "file_type": "document",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L1",
+      "community": 10,
+      "norm_label": "skill: cloudflare edge security, waf & r2 media protection",
+      "id": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection"
+    },
+    {
+      "label": "2. Content Security Policy (CSP) Configuration",
+      "file_type": "document",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L8",
+      "community": 10,
+      "norm_label": "2. content security policy (csp) configuration",
+      "id": "skills_cloudflare_security_2_content_security_policy_csp_configuration"
+    },
+    {
+      "label": "3. Cloudflare WAF & Edge Rate Limiting Rules",
+      "file_type": "document",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L30",
+      "community": 10,
+      "norm_label": "3. cloudflare waf & edge rate limiting rules",
+      "id": "skills_cloudflare_security_3_cloudflare_waf_edge_rate_limiting_rules"
+    },
+    {
+      "label": "4. Cloudflare R2 Media Security & Storage Headers",
+      "file_type": "document",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L47",
+      "community": 10,
+      "norm_label": "4. cloudflare r2 media security & storage headers",
+      "id": "skills_cloudflare_security_4_cloudflare_r2_media_security_storage_headers"
+    },
+    {
+      "label": "2. Cultural & Domain Entity Relationship Graph",
+      "file_type": "document",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L10",
+      "community": 14,
+      "norm_label": "2. cultural & domain entity relationship graph",
+      "id": "skills_graphify_2_cultural_domain_entity_relationship_graph"
+    },
+    {
+      "label": "3. Hybrid Relational + pgvector Semantic Search",
+      "file_type": "document",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L44",
+      "community": 14,
+      "norm_label": "3. hybrid relational + pgvector semantic search",
+      "id": "skills_graphify_3_hybrid_relational_pgvector_semantic_search"
+    },
+    {
+      "label": "4. Codebase Architecture Graph",
+      "file_type": "document",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L64",
+      "community": 14,
+      "norm_label": "4. codebase architecture graph",
+      "id": "skills_graphify_4_codebase_architecture_graph"
+    },
+    {
+      "label": "2. Test Suite Specifications",
+      "file_type": "document",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L12",
+      "community": 11,
+      "norm_label": "2. test suite specifications",
+      "id": "skills_playwright_2_test_suite_specifications"
+    },
+    {
+      "label": "Test Suite 1: Authentication & Admin Portal (`tests/e2e/auth.spec.ts`)",
+      "file_type": "document",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L14",
+      "community": 11,
+      "norm_label": "test suite 1: authentication & admin portal (`tests/e2e/auth.spec.ts`)",
+      "id": "skills_playwright_test_suite_1_authentication_admin_portal_tests_e2e_auth_spec_ts"
+    },
+    {
+      "label": "Test Suite 2: Visual Layout & Audio Synesthesia (`tests/e2e/gallery.spec.ts`)",
+      "file_type": "document",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L43",
+      "community": 11,
+      "norm_label": "test suite 2: visual layout & audio synesthesia (`tests/e2e/gallery.spec.ts`)",
+      "id": "skills_playwright_test_suite_2_visual_layout_audio_synesthesia_tests_e2e_gallery_spec_ts"
+    },
+    {
+      "label": "Test Suite 3: Image Watermarking & Dynamic Protection (`tests/e2e/media-protection.spec.ts`)",
+      "file_type": "document",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L73",
+      "community": 11,
+      "norm_label": "test suite 3: image watermarking & dynamic protection (`tests/e2e/media-protection.spec.ts`)",
+      "id": "skills_playwright_test_suite_3_image_watermarking_dynamic_protection_tests_e2e_media_protection_spec_ts"
+    },
+    {
+      "label": "Test Suite 4: Lead Capture & Commission Workflow (`tests/e2e/inquiry.spec.ts`)",
+      "file_type": "document",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L100",
+      "community": 11,
+      "norm_label": "test suite 4: lead capture & commission workflow (`tests/e2e/inquiry.spec.ts`)",
+      "id": "skills_playwright_test_suite_4_lead_capture_commission_workflow_tests_e2e_inquiry_spec_ts"
+    },
+    {
+      "label": "Skill: UI-UX-Pro-Max \u2014 Classical Fine Art & Music Aesthetic Standard",
+      "file_type": "document",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L1",
+      "community": 15,
+      "norm_label": "skill: ui-ux-pro-max \u2014 classical fine art & music aesthetic standard",
+      "id": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard"
+    },
+    {
+      "label": "2. Master Color Tokens (Dual Theme)",
+      "file_type": "document",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L8",
+      "community": 15,
+      "norm_label": "2. master color tokens (dual theme)",
+      "id": "skills_ui_ux_pro_max_2_master_color_tokens_dual_theme"
+    },
+    {
+      "label": "3. Typography Architecture",
+      "file_type": "document",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L30",
+      "community": 15,
+      "norm_label": "3. typography architecture",
+      "id": "skills_ui_ux_pro_max_3_typography_architecture"
+    },
+    {
+      "label": "4. Critical UX Rules (Priority-Ranked)",
+      "file_type": "document",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L37",
+      "community": 15,
+      "norm_label": "4. critical ux rules (priority-ranked)",
+      "id": "skills_ui_ux_pro_max_4_critical_ux_rules_priority_ranked"
+    },
+    {
+      "label": "Priority 1: Accessibility (CRITICAL)",
+      "file_type": "document",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L39",
+      "community": 15,
+      "norm_label": "priority 1: accessibility (critical)",
+      "id": "skills_ui_ux_pro_max_priority_1_accessibility_critical"
+    },
+    {
+      "label": "Priority 2: Interaction & Responsive Layout",
+      "file_type": "document",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L45",
+      "community": 15,
+      "norm_label": "priority 2: interaction & responsive layout",
+      "id": "skills_ui_ux_pro_max_priority_2_interaction_responsive_layout"
     },
     {
       "label": "Lalita Kapilavai \u2014 Sacred Art & Carnatic Music Archive",
@@ -11266,7 +11608,7 @@
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L152",
-      "community": 44,
+      "community": 57,
       "norm_label": "sortablesection()",
       "id": "builder_page_sortablesection"
     },
@@ -11284,7 +11626,7 @@
       "file_type": "code",
       "source_file": "src/components/builder/timeline-inspector.tsx",
       "source_location": "L47",
-      "community": 49,
+      "community": 1,
       "norm_label": "category_options",
       "id": "builder_timeline_inspector_category_options"
     },
@@ -11320,7 +11662,7 @@
       "file_type": "code",
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L7",
-      "community": 87,
+      "community": 39,
       "norm_label": "allowed_tokens",
       "id": "theme_route_allowed_tokens"
     },
@@ -11329,7 +11671,7 @@
       "file_type": "code",
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L17",
-      "community": 87,
+      "community": 39,
       "norm_label": "sanitizetokenset()",
       "id": "theme_route_sanitizetokenset"
     },
@@ -11401,7 +11743,7 @@
       "file_type": "code",
       "source_file": "src/app/layout.tsx",
       "source_location": "L17",
-      "community": 88,
+      "community": 43,
       "norm_label": "metadata",
       "id": "app_layout_metadata"
     },
@@ -11428,7 +11770,7 @@
       "file_type": "code",
       "source_file": "src/app/page.tsx",
       "source_location": "L3",
-      "community": 69,
+      "community": 88,
       "norm_label": "home()",
       "id": "app_page_home"
     },
@@ -41774,6 +42116,16 @@
       "source_file": "AGENTS.md",
       "source_location": "L50",
       "weight": 1.0,
+      "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
+      "target": "lalitakapilavai_agents_step_0_knowledge_graph_first_invariant_mandatory_pre_task_inspection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L50",
+      "weight": 1.0,
       "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
       "target": "lalitakapilavai_agents_step_1_local_first_validation_zero_remote_regressions"
@@ -41792,11 +42144,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "AGENTS.md",
-      "source_location": "L74",
+      "source_location": "L79",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
-      "target": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization"
+      "target": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization_mandatory_post_workflow_sync",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -41817,6 +42169,16 @@
       "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
       "target": "lalitakapilavai_agents_step_5_git_commit_remote_deployment_pipeline"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L74",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
+      "target": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization"
     },
     {
       "relation": "contains",
@@ -41857,6 +42219,16 @@
       "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_core_operational_rule_local_first_validation_before_deployment",
       "target": "lalitakapilavai_agents_codeblock_2"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization_mandatory_post_workflow_sync",
+      "target": "lalitakapilavai_agents_codeblock_3",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -41954,9 +42326,9 @@
       "source_file": "README.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_md",
-      "target": "lalitakapilavai_readme_savazai_webapps_platform",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_savazai_webapps_platform"
     },
     {
       "relation": "contains",
@@ -41974,9 +42346,9 @@
       "source_file": "README.md",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_savazai_webapps_platform",
-      "target": "lalitakapilavai_readme_1_executive_platform_overview",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_1_executive_platform_overview"
     },
     {
       "relation": "contains",
@@ -41984,9 +42356,9 @@
       "source_file": "README.md",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_savazai_webapps_platform",
-      "target": "lalitakapilavai_readme_2_technology_stack_modern_architectural_standards",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_2_technology_stack_modern_architectural_standards"
     },
     {
       "relation": "contains",
@@ -41994,18 +42366,18 @@
       "source_file": "README.md",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_savazai_webapps_platform",
-      "target": "lalitakapilavai_readme_3_high_level_modular_architecture",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_3_high_level_modular_architecture"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L70",
+      "source_location": "L97",
       "weight": 1.0,
       "source": "lalitakapilavai_readme_savazai_webapps_platform",
-      "target": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "target": "lalitakapilavai_readme_4_full_platform_feature_engine_catalog",
       "confidence_score": 1.0
     },
     {
@@ -42014,9 +42386,9 @@
       "source_file": "README.md",
       "source_location": "L92",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_savazai_webapps_platform",
-      "target": "lalitakapilavai_readme_5_quickstart_local_development",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_5_quickstart_local_development"
     },
     {
       "relation": "contains",
@@ -42024,9 +42396,9 @@
       "source_file": "README.md",
       "source_location": "L132",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_savazai_webapps_platform",
-      "target": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment"
     },
     {
       "relation": "contains",
@@ -42034,9 +42406,9 @@
       "source_file": "README.md",
       "source_location": "L152",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_savazai_webapps_platform",
-      "target": "lalitakapilavai_readme_7_production_environment_variables_template",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_7_production_environment_variables_template"
     },
     {
       "relation": "contains",
@@ -42044,9 +42416,19 @@
       "source_file": "README.md",
       "source_location": "L193",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_savazai_webapps_platform",
-      "target": "lalitakapilavai_readme_8_architectural_documentation_living_governance",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_8_architectural_documentation_living_governance"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L70",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_4_key_platform_features_engines"
     },
     {
       "relation": "contains",
@@ -42054,9 +42436,9 @@
       "source_file": "README.md",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_1_executive_platform_overview",
-      "target": "lalitakapilavai_readme_core_architectural_pillars",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_core_architectural_pillars"
     },
     {
       "relation": "contains",
@@ -42064,9 +42446,9 @@
       "source_file": "README.md",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_3_high_level_modular_architecture",
-      "target": "lalitakapilavai_readme_codeblock_1",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_codeblock_1"
     },
     {
       "relation": "contains",
@@ -42082,30 +42464,120 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L72",
+      "source_location": "L99",
       "weight": 1.0,
-      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
-      "target": "lalitakapilavai_readme_a_3d_webgl_exhibition_salon_wall",
+      "source": "lalitakapilavai_readme_4_full_platform_feature_engine_catalog",
+      "target": "lalitakapilavai_readme_a_public_web_experiences",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L77",
+      "source_location": "L127",
       "weight": 1.0,
-      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
-      "target": "lalitakapilavai_readme_b_physical_gallery_placard_label_generator",
+      "source": "lalitakapilavai_readme_4_full_platform_feature_engine_catalog",
+      "target": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L83",
+      "source_location": "L129",
       "weight": 1.0,
-      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
-      "target": "lalitakapilavai_readme_c_dynamic_mail_message_studio_dispatch_engine",
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_1_artwork_vault_catalog_manager_admin_artworks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L135",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_2_museum_placard_print_studio_src_lib_print_isolated_html_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L142",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_3_visual_drag_and_drop_page_builder_admin_pages_id_builder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L147",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_4_interactive_e_catalog_studio_admin_catalogs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L152",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_5_events_concerts_studio_admin_events",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L157",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_6_dynamic_mail_message_studio_audit_telemetry_admin_settings_mail_msg_config",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_7_unified_crm_leads_acquisition_inbox_admin_leads",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L169",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_8_curatorial_posts_blog_publisher_admin_posts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L173",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_9_white_label_theme_system_studio_admin_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_b_admin_control_center_10_core_operational_modules",
+      "target": "lalitakapilavai_readme_10_security_better_auth_rbac_user_administration_admin_users",
       "confidence_score": 1.0
     },
     {
@@ -42114,9 +42586,9 @@
       "source_file": "README.md",
       "source_location": "L94",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_5_quickstart_local_development",
-      "target": "lalitakapilavai_readme_prerequisites",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_prerequisites"
     },
     {
       "relation": "contains",
@@ -42124,9 +42596,9 @@
       "source_file": "README.md",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_5_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_1_clone_and_configure_environment",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_step_1_clone_and_configure_environment"
     },
     {
       "relation": "contains",
@@ -42134,9 +42606,9 @@
       "source_file": "README.md",
       "source_location": "L106",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_5_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack"
     },
     {
       "relation": "contains",
@@ -42144,9 +42616,9 @@
       "source_file": "README.md",
       "source_location": "L117",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_5_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed"
     },
     {
       "relation": "contains",
@@ -42154,9 +42626,9 @@
       "source_file": "README.md",
       "source_location": "L124",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_5_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_4_access_endpoints",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_step_4_access_endpoints"
     },
     {
       "relation": "contains",
@@ -42174,9 +42646,9 @@
       "source_file": "README.md",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_step_1_clone_and_configure_environment",
-      "target": "lalitakapilavai_readme_codeblock_2",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_codeblock_2"
     },
     {
       "relation": "contains",
@@ -42214,9 +42686,9 @@
       "source_file": "README.md",
       "source_location": "L108",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
-      "target": "lalitakapilavai_readme_codeblock_3",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_codeblock_3"
     },
     {
       "relation": "contains",
@@ -42224,9 +42696,9 @@
       "source_file": "README.md",
       "source_location": "L113",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
-      "target": "lalitakapilavai_readme_codeblock_4",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_codeblock_4"
     },
     {
       "relation": "contains",
@@ -42264,9 +42736,9 @@
       "source_file": "README.md",
       "source_location": "L118",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed",
-      "target": "lalitakapilavai_readme_codeblock_5",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_codeblock_5"
     },
     {
       "relation": "contains",
@@ -42294,9 +42766,9 @@
       "source_file": "README.md",
       "source_location": "L136",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment",
-      "target": "lalitakapilavai_readme_deployment_runbook",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_deployment_runbook"
     },
     {
       "relation": "contains",
@@ -42304,9 +42776,9 @@
       "source_file": "README.md",
       "source_location": "L154",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_7_production_environment_variables_template",
-      "target": "lalitakapilavai_readme_codeblock_6",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_readme_codeblock_6"
     },
     {
       "relation": "contains",
@@ -43084,9 +43556,69 @@
       "source_file": ".skills/cloudflare-security.md",
       "source_location": "L1",
       "weight": 1.0,
+      "source": "skills_cloudflare_security_md",
+      "target": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_vault_protection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L1",
+      "weight": 1.0,
       "confidence_score": 1.0,
       "source": "skills_cloudflare_security_md",
       "target": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_vault_protection",
+      "target": "skills_cloudflare_security_1_security_architecture_overview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_vault_protection",
+      "target": "skills_cloudflare_security_2_content_security_policy_csp_directives",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_vault_protection",
+      "target": "skills_cloudflare_security_3_cloudflare_waf_edge_rate_limiting_policies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_vault_protection",
+      "target": "skills_cloudflare_security_4_multi_tenant_media_vault_storage_headers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_vault_protection",
+      "target": "skills_cloudflare_security_5_deployment_hardening_checklist",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43102,41 +43634,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L8",
+      "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
-      "target": "skills_cloudflare_security_2_content_security_policy_csp_configuration"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L30",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
-      "target": "skills_cloudflare_security_3_cloudflare_waf_edge_rate_limiting_rules"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L47",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
-      "target": "skills_cloudflare_security_4_cloudflare_r2_media_security_storage_headers"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L86",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
-      "target": "skills_cloudflare_security_5_deployment_hardening_checklist"
+      "source": "skills_cloudflare_security_2_content_security_policy_csp_directives",
+      "target": "skills_cloudflare_security_codeblock_1",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43147,6 +43649,26 @@
       "confidence_score": 1.0,
       "source": "skills_cloudflare_security_2_content_security_policy_csp_configuration",
       "target": "skills_cloudflare_security_codeblock_1"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "skills_cloudflare_security_3_cloudflare_waf_edge_rate_limiting_policies",
+      "target": "skills_cloudflare_security_edge_rate_limiting_policies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "skills_cloudflare_security_3_cloudflare_waf_edge_rate_limiting_policies",
+      "target": "skills_cloudflare_security_waf_managed_rulesets",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43172,21 +43694,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L49",
+      "source_location": "L51",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_cloudflare_security_4_cloudflare_r2_media_security_storage_headers",
-      "target": "skills_cloudflare_security_bucket_access_policy"
+      "source": "skills_cloudflare_security_4_multi_tenant_media_vault_storage_headers",
+      "target": "skills_cloudflare_security_bucket_access_policy",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/cloudflare-security.md",
-      "source_location": "L75",
+      "source_location": "L77",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_cloudflare_security_4_cloudflare_r2_media_security_storage_headers",
-      "target": "skills_cloudflare_security_http_headers_for_public_media_delivery"
+      "source": "skills_cloudflare_security_4_multi_tenant_media_vault_storage_headers",
+      "target": "skills_cloudflare_security_http_headers_for_public_media_delivery",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43202,11 +43724,41 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L49",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_cloudflare_security_4_cloudflare_r2_media_security_storage_headers",
+      "target": "skills_cloudflare_security_bucket_access_policy"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
       "source_location": "L77",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "skills_cloudflare_security_http_headers_for_public_media_delivery",
       "target": "skills_cloudflare_security_codeblock_3"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L75",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_cloudflare_security_4_cloudflare_r2_media_security_storage_headers",
+      "target": "skills_cloudflare_security_http_headers_for_public_media_delivery"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L86",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
+      "target": "skills_cloudflare_security_5_deployment_hardening_checklist"
     },
     {
       "relation": "contains",
@@ -43227,6 +43779,46 @@
       "confidence_score": 1.0,
       "source": "skills_graphify_skill_graphify_architectural_cultural_knowledge_graph_engine",
       "target": "skills_graphify_1_scope_domain_context"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "skills_graphify_skill_graphify_architectural_cultural_knowledge_graph_engine",
+      "target": "skills_graphify_2_mandatory_agent_operating_protocol_knowledge_graph_first_invariant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "skills_graphify_skill_graphify_architectural_cultural_knowledge_graph_engine",
+      "target": "skills_graphify_3_cultural_domain_entity_relationship_graph",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "skills_graphify_skill_graphify_architectural_cultural_knowledge_graph_engine",
+      "target": "skills_graphify_4_hybrid_relational_pgvector_semantic_search",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L79",
+      "weight": 1.0,
+      "source": "skills_graphify_skill_graphify_architectural_cultural_knowledge_graph_engine",
+      "target": "skills_graphify_5_codebase_architecture_graph",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43262,6 +43854,46 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/graphify.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "skills_graphify_2_mandatory_agent_operating_protocol_knowledge_graph_first_invariant",
+      "target": "skills_graphify_phase_1_pre_modification_inspection_mandatory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "skills_graphify_2_mandatory_agent_operating_protocol_knowledge_graph_first_invariant",
+      "target": "skills_graphify_phase_2_post_workflow_synchronization_non_negotiable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "skills_graphify_3_cultural_domain_entity_relationship_graph",
+      "target": "skills_graphify_codeblock_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "skills_graphify_3_cultural_domain_entity_relationship_graph",
+      "target": "skills_graphify_relational_topology",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
       "source_location": "L12",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -43282,11 +43914,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/graphify.md",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "skills_graphify_4_hybrid_relational_pgvector_semantic_search",
+      "target": "skills_graphify_codeblock_2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
       "source_location": "L41",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "skills_graphify_3_hybrid_relational_pgvector_semantic_search",
       "target": "skills_graphify_codeblock_2"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/graphify.md",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "skills_graphify_5_codebase_architecture_graph",
+      "target": "skills_graphify_codeblock_3",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43322,6 +43974,26 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/playwright.md",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "skills_playwright_skill_playwright_e2e_test_suite_architecture",
+      "target": "skills_playwright_2_test_configuration_environment_standards",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "skills_playwright_skill_playwright_e2e_test_suite_architecture",
+      "target": "skills_playwright_3_test_suite_specifications",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
       "source_location": "L12",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -43332,41 +44004,51 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/playwright.md",
-      "source_location": "L14",
+      "source_location": "L25",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_playwright_2_test_suite_specifications",
-      "target": "skills_playwright_test_suite_1_authentication_admin_portal_tests_e2e_auth_spec_ts"
+      "source": "skills_playwright_3_test_suite_specifications",
+      "target": "skills_playwright_test_suite_1_authentication_admin_rbac_tests_e2e_auth_spec_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/playwright.md",
-      "source_location": "L43",
+      "source_location": "L57",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_playwright_2_test_suite_specifications",
-      "target": "skills_playwright_test_suite_2_visual_layout_audio_synesthesia_tests_e2e_gallery_spec_ts"
+      "source": "skills_playwright_3_test_suite_specifications",
+      "target": "skills_playwright_test_suite_2_3d_webgl_exhibition_salon_corridor_tests_e2e_exhibition_corridor_spec_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/playwright.md",
-      "source_location": "L73",
+      "source_location": "L87",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_playwright_2_test_suite_specifications",
-      "target": "skills_playwright_test_suite_3_image_watermarking_dynamic_protection_tests_e2e_media_protection_spec_ts"
+      "source": "skills_playwright_3_test_suite_specifications",
+      "target": "skills_playwright_test_suite_3_museum_placard_print_subsystem_tests_e2e_placard_print_spec_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/playwright.md",
-      "source_location": "L100",
+      "source_location": "L112",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_playwright_2_test_suite_specifications",
-      "target": "skills_playwright_test_suite_4_lead_capture_commission_workflow_tests_e2e_inquiry_spec_ts"
+      "source": "skills_playwright_3_test_suite_specifications",
+      "target": "skills_playwright_test_suite_4_dynamic_event_registration_rsvp_engine_tests_e2e_events_rsvp_spec_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "skills_playwright_test_suite_1_authentication_admin_rbac_tests_e2e_auth_spec_ts",
+      "target": "skills_playwright_codeblock_1",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43382,6 +44064,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/playwright.md",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "skills_playwright_test_suite_2_3d_webgl_exhibition_salon_corridor_tests_e2e_exhibition_corridor_spec_ts",
+      "target": "skills_playwright_codeblock_2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
       "source_location": "L48",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -43392,11 +44084,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/playwright.md",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "skills_playwright_test_suite_3_museum_placard_print_subsystem_tests_e2e_placard_print_spec_ts",
+      "target": "skills_playwright_codeblock_3",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
       "source_location": "L77",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "skills_playwright_test_suite_3_image_watermarking_dynamic_protection_tests_e2e_media_protection_spec_ts",
       "target": "skills_playwright_codeblock_3"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "skills_playwright_test_suite_4_dynamic_event_registration_rsvp_engine_tests_e2e_events_rsvp_spec_ts",
+      "target": "skills_playwright_codeblock_4",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43514,9 +44226,69 @@
       "source_file": ".skills/ui-ux-pro-max.md",
       "source_location": "L1",
       "weight": 1.0,
+      "source": "skills_ui_ux_pro_max_md",
+      "target": "skills_ui_ux_pro_max_skill_savazai_webapps_design_system_classical_fine_art_cultural_archive_spatial_exhibition_standards",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L1",
+      "weight": 1.0,
       "confidence_score": 1.0,
       "source": "skills_ui_ux_pro_max_md",
       "target": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "skills_ui_ux_pro_max_skill_savazai_webapps_design_system_classical_fine_art_cultural_archive_spatial_exhibition_standards",
+      "target": "skills_ui_ux_pro_max_1_philosophy_aesthetic_direction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "skills_ui_ux_pro_max_skill_savazai_webapps_design_system_classical_fine_art_cultural_archive_spatial_exhibition_standards",
+      "target": "skills_ui_ux_pro_max_2_flagship_preset_imperial_atelier_white_label_theme_studio",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "skills_ui_ux_pro_max_skill_savazai_webapps_design_system_classical_fine_art_cultural_archive_spatial_exhibition_standards",
+      "target": "skills_ui_ux_pro_max_3_strict_binary_theme_contrast_invariants",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "skills_ui_ux_pro_max_skill_savazai_webapps_design_system_classical_fine_art_cultural_archive_spatial_exhibition_standards",
+      "target": "skills_ui_ux_pro_max_4_typography_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "skills_ui_ux_pro_max_skill_savazai_webapps_design_system_classical_fine_art_cultural_archive_spatial_exhibition_standards",
+      "target": "skills_ui_ux_pro_max_5_critical_ui_ux_rules_priority_ranked",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43532,31 +44304,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L8",
+      "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard",
-      "target": "skills_ui_ux_pro_max_2_master_color_tokens_dual_theme"
+      "source": "skills_ui_ux_pro_max_2_flagship_preset_imperial_atelier_white_label_theme_studio",
+      "target": "skills_ui_ux_pro_max_light_mode_sacred_parchment_antique_gold",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L30",
+      "source_location": "L20",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard",
-      "target": "skills_ui_ux_pro_max_3_typography_architecture"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L37",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard",
-      "target": "skills_ui_ux_pro_max_4_critical_ux_rules_priority_ranked"
+      "source": "skills_ui_ux_pro_max_2_flagship_preset_imperial_atelier_white_label_theme_studio",
+      "target": "skills_ui_ux_pro_max_dark_mode_sanctum_obsidian_luminous_gold",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43582,21 +44344,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L39",
+      "source_location": "L48",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_ui_ux_pro_max_4_critical_ux_rules_priority_ranked",
-      "target": "skills_ui_ux_pro_max_priority_1_accessibility_critical"
+      "source": "skills_ui_ux_pro_max_5_critical_ui_ux_rules_priority_ranked",
+      "target": "skills_ui_ux_pro_max_priority_1_accessibility_contrast_critical",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".skills/ui-ux-pro-max.md",
-      "source_location": "L45",
+      "source_location": "L53",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "skills_ui_ux_pro_max_4_critical_ux_rules_priority_ranked",
-      "target": "skills_ui_ux_pro_max_priority_2_interaction_responsive_layout"
+      "source": "skills_ui_ux_pro_max_5_critical_ui_ux_rules_priority_ranked",
+      "target": "skills_ui_ux_pro_max_priority_2_spatial_exhibition_media_interaction",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -43997,6 +44759,156 @@
       "confidence_score": 1.0,
       "source": "validation_logs_run_2_validation_log_run_2_full_vulnerability_remediation_verification",
       "target": "validation_logs_run_2_2_quantitative_post_remediation_security_posture"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L72",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "target": "lalitakapilavai_readme_a_3d_webgl_exhibition_salon_wall"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L77",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "target": "lalitakapilavai_readme_b_physical_gallery_placard_label_generator"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L83",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "target": "lalitakapilavai_readme_c_dynamic_mail_message_studio_dispatch_engine"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
+      "target": "skills_cloudflare_security_2_content_security_policy_csp_configuration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L30",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
+      "target": "skills_cloudflare_security_3_cloudflare_waf_edge_rate_limiting_rules"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/cloudflare-security.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_cloudflare_security_skill_cloudflare_edge_security_waf_r2_media_protection",
+      "target": "skills_cloudflare_security_4_cloudflare_r2_media_security_storage_headers"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_playwright_2_test_suite_specifications",
+      "target": "skills_playwright_test_suite_1_authentication_admin_portal_tests_e2e_auth_spec_ts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_playwright_2_test_suite_specifications",
+      "target": "skills_playwright_test_suite_2_visual_layout_audio_synesthesia_tests_e2e_gallery_spec_ts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L73",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_playwright_2_test_suite_specifications",
+      "target": "skills_playwright_test_suite_3_image_watermarking_dynamic_protection_tests_e2e_media_protection_spec_ts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/playwright.md",
+      "source_location": "L100",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_playwright_2_test_suite_specifications",
+      "target": "skills_playwright_test_suite_4_lead_capture_commission_workflow_tests_e2e_inquiry_spec_ts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard",
+      "target": "skills_ui_ux_pro_max_2_master_color_tokens_dual_theme"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L30",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard",
+      "target": "skills_ui_ux_pro_max_3_typography_architecture"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_ui_ux_pro_max_skill_ui_ux_pro_max_classical_fine_art_music_aesthetic_standard",
+      "target": "skills_ui_ux_pro_max_4_critical_ux_rules_priority_ranked"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_ui_ux_pro_max_4_critical_ux_rules_priority_ranked",
+      "target": "skills_ui_ux_pro_max_priority_1_accessibility_critical"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".skills/ui-ux-pro-max.md",
+      "source_location": "L45",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "skills_ui_ux_pro_max_4_critical_ux_rules_priority_ranked",
+      "target": "skills_ui_ux_pro_max_priority_2_interaction_responsive_layout"
     },
     {
       "relation": "contains",
@@ -44511,5 +45423,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "191b9230f15da51a5aa01064f31e7815572b7b74"
+  "built_at_commit": "476570a5839feaa826dd03d398c35ab865af2a78"
 }

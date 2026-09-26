@@ -1,7 +1,7 @@
 # Skill: Better-Auth Enterprise Best Practices (Private Admin Architecture)
 
 ## 1. Core Principles
-The **Lalita Kapilavai** platform uses **Better-Auth** exclusively as a private, high-security administration and content management system.
+The **SavazAI WebApps Platform** uses **Better-Auth** exclusively as a private, high-security administration and content management system.
 - **Public Registrations Disabled**: `emailAndPassword.disableSignUp: true` is strictly enforced.
 - **Role-Based Access Control (RBAC)**: Supports roles (`SUPER_ADMIN`, `ADMIN`, `EDITOR`).
 - **Cryptographic Rigor**: High-entropy session tokens, HTTPS-only secure cookies in production, and timing-safe comparisons.

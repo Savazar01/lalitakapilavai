@@ -1,11 +1,12 @@
-# Skill: UI-UX-Pro-Max — Classical Fine Art & Music Aesthetic Standard
+# Skill: SavazAI WebApps Design System — Classical Fine Art, Cultural Archive & Spatial Exhibition Standards
 
 ## 1. Philosophy & Aesthetic Direction
-The design language reflects the high craftsmanship of **Lalita Kapilavai**: Tanjore 22k gold foil relief, classical Mysore painting, and Carnatic vocal mastery. The interface balances sacred classical elegance with modern web engineering, WCAG 2.2 AAA accessibility, and zero visual friction.
+The **SavazAI WebApps Design System** establishes a museum-grade visual standard for fine art master ateliers, royal cultural archives, and spatial exhibitions. The visual language marries classical craftsmanship (burnished gold leaf, natural pigments, polished hardwood framing, and archival parchment) with bleeding-edge web engineering, WCAG 2.2 AAA accessibility, and zero visual friction.
 
 ---
 
-## 2. Master Color Tokens (Dual Theme)
+## 2. Flagship Preset: "Imperial Atelier" (White-Label Theme Studio)
+The platform's Theme Studio provides multiple customizable aesthetic profiles. The signature default preset, **Imperial Atelier**, delivers an exquisite dual-theme experience:
 
 ### Light Mode ("Sacred Parchment & Antique Gold")
 - **Canvas / Background**: `#FAF7F2` (Warm Ivory / Palm-leaf Parchment)
@@ -27,23 +28,30 @@ The design language reflects the high craftsmanship of **Lalita Kapilavai**: Tan
 
 ---
 
-## 3. Typography Architecture
-- **Classical Headings (H1 - H3)**: `Playfair Display`, `Cinzel`, or `Cormorant Garamond` (evoking stone epigraphy, royal treatises, and Tanjore palace inscriptions).
-- **Body & Captions**: `Plus Jakarta Sans` or `Inter` (high x-height, ultra-crisp legibility across mobile and high-DPI displays).
-- **Musical Scales & Swaras**: `Geist Mono` or standard Monospace for Carnatic swara notations (`S R₂ G₃ M₁ P D₂ N₃ Ṡ`).
+## 3. Strict Binary Theme & Contrast Invariants
+1. **Binary Theme Only (`enableSystem: false`)**: The platform strictly toggles between `"light"` and `"dark"`. OS-level system dark mode detection must never automatically invert colors without explicit user/curator intent.
+2. **Class-Based Dark Engine**: `src/app/globals.css` enforces `@custom-variant dark (&:where(.dark, .dark *));`. All dark styles MUST use the `dark:` prefix.
+3. **Placard Contrast Lock**: Physical museum placards rendered on screen must maintain invariant high-contrast dark text (`#111827`, `#374151`) on pure white paper (`#FFFFFF`), regardless of active website dark/light mode toggles.
+4. **WCAG 2.2 AAA Compliance**: All UI text must maintain a minimum contrast ratio of 7:1 for body copy and 4.5:1 for large headlines.
 
 ---
 
-## 4. Critical UX Rules (Priority-Ranked)
+## 4. Typography Architecture
+- **Classical Headings (H1 - H3)**: `Playfair Display`, `Cinzel`, or `Cormorant Garamond` (evoking stone epigraphy, royal treatises, and palace inscriptions).
+- **Body & Captions**: `Plus Jakarta Sans` or `Inter` (high x-height, ultra-crisp legibility across mobile and high-DPI displays).
+- **Musical Scales & Swaras**: `Geist Mono` or standard Monospace for Carnatic / Hindustani musical swara notations (`S R₂ G₃ M₁ P D₂ N₃ Ṡ`).
 
-### Priority 1: Accessibility (CRITICAL)
-- **Color Contrast**: Enforce minimum 4.5:1 ratio for standard text and 3:1 for large display titles.
+---
+
+## 5. Critical UI/UX Rules (Priority-Ranked)
+
+### Priority 1: Accessibility & Contrast (CRITICAL)
 - **Focus Rings**: Distinct gold focus ring (`ring-2 ring-primary/80 ring-offset-2`) on all interactive controls.
 - **Touch Targets**: Minimum `44px x 44px` on all buttons, navigation links, and theme toggle buttons.
 - **Accessible Form Elements**: All inputs have associated labels, helper text, and clear error boundaries.
 
-### Priority 2: Interaction & Responsive Layout
+### Priority 2: Spatial Exhibition & Media Interaction
 - **Zero-FOUC Theming**: Server and client render with matched color schemes using `next-themes` and `suppressHydrationWarning`.
-- **Artwork Deep-Inspection**: Artwork image cards must preserve aspect ratios, prevent layout shifting (CLS), and deliver high-resolution zoom with dynamic watermarking.
+- **Artwork Aspect Ratio Preservation**: Canvas, matting, fillets, and outer timber frames dynamically scale to match the artwork's intrinsic aspect ratio (`naturalWidth / naturalHeight`). Never squish or crop paintings.
 - **Touch & Mobile Optimization**: Collapsible drawer navigation for mobile viewports (`Sheet`), sticky header with responsive elevation blur.
 - **Form Feedback**: Async button loading states with spinners and explicit validation error alerts.

@@ -47,6 +47,11 @@ All code in this repository strictly adheres to modern, bleeding-edge production
 ## 3. Universal Autonomous Agent Lifecycle & Quality Gates
 Every autonomous agent, developer, and contributor must strictly follow this execution protocol. **When this section is cited, all steps below must be executed in order without exception:**
 
+### Step 0: Knowledge Graph First Invariant (Mandatory Pre-Task Inspection)
+Before designing solutions or editing any codebase files:
+- **Inspect the Knowledge Graph**: Autonomous agents and developers MUST inspect the active graph at `graphify-out/` (specifically `graphify-out/GRAPH_REPORT.md` and `graphify-out/graph.json`) or run `graphify query "<topic>"` to understand architectural boundaries, component hierarchies, and database relationships.
+- **Prevent Regressions**: Never modify a shared driver, route handler, or schema without verifying its downstream dependents in the knowledge graph first.
+
 ### Step 1: Local-First Validation (Zero Remote Regressions)
 Prior to committing or pushing any code, run the complete validation chain:
 ```bash
@@ -71,11 +76,12 @@ docker compose -f docker-compose.dev.yml restart web-dev
 ```
 Verify localhost accessibility at http://localhost:3060.
 
-### Step 3: Knowledge Graph Synchronization
+### Step 3: Knowledge Graph Synchronization (Mandatory Post-Workflow Sync)
 Whenever files, routes, components, or Prisma schemas are added, modified, or deleted:
 ```bash
 graphify update .
 ```
+This guarantees that the knowledge graph permanently mirrors the current AST matrix, clusters community modules, and eliminates knowledge drift for future agent invocations.
 
 ### Step 4: Persistent DevPlans Archiving Rule
 All user prompts, implementation plans, and walkthrough logs MUST be persistently archived inside a single local directory: `DevPlans/`.
