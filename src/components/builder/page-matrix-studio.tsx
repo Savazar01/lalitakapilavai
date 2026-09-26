@@ -410,31 +410,45 @@ export function PageMatrixStudio({
         : {}),
       ...(type === "FORM_BLOCK"
         ? {
-            formTitle: "Send Curatorial Inquiry",
-            formSubtitle: "Direct correspondence with the curatorial atelier desk.",
-            submitButtonText: "Submit Inquiry",
-            successMessage: "Thank you for your correspondence. The curatorial desk will respond shortly.",
+            formTitle: "Get in Touch",
+            formSubtitle: "We would love to hear from you. Please fill out the form below and our team will get back to you shortly.",
+            submitButtonText: "Send Message",
+            successMessage: "Thank you for your message. Our team will get back to you shortly.",
             fields: [
               {
                 id: "name",
                 label: "Full Name",
                 type: "text" as const,
                 required: true,
-                placeholder: "e.g. Smt. Gayatri Iyer",
+                placeholder: "e.g. Alex Morgan",
               },
               {
                 id: "email",
                 label: "Email Address",
                 type: "email" as const,
                 required: true,
-                placeholder: "curator@example.com",
+                placeholder: "name@example.com",
+              },
+              {
+                id: "phone",
+                label: "Phone / Mobile",
+                type: "tel" as const,
+                required: false,
+                placeholder: "e.g. +1 (555) 019-2834",
+              },
+              {
+                id: "subject",
+                label: "Subject",
+                type: "text" as const,
+                required: true,
+                placeholder: "How can we help you?",
               },
               {
                 id: "message",
-                label: "Message / Commentary",
+                label: "Message",
                 type: "textarea" as const,
                 required: true,
-                placeholder: "Specify masterwork inquiries, dimensions, or bespoke requirements...",
+                placeholder: "Enter your message or inquiry...",
               },
             ],
           }

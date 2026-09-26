@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
 import {
   Bold,
   Italic,
@@ -58,6 +59,7 @@ export function EmailTiptapEditor({
     { token: "{email}", desc: "Sender or attendee email address" },
     { token: "{phone}", desc: "Contact telephone number" },
     { token: "{subject}", desc: "Inquiry or submission subject line" },
+    { token: "{organization_name}", desc: "Atelier or organization brand title" },
     { token: "{message}", desc: "Submitted correspondence or message" },
     { token: "{form_name}", desc: "Title or category of the submission form" },
     { token: "{event_title}", desc: "Exhibition or recital title" },
@@ -85,6 +87,10 @@ export function EmailTiptapEditor({
         HTMLAttributes: {
           style: "color: #b45309; text-decoration: underline;",
         },
+      }),
+      Placeholder.configure({
+        placeholder: placeholder || "Compose email copy with rich text formatting...",
+        emptyEditorClass: "is-editor-empty",
       }),
     ],
     content: content || "<p></p>",

@@ -59,10 +59,10 @@ export interface DynamicFormBlockProps {
 
 export function DynamicFormBlock({
   formConfig,
-  formTitle = "Send Curatorial Inquiry",
-  formSubtitle = "Direct correspondence with the curatorial atelier desk.",
-  submitButtonText = "Submit Inquiry",
-  successMessage = "Thank you for your correspondence. The curatorial desk will respond shortly.",
+  formTitle = "Get in Touch",
+  formSubtitle = "We would love to hear from you. Please fill out the form below and our team will get back to you shortly.",
+  submitButtonText = "Send Message",
+  successMessage = "Thank you for your message. Our team will get back to you shortly.",
   notifyEmail = true,
   recipientEmails = "",
   emailSubjectTemplate = "",
@@ -72,42 +72,35 @@ export function DynamicFormBlock({
       label: "Full Name",
       type: "text",
       required: true,
-      placeholder: "e.g. Smt. Gayatri Iyer",
+      placeholder: "e.g. Alex Morgan",
     },
     {
       id: "email",
       label: "Email Address",
       type: "email",
       required: true,
-      placeholder: "curator@example.com",
+      placeholder: "name@example.com",
     },
     {
       id: "phone",
-      label: "Phone / WhatsApp",
+      label: "Phone / Mobile",
       type: "tel",
       required: false,
-      placeholder: "+91 98450 12345",
+      placeholder: "e.g. +1 (555) 019-2834",
     },
     {
-      id: "inquiry_type",
-      label: "Inquiry Type",
-      type: "select",
-      required: false,
-      placeholder: "Select an option",
-      options: [
-        "Artwork Acquisition",
-        "Commission Work",
-        "Private Viewing / RSVP",
-        "Carnatic Music Recital",
-        "General Curatorial Question",
-      ],
+      id: "subject",
+      label: "Subject",
+      type: "text",
+      required: true,
+      placeholder: "How can we help you?",
     },
     {
       id: "message",
-      label: "Message / Commentary",
+      label: "Message",
       type: "textarea",
       required: true,
-      placeholder: "Specify masterwork inquiries, dimensions, or bespoke requirements...",
+      placeholder: "Enter your message or inquiry...",
     },
   ],
   pageSlug = "general",
@@ -136,6 +129,7 @@ export function DynamicFormBlock({
     let fullName = "";
     let email = "";
     let phone = "";
+    let subject = "";
     let message = "";
     const customFields: Record<string, unknown> = {};
 
@@ -147,8 +141,10 @@ export function DynamicFormBlock({
         if (!fullName && typeof val === "string") fullName = val;
       } else if (field.id === "email" || lower.includes("email")) {
         if (!email && typeof val === "string") email = val;
-      } else if (field.id === "phone" || lower.includes("phone") || lower.includes("whatsapp")) {
+      } else if (field.id === "phone" || lower.includes("phone") || lower.includes("mobile") || lower.includes("whatsapp")) {
         if (!phone && typeof val === "string") phone = val;
+      } else if (field.id === "subject" || lower.includes("subject")) {
+        if (!subject && typeof val === "string") subject = val;
       } else if (field.id === "message" || lower.includes("message") || lower.includes("notes") || lower.includes("comment")) {
         if (!message && typeof val === "string") message = val;
       } else if (val !== undefined && val !== "") {
@@ -159,6 +155,9 @@ export function DynamicFormBlock({
     // Fallbacks if not mapped by labels
     if (!fullName && typeof formData["name"] === "string") fullName = formData["name"];
     if (!email && typeof formData["email"] === "string") email = formData["email"];
+    if (!subject && typeof formData["subject"] === "string") subject = formData["subject"];
+    if (!phone && typeof formData["phone"] === "string") phone = formData["phone"];
+    if (!message && typeof formData["message"] === "string") message = formData["message"];
 
     if (!fullName.trim() || !email.trim()) {
       setIsSubmitting(false);
@@ -171,6 +170,7 @@ export function DynamicFormBlock({
         fullName: fullName.trim(),
         email: email.trim(),
         phone: phone.trim() || undefined,
+        subject: subject.trim() || undefined,
         message: message.trim() || undefined,
         formTitle: effectiveTitle,
         pageSlug,
@@ -415,7 +415,7 @@ export function DynamicFormBlock({
             className="text-[11px] text-center text-slate-600 dark:text-slate-400 mt-2.5 font-mono"
             style={{ color: "var(--form-placeholder-color, var(--muted-foreground))" }}
           >
-            Directly encrypted and dispatched to atelier curatorial records.
+            Your submission is encrypted and securely dispatched.
           </p>
         </div>
       </form>

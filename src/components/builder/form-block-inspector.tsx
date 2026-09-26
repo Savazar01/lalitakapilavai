@@ -70,14 +70,14 @@ const FIELD_TYPE_LABELS: Record<string, string> = {
 };
 
 export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) {
-  const formTitle = data.formTitle ?? "Send Curatorial Inquiry";
+  const formTitle = data.formTitle ?? "Get in Touch";
   const formSubtitle =
     data.formSubtitle ??
-    "Direct correspondence with the curatorial atelier desk.";
-  const submitButtonText = data.submitButtonText ?? "Submit Inquiry";
+    "We would love to hear from you. Please fill out the form below and our team will get back to you shortly.";
+  const submitButtonText = data.submitButtonText ?? "Send Message";
   const successMessage =
     data.successMessage ??
-    "Thank you for your correspondence. The curatorial desk will respond shortly.";
+    "Thank you for your message. Our team will get back to you shortly.";
   const notifyEmail = data.notifyEmail ?? true;
   const recipientEmails = data.recipientEmails ?? "";
   const emailSubjectTemplate = data.emailSubjectTemplate ?? "";
@@ -87,42 +87,35 @@ export function FormBlockInspector({ data, onChange }: FormBlockInspectorProps) 
       label: "Full Name",
       type: "text",
       required: true,
-      placeholder: "e.g. Smt. Gayatri Iyer",
+      placeholder: "e.g. Alex Morgan",
     },
     {
       id: "email",
       label: "Email Address",
       type: "email",
       required: true,
-      placeholder: "curator@example.com",
+      placeholder: "name@example.com",
     },
     {
       id: "phone",
-      label: "Phone / WhatsApp",
+      label: "Phone / Mobile",
       type: "tel",
       required: false,
-      placeholder: "+91 98450 12345",
+      placeholder: "e.g. +1 (555) 019-2834",
     },
     {
-      id: "inquiry_type",
-      label: "Inquiry Type",
-      type: "select",
-      required: false,
-      placeholder: "Select an option",
-      options: [
-        "Artwork Acquisition",
-        "Commission Work",
-        "Private Viewing / RSVP",
-        "Carnatic Music Recital",
-        "General Curatorial Question",
-      ],
+      id: "subject",
+      label: "Subject",
+      type: "text",
+      required: true,
+      placeholder: "How can we help you?",
     },
     {
       id: "message",
-      label: "Message / Commentary",
+      label: "Message",
       type: "textarea",
       required: true,
-      placeholder: "Specify masterwork inquiries, dimensions, or bespoke requirements...",
+      placeholder: "Enter your message or inquiry...",
     },
   ];
 

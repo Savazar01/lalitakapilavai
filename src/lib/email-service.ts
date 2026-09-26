@@ -25,84 +25,61 @@ export interface EmailDispatchOptions {
 export const DEFAULT_EMAIL_TEMPLATES = [
   {
     triggerType: "contact",
-    name: "General Contact Inquiries",
-    adminSubject: "✨ Inbound Inquiry: {subject} [{name}]",
-    adminBodyTemplate: `<p>A new visitor inquiry has been submitted through the digital archive.</p>
+    name: "Contact Form",
+    adminSubject: "New Inbound Inquiry: {subject} [{name}]",
+    adminBodyTemplate: `<p>A new visitor inquiry has been submitted through the website.</p>
 <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
   <tr><td style="padding: 6px 0; color: #6b7280; width: 120px;"><strong>Name:</strong></td><td style="padding: 6px 0; color: #111827;">{name}</td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Email:</strong></td><td style="padding: 6px 0; color: #111827;"><a href="mailto:{email}" style="color: #b45309;">{email}</a></td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Phone:</strong></td><td style="padding: 6px 0; color: #111827;">{phone}</td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Subject:</strong></td><td style="padding: 6px 0; color: #111827;">{subject}</td></tr>
 </table>
-<div style="background: #faf7f2; border-left: 3px solid #d4af37; padding: 14px; border-radius: 4px; margin: 16px 0; color: #1f2937;">
-  <p style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #854d0e; font-weight: bold;">Collector Message</p>
+<div style="background: #f9fafb; border-left: 3px solid #d4af37; padding: 14px; border-radius: 4px; margin: 16px 0; color: #1f2937;">
+  <p style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #854d0e; font-weight: bold;">Message</p>
   <p style="margin: 0; white-space: pre-wrap;">{message}</p>
 </div>
 {form_data}`,
     sendUserReceipt: true,
-    userSubject: "Thank you for contacting the Atelier",
+    userSubject: "Thank you for contacting {organization_name}",
     userBodyTemplate: `<p>Dear {name},</p>
-<p>Thank you for reaching out to the Atelier. We have received your inquiry regarding <strong>{subject}</strong>.</p>
-<p>Our curatorial desk will review your correspondence and respond promptly.</p>
-<p style="margin-top: 24px;">With warm regards,<br/><strong>Atelier Administration</strong><br/><span style="font-size: 12px; color: #6b7280;">Fine Art &amp; Cultural Archive</span></p>`,
+<p>Thank you for reaching out to us. We have received your inquiry regarding <strong>{subject}</strong>.</p>
+<p>Our team will review your message and respond as soon as possible.</p>
+<p style="margin-top: 24px;">Best regards,<br/><strong>{organization_name}</strong></p>`,
   },
   {
     triggerType: "event_rsvp",
-    name: "Exhibition & Concert RSVPs",
+    name: "Event & Recital RSVPs",
     adminSubject: "🎟️ New RSVP: {event_title} [{name}]",
-    adminBodyTemplate: `<p>A patron or guest has confirmed attendance for an upcoming recital or exhibition.</p>
+    adminBodyTemplate: `<p>A guest has confirmed attendance for an upcoming event.</p>
 <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
   <tr><td style="padding: 6px 0; color: #6b7280; width: 140px;"><strong>Attendee:</strong></td><td style="padding: 6px 0; color: #111827;">{name}</td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Email:</strong></td><td style="padding: 6px 0; color: #111827;"><a href="mailto:{email}" style="color: #b45309;">{email}</a></td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Phone:</strong></td><td style="padding: 6px 0; color: #111827;">{phone}</td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Event:</strong></td><td style="padding: 6px 0; color: #111827; font-weight: bold;">{event_title}</td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Date &amp; Venue:</strong></td><td style="padding: 6px 0; color: #111827;">{event_date}</td></tr>
-  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Ticket / Guests:</strong></td><td style="padding: 6px 0; color: #111827;">{guest_count}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Guests:</strong></td><td style="padding: 6px 0; color: #111827;">{guest_count}</td></tr>
 </table>
 {form_data}`,
     sendUserReceipt: true,
     userSubject: "Attendance Confirmed: {event_title}",
     userBodyTemplate: `<p>Dear {name},</p>
 <p>Your attendance reservation for <strong>{event_title}</strong> on {event_date} has been confirmed.</p>
-<p>We look forward to welcoming you to this celebration of fine art and cultural heritage.</p>
-<p>Please present this confirmation email upon arrival at the venue reception.</p>
-<p style="margin-top: 24px;">Warm regards,<br/><strong>Atelier Administration</strong></p>`,
-  },
-  {
-    triggerType: "acquisition",
-    name: "Commission & Acquisition Requests",
-    adminSubject: "🏛️ Private Acquisition Request: {subject} [{name}]",
-    adminBodyTemplate: `<p>A patron has submitted a private acquisition or commissioning request.</p>
-<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
-  <tr><td style="padding: 6px 0; color: #6b7280; width: 140px;"><strong>Patron Name:</strong></td><td style="padding: 6px 0; color: #111827;">{name}</td></tr>
-  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Email:</strong></td><td style="padding: 6px 0; color: #111827;"><a href="mailto:{email}" style="color: #b45309;">{email}</a></td></tr>
-  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Phone:</strong></td><td style="padding: 6px 0; color: #111827;">{phone}</td></tr>
-  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Artwork / Focus:</strong></td><td style="padding: 6px 0; color: #111827; font-weight: bold;">{subject}</td></tr>
-</table>
-<div style="background: #faf7f2; border-left: 3px solid #d4af37; padding: 14px; border-radius: 4px; margin: 16px 0; color: #1f2937;">
-  <p style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #854d0e; font-weight: bold;">Acquisition / Commission Details</p>
-  <p style="margin: 0; white-space: pre-wrap;">{message}</p>
-</div>
-{form_data}`,
-    sendUserReceipt: true,
-    userSubject: "Private Acquisition Inquiry Received",
-    userBodyTemplate: `<p>Dear {name},</p>
-<p>Thank you for expressing interest in acquiring or commissioning an authentic masterwork from our atelier collection.</p>
-<p>Our curatorial team is reviewing your requirements and will contact you with provenance details, dimensions, and schedule availability.</p>
-<p style="margin-top: 24px;">With respectful regards,<br/><strong>Atelier Curatorial Desk</strong></p>`,
+<p>We look forward to welcoming you.</p>
+<p>Please present this confirmation email upon arrival.</p>
+<p style="margin-top: 24px;">Best regards,<br/><strong>{organization_name}</strong></p>`,
   },
   {
     triggerType: "custom_form",
-    name: "Custom Dynamic Page Builder Forms",
+    name: "Custom Form Submissions",
     adminSubject: "📋 Form Submission: {form_name} [{name}]",
-    adminBodyTemplate: `<p>A new submission has been received from the digital portfolio page builder form: <strong>{form_name}</strong>.</p>
+    adminBodyTemplate: `<p>A new submission has been received from form: <strong>{form_name}</strong>.</p>
 <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
   <tr><td style="padding: 6px 0; color: #6b7280; width: 140px;"><strong>Respondent:</strong></td><td style="padding: 6px 0; color: #111827;">{name}</td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Email:</strong></td><td style="padding: 6px 0; color: #111827;"><a href="mailto:{email}" style="color: #b45309;">{email}</a></td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Phone:</strong></td><td style="padding: 6px 0; color: #111827;">{phone}</td></tr>
   <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Form Title:</strong></td><td style="padding: 6px 0; color: #111827;">{form_name}</td></tr>
 </table>
-<div style="background: #faf7f2; border-left: 3px solid #d4af37; padding: 14px; border-radius: 4px; margin: 16px 0; color: #1f2937;">
+<div style="background: #f9fafb; border-left: 3px solid #d4af37; padding: 14px; border-radius: 4px; margin: 16px 0; color: #1f2937;">
   <p style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #854d0e; font-weight: bold;">Submitted Message</p>
   <p style="margin: 0; white-space: pre-wrap;">{message}</p>
 </div>
@@ -110,8 +87,8 @@ export const DEFAULT_EMAIL_TEMPLATES = [
     sendUserReceipt: true,
     userSubject: "Confirmation: Your submission to {form_name}",
     userBodyTemplate: `<p>Dear {name},</p>
-<p>Thank you for submitting your details via <strong>{form_name}</strong>. Your correspondence has been securely logged with our administration.</p>
-<p style="margin-top: 24px;">With warm regards,<br/><strong>Atelier Administration</strong></p>`,
+<p>Thank you for submitting your details via <strong>{form_name}</strong>. Your correspondence has been received.</p>
+<p style="margin-top: 24px;">Best regards,<br/><strong>{organization_name}</strong></p>`,
   },
 ];
 
@@ -360,8 +337,7 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
   if (!dbTemplate) {
     let fallbackTrigger = "custom_form";
     if (triggerType.startsWith("event_rsvp")) fallbackTrigger = "event_rsvp";
-    else if (triggerType.includes("acquisition") || triggerType.includes("commission")) fallbackTrigger = "acquisition";
-    else if (triggerType.includes("contact")) fallbackTrigger = "contact";
+    else if (triggerType.includes("contact") || triggerType.includes("acquisition") || triggerType.includes("commission")) fallbackTrigger = "contact";
 
     dbTemplate = await prisma.emailTemplateConfig.findUnique({
       where: { triggerType: fallbackTrigger },
@@ -377,20 +353,29 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
 
   const { transporter, settings, fromEmail, fromName } = await getTransporter();
 
+  // Resolve tenant organization name
+  const orgName =
+    settings?.siteName
+      ? settings.siteName.includes("—")
+        ? settings.siteName.split("—")[0].trim()
+        : settings.siteName
+      : "SavazAI Platform";
+
   // Tokens dictionary
   const now = new Date();
   const tokens: Record<string, unknown> = {
     name: data.name || "Valued Guest",
     email: data.email || userEmail || "",
     phone: data.phone || "Not specified",
-    subject: data.subject || "Atelier Correspondence",
+    subject: data.subject || "General Inquiry",
     message: data.message || "",
-    form_name: data.form_name || activeTemplate.name || "General Form",
+    form_name: data.form_name || activeTemplate.name || "Contact Form",
     form_data: data.form_data || "",
-    event_title: data.event_title || "Classical Recital / Exhibition",
+    event_title: data.event_title || "Event",
     event_date: data.event_date || now.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }),
     guest_count: data.guest_count || 1,
     date: now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+    organization_name: orgName,
     ...data,
   };
 

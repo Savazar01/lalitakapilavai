@@ -142,7 +142,8 @@ SavazAI WebApps Platform
 
 #### 3. Visual Drag-and-Drop Page Builder (`/admin/pages/[id]/builder`)
 - Modular block studio supporting Hero Showcase, 3D Exhibition Salon Wall, Text Blocks, Image Blocks, Media Carousels, and Dynamic Form Blocks.
-- Real-time live preview with responsive device breakpoints (Desktop, Tablet, Mobile).
+- Universal Form Block scaffolding 5 standard inquiry fields: Full Name, Email Address, Phone (optional), Subject Line, and Message with dynamic CSRF-protected submission routing.
+- Real-time live preview with responsive device breakpoints (Desktop, Tablet, Mobile) and integrated `@tiptap/extension-placeholder` zero-state styling.
 - Clean JSON serialization stored in the `Page.content` database column.
 
 #### 4. Interactive e-Catalog Studio (`/admin/catalogs`)
@@ -157,8 +158,9 @@ SavazAI WebApps Platform
 
 #### 6. Dynamic Mail Message Studio & Audit Telemetry (`/admin/settings` -> Mail Msg Config)
 - **Decoupled Alert Routing**: Inbound submissions route to `systemSetting.adminAlertEmail`, never to administrative superadmin credentials.
-- **Dynamic Form Discovery**: Automatically aggregates Core triggers (`contact`, `acquisition`, `event_rsvp`), Page Builder form blocks, and active Event registration forms.
-- **Universal Tiptap WYSIWYG Editor**: Visual rich text editor for designing email notifications with clickable dynamic token chips (`{name}`, `{email}`, `{event_title}`, `{event_date}`).
+- **Dynamic Form Discovery**: Automatically aggregates Core triggers (`contact`, `event_rsvp`, `custom_form`), Page Builder form blocks, and active Event registration forms.
+- **Universal Tiptap WYSIWYG Editor**: Visual rich text editor for designing email notifications with clickable dynamic token chips (`{name}`, `{email}`, `{organization_name}`, `{subject}`, `{message}`, `{event_title}`, `{event_date}`).
+- **Multi-Tenant Brand Generalization**: Email templates resolve `{organization_name}` dynamically from the active tenant's brand title, eliminating hardcoded artist presets.
 - **Dual Delivery Logo Engine**: Employs CID inline multipart attachments (`cid:atelier-brand-logo`) for local media files alongside absolute HTTPS fallbacks, resolving broken images across Gmail, Outlook, and Apple Mail.
 - **Immutable Audit Logging**: Logs every outbound dispatch to `EmailDispatchLog` with delivery statuses (`SENT`, `FAILED`), error telemetry, and CSV export.
 

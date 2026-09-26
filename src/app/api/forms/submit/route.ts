@@ -48,9 +48,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const titleStr = (formTitle || "General Atelier Inquiry").trim();
+    const titleStr = (formTitle || "General Inquiry").trim();
     const pageStr = (pageSlug || "contact").trim();
     const messageStr = (message || comments || "Inquiry submitted through website form.").trim();
+    const subjectStr = (body.subject || `[${titleStr}] Inbound Request from ${trimmedName}`).trim();
 
     // 1. Record lead in database
     const lead = await prisma.lead.create({
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
         name: trimmedName,
         email: trimmedEmail,
         phone: phone ? phone.trim() : null,
-        subject: `[${titleStr}] Inbound Request from ${trimmedName}`,
+        subject: subjectStr,
         message: messageStr,
         formTitle: titleStr,
         pageSlug: pageStr,
@@ -71,20 +72,13 @@ export async function POST(req: NextRequest) {
     if (notifyEmail !== false) {
       try {
         const lowerTitle = titleStr.toLowerCase();
-        const lowerMessage = messageStr.toLowerCase();
-        const isAcquisition =
-          lowerTitle.includes("acquisition") ||
-          lowerTitle.includes("commission") ||
-          lowerMessage.includes("acquisition") ||
-          lowerMessage.includes("commission") ||
-          lowerTitle.includes("private viewing");
-        
         const isContact =
           lowerTitle.includes("contact") ||
           pageStr.toLowerCase() === "contact" ||
-          lowerTitle.includes("general inquiry");
+          lowerTitle.includes("inquiry") ||
+          lowerTitle.includes("get in touch");
 
-        const archetypeFallback = isAcquisition ? "acquisition" : isContact ? "contact" : "custom_form";
+        const archetypeFallback = isContact ? "contact" : "custom_form";
 
         let triggerType = (body.triggerType ? String(body.triggerType).trim() : "") || "";
         const formIdStr = body.formId ? String(body.formId).trim() : null;
@@ -131,7 +125,7 @@ export async function POST(req: NextRequest) {
             name: trimmedName,
             email: trimmedEmail,
             phone: phone ? phone.trim() : "Not specified",
-            subject: `[${titleStr}] Inbound Request from ${trimmedName}`,
+            subject: subjectStr,
             message: messageStr,
             form_name: titleStr,
             form_data: customRows,

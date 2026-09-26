@@ -39,27 +39,19 @@ export async function GET(request: NextRequest) {
     const coreForms: DiscoveredFormItem[] = [
       {
         triggerType: "contact",
-        name: "General Contact Inquiries",
+        name: "Contact Form",
         source: "System Core",
         url: "/contact",
         badge: "Global",
         description: "Inbound visitor inquiries submitted via /contact or general contact buttons.",
       },
       {
-        triggerType: "acquisition",
-        name: "Commission & Acquisition Requests",
-        source: "System Core",
-        url: "/commission",
-        badge: "Curatorial",
-        description: "Private collector acquisition inquiries and bespoke 22k gold Tanjore/Mysore commissions.",
-      },
-      {
         triggerType: "event_rsvp",
-        name: "General Exhibition & Concert RSVPs",
+        name: "General Event RSVPs",
         source: "System Core",
         url: "/events",
         badge: "Events",
-        description: "Default fallback RSVP confirmations across all upcoming recitals and exhibitions.",
+        description: "Default fallback RSVP confirmations across all upcoming recitals, workshops, and exhibitions.",
       },
       {
         triggerType: "custom_form",

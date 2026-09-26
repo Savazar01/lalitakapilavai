@@ -832,9 +832,88 @@ async function main() {
           },
         });
         console.log(`✅ Backfilled default hero section for: /${sp.slug}`);
-      } else {
-        console.log(`🛡️ Preserved existing admin modifications for: /${sp.slug} (${existingPage.sections.length} sections)`);
       }
+    }
+  }
+
+  // 14. Provision Default Multi-Tenant Email Templates
+  const defaultEmailTemplates = [
+    {
+      triggerType: "contact",
+      name: "Contact Form",
+      adminSubject: "New Inbound Inquiry: {subject} [{name}]",
+      adminBodyTemplate: `<p>A new visitor inquiry has been submitted through the website.</p>
+<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
+  <tr><td style="padding: 6px 0; color: #6b7280; width: 120px;"><strong>Name:</strong></td><td style="padding: 6px 0; color: #111827;">{name}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Email:</strong></td><td style="padding: 6px 0; color: #111827;"><a href="mailto:{email}" style="color: #b45309;">{email}</a></td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Phone:</strong></td><td style="padding: 6px 0; color: #111827;">{phone}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Subject:</strong></td><td style="padding: 6px 0; color: #111827;">{subject}</td></tr>
+</table>
+<div style="background: #f9fafb; border-left: 3px solid #d4af37; padding: 14px; border-radius: 4px; margin: 16px 0; color: #1f2937;">
+  <p style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #854d0e; font-weight: bold;">Message</p>
+  <p style="margin: 0; white-space: pre-wrap;">{message}</p>
+</div>
+{form_data}`,
+      sendUserReceipt: true,
+      userSubject: "Thank you for contacting {organization_name}",
+      userBodyTemplate: `<p>Dear {name},</p>
+<p>Thank you for reaching out to us. We have received your inquiry regarding <strong>{subject}</strong>.</p>
+<p>Our team will review your message and respond as soon as possible.</p>
+<p style="margin-top: 24px;">Best regards,<br/><strong>{organization_name}</strong></p>`,
+    },
+    {
+      triggerType: "event_rsvp",
+      name: "Event & Recital RSVPs",
+      adminSubject: "🎟️ New RSVP: {event_title} [{name}]",
+      adminBodyTemplate: `<p>A guest has confirmed attendance for an upcoming event.</p>
+<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
+  <tr><td style="padding: 6px 0; color: #6b7280; width: 140px;"><strong>Attendee:</strong></td><td style="padding: 6px 0; color: #111827;">{name}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Email:</strong></td><td style="padding: 6px 0; color: #111827;"><a href="mailto:{email}" style="color: #b45309;">{email}</a></td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Phone:</strong></td><td style="padding: 6px 0; color: #111827;">{phone}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Event:</strong></td><td style="padding: 6px 0; color: #111827; font-weight: bold;">{event_title}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Date &amp; Venue:</strong></td><td style="padding: 6px 0; color: #111827;">{event_date}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Guests:</strong></td><td style="padding: 6px 0; color: #111827;">{guest_count}</td></tr>
+</table>
+{form_data}`,
+      sendUserReceipt: true,
+      userSubject: "Attendance Confirmed: {event_title}",
+      userBodyTemplate: `<p>Dear {name},</p>
+<p>Your attendance reservation for <strong>{event_title}</strong> on {event_date} has been confirmed.</p>
+<p>We look forward to welcoming you.</p>
+<p>Please present this confirmation email upon arrival.</p>
+<p style="margin-top: 24px;">Best regards,<br/><strong>{organization_name}</strong></p>`,
+    },
+    {
+      triggerType: "custom_form",
+      name: "Custom Form Submissions",
+      adminSubject: "📋 Form Submission: {form_name} [{name}]",
+      adminBodyTemplate: `<p>A new submission has been received from form: <strong>{form_name}</strong>.</p>
+<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
+  <tr><td style="padding: 6px 0; color: #6b7280; width: 140px;"><strong>Respondent:</strong></td><td style="padding: 6px 0; color: #111827;">{name}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Email:</strong></td><td style="padding: 6px 0; color: #111827;"><a href="mailto:{email}" style="color: #b45309;">{email}</a></td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Phone:</strong></td><td style="padding: 6px 0; color: #111827;">{phone}</td></tr>
+  <tr><td style="padding: 6px 0; color: #6b7280;"><strong>Form Title:</strong></td><td style="padding: 6px 0; color: #111827;">{form_name}</td></tr>
+</table>
+<div style="background: #f9fafb; border-left: 3px solid #d4af37; padding: 14px; border-radius: 4px; margin: 16px 0; color: #1f2937;">
+  <p style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #854d0e; font-weight: bold;">Submitted Message</p>
+  <p style="margin: 0; white-space: pre-wrap;">{message}</p>
+</div>
+{form_data}`,
+      sendUserReceipt: true,
+      userSubject: "Confirmation: Your submission to {form_name}",
+      userBodyTemplate: `<p>Dear {name},</p>
+<p>Thank you for submitting your details via <strong>{form_name}</strong>. Your correspondence has been received.</p>
+<p style="margin-top: 24px;">Best regards,<br/><strong>{organization_name}</strong></p>`,
+    },
+  ];
+
+  for (const t of defaultEmailTemplates) {
+    const existing = await prisma.emailTemplateConfig.findUnique({
+      where: { triggerType: t.triggerType },
+    });
+    if (!existing) {
+      await prisma.emailTemplateConfig.create({ data: t });
+      console.log(`✅ Provisioned default email template: ${t.triggerType}`);
     }
   }
 

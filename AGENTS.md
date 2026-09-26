@@ -155,7 +155,7 @@ All code generation and architectural modifications must adhere to the specializ
 
 ### C. Universal Email Notification & Form Dispatch Engine
 - **Decoupled Alert Routing**: Inbound form submissions route to `systemSetting.adminAlertEmail`, never to console super-admin credentials.
-- **Dynamic Form Discovery**: `/api/admin/forms/discover` dynamically aggregates core triggers (`contact`, `acquisition`, `event_rsvp`), Page Builder form blocks, and active Event registration forms.
+- **Dynamic Form Discovery**: `/api/admin/forms/discover` dynamically aggregates core triggers (`contact`, `event_rsvp`, `custom_form`), Page Builder form blocks, and active Event registration forms.
 - **Dual Delivery Logo Engine (CID + HTTPS)**:
   - Email branding uses the single source of truth: `SystemSetting.logoUrl` from the "General" settings tab.
   - Embed local disk images as inline MIME attachments (`cid:atelier-brand-logo`) to guarantee instant rendering in Gmail, Outlook, and Apple Mail without broken image icons.
@@ -182,4 +182,10 @@ All code generation and architectural modifications must adhere to the specializ
 - **Strict Seeder Non-Destructive Invariant**:
   - `prisma/seed.ts` enforces that if an `existingSettings` record is detected, it logs `🛡️ Existing SystemSetting detected. Skipping configuration overwrite to protect client data.` and skips all configuration mutations.
   - Across container deployments and restarts, active tenant configuration, custom page blocks, menu items, and soft-deleted entities (`isDeleted: true`) are strictly preserved and never overwritten or resurrected.
+
+### G. Universal Contact Form & Generalized Multi-Tenant Email Templates
+- **Universal Form Structure**: Standard contact form blocks render 5 universal inquiry fields: Full Name, Email Address, Phone Number (optional), Subject Line, and Message. Specialized or artist-specific presets ("Artwork Acquisition", "Commission Work") are eradicated in favor of open-ended subject fields.
+- **Dynamic Organization Token Resolution**: System notification and auto-responder email templates resolve `{organization_name}` dynamically from `SystemSetting.siteName` (with graceful fallback to platform branding). Zero artist-specific strings are hardcoded in seeder presets or defaults.
+- **Unified Lead Ingestion**: Form submissions routed through `/api/forms/submit` map generic inquiries cleanly to the `contact` trigger template and CRM Lead pipeline, delivering alerts to `adminAlertEmail` with encrypted transmission notices.
+
 
