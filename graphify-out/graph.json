@@ -1178,7 +1178,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L1",
       "id": "src_app_page_tsx",
-      "community": 89,
+      "community": 69,
       "norm_label": "page.tsx"
     },
     {
@@ -1187,7 +1187,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L13",
       "id": "app_page_generatemetadata",
-      "community": 89,
+      "community": 69,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1196,7 +1196,7 @@
       "source_file": "src/app/page.tsx",
       "source_location": "L45",
       "id": "app_page_homepage",
-      "community": 89,
+      "community": 69,
       "norm_label": "homepage()"
     },
     {
@@ -1205,7 +1205,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_artwork_slug_page_tsx",
-      "community": 43,
+      "community": 82,
       "norm_label": "page.tsx"
     },
     {
@@ -1214,7 +1214,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L26",
       "id": "src_app_public_artwork_slug_page_tsx_slug_page_pageprops",
-      "community": 43,
+      "community": 82,
       "norm_label": "pageprops"
     },
     {
@@ -1223,7 +1223,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L32",
       "id": "slug_page_getartworkbyslug",
-      "community": 43,
+      "community": 82,
       "norm_label": "getartworkbyslug"
     },
     {
@@ -1232,7 +1232,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L47",
       "id": "src_app_public_artwork_slug_page_tsx_slug_page_generatemetadata",
-      "community": 43,
+      "community": 82,
       "norm_label": "generatemetadata()"
     },
     {
@@ -1241,7 +1241,7 @@
       "source_file": "src/app/(public)/artwork/[slug]/page.tsx",
       "source_location": "L66",
       "id": "slug_page_artworkdetailpage",
-      "community": 43,
+      "community": 82,
       "norm_label": "artworkdetailpage()"
     },
     {
@@ -1331,7 +1331,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L46",
       "id": "slug_page_getframeclass",
-      "community": 4,
+      "community": 57,
       "norm_label": "getframeclass()"
     },
     {
@@ -1349,7 +1349,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L81",
       "id": "slug_page_spinedecoratorslotview",
-      "community": 4,
+      "community": 59,
       "norm_label": "spinedecoratorslotview()"
     },
     {
@@ -1358,7 +1358,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L162",
       "id": "slug_page_catalogsingleplateview",
-      "community": 4,
+      "community": 59,
       "norm_label": "catalogsingleplateview()"
     },
     {
@@ -1367,7 +1367,7 @@
       "source_file": "src/app/(public)/catalogs/[slug]/page.tsx",
       "source_location": "L292",
       "id": "slug_page_catalogbackgroundlayer",
-      "community": 0,
+      "community": 44,
       "norm_label": "catalogbackgroundlayer()"
     },
     {
@@ -1394,7 +1394,7 @@
       "source_file": "src/app/(public)/categories/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_categories_page_tsx",
-      "community": 86,
+      "community": 32,
       "norm_label": "page.tsx"
     },
     {
@@ -1403,7 +1403,7 @@
       "source_file": "src/app/(public)/categories/page.tsx",
       "source_location": "L13",
       "id": "categories_page_metadata",
-      "community": 86,
+      "community": 32,
       "norm_label": "metadata"
     },
     {
@@ -1412,7 +1412,7 @@
       "source_file": "src/app/(public)/categories/page.tsx",
       "source_location": "L19",
       "id": "categories_page_categoriespage",
-      "community": 86,
+      "community": 32,
       "norm_label": "categoriespage()"
     },
     {
@@ -1421,7 +1421,7 @@
       "source_file": "src/app/(public)/commission/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_commission_page_tsx",
-      "community": 86,
+      "community": 8,
       "norm_label": "page.tsx"
     },
     {
@@ -1430,7 +1430,7 @@
       "source_file": "src/app/(public)/commission/page.tsx",
       "source_location": "L10",
       "id": "commission_page_metadata",
-      "community": 86,
+      "community": 8,
       "norm_label": "metadata"
     },
     {
@@ -1439,7 +1439,7 @@
       "source_file": "src/app/(public)/commission/page.tsx",
       "source_location": "L16",
       "id": "commission_page_commissionpage",
-      "community": 86,
+      "community": 8,
       "norm_label": "commissionpage()"
     },
     {
@@ -1475,7 +1475,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_events_page_tsx",
-      "community": 86,
+      "community": 8,
       "norm_label": "page.tsx"
     },
     {
@@ -1484,7 +1484,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L15",
       "id": "events_page_metadata",
-      "community": 86,
+      "community": 8,
       "norm_label": "metadata"
     },
     {
@@ -1493,7 +1493,7 @@
       "source_file": "src/app/(public)/events/page.tsx",
       "source_location": "L21",
       "id": "events_page_eventspage",
-      "community": 86,
+      "community": 8,
       "norm_label": "eventspage()"
     },
     {
@@ -1556,7 +1556,7 @@
       "source_file": "src/app/(public)/exhibition-simulator/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_exhibition_simulator_page_tsx",
-      "community": 8,
+      "community": 18,
       "norm_label": "page.tsx"
     },
     {
@@ -1565,7 +1565,7 @@
       "source_file": "src/app/(public)/exhibition-simulator/page.tsx",
       "source_location": "L9",
       "id": "exhibition_simulator_page_metadata",
-      "community": 8,
+      "community": 18,
       "norm_label": "metadata"
     },
     {
@@ -1574,7 +1574,7 @@
       "source_file": "src/app/(public)/exhibition-simulator/page.tsx",
       "source_location": "L15",
       "id": "exhibition_simulator_page_exhibitionsimulatorpage",
-      "community": 8,
+      "community": 18,
       "norm_label": "exhibitionsimulatorpage()"
     },
     {
@@ -1646,7 +1646,7 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L1",
       "id": "src_app_public_posts_page_tsx",
-      "community": 92,
+      "community": 8,
       "norm_label": "page.tsx"
     },
     {
@@ -1655,7 +1655,7 @@
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L5",
       "id": "posts_page_postslegacyredirect",
-      "community": 92,
+      "community": 8,
       "norm_label": "postslegacyredirect()"
     },
     {
@@ -1799,7 +1799,7 @@
       "source_file": "src/app/admin/(dashboard)/artworks/page.tsx",
       "source_location": "L108",
       "id": "artworks_page_artworksadminpage",
-      "community": 62,
+      "community": 59,
       "norm_label": "artworksadminpage()"
     },
     {
@@ -1961,7 +1961,7 @@
       "source_file": "src/app/admin/(dashboard)/categories/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_categories_page_tsx",
-      "community": 32,
+      "community": 33,
       "norm_label": "page.tsx"
     },
     {
@@ -1970,7 +1970,7 @@
       "source_file": "src/app/admin/(dashboard)/categories/page.tsx",
       "source_location": "L53",
       "id": "categories_page_artcategoryitem",
-      "community": 32,
+      "community": 33,
       "norm_label": "artcategoryitem"
     },
     {
@@ -1979,7 +1979,7 @@
       "source_file": "src/app/admin/(dashboard)/categories/page.tsx",
       "source_location": "L87",
       "id": "categories_page_admincategoriespage",
-      "community": 32,
+      "community": 33,
       "norm_label": "admincategoriespage()"
     },
     {
@@ -2033,7 +2033,7 @@
       "source_file": "src/app/admin/(dashboard)/leads/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_leads_page_tsx",
-      "community": 49,
+      "community": 32,
       "norm_label": "page.tsx"
     },
     {
@@ -2042,7 +2042,7 @@
       "source_file": "src/app/admin/(dashboard)/leads/page.tsx",
       "source_location": "L48",
       "id": "leads_page_leaditem",
-      "community": 49,
+      "community": 32,
       "norm_label": "leaditem"
     },
     {
@@ -2051,7 +2051,7 @@
       "source_file": "src/app/admin/(dashboard)/leads/page.tsx",
       "source_location": "L73",
       "id": "leads_page_statuscolors",
-      "community": 49,
+      "community": 32,
       "norm_label": "statuscolors"
     },
     {
@@ -2060,7 +2060,7 @@
       "source_file": "src/app/admin/(dashboard)/leads/page.tsx",
       "source_location": "L82",
       "id": "leads_page_adminleadspage",
-      "community": 49,
+      "community": 32,
       "norm_label": "adminleadspage()"
     },
     {
@@ -2186,7 +2186,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/builder-client.tsx",
       "source_location": "L155",
       "id": "builder_builder_client_sortablesection",
-      "community": 0,
+      "community": 44,
       "norm_label": "sortablesection()"
     },
     {
@@ -2240,7 +2240,7 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L1",
       "id": "src_app_admin_dashboard_posts_page_tsx",
-      "community": 21,
+      "community": 49,
       "norm_label": "page.tsx"
     },
     {
@@ -2249,7 +2249,7 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L53",
       "id": "posts_page_blogpostitem",
-      "community": 21,
+      "community": 49,
       "norm_label": "blogpostitem"
     },
     {
@@ -2258,7 +2258,7 @@
       "source_file": "src/app/admin/(dashboard)/posts/page.tsx",
       "source_location": "L71",
       "id": "posts_page_adminpostspage",
-      "community": 21,
+      "community": 49,
       "norm_label": "adminpostspage()"
     },
     {
@@ -2447,7 +2447,7 @@
       "source_file": "src/app/api/admin/artworks/export/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_artworks_export_route_ts",
-      "community": 40,
+      "community": 29,
       "norm_label": "route.ts"
     },
     {
@@ -2456,7 +2456,7 @@
       "source_file": "src/app/api/admin/artworks/export/route.ts",
       "source_location": "L16",
       "id": "export_route_fetchthumbnailbuffer",
-      "community": 40,
+      "community": 29,
       "norm_label": "fetchthumbnailbuffer()"
     },
     {
@@ -2465,7 +2465,7 @@
       "source_file": "src/app/api/admin/artworks/export/route.ts",
       "source_location": "L55",
       "id": "export_route_get",
-      "community": 40,
+      "community": 29,
       "norm_label": "get()"
     },
     {
@@ -2771,7 +2771,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_categories_route_ts",
-      "community": 34,
+      "community": 29,
       "norm_label": "route.ts"
     },
     {
@@ -2780,7 +2780,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L5",
       "id": "categories_route_get",
-      "community": 34,
+      "community": 29,
       "norm_label": "get()"
     },
     {
@@ -2789,7 +2789,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L40",
       "id": "categories_route_post",
-      "community": 34,
+      "community": 29,
       "norm_label": "post()"
     },
     {
@@ -2798,7 +2798,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L130",
       "id": "categories_route_put",
-      "community": 34,
+      "community": 29,
       "norm_label": "put()"
     },
     {
@@ -2807,7 +2807,7 @@
       "source_file": "src/app/api/admin/categories/route.ts",
       "source_location": "L209",
       "id": "categories_route_delete",
-      "community": 34,
+      "community": 29,
       "norm_label": "delete()"
     },
     {
@@ -2852,7 +2852,7 @@
       "source_file": "src/app/api/admin/email-templates/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_email_templates_route_ts",
-      "community": 29,
+      "community": 51,
       "norm_label": "route.ts"
     },
     {
@@ -2861,7 +2861,7 @@
       "source_file": "src/app/api/admin/email-templates/route.ts",
       "source_location": "L8",
       "id": "email_templates_route_get",
-      "community": 29,
+      "community": 51,
       "norm_label": "get()"
     },
     {
@@ -2870,7 +2870,7 @@
       "source_file": "src/app/api/admin/email-templates/route.ts",
       "source_location": "L45",
       "id": "email_templates_route_put",
-      "community": 29,
+      "community": 51,
       "norm_label": "put()"
     },
     {
@@ -3230,7 +3230,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_posts_id_route_ts",
-      "community": 29,
+      "community": 86,
       "norm_label": "route.ts"
     },
     {
@@ -3239,7 +3239,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L5",
       "id": "src_app_api_admin_posts_id_route_ts_id_route_routeparams",
-      "community": 29,
+      "community": 86,
       "norm_label": "routeparams"
     },
     {
@@ -3248,7 +3248,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L9",
       "id": "src_app_api_admin_posts_id_route_ts_id_route_get",
-      "community": 29,
+      "community": 86,
       "norm_label": "get()"
     },
     {
@@ -3257,7 +3257,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L36",
       "id": "src_app_api_admin_posts_id_route_ts_id_route_put",
-      "community": 29,
+      "community": 86,
       "norm_label": "put()"
     },
     {
@@ -3266,7 +3266,7 @@
       "source_file": "src/app/api/admin/posts/[id]/route.ts",
       "source_location": "L131",
       "id": "src_app_api_admin_posts_id_route_ts_id_route_delete",
-      "community": 29,
+      "community": 86,
       "norm_label": "delete()"
     },
     {
@@ -3347,7 +3347,7 @@
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_settings_theme_route_ts",
-      "community": 39,
+      "community": 87,
       "norm_label": "route.ts"
     },
     {
@@ -3356,7 +3356,7 @@
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L7",
       "id": "theme_route_get",
-      "community": 39,
+      "community": 87,
       "norm_label": "get()"
     },
     {
@@ -3365,7 +3365,7 @@
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L19",
       "id": "theme_route_put",
-      "community": 39,
+      "community": 87,
       "norm_label": "put()"
     },
     {
@@ -3428,7 +3428,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_widgets_route_ts",
-      "community": 34,
+      "community": 29,
       "norm_label": "route.ts"
     },
     {
@@ -3437,7 +3437,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L7",
       "id": "widgets_route_get",
-      "community": 34,
+      "community": 29,
       "norm_label": "get()"
     },
     {
@@ -3446,7 +3446,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L71",
       "id": "widgets_route_post",
-      "community": 34,
+      "community": 29,
       "norm_label": "post()"
     },
     {
@@ -3455,7 +3455,7 @@
       "source_file": "src/app/api/admin/widgets/route.ts",
       "source_location": "L116",
       "id": "widgets_route_put",
-      "community": 34,
+      "community": 29,
       "norm_label": "put()"
     },
     {
@@ -3464,7 +3464,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_widgets_id_route_ts",
-      "community": 82,
+      "community": 29,
       "norm_label": "route.ts"
     },
     {
@@ -3473,7 +3473,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L7",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_routeparams",
-      "community": 82,
+      "community": 29,
       "norm_label": "routeparams"
     },
     {
@@ -3482,7 +3482,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L11",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_patch",
-      "community": 82,
+      "community": 29,
       "norm_label": "patch()"
     },
     {
@@ -3491,7 +3491,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L50",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_delete",
-      "community": 82,
+      "community": 29,
       "norm_label": "delete()"
     },
     {
@@ -3536,7 +3536,7 @@
       "source_file": "src/app/api/events/register/route.ts",
       "source_location": "L1",
       "id": "src_app_api_events_register_route_ts",
-      "community": 51,
+      "community": 34,
       "norm_label": "route.ts"
     },
     {
@@ -3545,7 +3545,7 @@
       "source_file": "src/app/api/events/register/route.ts",
       "source_location": "L7",
       "id": "register_route_post",
-      "community": 51,
+      "community": 34,
       "norm_label": "post()"
     },
     {
@@ -3554,7 +3554,7 @@
       "source_file": "src/app/api/forms/submit/route.ts",
       "source_location": "L1",
       "id": "src_app_api_forms_submit_route_ts",
-      "community": 51,
+      "community": 43,
       "norm_label": "route.ts"
     },
     {
@@ -3563,7 +3563,7 @@
       "source_file": "src/app/api/forms/submit/route.ts",
       "source_location": "L8",
       "id": "src_app_api_forms_submit_route_ts_submit_route_post",
-      "community": 51,
+      "community": 43,
       "norm_label": "post()"
     },
     {
@@ -3590,7 +3590,7 @@
       "source_file": "src/app/api/leads/submit/route.ts",
       "source_location": "L1",
       "id": "src_app_api_leads_submit_route_ts",
-      "community": 51,
+      "community": 34,
       "norm_label": "route.ts"
     },
     {
@@ -3599,7 +3599,7 @@
       "source_file": "src/app/api/leads/submit/route.ts",
       "source_location": "L7",
       "id": "src_app_api_leads_submit_route_ts_submit_route_post",
-      "community": 51,
+      "community": 34,
       "norm_label": "post()"
     },
     {
@@ -3671,7 +3671,7 @@
       "source_file": "src/components/admin/ai-assistant-modal.tsx",
       "source_location": "L1",
       "id": "src_components_admin_ai_assistant_modal_tsx",
-      "community": 21,
+      "community": 49,
       "norm_label": "ai-assistant-modal.tsx"
     },
     {
@@ -3680,7 +3680,7 @@
       "source_file": "src/components/admin/ai-assistant-modal.tsx",
       "source_location": "L25",
       "id": "admin_ai_assistant_modal_aiassistantmodalprops",
-      "community": 21,
+      "community": 49,
       "norm_label": "aiassistantmodalprops"
     },
     {
@@ -3743,7 +3743,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L1",
       "id": "src_components_admin_artwork_placard_sheet_tsx",
-      "community": 36,
+      "community": 48,
       "norm_label": "artwork-placard-sheet.tsx"
     },
     {
@@ -3752,7 +3752,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L50",
       "id": "admin_artwork_placard_sheet_placardartwork",
-      "community": 36,
+      "community": 48,
       "norm_label": "placardartwork"
     },
     {
@@ -3761,7 +3761,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L65",
       "id": "admin_artwork_placard_sheet_artworkplacardsheetprops",
-      "community": 36,
+      "community": 48,
       "norm_label": "artworkplacardsheetprops"
     },
     {
@@ -3770,7 +3770,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L72",
       "id": "admin_artwork_placard_sheet_editableplacarditem",
-      "community": 36,
+      "community": 48,
       "norm_label": "editableplacarditem"
     },
     {
@@ -3779,7 +3779,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L85",
       "id": "admin_artwork_placard_sheet_default_placard_styling",
-      "community": 36,
+      "community": 48,
       "norm_label": "default_placard_styling"
     },
     {
@@ -3788,7 +3788,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L103",
       "id": "admin_artwork_placard_sheet_card_bg_swatches",
-      "community": 36,
+      "community": 48,
       "norm_label": "card_bg_swatches"
     },
     {
@@ -3797,7 +3797,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L110",
       "id": "admin_artwork_placard_sheet_title_color_swatches",
-      "community": 36,
+      "community": 48,
       "norm_label": "title_color_swatches"
     },
     {
@@ -3806,7 +3806,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L117",
       "id": "admin_artwork_placard_sheet_text_color_swatches",
-      "community": 36,
+      "community": 48,
       "norm_label": "text_color_swatches"
     },
     {
@@ -3815,7 +3815,7 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L124",
       "id": "admin_artwork_placard_sheet_header_color_swatches",
-      "community": 36,
+      "community": 48,
       "norm_label": "header_color_swatches"
     },
     {
@@ -3932,7 +3932,7 @@
       "source_file": "src/components/admin/catalog-matrix-studio.tsx",
       "source_location": "L160",
       "id": "admin_catalog_matrix_studio_catalogmatrixstudio",
-      "community": 57,
+      "community": 33,
       "norm_label": "catalogmatrixstudio()"
     },
     {
@@ -3941,7 +3941,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L1",
       "id": "src_components_admin_catalog_single_plate_editor_tsx",
-      "community": 47,
+      "community": 33,
       "norm_label": "catalog-single-plate-editor.tsx"
     },
     {
@@ -3959,7 +3959,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L47",
       "id": "admin_catalog_single_plate_editor_catalogsingleplateeditorprops",
-      "community": 47,
+      "community": 33,
       "norm_label": "catalogsingleplateeditorprops"
     },
     {
@@ -3968,7 +3968,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L54",
       "id": "admin_catalog_single_plate_editor_matting_presets",
-      "community": 47,
+      "community": 33,
       "norm_label": "matting_presets"
     },
     {
@@ -3977,7 +3977,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L63",
       "id": "admin_catalog_single_plate_editor_catalogsingleplateeditor",
-      "community": 47,
+      "community": 33,
       "norm_label": "catalogsingleplateeditor()"
     },
     {
@@ -3986,7 +3986,7 @@
       "source_file": "src/components/admin/catalog-single-plate-editor.tsx",
       "source_location": "L705",
       "id": "admin_catalog_single_plate_editor_editorialmodeswitcher",
-      "community": 47,
+      "community": 33,
       "norm_label": "editorialmodeswitcher()"
     },
     {
@@ -4031,7 +4031,7 @@
       "source_file": "src/components/admin/editable-page-header.tsx",
       "source_location": "L1",
       "id": "src_components_admin_editable_page_header_tsx",
-      "community": 50,
+      "community": 36,
       "norm_label": "editable-page-header.tsx"
     },
     {
@@ -4040,7 +4040,7 @@
       "source_file": "src/components/admin/editable-page-header.tsx",
       "source_location": "L12",
       "id": "admin_editable_page_header_editablepageheaderprops",
-      "community": 50,
+      "community": 36,
       "norm_label": "editablepageheaderprops"
     },
     {
@@ -4058,7 +4058,7 @@
       "source_file": "src/components/admin/email-tiptap-editor.tsx",
       "source_location": "L1",
       "id": "src_components_admin_email_tiptap_editor_tsx",
-      "community": 49,
+      "community": 36,
       "norm_label": "email-tiptap-editor.tsx"
     },
     {
@@ -4067,7 +4067,7 @@
       "source_file": "src/components/admin/email-tiptap-editor.tsx",
       "source_location": "L43",
       "id": "admin_email_tiptap_editor_emailtiptapeditorprops",
-      "community": 49,
+      "community": 36,
       "norm_label": "emailtiptapeditorprops"
     },
     {
@@ -4076,7 +4076,7 @@
       "source_file": "src/components/admin/email-tiptap-editor.tsx",
       "source_location": "L51",
       "id": "admin_email_tiptap_editor_emailtiptapeditor",
-      "community": 62,
+      "community": 36,
       "norm_label": "emailtiptapeditor()"
     },
     {
@@ -4166,7 +4166,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L1",
       "id": "src_components_admin_mail_config_studio_tsx",
-      "community": 32,
+      "community": 36,
       "norm_label": "mail-config-studio.tsx"
     },
     {
@@ -4175,7 +4175,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L44",
       "id": "admin_mail_config_studio_emailtemplate",
-      "community": 32,
+      "community": 36,
       "norm_label": "emailtemplate"
     },
     {
@@ -4184,7 +4184,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L55",
       "id": "admin_mail_config_studio_emaillog",
-      "community": 32,
+      "community": 36,
       "norm_label": "emaillog"
     },
     {
@@ -4193,7 +4193,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L66",
       "id": "admin_mail_config_studio_pagination",
-      "community": 32,
+      "community": 36,
       "norm_label": "pagination"
     },
     {
@@ -4202,7 +4202,7 @@
       "source_file": "src/components/admin/mail-config-studio.tsx",
       "source_location": "L73",
       "id": "admin_mail_config_studio_available_tokens",
-      "community": 32,
+      "community": 36,
       "norm_label": "available_tokens"
     },
     {
@@ -4247,7 +4247,7 @@
       "source_file": "src/components/admin/media-vault-dialog.tsx",
       "source_location": "L1",
       "id": "src_components_admin_media_vault_dialog_tsx",
-      "community": 49,
+      "community": 36,
       "norm_label": "media-vault-dialog.tsx"
     },
     {
@@ -4256,7 +4256,7 @@
       "source_file": "src/components/admin/media-vault-dialog.tsx",
       "source_location": "L18",
       "id": "admin_media_vault_dialog_mediavaultitem",
-      "community": 49,
+      "community": 36,
       "norm_label": "mediavaultitem"
     },
     {
@@ -4265,7 +4265,7 @@
       "source_file": "src/components/admin/media-vault-dialog.tsx",
       "source_location": "L28",
       "id": "admin_media_vault_dialog_mediavaultdialogprops",
-      "community": 49,
+      "community": 36,
       "norm_label": "mediavaultdialogprops"
     },
     {
@@ -4373,7 +4373,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L1",
       "id": "src_components_admin_universal_media_dialog_tsx",
-      "community": 49,
+      "community": 21,
       "norm_label": "universal-media-dialog.tsx"
     },
     {
@@ -4382,7 +4382,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L29",
       "id": "admin_universal_media_dialog_universalmediaitem",
-      "community": 49,
+      "community": 21,
       "norm_label": "universalmediaitem"
     },
     {
@@ -4391,7 +4391,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L42",
       "id": "admin_universal_media_dialog_universalmediadialogprops",
-      "community": 49,
+      "community": 21,
       "norm_label": "universalmediadialogprops"
     },
     {
@@ -4400,7 +4400,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L54",
       "id": "admin_universal_media_dialog_vaultitem",
-      "community": 49,
+      "community": 21,
       "norm_label": "vaultitem"
     },
     {
@@ -4409,7 +4409,7 @@
       "source_file": "src/components/admin/universal-media-dialog.tsx",
       "source_location": "L71",
       "id": "admin_universal_media_dialog_universalmediadialog",
-      "community": 36,
+      "community": 33,
       "norm_label": "universalmediadialog()"
     },
     {
@@ -4418,7 +4418,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L1",
       "id": "src_components_builder_form_block_inspector_tsx",
-      "community": 36,
+      "community": 49,
       "norm_label": "form-block-inspector.tsx"
     },
     {
@@ -4436,7 +4436,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L46",
       "id": "builder_form_block_inspector_formblockdata",
-      "community": 36,
+      "community": 45,
       "norm_label": "formblockdata"
     },
     {
@@ -4445,7 +4445,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L58",
       "id": "builder_form_block_inspector_formblockinspectorprops",
-      "community": 36,
+      "community": 49,
       "norm_label": "formblockinspectorprops"
     },
     {
@@ -4454,7 +4454,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L63",
       "id": "builder_form_block_inspector_field_type_labels",
-      "community": 36,
+      "community": 49,
       "norm_label": "field_type_labels"
     },
     {
@@ -4517,7 +4517,7 @@
       "source_file": "src/components/builder/media-gallery-inspector.tsx",
       "source_location": "L39",
       "id": "builder_media_gallery_inspector_mediagalleryblockdata",
-      "community": 87,
+      "community": 59,
       "norm_label": "mediagalleryblockdata"
     },
     {
@@ -4598,7 +4598,7 @@
       "source_file": "src/components/builder/page-matrix-studio.tsx",
       "source_location": "L220",
       "id": "builder_page_matrix_studio_pagematrixstudio",
-      "community": 44,
+      "community": 57,
       "norm_label": "pagematrixstudio()"
     },
     {
@@ -4607,7 +4607,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L1",
       "id": "src_components_builder_style_inspector_tsx",
-      "community": 44,
+      "community": 59,
       "norm_label": "style-inspector.tsx"
     },
     {
@@ -4625,7 +4625,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L78",
       "id": "builder_style_inspector_styleinspectorprops",
-      "community": 44,
+      "community": 59,
       "norm_label": "styleinspectorprops"
     },
     {
@@ -4634,7 +4634,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L84",
       "id": "builder_style_inspector_colorpresets",
-      "community": 44,
+      "community": 59,
       "norm_label": "colorpresets"
     },
     {
@@ -4643,7 +4643,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L95",
       "id": "builder_style_inspector_artisticborderpresets",
-      "community": 44,
+      "community": 59,
       "norm_label": "artisticborderpresets"
     },
     {
@@ -4652,7 +4652,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L103",
       "id": "builder_style_inspector_fontfamilies",
-      "community": 44,
+      "community": 59,
       "norm_label": "fontfamilies"
     },
     {
@@ -4661,7 +4661,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L111",
       "id": "builder_style_inspector_availableicons",
-      "community": 44,
+      "community": 59,
       "norm_label": "availableicons"
     },
     {
@@ -4670,7 +4670,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L125",
       "id": "builder_style_inspector_styleinspector",
-      "community": 44,
+      "community": 59,
       "norm_label": "styleinspector()"
     },
     {
@@ -4679,7 +4679,7 @@
       "source_file": "src/components/builder/timeline-inspector.tsx",
       "source_location": "L1",
       "id": "src_components_builder_timeline_inspector_tsx",
-      "community": 44,
+      "community": 49,
       "norm_label": "timeline-inspector.tsx"
     },
     {
@@ -4688,7 +4688,7 @@
       "source_file": "src/components/builder/timeline-inspector.tsx",
       "source_location": "L47",
       "id": "builder_timeline_inspector_timelineinspectorprops",
-      "community": 44,
+      "community": 1,
       "norm_label": "timelineinspectorprops"
     },
     {
@@ -4697,7 +4697,7 @@
       "source_file": "src/components/builder/timeline-inspector.tsx",
       "source_location": "L64",
       "id": "builder_timeline_inspector_common_timezones",
-      "community": 44,
+      "community": 49,
       "norm_label": "common_timezones"
     },
     {
@@ -4841,7 +4841,7 @@
       "source_file": "src/components/builder/tiptap-editor.tsx",
       "source_location": "L190",
       "id": "builder_tiptap_editor_tiptapeditor",
-      "community": 21,
+      "community": 31,
       "norm_label": "tiptapeditor()"
     },
     {
@@ -4886,7 +4886,7 @@
       "source_file": "src/components/builder/tiptap-floating-layer-node.tsx",
       "source_location": "L396",
       "id": "builder_tiptap_floating_layer_node_floatinglayernode",
-      "community": 21,
+      "community": 36,
       "norm_label": "floatinglayernode"
     },
     {
@@ -4895,7 +4895,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L1",
       "id": "src_components_builder_tiptap_image_node_tsx",
-      "community": 80,
+      "community": 31,
       "norm_label": "tiptap-image-node.tsx"
     },
     {
@@ -4904,7 +4904,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L21",
       "id": "builder_tiptap_image_node_imagelayoutmode",
-      "community": 80,
+      "community": 31,
       "norm_label": "imagelayoutmode"
     },
     {
@@ -4913,7 +4913,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L22",
       "id": "builder_tiptap_image_node_imageaspectratio",
-      "community": 80,
+      "community": 31,
       "norm_label": "imageaspectratio"
     },
     {
@@ -4922,7 +4922,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L24",
       "id": "builder_tiptap_image_node_customimageattributes",
-      "community": 80,
+      "community": 31,
       "norm_label": "customimageattributes"
     },
     {
@@ -4931,7 +4931,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L34",
       "id": "builder_tiptap_image_node_layout_modes",
-      "community": 80,
+      "community": 31,
       "norm_label": "layout_modes"
     },
     {
@@ -4940,7 +4940,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L42",
       "id": "builder_tiptap_image_node_aspect_ratios",
-      "community": 80,
+      "community": 31,
       "norm_label": "aspect_ratios"
     },
     {
@@ -4949,7 +4949,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L51",
       "id": "builder_tiptap_image_node_imageviewcomponent",
-      "community": 80,
+      "community": 31,
       "norm_label": "imageviewcomponent()"
     },
     {
@@ -4958,7 +4958,7 @@
       "source_file": "src/components/builder/tiptap-image-node.tsx",
       "source_location": "L275",
       "id": "builder_tiptap_image_node_customimagenode",
-      "community": 80,
+      "community": 31,
       "norm_label": "customimagenode"
     },
     {
@@ -5219,7 +5219,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L1",
       "id": "src_components_public_animated_section_tsx",
-      "community": 89,
+      "community": 69,
       "norm_label": "animated-section.tsx"
     },
     {
@@ -5228,7 +5228,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L6",
       "id": "public_animated_section_animatedsectionprops",
-      "community": 89,
+      "community": 69,
       "norm_label": "animatedsectionprops"
     },
     {
@@ -5237,7 +5237,7 @@
       "source_file": "src/components/public/animated-section.tsx",
       "source_location": "L12",
       "id": "public_animated_section_animatedsection",
-      "community": 89,
+      "community": 69,
       "norm_label": "animatedsection()"
     },
     {
@@ -5246,7 +5246,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L1",
       "id": "src_components_public_art_canvas_viewer_tsx",
-      "community": 49,
+      "community": 36,
       "norm_label": "art-canvas-viewer.tsx"
     },
     {
@@ -5255,7 +5255,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L15",
       "id": "public_art_canvas_viewer_artcanvasviewerprops",
-      "community": 49,
+      "community": 36,
       "norm_label": "artcanvasviewerprops"
     },
     {
@@ -5264,7 +5264,7 @@
       "source_file": "src/components/public/art-canvas-viewer.tsx",
       "source_location": "L28",
       "id": "public_art_canvas_viewer_artcanvasviewer",
-      "community": 43,
+      "community": 82,
       "norm_label": "artcanvasviewer()"
     },
     {
@@ -5345,7 +5345,7 @@
       "source_file": "src/components/public/catalog-matrix-page.tsx",
       "source_location": "L1",
       "id": "src_components_public_catalog_matrix_page_tsx",
-      "community": 45,
+      "community": 57,
       "norm_label": "catalog-matrix-page.tsx"
     },
     {
@@ -5354,7 +5354,7 @@
       "source_file": "src/components/public/catalog-matrix-page.tsx",
       "source_location": "L7",
       "id": "public_catalog_matrix_page_matrixcellsegmentdata",
-      "community": 45,
+      "community": 57,
       "norm_label": "matrixcellsegmentdata"
     },
     {
@@ -5363,7 +5363,7 @@
       "source_file": "src/components/public/catalog-matrix-page.tsx",
       "source_location": "L17",
       "id": "public_catalog_matrix_page_catalogmatrixpageprops",
-      "community": 45,
+      "community": 57,
       "norm_label": "catalogmatrixpageprops"
     },
     {
@@ -5372,7 +5372,7 @@
       "source_file": "src/components/public/catalog-matrix-page.tsx",
       "source_location": "L45",
       "id": "public_catalog_matrix_page_catalogmatrixpage",
-      "community": 45,
+      "community": 57,
       "norm_label": "catalogmatrixpage()"
     },
     {
@@ -5507,7 +5507,7 @@
       "source_file": "src/components/public/dynamic-page-sections.tsx",
       "source_location": "L42",
       "id": "public_dynamic_page_sections_dynamicpagesections",
-      "community": 86,
+      "community": 8,
       "norm_label": "dynamicpagesections()"
     },
     {
@@ -5579,7 +5579,7 @@
       "source_file": "src/components/public/exhibition-qr-modal.tsx",
       "source_location": "L24",
       "id": "public_exhibition_qr_modal_exhibitionqrmodal",
-      "community": 43,
+      "community": 82,
       "norm_label": "exhibitionqrmodal()"
     },
     {
@@ -5705,7 +5705,7 @@
       "source_file": "src/components/public/exhibition-wall-viewer.tsx",
       "source_location": "L265",
       "id": "public_exhibition_wall_viewer_exhibitionwallviewer",
-      "community": 8,
+      "community": 18,
       "norm_label": "exhibitionwallviewer()"
     },
     {
@@ -5759,7 +5759,7 @@
       "source_file": "src/components/public/gallery-grid.tsx",
       "source_location": "L1",
       "id": "src_components_public_gallery_grid_tsx",
-      "community": 79,
+      "community": 56,
       "norm_label": "gallery-grid.tsx"
     },
     {
@@ -5768,7 +5768,7 @@
       "source_file": "src/components/public/gallery-grid.tsx",
       "source_location": "L12",
       "id": "public_gallery_grid_category",
-      "community": 79,
+      "community": 56,
       "norm_label": "category"
     },
     {
@@ -5777,7 +5777,7 @@
       "source_file": "src/components/public/gallery-grid.tsx",
       "source_location": "L18",
       "id": "public_gallery_grid_artwork",
-      "community": 79,
+      "community": 56,
       "norm_label": "artwork"
     },
     {
@@ -5786,7 +5786,7 @@
       "source_file": "src/components/public/gallery-grid.tsx",
       "source_location": "L36",
       "id": "public_gallery_grid_gallerygridprops",
-      "community": 79,
+      "community": 56,
       "norm_label": "gallerygridprops"
     },
     {
@@ -5813,7 +5813,7 @@
       "source_file": "src/components/public/navbar.tsx",
       "source_location": "L24",
       "id": "public_navbar_navbar",
-      "community": 86,
+      "community": 8,
       "norm_label": "navbar()"
     },
     {
@@ -5822,7 +5822,7 @@
       "source_file": "src/components/public/protected-image.tsx",
       "source_location": "L1",
       "id": "src_components_public_protected_image_tsx",
-      "community": 62,
+      "community": 59,
       "norm_label": "protected-image.tsx"
     },
     {
@@ -5831,7 +5831,7 @@
       "source_file": "src/components/public/protected-image.tsx",
       "source_location": "L7",
       "id": "public_protected_image_protectedimageprops",
-      "community": 62,
+      "community": 59,
       "norm_label": "protectedimageprops"
     },
     {
@@ -5840,7 +5840,7 @@
       "source_file": "src/components/public/protected-image.tsx",
       "source_location": "L26",
       "id": "public_protected_image_protectedimage",
-      "community": 62,
+      "community": 59,
       "norm_label": "protectedimage()"
     },
     {
@@ -5885,7 +5885,7 @@
       "source_file": "src/components/public/tiptap-renderer.tsx",
       "source_location": "L69",
       "id": "public_tiptap_renderer_tiptaprendererprops",
-      "community": 80,
+      "community": 4,
       "norm_label": "tiptaprendererprops"
     },
     {
@@ -5903,7 +5903,7 @@
       "source_file": "src/components/public/tiptap-renderer.tsx",
       "source_location": "L95",
       "id": "public_tiptap_renderer_sanitizeadaptivethemehtml",
-      "community": 43,
+      "community": 45,
       "norm_label": "sanitizeadaptivethemehtml()"
     },
     {
@@ -5993,7 +5993,7 @@
       "source_file": "src/components/public/blocks/dynamic-form-block.tsx",
       "source_location": "L34",
       "id": "blocks_dynamic_form_block_dynamicformconfig",
-      "community": 36,
+      "community": 45,
       "norm_label": "dynamicformconfig"
     },
     {
@@ -6011,7 +6011,7 @@
       "source_file": "src/components/public/blocks/dynamic-form-block.tsx",
       "source_location": "L60",
       "id": "blocks_dynamic_form_block_dynamicformblock",
-      "community": 86,
+      "community": 8,
       "norm_label": "dynamicformblock()"
     },
     {
@@ -6101,7 +6101,7 @@
       "source_file": "src/components/public/blocks/media-gallery-block.tsx",
       "source_location": "L52",
       "id": "blocks_media_gallery_block_mediagalleryitem",
-      "community": 87,
+      "community": 59,
       "norm_label": "mediagalleryitem"
     },
     {
@@ -6110,7 +6110,7 @@
       "source_file": "src/components/public/blocks/media-gallery-block.tsx",
       "source_location": "L71",
       "id": "blocks_media_gallery_block_mediagallerydisplaymode",
-      "community": 87,
+      "community": 59,
       "norm_label": "mediagallerydisplaymode"
     },
     {
@@ -6173,7 +6173,7 @@
       "source_file": "src/components/public/blocks/pdf-viewer-block.tsx",
       "source_location": "L1",
       "id": "src_components_public_blocks_pdf_viewer_block_tsx",
-      "community": 62,
+      "community": 44,
       "norm_label": "pdf-viewer-block.tsx"
     },
     {
@@ -6182,7 +6182,7 @@
       "source_file": "src/components/public/blocks/pdf-viewer-block.tsx",
       "source_location": "L7",
       "id": "blocks_pdf_viewer_block_pdfviewerblockprops",
-      "community": 62,
+      "community": 44,
       "norm_label": "pdfviewerblockprops"
     },
     {
@@ -6191,7 +6191,7 @@
       "source_file": "src/components/public/blocks/pdf-viewer-block.tsx",
       "source_location": "L16",
       "id": "blocks_pdf_viewer_block_pdfviewerblock",
-      "community": 62,
+      "community": 44,
       "norm_label": "pdfviewerblock()"
     },
     {
@@ -6227,7 +6227,7 @@
       "source_file": "src/components/public/blocks/timeline-block.tsx",
       "source_location": "L66",
       "id": "blocks_timeline_block_timelineblock",
-      "community": 1,
+      "community": 45,
       "norm_label": "timelineblock()"
     },
     {
@@ -6317,7 +6317,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-environments.ts",
       "source_location": "L1",
       "id": "src_components_public_blocks_gallery_exhibition_wall_exhibition_environments_ts",
-      "community": 84,
+      "community": 59,
       "norm_label": "exhibition-environments.ts"
     },
     {
@@ -6326,7 +6326,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-environments.ts",
       "source_location": "L1",
       "id": "gallery_exhibition_wall_exhibition_environments_environmentcategory",
-      "community": 84,
+      "community": 59,
       "norm_label": "environmentcategory"
     },
     {
@@ -6335,7 +6335,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-environments.ts",
       "source_location": "L3",
       "id": "gallery_exhibition_wall_exhibition_environments_wallenvironment",
-      "community": 84,
+      "community": 59,
       "norm_label": "wallenvironment"
     },
     {
@@ -6344,7 +6344,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-environments.ts",
       "source_location": "L21",
       "id": "gallery_exhibition_wall_exhibition_environments_wall_environments",
-      "community": 84,
+      "community": 59,
       "norm_label": "wall_environments"
     },
     {
@@ -6353,7 +6353,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-environments.ts",
       "source_location": "L120",
       "id": "gallery_exhibition_wall_exhibition_environments_getwallenvironment",
-      "community": 84,
+      "community": 59,
       "norm_label": "getwallenvironment()"
     },
     {
@@ -6362,7 +6362,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L1",
       "id": "src_components_public_blocks_gallery_exhibition_wall_exhibition_wall_block_tsx",
-      "community": 84,
+      "community": 59,
       "norm_label": "exhibition-wall-block.tsx"
     },
     {
@@ -6371,7 +6371,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L20",
       "id": "gallery_exhibition_wall_exhibition_wall_block_cameratourstyle",
-      "community": 84,
+      "community": 59,
       "norm_label": "cameratourstyle"
     },
     {
@@ -6380,7 +6380,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L21",
       "id": "gallery_exhibition_wall_exhibition_wall_block_walllayoutmatrix",
-      "community": 84,
+      "community": 59,
       "norm_label": "walllayoutmatrix"
     },
     {
@@ -6389,7 +6389,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L23",
       "id": "gallery_exhibition_wall_exhibition_wall_block_exhibitionwallblockprops",
-      "community": 87,
+      "community": 59,
       "norm_label": "exhibitionwallblockprops"
     },
     {
@@ -6398,7 +6398,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L39",
       "id": "gallery_exhibition_wall_exhibition_wall_block_artworkplacement",
-      "community": 87,
+      "community": 59,
       "norm_label": "artworkplacement"
     },
     {
@@ -6407,7 +6407,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L51",
       "id": "gallery_exhibition_wall_exhibition_wall_block_tourstep",
-      "community": 84,
+      "community": 59,
       "norm_label": "tourstep"
     },
     {
@@ -6416,7 +6416,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L59",
       "id": "gallery_exhibition_wall_exhibition_wall_block_parseartworkaspectratio",
-      "community": 84,
+      "community": 59,
       "norm_label": "parseartworkaspectratio()"
     },
     {
@@ -6425,7 +6425,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L82",
       "id": "gallery_exhibition_wall_exhibition_wall_block_calculateframesize",
-      "community": 84,
+      "community": 59,
       "norm_label": "calculateframesize()"
     },
     {
@@ -6434,7 +6434,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L100",
       "id": "gallery_exhibition_wall_exhibition_wall_block_computeplacements",
-      "community": 84,
+      "community": 59,
       "norm_label": "computeplacements()"
     },
     {
@@ -6443,7 +6443,7 @@
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L256",
       "id": "gallery_exhibition_wall_exhibition_wall_block_exhibitionwallblock",
-      "community": 84,
+      "community": 59,
       "norm_label": "exhibitionwallblock()"
     },
     {
@@ -6488,7 +6488,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L1",
       "id": "src_components_ui_button_tsx",
-      "community": 49,
+      "community": 36,
       "norm_label": "button.tsx"
     },
     {
@@ -6497,7 +6497,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L6",
       "id": "ui_button_buttonvariants",
-      "community": 49,
+      "community": 36,
       "norm_label": "buttonvariants"
     },
     {
@@ -6506,7 +6506,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L37",
       "id": "ui_button_buttonprops",
-      "community": 49,
+      "community": 36,
       "norm_label": "buttonprops"
     },
     {
@@ -6515,7 +6515,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L43",
       "id": "ui_button_button",
-      "community": 49,
+      "community": 36,
       "norm_label": "button"
     },
     {
@@ -6758,7 +6758,7 @@
       "source_file": "src/components/ui/input.tsx",
       "source_location": "L1",
       "id": "src_components_ui_input_tsx",
-      "community": 36,
+      "community": 33,
       "norm_label": "input.tsx"
     },
     {
@@ -6767,7 +6767,7 @@
       "source_file": "src/components/ui/input.tsx",
       "source_location": "L4",
       "id": "ui_input_input",
-      "community": 36,
+      "community": 33,
       "norm_label": "input"
     },
     {
@@ -6776,7 +6776,7 @@
       "source_file": "src/components/ui/label.tsx",
       "source_location": "L1",
       "id": "src_components_ui_label_tsx",
-      "community": 21,
+      "community": 36,
       "norm_label": "label.tsx"
     },
     {
@@ -6785,7 +6785,7 @@
       "source_file": "src/components/ui/label.tsx",
       "source_location": "L5",
       "id": "ui_label_labelvariants",
-      "community": 21,
+      "community": 36,
       "norm_label": "labelvariants"
     },
     {
@@ -6794,7 +6794,7 @@
       "source_file": "src/components/ui/label.tsx",
       "source_location": "L9",
       "id": "ui_label_labelprops",
-      "community": 21,
+      "community": 36,
       "norm_label": "labelprops"
     },
     {
@@ -6803,7 +6803,7 @@
       "source_file": "src/components/ui/label.tsx",
       "source_location": "L13",
       "id": "ui_label_label",
-      "community": 21,
+      "community": 49,
       "norm_label": "label"
     },
     {
@@ -6902,7 +6902,7 @@
       "source_file": "src/components/ui/separator.tsx",
       "source_location": "L1",
       "id": "src_components_ui_separator_tsx",
-      "community": 62,
+      "community": 59,
       "norm_label": "separator.tsx"
     },
     {
@@ -6911,7 +6911,7 @@
       "source_file": "src/components/ui/separator.tsx",
       "source_location": "L5",
       "id": "ui_separator_separator",
-      "community": 62,
+      "community": 59,
       "norm_label": "separator"
     },
     {
@@ -7172,7 +7172,7 @@
       "source_file": "src/components/ui/tooltip.tsx",
       "source_location": "L1",
       "id": "src_components_ui_tooltip_tsx",
-      "community": 62,
+      "community": 59,
       "norm_label": "tooltip.tsx"
     },
     {
@@ -7181,7 +7181,7 @@
       "source_file": "src/components/ui/tooltip.tsx",
       "source_location": "L9",
       "id": "ui_tooltip_tooltipcontent",
-      "community": 62,
+      "community": 59,
       "norm_label": "tooltipcontent"
     },
     {
@@ -7334,7 +7334,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L1",
       "id": "src_lib_background_patterns_ts",
-      "community": 0,
+      "community": 44,
       "norm_label": "background-patterns.ts"
     },
     {
@@ -7343,7 +7343,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L6",
       "id": "lib_background_patterns_backgroundpattern",
-      "community": 0,
+      "community": 44,
       "norm_label": "backgroundpattern"
     },
     {
@@ -7361,7 +7361,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L84",
       "id": "lib_background_patterns_getpatternbyid",
-      "community": 0,
+      "community": 44,
       "norm_label": "getpatternbyid()"
     },
     {
@@ -7370,7 +7370,7 @@
       "source_file": "src/lib/background-patterns.ts",
       "source_location": "L89",
       "id": "lib_background_patterns_getpatternstyle",
-      "community": 0,
+      "community": 44,
       "norm_label": "getpatternstyle()"
     },
     {
@@ -7379,7 +7379,7 @@
       "source_file": "src/lib/catalog-editor-context.tsx",
       "source_location": "L1",
       "id": "src_lib_catalog_editor_context_tsx",
-      "community": 80,
+      "community": 4,
       "norm_label": "catalog-editor-context.tsx"
     },
     {
@@ -7388,7 +7388,7 @@
       "source_file": "src/lib/catalog-editor-context.tsx",
       "source_location": "L6",
       "id": "lib_catalog_editor_context_catalogeditorcontext",
-      "community": 80,
+      "community": 4,
       "norm_label": "catalogeditorcontext"
     },
     {
@@ -7397,7 +7397,7 @@
       "source_file": "src/lib/catalog-editor-context.tsx",
       "source_location": "L14",
       "id": "lib_catalog_editor_context_usecatalogeditorcontext",
-      "community": 80,
+      "community": 31,
       "norm_label": "usecatalogeditorcontext()"
     },
     {
@@ -7406,7 +7406,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L1",
       "id": "src_lib_catalog_geometry_ts",
-      "community": 80,
+      "community": 4,
       "norm_label": "catalog-geometry.ts"
     },
     {
@@ -7415,7 +7415,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L7",
       "id": "lib_catalog_geometry_catalogpagesize",
-      "community": 80,
+      "community": 4,
       "norm_label": "catalogpagesize"
     },
     {
@@ -7424,7 +7424,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L8",
       "id": "lib_catalog_geometry_catalogorientation",
-      "community": 80,
+      "community": 4,
       "norm_label": "catalogorientation"
     },
     {
@@ -7433,7 +7433,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L10",
       "id": "lib_catalog_geometry_pagedimension",
-      "community": 80,
+      "community": 4,
       "norm_label": "pagedimension"
     },
     {
@@ -7442,7 +7442,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L21",
       "id": "lib_catalog_geometry_catalog_page_dimensions",
-      "community": 80,
+      "community": 4,
       "norm_label": "catalog_page_dimensions"
     },
     {
@@ -7451,7 +7451,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L84",
       "id": "lib_catalog_geometry_page_size_options",
-      "community": 80,
+      "community": 4,
       "norm_label": "page_size_options"
     },
     {
@@ -7460,7 +7460,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L93",
       "id": "lib_catalog_geometry_cataloggeometry",
-      "community": 80,
+      "community": 4,
       "norm_label": "cataloggeometry"
     },
     {
@@ -7469,7 +7469,7 @@
       "source_file": "src/lib/catalog-geometry.ts",
       "source_location": "L106",
       "id": "lib_catalog_geometry_getcatalogdimensions",
-      "community": 80,
+      "community": 45,
       "norm_label": "getcatalogdimensions()"
     },
     {
@@ -7478,7 +7478,7 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L1",
       "id": "src_lib_catalog_ribbon_patterns_ts",
-      "community": 47,
+      "community": 84,
       "norm_label": "catalog-ribbon-patterns.ts"
     },
     {
@@ -7487,7 +7487,7 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L7",
       "id": "lib_catalog_ribbon_patterns_ribbonpattern",
-      "community": 47,
+      "community": 84,
       "norm_label": "ribbonpattern"
     },
     {
@@ -7496,7 +7496,7 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L105",
       "id": "lib_catalog_ribbon_patterns_standard_ribbon_patterns",
-      "community": 47,
+      "community": 84,
       "norm_label": "standard_ribbon_patterns"
     },
     {
@@ -7505,7 +7505,7 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L180",
       "id": "lib_catalog_ribbon_patterns_getribbonpatternbyid",
-      "community": 47,
+      "community": 84,
       "norm_label": "getribbonpatternbyid()"
     },
     {
@@ -7514,7 +7514,7 @@
       "source_file": "src/lib/catalog-ribbon-patterns.ts",
       "source_location": "L185",
       "id": "lib_catalog_ribbon_patterns_ispresetribbonpattern",
-      "community": 47,
+      "community": 84,
       "norm_label": "ispresetribbonpattern()"
     },
     {
@@ -7541,7 +7541,7 @@
       "source_file": "src/lib/email-service.ts",
       "source_location": "L25",
       "id": "lib_email_service_default_email_templates",
-      "community": 29,
+      "community": 51,
       "norm_label": "default_email_templates"
     },
     {
@@ -7802,7 +7802,7 @@
       "source_file": "src/lib/get-base-url-client.ts",
       "source_location": "L1",
       "id": "src_lib_get_base_url_client_ts",
-      "community": 43,
+      "community": 48,
       "norm_label": "get-base-url-client.ts"
     },
     {
@@ -7811,7 +7811,7 @@
       "source_file": "src/lib/get-base-url-client.ts",
       "source_location": "L5",
       "id": "lib_get_base_url_client_getclientbaseurl",
-      "community": 43,
+      "community": 48,
       "norm_label": "getclientbaseurl()"
     },
     {
@@ -7991,7 +7991,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L1",
       "id": "src_lib_rate_limit_ts",
-      "community": 51,
+      "community": 34,
       "norm_label": "rate-limit.ts"
     },
     {
@@ -8000,7 +8000,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L3",
       "id": "lib_rate_limit_ratelimitrecord",
-      "community": 51,
+      "community": 34,
       "norm_label": "ratelimitrecord"
     },
     {
@@ -8009,7 +8009,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L8",
       "id": "lib_rate_limit_ratelimitmap",
-      "community": 51,
+      "community": 34,
       "norm_label": "ratelimitmap"
     },
     {
@@ -8018,7 +8018,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L12",
       "id": "lib_rate_limit_lastcleanup",
-      "community": 51,
+      "community": 34,
       "norm_label": "lastcleanup"
     },
     {
@@ -8027,7 +8027,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L14",
       "id": "lib_rate_limit_cleanupexpired",
-      "community": 51,
+      "community": 34,
       "norm_label": "cleanupexpired()"
     },
     {
@@ -8036,7 +8036,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L28",
       "id": "lib_rate_limit_getclientip",
-      "community": 51,
+      "community": 34,
       "norm_label": "getclientip()"
     },
     {
@@ -8045,7 +8045,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L46",
       "id": "lib_rate_limit_ratelimitoptions",
-      "community": 51,
+      "community": 34,
       "norm_label": "ratelimitoptions"
     },
     {
@@ -8054,7 +8054,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L52",
       "id": "lib_rate_limit_ratelimitresult",
-      "community": 51,
+      "community": 34,
       "norm_label": "ratelimitresult"
     },
     {
@@ -8063,7 +8063,7 @@
       "source_file": "src/lib/rate-limit.ts",
       "source_location": "L63",
       "id": "lib_rate_limit_checkratelimit",
-      "community": 51,
+      "community": 34,
       "norm_label": "checkratelimit()"
     },
     {
@@ -8396,7 +8396,7 @@
       "source_file": "src/lib/theme-contrast.ts",
       "source_location": "L291",
       "id": "lib_theme_contrast_getcontrasttypographyclasses",
-      "community": 45,
+      "community": 44,
       "norm_label": "getcontrasttypographyclasses()"
     },
     {
@@ -8414,7 +8414,7 @@
       "source_file": "src/lib/utils.ts",
       "source_location": "L1",
       "id": "src_lib_utils_ts",
-      "community": 62,
+      "community": 36,
       "norm_label": "utils.ts"
     },
     {
@@ -8423,7 +8423,7 @@
       "source_file": "src/lib/utils.ts",
       "source_location": "L4",
       "id": "lib_utils_cn",
-      "community": 62,
+      "community": 59,
       "norm_label": "cn()"
     },
     {
@@ -8603,7 +8603,7 @@
       "source_file": "src/types/timeline.ts",
       "source_location": "L6",
       "id": "types_timeline_timelinegranularity",
-      "community": 44,
+      "community": 1,
       "norm_label": "timelinegranularity"
     },
     {
@@ -8612,7 +8612,7 @@
       "source_file": "src/types/timeline.ts",
       "source_location": "L12",
       "id": "types_timeline_timelinelayout",
-      "community": 44,
+      "community": 1,
       "norm_label": "timelinelayout"
     },
     {
@@ -8621,7 +8621,7 @@
       "source_file": "src/types/timeline.ts",
       "source_location": "L18",
       "id": "types_timeline_timelineitem",
-      "community": 44,
+      "community": 1,
       "norm_label": "timelineitem"
     },
     {
@@ -8900,41 +8900,113 @@
       "source_file": "README.md",
       "source_location": "L1",
       "id": "readme_md",
-      "community": 3,
+      "community": 62,
       "norm_label": "readme.md"
     },
     {
-      "label": "Lalita Kapilavai \u2014 Sacred Art & Carnatic Music Archive",
+      "label": "SavazAI WebApps Platform",
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L1",
-      "id": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
-      "community": 3,
-      "norm_label": "lalita kapilavai \u2014 sacred art & carnatic music archive"
+      "id": "lalitakapilavai_readme_savazai_webapps_platform",
+      "community": 40,
+      "norm_label": "savazai webapps platform"
     },
     {
-      "label": "1. Architectural Stack",
+      "label": "1. Executive Platform Overview",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L7",
-      "id": "lalitakapilavai_readme_1_architectural_stack",
-      "community": 3,
-      "norm_label": "1. architectural stack"
+      "source_location": "L8",
+      "id": "lalitakapilavai_readme_1_executive_platform_overview",
+      "community": 40,
+      "norm_label": "1. executive platform overview"
     },
     {
-      "label": "2. Quickstart & Local Development",
+      "label": "Core Architectural Pillars",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L12",
+      "id": "lalitakapilavai_readme_core_architectural_pillars",
+      "community": 40,
+      "norm_label": "core architectural pillars"
+    },
+    {
+      "label": "2. Technology Stack & Modern Architectural Standards",
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L21",
-      "id": "lalitakapilavai_readme_2_quickstart_local_development",
+      "id": "lalitakapilavai_readme_2_technology_stack_modern_architectural_standards",
+      "community": 40,
+      "norm_label": "2. technology stack & modern architectural standards"
+    },
+    {
+      "label": "3. High-Level Modular Architecture",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L40",
+      "id": "lalitakapilavai_readme_3_high_level_modular_architecture",
+      "community": 40,
+      "norm_label": "3. high-level modular architecture"
+    },
+    {
+      "label": "code:block1 (SavazAI WebApps Platform)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L42",
+      "id": "lalitakapilavai_readme_codeblock_1",
+      "community": 40,
+      "norm_label": "code:block1 (savazai webapps platform)"
+    },
+    {
+      "label": "4. Key Platform Features & Engines",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L70",
+      "id": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "community": 40,
+      "norm_label": "4. key platform features & engines"
+    },
+    {
+      "label": "A. 3D WebGL Exhibition Salon Wall",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L72",
+      "id": "lalitakapilavai_readme_a_3d_webgl_exhibition_salon_wall",
+      "community": 40,
+      "norm_label": "a. 3d webgl exhibition salon wall"
+    },
+    {
+      "label": "B. Physical Gallery Placard & Label Generator",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L77",
+      "id": "lalitakapilavai_readme_b_physical_gallery_placard_label_generator",
+      "community": 40,
+      "norm_label": "b. physical gallery placard & label generator"
+    },
+    {
+      "label": "C. Dynamic Mail Message Studio & Dispatch Engine",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L83",
+      "id": "lalitakapilavai_readme_c_dynamic_mail_message_studio_dispatch_engine",
+      "community": 40,
+      "norm_label": "c. dynamic mail message studio & dispatch engine"
+    },
+    {
+      "label": "5. Quickstart & Local Development",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L92",
+      "id": "lalitakapilavai_readme_5_quickstart_local_development",
       "community": 3,
-      "norm_label": "2. quickstart & local development"
+      "norm_label": "5. quickstart & local development"
     },
     {
       "label": "Prerequisites",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L23",
+      "source_location": "L94",
       "id": "lalitakapilavai_readme_prerequisites",
       "community": 3,
       "norm_label": "prerequisites"
@@ -8943,7 +9015,7 @@
       "label": "Step 1: Clone and Configure Environment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L28",
+      "source_location": "L99",
       "id": "lalitakapilavai_readme_step_1_clone_and_configure_environment",
       "community": 3,
       "norm_label": "step 1: clone and configure environment"
@@ -8952,26 +9024,26 @@
       "label": "code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L29",
-      "id": "lalitakapilavai_readme_codeblock_1",
+      "source_location": "L100",
+      "id": "lalitakapilavai_readme_codeblock_2",
       "community": 3,
       "norm_label": "code:bash (git clone https://github.com/savazar01/lalitakapilavai.git)"
     },
     {
-      "label": "Step 2: Start Local Full-Stack (Web + PostgreSQL)",
+      "label": "Step 2: Launch Local Multi-Container Stack",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L35",
-      "id": "lalitakapilavai_readme_step_2_start_local_full_stack_web_postgresql",
+      "source_location": "L106",
+      "id": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
       "community": 3,
-      "norm_label": "step 2: start local full-stack (web + postgresql)"
+      "norm_label": "step 2: launch local multi-container stack"
     },
     {
       "label": "code:bash (docker compose -f docker-compose.dev.yml up -d)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L37",
-      "id": "lalitakapilavai_readme_codeblock_2",
+      "source_location": "L108",
+      "id": "lalitakapilavai_readme_codeblock_3",
       "community": 3,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml up -d)"
     },
@@ -8979,181 +9051,82 @@
       "label": "code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L42",
-      "id": "lalitakapilavai_readme_codeblock_3",
+      "source_location": "L113",
+      "id": "lalitakapilavai_readme_codeblock_4",
       "community": 3,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p)"
     },
     {
-      "label": "Step 3: Install Dependencies & Generate Prisma Client",
+      "label": "Step 3: Initialize Database & Run Idempotent Seed",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L46",
-      "id": "lalitakapilavai_readme_step_3_install_dependencies_generate_prisma_client",
+      "source_location": "L117",
+      "id": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed",
       "community": 3,
-      "norm_label": "step 3: install dependencies & generate prisma client"
+      "norm_label": "step 3: initialize database & run idempotent seed"
     },
     {
-      "label": "code:bash (npm install)",
+      "label": "code:bash (npx prisma generate)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L47",
-      "id": "lalitakapilavai_readme_codeblock_4",
-      "community": 3,
-      "norm_label": "code:bash (npm install)"
-    },
-    {
-      "label": "Step 4: Run Database Migrations & Seed Default Data",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L52",
-      "id": "lalitakapilavai_readme_step_4_run_database_migrations_seed_default_data",
-      "community": 3,
-      "norm_label": "step 4: run database migrations & seed default data"
-    },
-    {
-      "label": "code:bash (npx prisma db push)",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L53",
+      "source_location": "L118",
       "id": "lalitakapilavai_readme_codeblock_5",
       "community": 3,
-      "norm_label": "code:bash (npx prisma db push)"
+      "norm_label": "code:bash (npx prisma generate)"
     },
     {
-      "label": "Step 5: Admin Control Center & Default Credentials",
+      "label": "Step 4: Access Endpoints",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L58",
-      "id": "lalitakapilavai_readme_step_5_admin_control_center_default_credentials",
+      "source_location": "L124",
+      "id": "lalitakapilavai_readme_step_4_access_endpoints",
       "community": 3,
-      "norm_label": "step 5: admin control center & default credentials"
+      "norm_label": "step 4: access endpoints"
     },
     {
-      "label": "3. Docker Containerization & Production Build",
+      "label": "6. Zero-Touch Coolify VPS Deployment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L69",
-      "id": "lalitakapilavai_readme_3_docker_containerization_production_build",
-      "community": 3,
-      "norm_label": "3. docker containerization & production build"
+      "source_location": "L132",
+      "id": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment",
+      "community": 40,
+      "norm_label": "6. zero-touch coolify vps deployment"
     },
     {
-      "label": "Local Production Build Test",
+      "label": "Deployment Runbook",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L71",
-      "id": "lalitakapilavai_readme_local_production_build_test",
-      "community": 3,
-      "norm_label": "local production build test"
+      "source_location": "L136",
+      "id": "lalitakapilavai_readme_deployment_runbook",
+      "community": 40,
+      "norm_label": "deployment runbook"
     },
     {
-      "label": "code:bash (npm run build)",
+      "label": "7. Production Environment Variables Template",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L73",
+      "source_location": "L152",
+      "id": "lalitakapilavai_readme_7_production_environment_variables_template",
+      "community": 80,
+      "norm_label": "7. production environment variables template"
+    },
+    {
+      "label": "code:bash (# ==========================================================)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L154",
       "id": "lalitakapilavai_readme_codeblock_6",
-      "community": 3,
-      "norm_label": "code:bash (npm run build)"
+      "community": 80,
+      "norm_label": "code:bash (# ==========================================================)"
     },
     {
-      "label": "Full Multi-Stage Docker Build",
+      "label": "8. Architectural Documentation & Living Governance",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L77",
-      "id": "lalitakapilavai_readme_full_multi_stage_docker_build",
-      "community": 3,
-      "norm_label": "full multi-stage docker build"
-    },
-    {
-      "label": "code:bash (docker compose up -d --build)",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L79",
-      "id": "lalitakapilavai_readme_codeblock_7",
-      "community": 3,
-      "norm_label": "code:bash (docker compose up -d --build)"
-    },
-    {
-      "label": "code:bash (docker compose ps)",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L83",
-      "id": "lalitakapilavai_readme_codeblock_8",
-      "community": 3,
-      "norm_label": "code:bash (docker compose ps)"
-    },
-    {
-      "label": "code:bash (curl http://localhost:3000/api/health)",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L88",
-      "id": "lalitakapilavai_readme_codeblock_9",
-      "community": 3,
-      "norm_label": "code:bash (curl http://localhost:3000/api/health)"
-    },
-    {
-      "label": "code:bash (docker compose down)",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L93",
-      "id": "lalitakapilavai_readme_codeblock_10",
-      "community": 3,
-      "norm_label": "code:bash (docker compose down)"
-    },
-    {
-      "label": "4. Zero-Touch Coolify Deployment (via `coolify` Network)",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L99",
-      "id": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
-      "community": 3,
-      "norm_label": "4. zero-touch coolify deployment (via `coolify` network)"
-    },
-    {
-      "label": "5-Step Deployment Runbook",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L103",
-      "id": "lalitakapilavai_readme_5_step_deployment_runbook",
-      "community": 3,
-      "norm_label": "5-step deployment runbook"
-    },
-    {
-      "label": "Complete Production Environment Variables Template",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L128",
-      "id": "lalitakapilavai_readme_complete_production_environment_variables_template",
-      "community": 3,
-      "norm_label": "complete production environment variables template"
-    },
-    {
-      "label": "code:env (# ==========================================================)",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L130",
-      "id": "lalitakapilavai_readme_codeblock_11",
-      "community": 3,
-      "norm_label": "code:env (# ==========================================================)"
-    },
-    {
-      "label": "Automated Container Lifecycle & Idempotency Hook",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L168",
-      "id": "lalitakapilavai_readme_automated_container_lifecycle_idempotency_hook",
-      "community": 3,
-      "norm_label": "automated container lifecycle & idempotency hook"
-    },
-    {
-      "label": "5. Architectural Documentation & Skills",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L178",
-      "id": "lalitakapilavai_readme_5_architectural_documentation_skills",
-      "community": 3,
-      "norm_label": "5. architectural documentation & skills"
+      "source_location": "L193",
+      "id": "lalitakapilavai_readme_8_architectural_documentation_living_governance",
+      "community": 40,
+      "norm_label": "8. architectural documentation & living governance"
     },
     {
       "label": "SKILL.md",
@@ -10794,6 +10767,186 @@
       "norm_label": "{\n  signin,\n  signout,\n  usesession,\n  getsession,\n  changepassword,\n  updateuser,\n}"
     },
     {
+      "label": "Lalita Kapilavai \u2014 Sacred Art & Carnatic Music Archive",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "community": 62,
+      "norm_label": "lalita kapilavai \u2014 sacred art & carnatic music archive",
+      "id": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive"
+    },
+    {
+      "label": "1. Architectural Stack",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L7",
+      "community": 62,
+      "norm_label": "1. architectural stack",
+      "id": "lalitakapilavai_readme_1_architectural_stack"
+    },
+    {
+      "label": "2. Quickstart & Local Development",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L21",
+      "community": 3,
+      "norm_label": "2. quickstart & local development",
+      "id": "lalitakapilavai_readme_2_quickstart_local_development"
+    },
+    {
+      "label": "Step 2: Start Local Full-Stack (Web + PostgreSQL)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L35",
+      "community": 3,
+      "norm_label": "step 2: start local full-stack (web + postgresql)",
+      "id": "lalitakapilavai_readme_step_2_start_local_full_stack_web_postgresql"
+    },
+    {
+      "label": "Step 3: Install Dependencies & Generate Prisma Client",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L46",
+      "community": 3,
+      "norm_label": "step 3: install dependencies & generate prisma client",
+      "id": "lalitakapilavai_readme_step_3_install_dependencies_generate_prisma_client"
+    },
+    {
+      "label": "Step 4: Run Database Migrations & Seed Default Data",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L52",
+      "community": 3,
+      "norm_label": "step 4: run database migrations & seed default data",
+      "id": "lalitakapilavai_readme_step_4_run_database_migrations_seed_default_data"
+    },
+    {
+      "label": "Step 5: Admin Control Center & Default Credentials",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L58",
+      "community": 3,
+      "norm_label": "step 5: admin control center & default credentials",
+      "id": "lalitakapilavai_readme_step_5_admin_control_center_default_credentials"
+    },
+    {
+      "label": "3. Docker Containerization & Production Build",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L69",
+      "community": 80,
+      "norm_label": "3. docker containerization & production build",
+      "id": "lalitakapilavai_readme_3_docker_containerization_production_build"
+    },
+    {
+      "label": "Local Production Build Test",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L71",
+      "community": 80,
+      "norm_label": "local production build test",
+      "id": "lalitakapilavai_readme_local_production_build_test"
+    },
+    {
+      "label": "Full Multi-Stage Docker Build",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L77",
+      "community": 80,
+      "norm_label": "full multi-stage docker build",
+      "id": "lalitakapilavai_readme_full_multi_stage_docker_build"
+    },
+    {
+      "label": "code:bash (docker compose up -d --build)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L79",
+      "community": 80,
+      "norm_label": "code:bash (docker compose up -d --build)",
+      "id": "lalitakapilavai_readme_codeblock_7"
+    },
+    {
+      "label": "code:bash (docker compose ps)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L83",
+      "community": 80,
+      "norm_label": "code:bash (docker compose ps)",
+      "id": "lalitakapilavai_readme_codeblock_8"
+    },
+    {
+      "label": "code:bash (curl http://localhost:3000/api/health)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L88",
+      "community": 80,
+      "norm_label": "code:bash (curl http://localhost:3000/api/health)",
+      "id": "lalitakapilavai_readme_codeblock_9"
+    },
+    {
+      "label": "code:bash (docker compose down)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L93",
+      "community": 80,
+      "norm_label": "code:bash (docker compose down)",
+      "id": "lalitakapilavai_readme_codeblock_10"
+    },
+    {
+      "label": "4. Zero-Touch Coolify Deployment (via `coolify` Network)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L99",
+      "community": 62,
+      "norm_label": "4. zero-touch coolify deployment (via `coolify` network)",
+      "id": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network"
+    },
+    {
+      "label": "5-Step Deployment Runbook",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L103",
+      "community": 62,
+      "norm_label": "5-step deployment runbook",
+      "id": "lalitakapilavai_readme_5_step_deployment_runbook"
+    },
+    {
+      "label": "Complete Production Environment Variables Template",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L128",
+      "community": 62,
+      "norm_label": "complete production environment variables template",
+      "id": "lalitakapilavai_readme_complete_production_environment_variables_template"
+    },
+    {
+      "label": "code:env (# ==========================================================)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L130",
+      "community": 62,
+      "norm_label": "code:env (# ==========================================================)",
+      "id": "lalitakapilavai_readme_codeblock_11"
+    },
+    {
+      "label": "Automated Container Lifecycle & Idempotency Hook",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L168",
+      "community": 62,
+      "norm_label": "automated container lifecycle & idempotency hook",
+      "id": "lalitakapilavai_readme_automated_container_lifecycle_idempotency_hook"
+    },
+    {
+      "label": "5. Architectural Documentation & Skills",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L178",
+      "community": 62,
+      "norm_label": "5. architectural documentation & skills",
+      "id": "lalitakapilavai_readme_5_architectural_documentation_skills"
+    },
+    {
       "label": "Operational Context & Architecture: Lalita Kapilavai Portfolio & Archive",
       "file_type": "document",
       "source_file": "AGENTS.md",
@@ -10924,7 +11077,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block.tsx",
       "source_location": "L47",
-      "community": 84,
+      "community": 59,
       "norm_label": "gethexluminance()",
       "id": "gallery_exhibition_wall_exhibition_wall_block_gethexluminance"
     },
@@ -10960,7 +11113,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/interactive-depth-card.tsx",
       "source_location": "L1",
-      "community": 62,
+      "community": 59,
       "norm_label": "interactive-depth-card.tsx",
       "id": "src_components_public_blocks_gallery_3d_interactive_depth_card_tsx"
     },
@@ -10969,7 +11122,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/interactive-depth-card.tsx",
       "source_location": "L9",
-      "community": 87,
+      "community": 59,
       "norm_label": "interactivedepthcardprops",
       "id": "gallery_3d_interactive_depth_card_interactivedepthcardprops"
     },
@@ -10978,7 +11131,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/interactive-depth-card.tsx",
       "source_location": "L16",
-      "community": 62,
+      "community": 59,
       "norm_label": "interactivedepthcard()",
       "id": "gallery_3d_interactive_depth_card_interactivedepthcard"
     },
@@ -10987,7 +11140,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/three-cylinder-carousel.tsx",
       "source_location": "L1",
-      "community": 87,
+      "community": 59,
       "norm_label": "three-cylinder-carousel.tsx",
       "id": "src_components_public_blocks_gallery_3d_three_cylinder_carousel_tsx"
     },
@@ -10996,7 +11149,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/three-cylinder-carousel.tsx",
       "source_location": "L9",
-      "community": 87,
+      "community": 59,
       "norm_label": "threecylindercarouselprops",
       "id": "gallery_3d_three_cylinder_carousel_threecylindercarouselprops"
     },
@@ -11005,7 +11158,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/three-cylinder-carousel.tsx",
       "source_location": "L17",
-      "community": 87,
+      "community": 59,
       "norm_label": "threecylindercarousel()",
       "id": "gallery_3d_three_cylinder_carousel_threecylindercarousel"
     },
@@ -11014,7 +11167,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/three-liquid-warp.tsx",
       "source_location": "L1",
-      "community": 87,
+      "community": 59,
       "norm_label": "three-liquid-warp.tsx",
       "id": "src_components_public_blocks_gallery_3d_three_liquid_warp_tsx"
     },
@@ -11023,7 +11176,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/three-liquid-warp.tsx",
       "source_location": "L9",
-      "community": 87,
+      "community": 59,
       "norm_label": "threeliquidwarpprops",
       "id": "gallery_3d_three_liquid_warp_threeliquidwarpprops"
     },
@@ -11032,7 +11185,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/gallery-3d/three-liquid-warp.tsx",
       "source_location": "L60",
-      "community": 87,
+      "community": 59,
       "norm_label": "threeliquidwarp()",
       "id": "gallery_3d_three_liquid_warp_threeliquidwarp"
     },
@@ -11113,7 +11266,7 @@
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L152",
-      "community": 57,
+      "community": 44,
       "norm_label": "sortablesection()",
       "id": "builder_page_sortablesection"
     },
@@ -11131,7 +11284,7 @@
       "file_type": "code",
       "source_file": "src/components/builder/timeline-inspector.tsx",
       "source_location": "L47",
-      "community": 44,
+      "community": 49,
       "norm_label": "category_options",
       "id": "builder_timeline_inspector_category_options"
     },
@@ -11140,7 +11293,7 @@
       "file_type": "code",
       "source_file": "src/components/public/blocks/timeline-block.tsx",
       "source_location": "L17",
-      "community": 44,
+      "community": 1,
       "norm_label": "timelinemilestone",
       "id": "blocks_timeline_block_timelinemilestone"
     },
@@ -11158,7 +11311,7 @@
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L76",
-      "community": 57,
+      "community": 44,
       "norm_label": "islightcolor",
       "id": "builder_page_islightcolor"
     },
@@ -11167,7 +11320,7 @@
       "file_type": "code",
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L7",
-      "community": 39,
+      "community": 87,
       "norm_label": "allowed_tokens",
       "id": "theme_route_allowed_tokens"
     },
@@ -11176,7 +11329,7 @@
       "file_type": "code",
       "source_file": "src/app/api/admin/settings/theme/route.ts",
       "source_location": "L17",
-      "community": 39,
+      "community": 87,
       "norm_label": "sanitizetokenset()",
       "id": "theme_route_sanitizetokenset"
     },
@@ -11239,7 +11392,7 @@
       "file_type": "code",
       "source_file": "src/app/api/leads/submit/route.ts",
       "source_location": "L4",
-      "community": 51,
+      "community": 34,
       "norm_label": "post()",
       "id": "submit_route_post"
     },
@@ -11275,7 +11428,7 @@
       "file_type": "code",
       "source_file": "src/app/page.tsx",
       "source_location": "L3",
-      "community": 89,
+      "community": 69,
       "norm_label": "home()",
       "id": "app_page_home"
     },
@@ -11311,7 +11464,7 @@
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L99",
-      "community": 3,
+      "community": 62,
       "norm_label": "4. coolify vps deployment workflow",
       "id": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow"
     },
@@ -11320,7 +11473,7 @@
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L107",
-      "community": 3,
+      "community": 62,
       "norm_label": "code:bash (git push origin main)",
       "id": "lalitakapilavai_readme_codeblock_12"
     },
@@ -11329,7 +11482,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L9",
-      "community": 92,
+      "community": 8,
       "norm_label": "metadata",
       "id": "posts_page_metadata"
     },
@@ -11338,7 +11491,7 @@
       "file_type": "code",
       "source_file": "src/app/(public)/posts/page.tsx",
       "source_location": "L15",
-      "community": 92,
+      "community": 8,
       "norm_label": "blogarchivepage()",
       "id": "posts_page_blogarchivepage"
     },
@@ -11392,7 +11545,7 @@
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L57",
-      "community": 3,
+      "community": 80,
       "norm_label": "step 5: start local development server",
       "id": "lalitakapilavai_readme_step_5_start_local_development_server"
     },
@@ -11401,7 +11554,7 @@
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L103",
-      "community": 3,
+      "community": 62,
       "norm_label": "code:bash (git push origin master)",
       "id": "lalitakapilavai_readme_codeblock_13"
     },
@@ -41541,9 +41694,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "agents_md",
-      "target": "lalitakapilavai_agents_operational_context_architecture_savazai_webapps_platform",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_operational_context_architecture_savazai_webapps_platform"
     },
     {
       "relation": "contains",
@@ -41561,9 +41714,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_operational_context_architecture_savazai_webapps_platform",
-      "target": "lalitakapilavai_agents_1_platform_vision_multi_tenant_atelier_architecture",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_1_platform_vision_multi_tenant_atelier_architecture"
     },
     {
       "relation": "contains",
@@ -41571,9 +41724,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_operational_context_architecture_savazai_webapps_platform",
-      "target": "lalitakapilavai_agents_2_technology_stack_architectural_standards",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_2_technology_stack_architectural_standards"
     },
     {
       "relation": "contains",
@@ -41581,9 +41734,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_operational_context_architecture_savazai_webapps_platform",
-      "target": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates"
     },
     {
       "relation": "contains",
@@ -41591,9 +41744,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L98",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_operational_context_architecture_savazai_webapps_platform",
-      "target": "lalitakapilavai_agents_4_living_document_governance_invariant",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_4_living_document_governance_invariant"
     },
     {
       "relation": "contains",
@@ -41601,9 +41754,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L111",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_operational_context_architecture_savazai_webapps_platform",
-      "target": "lalitakapilavai_agents_5_enterprise_skill_manuals_skills",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_5_enterprise_skill_manuals_skills"
     },
     {
       "relation": "contains",
@@ -41611,9 +41764,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_operational_context_architecture_savazai_webapps_platform",
-      "target": "lalitakapilavai_agents_6_architectural_invariants_specialized_core_engines",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_6_architectural_invariants_specialized_core_engines"
     },
     {
       "relation": "contains",
@@ -41621,9 +41774,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
-      "target": "lalitakapilavai_agents_step_1_local_first_validation_zero_remote_regressions",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_step_1_local_first_validation_zero_remote_regressions"
     },
     {
       "relation": "contains",
@@ -41631,9 +41784,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
-      "target": "lalitakapilavai_agents_step_2_container_environment_validation",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_step_2_container_environment_validation"
     },
     {
       "relation": "contains",
@@ -41641,9 +41794,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
-      "target": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization"
     },
     {
       "relation": "contains",
@@ -41651,9 +41804,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L80",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
-      "target": "lalitakapilavai_agents_step_4_persistent_devplans_archiving_rule",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_step_4_persistent_devplans_archiving_rule"
     },
     {
       "relation": "contains",
@@ -41661,9 +41814,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L87",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_3_universal_autonomous_agent_lifecycle_quality_gates",
-      "target": "lalitakapilavai_agents_step_5_git_commit_remote_deployment_pipeline",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_step_5_git_commit_remote_deployment_pipeline"
     },
     {
       "relation": "contains",
@@ -41671,9 +41824,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_step_1_local_first_validation_zero_remote_regressions",
-      "target": "lalitakapilavai_agents_codeblock_1",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_codeblock_1"
     },
     {
       "relation": "contains",
@@ -41691,9 +41844,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L68",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_step_2_container_environment_validation",
-      "target": "lalitakapilavai_agents_codeblock_2",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_codeblock_2"
     },
     {
       "relation": "contains",
@@ -41711,9 +41864,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L76",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_step_3_knowledge_graph_synchronization",
-      "target": "lalitakapilavai_agents_codeblock_3",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_codeblock_3"
     },
     {
       "relation": "contains",
@@ -41731,9 +41884,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L89",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_step_5_git_commit_remote_deployment_pipeline",
-      "target": "lalitakapilavai_agents_codeblock_4",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_codeblock_4"
     },
     {
       "relation": "contains",
@@ -41761,9 +41914,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L125",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_6_architectural_invariants_specialized_core_engines",
-      "target": "lalitakapilavai_agents_a_physical_placard_print_engine_isolated_iframe_driver",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_a_physical_placard_print_engine_isolated_iframe_driver"
     },
     {
       "relation": "contains",
@@ -41771,9 +41924,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L137",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_6_architectural_invariants_specialized_core_engines",
-      "target": "lalitakapilavai_agents_b_3d_webgl_exhibition_salon_wall_engine",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_b_3d_webgl_exhibition_salon_wall_engine"
     },
     {
       "relation": "contains",
@@ -41781,9 +41934,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L150",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_6_architectural_invariants_specialized_core_engines",
-      "target": "lalitakapilavai_agents_c_universal_email_notification_form_dispatch_engine",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_agents_c_universal_email_notification_form_dispatch_engine"
     },
     {
       "relation": "contains",
@@ -41791,8 +41944,18 @@
       "source_file": "AGENTS.md",
       "source_location": "L159",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_agents_6_architectural_invariants_specialized_core_engines",
-      "target": "lalitakapilavai_agents_d_strict_binary_theme_contrast_invariant",
+      "target": "lalitakapilavai_agents_d_strict_binary_theme_contrast_invariant"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "readme_md",
+      "target": "lalitakapilavai_readme_savazai_webapps_platform",
       "confidence_score": 1.0
     },
     {
@@ -41809,11 +41972,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
-      "target": "lalitakapilavai_readme_1_architectural_stack"
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_1_executive_platform_overview",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -41821,139 +41984,89 @@
       "source_file": "README.md",
       "source_location": "L21",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
-      "target": "lalitakapilavai_readme_2_quickstart_local_development"
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_2_technology_stack_modern_architectural_standards",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L65",
+      "source_location": "L40",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
-      "target": "lalitakapilavai_readme_3_docker_containerization_production_build"
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_3_high_level_modular_architecture",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L99",
+      "source_location": "L70",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
-      "target": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network"
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L111",
+      "source_location": "L92",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
-      "target": "lalitakapilavai_readme_5_architectural_documentation_skills"
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_5_quickstart_local_development",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L95",
+      "source_location": "L132",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
-      "target": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow"
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L23",
+      "source_location": "L152",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_prerequisites"
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_7_production_environment_variables_template",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L28",
+      "source_location": "L193",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_1_clone_and_configure_environment"
+      "source": "lalitakapilavai_readme_savazai_webapps_platform",
+      "target": "lalitakapilavai_readme_8_architectural_documentation_living_governance",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L35",
+      "source_location": "L12",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_2_start_local_full_stack_web_postgresql"
+      "source": "lalitakapilavai_readme_1_executive_platform_overview",
+      "target": "lalitakapilavai_readme_core_architectural_pillars",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L46",
+      "source_location": "L42",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_3_install_dependencies_generate_prisma_client"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L52",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_4_run_database_migrations_seed_default_data"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L58",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_5_admin_control_center_default_credentials"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L35",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_2_start_local_postgresql_with_pgvector"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L52",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_4_run_database_migrations_push"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L57",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_2_quickstart_local_development",
-      "target": "lalitakapilavai_readme_step_5_start_local_development_server"
+      "source": "lalitakapilavai_readme_3_high_level_modular_architecture",
+      "target": "lalitakapilavai_readme_codeblock_1",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -41969,21 +42082,121 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L37",
+      "source_location": "L72",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_step_2_start_local_full_stack_web_postgresql",
-      "target": "lalitakapilavai_readme_codeblock_2"
+      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "target": "lalitakapilavai_readme_a_3d_webgl_exhibition_salon_wall",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L42",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "target": "lalitakapilavai_readme_b_physical_gallery_placard_label_generator",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L83",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_4_key_platform_features_engines",
+      "target": "lalitakapilavai_readme_c_dynamic_mail_message_studio_dispatch_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_5_quickstart_local_development",
+      "target": "lalitakapilavai_readme_prerequisites",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L99",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_5_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_1_clone_and_configure_environment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L106",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_5_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_5_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L124",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_5_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_4_access_endpoints",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_prerequisites"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_step_1_clone_and_configure_environment",
+      "target": "lalitakapilavai_readme_codeblock_2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_1_clone_and_configure_environment"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L37",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_step_2_start_local_full_stack_web_postgresql",
-      "target": "lalitakapilavai_readme_codeblock_3"
+      "target": "lalitakapilavai_readme_codeblock_2"
     },
     {
       "relation": "contains",
@@ -41994,6 +42207,36 @@
       "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_step_2_start_local_postgresql_with_pgvector",
       "target": "lalitakapilavai_readme_codeblock_2"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
+      "target": "lalitakapilavai_readme_codeblock_3",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
+      "target": "lalitakapilavai_readme_codeblock_4",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L42",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_step_2_start_local_full_stack_web_postgresql",
+      "target": "lalitakapilavai_readme_codeblock_3"
     },
     {
       "relation": "contains",
@@ -42019,6 +42262,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
+      "source_location": "L118",
+      "weight": 1.0,
+      "source": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed",
+      "target": "lalitakapilavai_readme_codeblock_5",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
       "source_location": "L53",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -42039,21 +42292,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L67",
+      "source_location": "L136",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_3_docker_containerization_production_build",
-      "target": "lalitakapilavai_readme_local_production_build_test"
+      "source": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment",
+      "target": "lalitakapilavai_readme_deployment_runbook",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L73",
+      "source_location": "L154",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_3_docker_containerization_production_build",
-      "target": "lalitakapilavai_readme_full_multi_stage_docker_build"
+      "source": "lalitakapilavai_readme_7_production_environment_variables_template",
+      "target": "lalitakapilavai_readme_codeblock_6",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -42064,16 +42317,6 @@
       "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_local_production_build_test",
       "target": "lalitakapilavai_readme_codeblock_6"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L69",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_local_production_build_test",
-      "target": "lalitakapilavai_readme_codeblock_7"
     },
     {
       "relation": "contains",
@@ -42084,106 +42327,6 @@
       "confidence_score": 1.0,
       "source": "lalitakapilavai_readme_step_5_start_local_development_server",
       "target": "lalitakapilavai_readme_codeblock_6"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L79",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
-      "target": "lalitakapilavai_readme_codeblock_7"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L75",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
-      "target": "lalitakapilavai_readme_codeblock_8"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L79",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
-      "target": "lalitakapilavai_readme_codeblock_9"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L84",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
-      "target": "lalitakapilavai_readme_codeblock_10"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L89",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
-      "target": "lalitakapilavai_readme_codeblock_11"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L103",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
-      "target": "lalitakapilavai_readme_5_step_deployment_runbook"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L128",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
-      "target": "lalitakapilavai_readme_complete_production_environment_variables_template"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L168",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
-      "target": "lalitakapilavai_readme_automated_container_lifecycle_idempotency_hook"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L130",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_complete_production_environment_variables_template",
-      "target": "lalitakapilavai_readme_codeblock_11"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L102",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow",
-      "target": "lalitakapilavai_readme_codeblock_11"
     },
     {
       "relation": "contains",
@@ -43858,6 +44001,266 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
+      "target": "lalitakapilavai_readme_1_architectural_stack"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
+      "target": "lalitakapilavai_readme_2_quickstart_local_development"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L65",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
+      "target": "lalitakapilavai_readme_3_docker_containerization_production_build"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L99",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
+      "target": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L111",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
+      "target": "lalitakapilavai_readme_5_architectural_documentation_skills"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L95",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_lalita_kapilavai_sacred_art_carnatic_music_archive",
+      "target": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L35",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_2_start_local_full_stack_web_postgresql"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_3_install_dependencies_generate_prisma_client"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_4_run_database_migrations_seed_default_data"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L58",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_5_admin_control_center_default_credentials"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L35",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_2_start_local_postgresql_with_pgvector"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_4_run_database_migrations_push"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_2_quickstart_local_development",
+      "target": "lalitakapilavai_readme_step_5_start_local_development_server"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L67",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_3_docker_containerization_production_build",
+      "target": "lalitakapilavai_readme_local_production_build_test"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L73",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_3_docker_containerization_production_build",
+      "target": "lalitakapilavai_readme_full_multi_stage_docker_build"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L69",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_local_production_build_test",
+      "target": "lalitakapilavai_readme_codeblock_7"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L79",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
+      "target": "lalitakapilavai_readme_codeblock_7"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L75",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
+      "target": "lalitakapilavai_readme_codeblock_8"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L79",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
+      "target": "lalitakapilavai_readme_codeblock_9"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L84",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
+      "target": "lalitakapilavai_readme_codeblock_10"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L89",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_full_multi_stage_docker_build",
+      "target": "lalitakapilavai_readme_codeblock_11"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L103",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
+      "target": "lalitakapilavai_readme_5_step_deployment_runbook"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L128",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
+      "target": "lalitakapilavai_readme_complete_production_environment_variables_template"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L168",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_zero_touch_coolify_deployment_via_coolify_network",
+      "target": "lalitakapilavai_readme_automated_container_lifecycle_idempotency_hook"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L130",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_complete_production_environment_variables_template",
+      "target": "lalitakapilavai_readme_codeblock_11"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L102",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "lalitakapilavai_readme_4_coolify_vps_deployment_workflow",
+      "target": "lalitakapilavai_readme_codeblock_11"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "AGENTS.md",
       "source_location": "L13",
       "weight": 1.0,
@@ -44108,5 +44511,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4e51abf81270abd114de4fa2fd98a609c2ce2d4b"
+  "built_at_commit": "191b9230f15da51a5aa01064f31e7815572b7b74"
 }

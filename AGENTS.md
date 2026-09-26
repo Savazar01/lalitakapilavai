@@ -96,15 +96,15 @@ GitHub pushes to `main` trigger automated builds on the remote VPS managed via *
 ---
 
 ## 4. Living Document Governance Invariant
-`AGENTS.md` is a living architectural manifest.
-- **Mandatory Documentation Sync**: Whenever any agent or developer:
-  - Adds or updates a component, service, or public/admin route.
-  - Installs, updates, or removes an npm library or third-party dependency.
-  - Extends the Prisma database schema.
-  - Creates, modifies, or deprecates a `.skills/` manual.
-  `AGENTS.md` MUST be updated within the exact same pull request or commit.
-- **Preventing Knowledge Decay**: Outdated patterns, deprecated routes, or superseded component instructions must be removed or moved to a legacy section immediately.
-- **No Skill Drift**: If a new capability or architectural pattern is established (such as a new print engine or 3D shader technique), it must be cataloged in both `.skills/` and summarized in Section 6 of this document.
+**`AGENTS.md` and `README.md` are living architectural manifests.**
+1. **Mandatory Documentation Sync**: Whenever any agent or developer:
+   - Adds or updates a component, service, visual block, or public/admin route.
+   - Installs, updates, or removes an npm library or third-party dependency.
+   - Extends the Prisma database schema or modifies environment configurations.
+   - Creates, modifies, or deprecates a `.skills/` manual.
+   **BOTH `AGENTS.md` AND `README.md` MUST be reviewed and updated concurrently in the exact same pull request or commit.**
+2. **Preventing Knowledge Decay**: Outdated architectural notes, superseded components, or deprecated workflow steps must be removed from `README.md` and `AGENTS.md` immediately.
+3. **No Drift Between Docs and Code**: All descriptions of components, port numbers, environment variables, and print/WebGL capabilities in `README.md` must accurately reflect the codebase at all times.
 
 ---
 
