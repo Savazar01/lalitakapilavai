@@ -28,7 +28,7 @@ The **SavazAI WebApps Platform** is an enterprise-grade digital publishing, arch
 - **Language**: TypeScript 5+ in strict mode (`noImplicitAny`, strict null checks).
 - **Styling Engine**: Tailwind CSS v4 (`@tailwindcss/postcss`) with CSS theme variables — **No legacy tailwind.config.js**.
 - **Component Primitives**: Shadcn UI primitives hardened with WCAG 2.2 AAA accessibility.
-- **Rich Text Suite**: Universal Tiptap WYSIWYG Editor (`@tiptap/react`, `@tiptap/starter-kit`) with one-click token insertion chips.
+- **Rich Text Suite**: Universal Tiptap WYSIWYG Editor (`@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-placeholder`) with one-click token insertion chips and accessible zero-state placeholders.
 - **3D Spatial Graphics**: Three.js & React Three Fiber (R3F) for procedural architectural backdrops and cinematic camera paths.
 - **Print Subsystem**: Isolated Headless Iframe Print Driver (`src/lib/print-isolated-html.ts`) ensuring 1:1 physical millimeter scaling without browser print UI bleed.
 - **Database & Vector Storage**: PostgreSQL 17 with `pgvector` (`pgvector/pgvector:pg17`).

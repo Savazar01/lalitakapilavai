@@ -187,12 +187,12 @@ export default function AdminSettingsPage() {
     watermarkStyle: "REPEAT_DIAGONAL",
     defaultFoilEarmarkText: "Gold Foil",
     showFoilEarmark: true,
-    storageProvider: "R2",
+    storageProvider: "LOCAL",
     r2AccountId: "",
-    r2BucketName: "savazai-media-vault",
-    r2PublicUrl: "https://media.savazar.com",
+    r2BucketName: "",
+    r2PublicUrl: "",
     s3Region: "ap-south-1",
-    s3BucketName: "savazai-backup-vault",
+    s3BucketName: "",
     s3Endpoint: "",
     s3AccessKey: "",
     s3SecretKey: "",
@@ -300,10 +300,10 @@ export default function AdminSettingsPage() {
             watermarkStyle: data.watermarkStyle || "REPEAT_DIAGONAL",
             defaultFoilEarmarkText: data.watermarkConfig?.defaultFoilEarmarkText || "Gold Foil",
             showFoilEarmark: data.watermarkConfig?.showFoilEarmark !== false,
-            storageProvider: data.storageProvider || "R2",
+            storageProvider: data.storageProvider || "LOCAL",
             r2AccountId: data.r2AccountId || "",
-            r2BucketName: data.r2BucketName || "savazai-media-vault",
-            r2PublicUrl: data.r2PublicUrl || "https://media.savazar.com",
+            r2BucketName: data.r2BucketName || "",
+            r2PublicUrl: data.r2PublicUrl || "",
             s3Region: data.s3Region || "ap-south-1",
             s3BucketName: data.s3BucketName || "",
             s3Endpoint: data.s3Endpoint || "",
@@ -1277,55 +1277,167 @@ export default function AdminSettingsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 text-xs">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">Storage Provider</Label>
-                      <Select
-                        value={form.storageProvider}
-                        onValueChange={(val) => setForm({ ...form, storageProvider: val })}
-                      >
-                        <SelectTrigger className="text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="R2">Cloudflare R2</SelectItem>
-                          <SelectItem value="S3">Amazon AWS S3</SelectItem>
-                          <SelectItem value="LOCAL">Local Filesystem (/public/media)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">R2 Account ID</Label>
-                      <Input
-                        value={form.r2AccountId}
-                        onChange={(e) => setForm({ ...form, r2AccountId: e.target.value })}
-                        className="text-xs font-mono"
-                        placeholder="Cloudflare account ID"
-                      />
-                    </div>
+                  <div className="space-y-1.5 max-w-md">
+                    <Label className="font-semibold text-foreground">Storage Provider</Label>
+                    <Select
+                      value={form.storageProvider}
+                      onValueChange={(val) => setForm({ ...form, storageProvider: val })}
+                    >
+                      <SelectTrigger className="text-xs">
+                        <SelectValue placeholder="Select storage provider" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="LOCAL">Local Filesystem (/public/media)</SelectItem>
+                        <SelectItem value="R2">Cloudflare R2 Object Storage</SelectItem>
+                        <SelectItem value="S3">Amazon S3 Object Storage</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">Bucket Name</Label>
-                      <Input
-                        value={form.r2BucketName}
-                        onChange={(e) => setForm({ ...form, r2BucketName: e.target.value })}
-                        className="text-xs font-mono"
-                      />
+                  {/* When LOCAL: Show clear info callout and hide cloud inputs */}
+                  {form.storageProvider === "LOCAL" && (
+                    <div className="p-4 rounded-lg border border-border bg-muted/40 text-xs text-muted-foreground space-y-1.5">
+                      <p className="font-semibold text-foreground text-sm">Local Storage Mode Active</p>
+                      <p className="leading-relaxed">
+                        Media assets will be stored directly inside the persistent container volume at{" "}
+                        <code className="text-xs bg-background px-1.5 py-0.5 rounded border border-border font-mono text-foreground">
+                          /app/public/media
+                        </code>
+                        . No external cloud credentials or bucket policies required.
+                      </p>
                     </div>
+                  )}
 
-                    <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">Public CDN URL</Label>
-                      <Input
-                        value={form.r2PublicUrl}
-                        onChange={(e) => setForm({ ...form, r2PublicUrl: e.target.value })}
-                        className="text-xs font-mono"
-                        placeholder="https://media.savazar.com or /media"
-                      />
+                  {/* When CLOUDFLARE R2: Show R2 specific inputs + help link */}
+                  {form.storageProvider === "R2" && (
+                    <div className="space-y-4 pt-2">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground pb-2 border-b border-border/60">
+                        <span>Configure your Cloudflare R2 bucket details and public access domain.</span>
+                        <a
+                          href="https://developers.cloudflare.com/r2/api/s3/tokens/"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                        >
+                          Cloudflare R2 Documentation ↗
+                        </a>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <Label className="font-semibold text-foreground">R2 Account ID</Label>
+                          <Input
+                            value={form.r2AccountId}
+                            onChange={(e) => setForm({ ...form, r2AccountId: e.target.value })}
+                            className="text-xs font-mono"
+                            placeholder="e.g. 0123456789abcdef0123456789abcdef"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="font-semibold text-foreground">Bucket Name</Label>
+                          <Input
+                            value={form.r2BucketName}
+                            onChange={(e) => setForm({ ...form, r2BucketName: e.target.value })}
+                            className="text-xs font-mono"
+                            placeholder="e.g. atelier-media-vault"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Public CDN URL</Label>
+                        <Input
+                          value={form.r2PublicUrl}
+                          onChange={(e) => setForm({ ...form, r2PublicUrl: e.target.value })}
+                          className="text-xs font-mono"
+                          placeholder="e.g. https://media.yourdomain.com"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* When AMAZON S3: Show S3 inputs + help link */}
+                  {form.storageProvider === "S3" && (
+                    <div className="space-y-4 pt-2">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground pb-2 border-b border-border/60">
+                        <span>Configure your Amazon Web Services S3 bucket details and access credentials.</span>
+                        <a
+                          href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                        >
+                          AWS S3 Documentation ↗
+                        </a>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <Label className="font-semibold text-foreground">S3 Region</Label>
+                          <Input
+                            value={form.s3Region}
+                            onChange={(e) => setForm({ ...form, s3Region: e.target.value })}
+                            className="text-xs font-mono"
+                            placeholder="e.g. ap-south-1, us-east-1"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="font-semibold text-foreground">Bucket Name</Label>
+                          <Input
+                            value={form.s3BucketName}
+                            onChange={(e) => setForm({ ...form, s3BucketName: e.target.value })}
+                            className="text-xs font-mono"
+                            placeholder="e.g. archive-master-vault"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Custom Endpoint (Optional)</Label>
+                        <Input
+                          value={form.s3Endpoint}
+                          onChange={(e) => setForm({ ...form, s3Endpoint: e.target.value })}
+                          className="text-xs font-mono"
+                          placeholder="e.g. https://s3.ap-south-1.amazonaws.com or MinIO endpoint"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <Label className="font-semibold text-foreground">Access Key ID</Label>
+                          <Input
+                            value={form.s3AccessKey}
+                            onChange={(e) => setForm({ ...form, s3AccessKey: e.target.value })}
+                            className="text-xs font-mono"
+                            placeholder="AWS Access Key ID"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="font-semibold text-foreground">Secret Access Key</Label>
+                          <Input
+                            type="password"
+                            value={form.s3SecretKey}
+                            onChange={(e) => setForm({ ...form, s3SecretKey: e.target.value })}
+                            className="text-xs font-mono"
+                            placeholder="AWS Secret Access Key"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Public CDN URL (Optional)</Label>
+                        <Input
+                          value={form.s3PublicUrl}
+                          onChange={(e) => setForm({ ...form, s3PublicUrl: e.target.value })}
+                          className="text-xs font-mono"
+                          placeholder="e.g. https://cdn.yourdomain.com"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

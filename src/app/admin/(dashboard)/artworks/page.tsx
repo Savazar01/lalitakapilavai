@@ -1690,8 +1690,10 @@ export default function ArtworksAdminPage() {
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     Saving...
                   </>
+                ) : editingArtwork ? (
+                  "Update Item"
                 ) : (
-                  "Save Masterwork"
+                  "Save Record"
                 )}
               </Button>
             </DialogFooter>

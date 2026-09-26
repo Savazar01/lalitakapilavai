@@ -30,7 +30,7 @@ All code in this repository strictly adheres to modern, bleeding-edge production
 - **Language**: TypeScript 5+ in strict mode (`noImplicitAny`, strict null checks).
 - **Styling**: Tailwind CSS v4 (`@tailwindcss/postcss`) with CSS theme variables — **No legacy tailwind.config.js**.
 - **Component System**: Shadcn UI with high-elegance classical tokens and WCAG AAA compliance.
-- **Rich Text Engine**: Universal Tiptap WYSIWYG Editor (`@tiptap/react`, `@tiptap/starter-kit`) for Page Builder blocks, blogs, curatorial essays, and email templates.
+- **Rich Text Engine**: Universal Tiptap WYSIWYG Editor (`@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-placeholder`) for Page Builder blocks, blogs, curatorial essays, and email templates.
 - **3D Spatial Exhibition Engine**: Three.js & React Three Fiber (R3F) for architectural salon walls, procedural lighting rigs, and director-driven camera tours.
 - **Print & Publishing Driver**: Isolated Headless Iframe Print Driver (`src/lib/print-isolated-html.ts`) for physical visiting-card ($3.5 \times 2\text{ in}$) and museum-wall ($4 \times 2.5\text{ in}$) placards.
 - **Database & Vector Engine**: PostgreSQL 17 with `pgvector` (`pgvector/pgvector:pg17`) running semantic embeddings for multi-modal art and audio exploration.
@@ -166,7 +166,7 @@ All code generation and architectural modifications must adhere to the specializ
 - **Binary Modes Only**: Strictly `"dark"` and `"light"`. `enableSystem` is permanently `false`.
 - **Zero Inverted Surfaces**: Never hardcode dark backgrounds without a `dark:` prefix. Light mode surfaces must resolve to `bg-card` (`#FFFFFF`) with visible `#CBD5E1` borders.
 - **Class-Based Dark Engine**: `src/app/globals.css` must always maintain `@custom-variant dark (&:where(.dark, .dark *));` so OS dark preferences do not leak into Light mode.
-- **Placard Contrast Lock**: Physical museum placards rendered on screen must maintain invariant high-contrast dark text (`#111827`, `#374151`) on pure white paper (`#FFFFFF`), regardless of website dark/light mode toggles.
+- **Placard Contrast Lock**: Physical museum placards and on-screen exhibition placards rendered beneath or beside 3D WebGL Exhibition Walls must maintain invariant high-contrast dark text (`#111827`, `#374151`) on pure white paper (`#FFFFFF`, `[color-scheme:light]`), regardless of website dark/light mode toggles.
 
 ### E. Multi-Tenant Brand Identity & Asset Engine (.ico Favicon & Conditional Phone)
 - **Dynamic Brand Notice**: The public footer never hardcodes copyright notices or watermark fallbacks; it renders dynamic `footerConfig.copyrightNotice` exclusively.

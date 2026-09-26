@@ -214,11 +214,13 @@ export function ArtworkPlacard({
   className = "",
   overlayTitleColor,
   overlayTextColor,
+  alwaysLight = false,
 }: {
   item?: MediaGalleryItem;
   className?: string;
   overlayTitleColor?: string;
   overlayTextColor?: string;
+  alwaysLight?: boolean;
 }) {
   if (!item) return null;
   const hasMetadata =
@@ -237,32 +239,52 @@ export function ArtworkPlacard({
   return (
     <div
       className={cn(
-        "mt-4 p-4 rounded-xl border bg-[#FAF7F2] dark:bg-stone-900 border-amber-900/10 dark:border-amber-500/20 shadow-xs text-left transition-all",
+        "mt-4 p-4 rounded-xl border shadow-xs text-left transition-colors",
+        alwaysLight
+          ? "border-stone-200/90 bg-white text-stone-900 isolate [color-scheme:light]"
+          : "border-border bg-card text-card-foreground",
         className
       )}
+      style={alwaysLight ? { backgroundColor: "#FFFFFF", color: "#111827" } : undefined}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
           <h4
-            className="font-serif text-base font-bold text-slate-900 dark:text-amber-100 tracking-wide"
-            style={{ color: overlayTitleColor || undefined }}
+            className={cn(
+              "font-serif text-base font-bold tracking-wide",
+              alwaysLight ? "text-stone-950" : "text-foreground"
+            )}
+            style={{ color: overlayTitleColor || (alwaysLight ? "#111827" : undefined) }}
           >
-            {item.title || "Classical Masterwork"}
+            {item.title || "Curated Masterwork"}
           </h4>
           {schoolMedium && (
-            <p className="text-xs font-serif text-amber-950/80 dark:text-amber-300/80">
+            <p
+              className={cn(
+                "text-xs font-serif font-medium",
+                alwaysLight ? "text-amber-800" : "text-amber-700 dark:text-amber-400"
+              )}
+            >
               {schoolMedium}
             </p>
           )}
           {item.dimensions && (
-            <p className="text-[11px] font-mono text-slate-500 dark:text-stone-400">
+            <p
+              className={cn(
+                "text-[11px] font-mono",
+                alwaysLight ? "text-stone-600" : "text-muted-foreground"
+              )}
+            >
               {item.dimensions}
             </p>
           )}
           {(item.description || item.caption) && (
             <p
-              className="text-xs font-serif text-slate-700 dark:text-stone-300 mt-2 leading-relaxed"
-              style={{ color: overlayTextColor || undefined }}
+              className={cn(
+                "text-xs font-serif mt-2 leading-relaxed",
+                alwaysLight ? "text-stone-700" : "text-foreground/80"
+              )}
+              style={{ color: overlayTextColor || (alwaysLight ? "#374151" : undefined) }}
             >
               {item.description || item.caption}
             </p>
@@ -271,7 +293,12 @@ export function ArtworkPlacard({
         {href && (
           <Link
             href={href}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/30 text-xs font-serif font-semibold shrink-0 transition-colors cursor-pointer"
+            className={cn(
+              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-serif font-semibold shrink-0 transition-colors cursor-pointer",
+              alwaysLight
+                ? "bg-stone-900 text-white hover:bg-stone-800 shadow-xs"
+                : "bg-primary hover:bg-primary/90 text-primary-foreground"
+            )}
           >
             <span>View Work</span>
             <ExternalLink className="w-3 h-3" />

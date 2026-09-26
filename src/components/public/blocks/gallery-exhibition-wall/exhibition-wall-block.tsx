@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import * as THREE from "three";
 import QRCode from "qrcode";
 import {
@@ -10,7 +11,7 @@ import {
   Pause,
   QrCode,
 } from "lucide-react";
-import { MediaGalleryItem, ArtworkPlacard } from "../media-gallery-block";
+import { MediaGalleryItem } from "../media-gallery-block";
 import {
   WallEnvironment,
   getWallEnvironment,
@@ -1304,11 +1305,72 @@ export function ExhibitionWallBlock({
       </div>
 
       {/* Artwork details (Title, Medium, Dimensions) ONLY rendered below the exhibition container in standard HTML flow */}
-      {!isFullscreen && activePlacement && (
-        <div className="mt-4 p-4 text-center">
-          <ArtworkPlacard item={activePlacement.item} />
-        </div>
-      )}
+      {!isFullscreen && activePlacement && (() => {
+        const activeArtwork = activePlacement.item;
+        const artworkSlug =
+          activeArtwork.artwork?.slug ||
+          activeArtwork.slug ||
+          (activeArtwork.linkType === "artwork" ? activeArtwork.linkTarget : null);
+        const artworkHref = artworkSlug
+          ? artworkSlug.startsWith("/")
+            ? artworkSlug
+            : `/artwork/${artworkSlug}`
+          : activeArtwork.linkTarget || null;
+        const categoryName =
+          activeArtwork.artwork?.category?.name ||
+          activeArtwork.artwork?.traditionalSchool ||
+          activeArtwork.traditionalSchool ||
+          "Curated Work";
+        const artworkTitle =
+          activeArtwork.artwork?.title || activeArtwork.title || "Curated Masterwork";
+        const artworkMeta = [
+          activeArtwork.artwork?.medium || activeArtwork.medium,
+          activeArtwork.artwork?.dimensions || activeArtwork.dimensions,
+          activeArtwork.artwork?.yearCreated || activeArtwork.year,
+        ]
+          .filter(Boolean)
+          .join(" • ");
+        const artworkDesc =
+          activeArtwork.artwork?.description ||
+          activeArtwork.description ||
+          activeArtwork.caption;
+
+        return (
+          <div
+            className="w-full max-w-4xl mx-auto mt-6 p-6 rounded-xl border border-stone-200/90 shadow-xl transition-all text-left isolate [color-scheme:light]"
+            style={{ backgroundColor: "#FFFFFF", color: "#111827" }}
+          >
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span className="text-xs font-mono font-semibold tracking-widest uppercase text-amber-800 block">
+                  {categoryName}
+                </span>
+                <h3 className="text-xl md:text-2xl font-serif font-bold text-stone-950 mt-1">
+                  {artworkTitle}
+                </h3>
+                {artworkMeta && (
+                  <p className="text-sm text-stone-600 mt-1 font-serif">
+                    {artworkMeta}
+                  </p>
+                )}
+              </div>
+              {artworkHref && (
+                <Link
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-serif font-semibold uppercase tracking-wider bg-stone-900 text-white hover:bg-stone-800 transition-colors shrink-0 cursor-pointer shadow-xs"
+                  href={artworkHref}
+                >
+                  View Details
+                </Link>
+              )}
+            </div>
+            {artworkDesc && (
+              <p className="text-sm text-stone-700 mt-4 pt-4 border-t border-stone-200/90 leading-relaxed font-sans">
+                {artworkDesc}
+              </p>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }

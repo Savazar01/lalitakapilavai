@@ -7,6 +7,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
 import { Mark, mergeAttributes } from "@tiptap/core";
 import {
   Bold,
@@ -191,7 +192,7 @@ export function TiptapEditor({
   content,
   onChange,
   className = "",
-  placeholder = "Write and polish traditional verses, curatorial notes, or philosophical commentary...",
+  placeholder = "Start typing commentary, narrative, or documentation...",
   readOnly = false,
   isLight = false,
   contrast,
@@ -252,13 +253,22 @@ export function TiptapEditor({
           class: "text-primary underline hover:opacity-80 transition-opacity",
         },
       }),
+      Placeholder.configure({
+        placeholder: ({ node }) => {
+          if (node.type.name === "heading") {
+            return "Heading...";
+          }
+          return placeholder || "Start typing commentary, narrative, or documentation...";
+        },
+        emptyEditorClass: "is-editor-empty",
+      }),
       TextStyleMark,
       CustomImageNode,
       CustomDividerNode,
       CustomShapeNode,
       FloatingLayerNode,
     ],
-    content: parsedContent || "<p>Click to compose devotional verses or artwork narrative...</p>",
+    content: parsedContent || "",
     editable: !readOnly,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {

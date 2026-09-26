@@ -29,9 +29,9 @@ export async function GET(request: NextRequest) {
           watermarkFontSize: 28,
           defaultCurrency: "INR",
           defaultTimezone: "Asia/Kolkata",
-          storageProvider: "R2",
-          r2BucketName: "savazai-media-vault",
-          r2PublicUrl: "https://media.savazar.com",
+          storageProvider: "LOCAL",
+          r2BucketName: null,
+          r2PublicUrl: null,
         },
       });
     }
