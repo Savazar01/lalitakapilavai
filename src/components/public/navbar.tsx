@@ -69,6 +69,18 @@ export async function Navbar() {
       .catch(() => []),
   ]);
 
+  const brandTitle = settings?.siteName
+    ? settings.siteName.includes("—")
+      ? settings.siteName.split("—")[0].trim()
+      : settings.siteName
+    : "SavazAI WebApps";
+
+  const brandSubtitle =
+    settings?.archiveSubtitle?.trim() ||
+    (settings?.siteName?.includes("—")
+      ? settings.siteName.split("—").slice(1).join("—").trim()
+      : "");
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-stone-300 dark:border-stone-800 bg-background/90 backdrop-blur-md transition-colors duration-300">
       {/* Top Gold Accent Border */}
@@ -80,7 +92,7 @@ export async function Navbar() {
           {settings?.logoUrl ? (
             <img
               src={settings.logoUrl}
-              alt={settings.siteName || "SavazAI WebApps"}
+              alt={brandTitle}
               className="h-11 w-auto max-w-[160px] object-contain group-hover:scale-105 transition-transform"
             />
           ) : (
@@ -90,17 +102,13 @@ export async function Navbar() {
           )}
           <div className="flex flex-col">
             <span className="font-serif font-bold text-lg tracking-tight text-foreground group-hover:text-primary transition-colors">
-              {settings?.siteName
-                ? settings.siteName.includes("—")
-                ? settings.siteName.split("—")[0].trim()
-                : settings.siteName
-                : "SavazAI WebApps"}
+              {brandTitle}
             </span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
-              {settings?.siteName?.includes("—")
-                ? settings.siteName.split("—").slice(1).join("—").trim()
-                : "Digital Atelier & Cultural Archive"}
-            </span>
+            {brandSubtitle ? (
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
+                {brandSubtitle}
+              </span>
+            ) : null}
           </div>
         </Link>
 
@@ -222,17 +230,13 @@ export async function Navbar() {
             <SheetContent side="right" className="w-80 p-0 flex flex-col">
               <SheetHeader className="p-6 border-b border-border text-left">
                 <SheetTitle className="font-serif font-bold text-lg">
-                  {settings?.siteName
-                    ? settings.siteName.includes("—")
-                      ? settings.siteName.split("—")[0].trim()
-                      : settings.siteName
-                    : "SavazAI WebApps"}
+                  {brandTitle}
                 </SheetTitle>
-                <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                  {settings?.siteName?.includes("—")
-                    ? settings.siteName.split("—").slice(1).join("—").trim()
-                    : "Archive Navigation"}
-                </span>
+                {brandSubtitle ? (
+                  <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                    {brandSubtitle}
+                  </span>
+                ) : null}
               </SheetHeader>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">

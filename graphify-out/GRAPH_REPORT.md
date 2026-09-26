@@ -1,7 +1,7 @@
 # Graph Report - lalitakapilavai  (2026-09-26)
 
 ## Corpus Check
-- 209 files · ~220,113 words
+- 209 files · ~220,096 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `628270ec`
+- Built from commit: `01ae50fe`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -145,8 +145,8 @@ Cohesion: 0.05
 Nodes (43): dependencies, @aws-sdk/client-s3, @aws-sdk/s3-request-presigner, better-auth, class-variance-authority, clsx, countries-and-timezones, @dnd-kit/core (+35 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.15
-Nodes (19): 2. Quickstart & Local Development, 3. High-Level Modular Architecture, 5. Quickstart & Local Development, code:block1 (SavazAI WebApps Platform), code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git), code:bash (docker compose -f docker-compose.dev.yml up -d), code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p), code:bash (npx prisma generate) (+11 more)
+Cohesion: 0.18
+Nodes (17): 2. Quickstart & Local Development, 5. Quickstart & Local Development, code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git), code:bash (docker compose -f docker-compose.dev.yml up -d), code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p), code:bash (npx prisma generate), Prerequisites, Step 1: Clone and Configure Environment (+9 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.09
@@ -245,8 +245,8 @@ Cohesion: 0.06
 Nodes (45): MailConfigStudio(), ADMIN_NAV_ITEMS, NavItemDef, Sidebar(), SidebarProps, ALLOWED_TOKENS, AllowedToken, DynamicThemeProvider() (+37 more)
 
 ### Community 40 - "Community 40"
-Cohesion: 0.18
-Nodes (11): 1. Executive Platform Overview, 2. Technology Stack & Modern Architectural Standards, 4. Key Platform Features & Engines, 6. Zero-Touch Coolify VPS Deployment, 8. Architectural Documentation & Living Governance, A. 3D WebGL Exhibition Salon Wall, B. Physical Gallery Placard & Label Generator, C. Dynamic Mail Message Studio & Dispatch Engine (+3 more)
+Cohesion: 0.15
+Nodes (13): 1. Executive Platform Overview, 2. Technology Stack & Modern Architectural Standards, 3. High-Level Modular Architecture, 4. Key Platform Features & Engines, 6. Zero-Touch Coolify VPS Deployment, 8. Architectural Documentation & Living Governance, A. 3D WebGL Exhibition Salon Wall, B. Physical Gallery Placard & Label Generator (+5 more)
 
 ### Community 43 - "Community 43"
 Cohesion: 0.18

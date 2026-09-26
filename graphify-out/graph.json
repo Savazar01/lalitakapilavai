@@ -3318,7 +3318,7 @@
       "label": "PUT()",
       "file_type": "code",
       "source_file": "src/app/api/admin/settings/route.ts",
-      "source_location": "L46",
+      "source_location": "L47",
       "id": "settings_route_put",
       "community": 29,
       "norm_label": "put()"
@@ -8972,7 +8972,7 @@
       "source_file": "README.md",
       "source_location": "L43",
       "id": "lalitakapilavai_readme_3_high_level_modular_architecture",
-      "community": 3,
+      "community": 40,
       "norm_label": "3. high-level modular architecture"
     },
     {
@@ -8981,7 +8981,7 @@
       "source_file": "README.md",
       "source_location": "L45",
       "id": "lalitakapilavai_readme_codeblock_1",
-      "community": 3,
+      "community": 40,
       "norm_label": "code:block1 (savazai webapps platform)"
     },
     {
@@ -12355,9 +12355,9 @@
       "source_file": "package.json",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_package_dependencies",
-      "target": "lalitakapilavai_package_dependencies_tiptap_extension_placeholder",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_package_dependencies_tiptap_extension_placeholder"
     },
     {
       "relation": "contains",
@@ -45556,5 +45556,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "628270ec52a9fdf74a67b76812d9df7adf2949fb"
+  "built_at_commit": "01ae50fe1c62d2986ff508e4e3dba1b44800c669"
 }

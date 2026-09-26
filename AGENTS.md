@@ -172,3 +172,14 @@ All code generation and architectural modifications must adhere to the specializ
 - **Dynamic Brand Notice**: The public footer never hardcodes copyright notices or watermark fallbacks; it renders dynamic `footerConfig.copyrightNotice` exclusively.
 - **Conditional Contact Phone Suppression**: Whenever Studio / Contact Phone is blank, empty, or null in System Settings, the UI completely suppresses the phone row (both icon and text) across public footers and headers without displaying default placeholder phone numbers.
 - **Native Favicon & Vector Engine**: Media upload pipeline provides dedicated direct passthrough bypass for `.ico` (`image/x-icon`, `image/vnd.microsoft.icon`) and `.svg` (`image/svg+xml`), preventing Sharp rasterization or WebP degradation of multi-resolution icons and scalable vector graphics.
+
+### F. Dynamic Archive Subtitle & Idempotent Non-Destructive Tenant Deployment
+- **Configurable Archive Subtitle**:
+  - `SystemSetting.archiveSubtitle` provides a dedicated field in Admin Settings -> General ("Archive Subtitle / Brand Tagline") rendered directly beneath the brand title in `Navbar`.
+  - If omitted or empty, the subtitle element is cleanly suppressed without rendering empty layout rows or falling back to hardcoded text.
+- **Storage Credentials Neutrality**:
+  - Storage credential inputs (S3/R2 access keys, secret keys, bucket names) strictly display neutral placeholder formats (e.g. `placeholder="e.g. AKIAIOSFODNN7EXAMPLE"`) and must never be pre-populated or defaulted with administrative email addresses.
+- **Strict Seeder Non-Destructive Invariant**:
+  - `prisma/seed.ts` enforces that if an `existingSettings` record is detected, it logs `🛡️ Existing SystemSetting detected. Skipping configuration overwrite to protect client data.` and skips all configuration mutations.
+  - Across container deployments and restarts, active tenant configuration, custom page blocks, menu items, and soft-deleted entities (`isDeleted: true`) are strictly preserved and never overwritten or resurrected.
+

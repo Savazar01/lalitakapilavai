@@ -91,6 +91,7 @@ model Verification {
 model SystemSetting {
   id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   siteName          String   @default("SavazAI WebApps — Digital Atelier & Cultural Archive")
+  archiveSubtitle   String?  @default("Digital Exhibition & Cultural Suite")
   siteDescription   String?  @db.Text
   adminAlertEmail   String?  @default("alerts@savazar.com")
   contactEmail      String?
@@ -109,10 +110,10 @@ model SystemSetting {
   watermarkStyle    String?  @default("REPEAT_DIAGONAL") // REPEAT_DIAGONAL, BANNER, CORNER, BOTH
 
   // Cloudflare R2 / AWS S3 storage settings
-  storageProvider   String   @default("R2") // R2, S3, CUSTOM
+  storageProvider   String   @default("LOCAL") // LOCAL, R2, S3
   r2AccountId       String?
-  r2BucketName      String?  @default("savazai-media-vault")
-  r2PublicUrl       String?  @default("/media")
+  r2BucketName      String?
+  r2PublicUrl       String?
   s3Region          String?  @default("ap-south-1")
   s3BucketName      String?
   s3Endpoint        String?

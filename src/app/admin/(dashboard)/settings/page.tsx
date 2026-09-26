@@ -169,6 +169,7 @@ export default function AdminSettingsPage() {
   // Core Settings Form
   const [form, setForm] = React.useState({
     siteName: "",
+    archiveSubtitle: "",
     siteDescription: "",
     adminAlertEmail: "alerts@savazar.com",
     emailHeaderTitle: "SavazAI Atelier",
@@ -284,6 +285,7 @@ export default function AdminSettingsPage() {
         if (data && !data.error) {
           setForm({
             siteName: data.siteName || "",
+            archiveSubtitle: data.archiveSubtitle || "",
             siteDescription: data.siteDescription || "",
             adminAlertEmail: data.adminAlertEmail || "alerts@savazar.com",
             emailHeaderTitle: data.emailHeaderTitle || "SavazAI Atelier",
@@ -838,19 +840,39 @@ export default function AdminSettingsPage() {
                       <Input
                         value={form.siteName}
                         onChange={(e) => setForm({ ...form, siteName: e.target.value })}
+                        placeholder="e.g. SavazAI Archive"
                         className="text-xs"
                       />
+                      <p className="text-[11px] text-muted-foreground">
+                        Primary brand title displayed in navigation headers and page titles.
+                      </p>
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">Admin Alert Email</Label>
+                      <Label className="font-semibold text-foreground">Archive Subtitle / Brand Tagline</Label>
                       <Input
-                        type="email"
-                        value={form.adminAlertEmail}
-                        onChange={(e) => setForm({ ...form, adminAlertEmail: e.target.value })}
-                        className="text-xs font-mono"
+                        value={form.archiveSubtitle}
+                        onChange={(e) => setForm({ ...form, archiveSubtitle: e.target.value })}
+                        placeholder="e.g. Digital Archive & Exhibition Suite"
+                        className="text-xs"
                       />
+                      <p className="text-[11px] text-muted-foreground">
+                        Displayed in the public website header directly below the primary brand title.
+                      </p>
                     </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="font-semibold text-foreground">Admin Alert Email</Label>
+                    <Input
+                      type="email"
+                      value={form.adminAlertEmail}
+                      onChange={(e) => setForm({ ...form, adminAlertEmail: e.target.value })}
+                      className="text-xs font-mono"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Inbound notifications and system alerts destination address.
+                    </p>
                   </div>
 
                   <div className="space-y-1.5">
@@ -1411,7 +1433,7 @@ export default function AdminSettingsPage() {
                             value={form.s3AccessKey}
                             onChange={(e) => setForm({ ...form, s3AccessKey: e.target.value })}
                             className="text-xs font-mono"
-                            placeholder="AWS Access Key ID"
+                            placeholder="e.g. AKIAIOSFODNN7EXAMPLE"
                           />
                         </div>
 
@@ -1422,7 +1444,7 @@ export default function AdminSettingsPage() {
                             value={form.s3SecretKey}
                             onChange={(e) => setForm({ ...form, s3SecretKey: e.target.value })}
                             className="text-xs font-mono"
-                            placeholder="AWS Secret Access Key"
+                            placeholder="Enter secret access key"
                           />
                         </div>
                       </div>

@@ -172,10 +172,11 @@ SavazAI WebApps Platform
 - Category tagging, feature image management, and slug optimization.
 
 #### 9. White-Label Theme & System Studio (`/admin/settings`)
-- **General Branding**: Dynamic atelier title, subtitle, bio, contact email, and single-source-of-truth brand logo URL.
+- **General Branding**: Dynamic atelier title, configurable Archive Subtitle / Brand Tagline (`SystemSetting.archiveSubtitle`), bio, contact email, optional phone suppression, and single-source-of-truth brand logo URL.
+- **Header Integration**: Dynamic subtitle rendering in public `Navbar` and mobile navigation drawer, cleanly suppressed when omitted without empty layout artifacts.
 - **Theme Studio**: Live palette selector with the flagship **"Imperial Atelier"** preset, custom primary/accent hex picker, and strict binary theme preview.
 - **Gmail / SMTP Configuration**: Dynamic SMTP host, port, credentials, and admin alert routing recipient.
-- **Media Vault Settings**: Cloudflare R2 / AWS S3 endpoint, bucket name, access keys, and public CDN domain.
+- **Media Vault Settings**: Cloudflare R2 / AWS S3 storage provider selection with clean placeholder guidance, endpoint, bucket name, access keys, and public CDN domain.
 
 #### 10. Security, Better-Auth RBAC & User Administration (`/admin/users`)
 - Role-Based Access Control (`SUPER_ADMIN`, `ADMIN`, `EDITOR`).

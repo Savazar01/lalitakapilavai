@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
       settings = await prisma.systemSetting.create({
         data: {
           siteName: "SavazAI WebApps — Digital Atelier & Cultural Archive",
+          archiveSubtitle: "Digital Exhibition & Cultural Suite",
           siteDescription:
             "Living digital atelier and high-fidelity cultural archive platform engineered by Savazar.",
           adminAlertEmail: "alerts@savazar.com",
@@ -58,6 +59,7 @@ export async function PUT(request: NextRequest) {
 
     const data = {
       siteName: body.siteName,
+      archiveSubtitle: body.archiveSubtitle !== undefined ? (body.archiveSubtitle ? String(body.archiveSubtitle).trim() : null) : undefined,
       siteDescription: body.siteDescription,
       adminAlertEmail: body.adminAlertEmail,
       emailHeaderTitle: body.emailHeaderTitle,

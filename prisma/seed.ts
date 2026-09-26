@@ -69,26 +69,30 @@ async function main() {
     await prisma.systemSetting.create({
       data: {
         siteName: "SavazAI WebApps — Digital Atelier & Cultural Archive",
+        archiveSubtitle: "Digital Exhibition & Cultural Suite",
         siteDescription:
           "Enterprise multi-tenant digital atelier, spatial exhibition corridor, and museum publishing system.",
         adminAlertEmail: adminEmail,
         contactEmail: "contact@savazar.com",
-        contactPhone: "+91 98450 12345",
+        contactPhone: null,
         watermarkText: process.env.WATERMARK_TEXT || "© SavazAI WebApps | All Rights Reserved",
         watermarkOpacity: parseFloat(process.env.WATERMARK_OPACITY || "0.35"),
         watermarkFontSize: 28,
-        r2AccountId: process.env.S3_ENDPOINT || process.env.R2_ACCOUNT_ID || "cloudflare-r2-account-id",
-        r2BucketName: process.env.S3_BUCKET_NAME || "savazai-media-vault",
-        r2PublicUrl: process.env.S3_PUBLIC_DOMAIN || "/media",
+        storageProvider: "LOCAL",
+        r2AccountId: process.env.R2_ACCOUNT_ID || null,
+        r2BucketName: process.env.R2_BUCKET_NAME || null,
+        r2PublicUrl: process.env.R2_PUBLIC_URL || null,
         s3Region: process.env.S3_REGION || "ap-south-1",
-        s3BucketName: process.env.S3_BUCKET_NAME || "savazai-media-vault",
+        s3BucketName: process.env.S3_BUCKET_NAME || null,
+        s3AccessKey: process.env.S3_ACCESS_KEY || null,
+        s3SecretKey: process.env.S3_SECRET_KEY || null,
         instagramUrl: "https://instagram.com/savazai",
         youtubeUrl: "https://youtube.com/@savazai",
         footerConfig: {
           aboutText:
             "Enterprise digital publishing, cultural archiving, and spatial 3D exhibition suite for fine art masters, traditional heritage artists, and museum collections.",
           contactEmail: "contact@savazar.com",
-          contactPhone: "+91 98450 12345",
+          contactPhone: "",
           copyrightText: "© 2026 SavazAI WebApps Platform. All rights reserved.",
           socialLinks: [
             { platform: "Instagram", url: "https://instagram.com/savazai", isVisible: true },
@@ -122,34 +126,7 @@ async function main() {
     });
     console.log("✅ Provisioned SystemSettings with watermark, storage, footer, and AI configs");
   } else {
-    // Ensure configs exist if null
-    const updates: Record<string, unknown> = {};
-    if (!existingSettings.footerConfig) {
-      updates.footerConfig = {
-        aboutText:
-          "Enterprise digital publishing, cultural archiving, and spatial 3D exhibition suite for fine art masters, traditional heritage artists, and museum collections.",
-        contactEmail: existingSettings.contactEmail || "contact@savazar.com",
-        contactPhone: existingSettings.contactPhone || "+91 98450 12345",
-        copyrightText: "© 2026 SavazAI WebApps Platform. All rights reserved.",
-        socialLinks: [
-          { platform: "Instagram", url: existingSettings.instagramUrl || "https://instagram.com/savazai", isVisible: true },
-          { platform: "YouTube", url: existingSettings.youtubeUrl || "https://youtube.com/@savazai", isVisible: true },
-        ],
-        legalLinks: [
-          { label: "Privacy Policy", url: "/privacy", isVisible: true },
-          { label: "Terms & Conditions", url: "/terms", isVisible: true },
-          { label: "Art Licensing & Reproduction", url: "/licensing", isVisible: true },
-          { label: "Admin Portal", url: "/admin", isVisible: true },
-        ],
-      };
-    }
-    if (Object.keys(updates).length > 0) {
-      await prisma.systemSetting.update({
-        where: { id: existingSettings.id },
-        data: updates,
-      });
-      console.log("✅ Synchronized missing footer/email configurations in SystemSettings");
-    }
+    console.log("🛡️ Existing SystemSetting detected. Skipping configuration overwrite to protect client data.");
   }
 
   // 3. Provision Default Art Categories

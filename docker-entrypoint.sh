@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "🚀 [Lalita Kapilavai Platform] Starting Container Entrypoint..."
+echo "🚀 [SavazAI WebApps Platform] Starting Container Entrypoint..."
 
 DB_HOST="db"
 DB_PORT="5432"
