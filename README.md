@@ -185,6 +185,13 @@ SavazAI WebApps Platform
 - Public registration strictly disabled (`disableSignUp: true`).
 - Middleware session verification and brute-force protection.
 
+#### 11. Dynamic Admin Overview & Metric Engine (`/admin` and `src/components/admin/dashboard-layout-manager.tsx`)
+- **Generalized Enterprise Tiles**: Overview tiles standardized to neutral domain terminology: Catalog & Assets, Categories & Classifications, Events & Showcases, Inbound Inquiries & Leads, Digital e-Catalogs, Articles & Publications, System Health & Services, and Quick Operations.
+- **Dynamic Metric Source Resolver**: The backend resolver (`/api/admin/overview/metrics` and `DashboardWidget.metricSource`) executes parallel count queries across database models (`count:artworks`, `count:categories`, `count:events`, `count:leads`, `count:event_rsvps`, `count:event_specific_rsvp`, `count:catalogs`, `count:pages`, `count:posts`).
+- **Filtered Event Metrics**: Support for `count:event_specific_rsvp` with secondary event picker and dynamic count resolution.
+- **Full Field Customization**: Every tile field (Title, Sub-label, Description, Icon, Target URL, Metric Source, and Manual Value) is interactively editable with live preview and reordering controls.
+- **SSR Pre-Computation**: Server-rendered SSR aggregation ensures immediate, zero-flicker metric integer hydration upon page load.
+
 ---
 
 ## 5. Quickstart & Local Development

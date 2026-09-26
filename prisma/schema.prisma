@@ -558,18 +558,20 @@ model BlogPost {
 // -----------------------------------------------------------------------------
 
 model DashboardWidget {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  title       String
-  description String?
-  widgetType  String   // "STAT_CARD", "QUICK_LINK", "SYSTEM_STATUS", "CUSTOM_HTML"
-  metricValue String?
-  metricSub   String?
-  targetUrl   String?
-  iconName    String?  // Lucide icon identifier
-  order       Int      @default(0)
-  isArchived  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title          String
+  description    String?
+  widgetType     String   // "STAT_CARD", "QUICK_LINK", "SYSTEM_STATUS", "CUSTOM_HTML"
+  metricValue    String?
+  metricSub      String?
+  targetUrl      String?
+  iconName       String?  // Lucide icon identifier
+  metricSource   String?  @default("static:manual")
+  metricFilterId String?
+  order          Int      @default(0)
+  isArchived     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@map("dashboard_widgets")
 }

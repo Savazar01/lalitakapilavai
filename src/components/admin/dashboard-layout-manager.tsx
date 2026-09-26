@@ -56,6 +56,8 @@ export interface DashboardWidgetData {
   metricSub?: string | null;
   targetUrl?: string | null;
   iconName?: string | null;
+  metricSource?: string | null;
+  metricFilterId?: string | null;
   order: number;
   isArchived: boolean;
   computedMetric?: string;
@@ -78,6 +80,12 @@ const iconRegistry: Record<string, React.ComponentType<{ className?: string }>> 
   ExternalLink,
 };
 
+interface MetricsPayload {
+  metrics?: Record<string, number>;
+  eventMetrics?: Array<{ id: string; title: string; sourceKey: string; count: number }>;
+  events?: Array<{ id: string; title: string }>;
+}
+
 export function DashboardLayoutManager({
   initialWidgets,
 }: {
@@ -88,6 +96,10 @@ export function DashboardLayoutManager({
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [editingWidget, setEditingWidget] = React.useState<DashboardWidgetData | null>(null);
 
+  // Dynamic Metrics & Event Selection State
+  const [metricsData, setMetricsData] = React.useState<MetricsPayload | null>(null);
+  const [eventsList, setEventsList] = React.useState<Array<{ id: string; title: string }>>([]);
+
   // Form State
   const [formData, setFormData] = React.useState({
     title: "",
@@ -97,7 +109,44 @@ export function DashboardLayoutManager({
     metricSub: "",
     targetUrl: "",
     iconName: "Palette",
+    metricSource: "count:artworks",
+    metricFilterId: "",
   });
+
+  const loadMetricsData = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/overview/metrics");
+      if (res.ok) {
+        const data: MetricsPayload = await res.json();
+        setMetricsData(data);
+        if (data.events) {
+          setEventsList(data.events);
+        }
+      }
+    } catch (e) {
+      console.warn("Unable to load overview metrics telemetry:", e);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    fetch("/api/admin/overview/metrics")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: MetricsPayload | null) => {
+        if (isMounted && data) {
+          setMetricsData(data);
+          if (data.events) {
+            setEventsList(data.events);
+          }
+        }
+      })
+      .catch((e) => {
+        console.warn("Unable to load overview metrics telemetry:", e);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const fetchWidgets = async () => {
     try {
@@ -106,9 +155,23 @@ export function DashboardLayoutManager({
         const data = await res.json();
         setWidgets(data);
       }
+      loadMetricsData();
     } catch {
       toast.error("Failed to load dashboard widgets");
     }
+  };
+
+  const getResolvedMetricPreview = (source: string, filterId?: string): number | string => {
+    if (!metricsData) return "...";
+    if (source === "count:event_specific_rsvp") {
+      if (!filterId) return "Select target event";
+      const found = metricsData.eventMetrics?.find((e) => e.id === filterId);
+      return found ? found.count : 0;
+    }
+    if (metricsData.metrics && metricsData.metrics[source] !== undefined) {
+      return metricsData.metrics[source];
+    }
+    return 0;
   };
 
   const handleOpenAdd = () => {
@@ -118,9 +181,11 @@ export function DashboardLayoutManager({
       description: "",
       widgetType: "STAT_CARD",
       metricValue: "",
-      metricSub: "",
-      targetUrl: "/admin",
-      iconName: "Sparkles",
+      metricSub: "Active catalog items",
+      targetUrl: "/admin/artworks",
+      iconName: "Palette",
+      metricSource: "count:artworks",
+      metricFilterId: eventsList[0]?.id || "",
     });
     setDialogOpen(true);
   };
@@ -135,6 +200,8 @@ export function DashboardLayoutManager({
       metricSub: w.metricSub || "",
       targetUrl: w.targetUrl || "",
       iconName: w.iconName || "Palette",
+      metricSource: w.metricSource || "count:artworks",
+      metricFilterId: w.metricFilterId || eventsList[0]?.id || "",
     });
     setDialogOpen(true);
   };
@@ -525,7 +592,7 @@ export function DashboardLayoutManager({
 
       {/* Add / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-serif text-lg">
               {editingWidget ? "Edit Dashboard Tile" : "Add Custom Dashboard Tile"}
@@ -541,7 +608,7 @@ export function DashboardLayoutManager({
               <Input
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g., Blog Chronicles, VIP Inquiries"
+                placeholder="e.g., Total Catalog Items, Active Showcases, Inbound Inquiries"
                 className="text-xs"
                 required
               />
@@ -586,28 +653,140 @@ export function DashboardLayoutManager({
             </div>
 
             {formData.widgetType === "STAT_CARD" && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-3 p-3 rounded-lg border border-border/70 bg-muted/20">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Metric Value (Optional)</Label>
-                  <Input
-                    value={formData.metricValue}
-                    onChange={(e) => setFormData({ ...formData, metricValue: e.target.value })}
-                    placeholder="e.g., 24, Live, ₹1.5L"
-                    className="text-xs"
-                  />
-                  <p className="text-[10px] text-muted-foreground">
-                    Leave blank to auto-evaluate if linked to core resources.
+                  <Label className="text-xs font-medium">Metric Data Source</Label>
+                  <Select
+                    value={formData.metricSource}
+                    onValueChange={(val) => {
+                      let updatedSub = formData.metricSub;
+                      let updatedUrl = formData.targetUrl;
+                      if (!editingWidget) {
+                        if (val === "count:artworks") {
+                          updatedSub = "Active catalog items";
+                          updatedUrl = "/admin/artworks";
+                        } else if (val === "count:categories") {
+                          updatedSub = "Active categories";
+                          updatedUrl = "/admin/categories";
+                        } else if (val === "count:events") {
+                          updatedSub = "Scheduled events";
+                          updatedUrl = "/admin/events";
+                        } else if (val === "count:leads") {
+                          updatedSub = "Contact & CRM submissions";
+                          updatedUrl = "/admin/leads";
+                        } else if (val === "count:event_rsvps") {
+                          updatedSub = "Total registrations";
+                          updatedUrl = "/admin/events";
+                        } else if (val === "count:event_specific_rsvp") {
+                          updatedSub = "Event registrations";
+                          updatedUrl = "/admin/events";
+                        } else if (val === "count:catalogs") {
+                          updatedSub = "Published catalogs";
+                          updatedUrl = "/admin/catalogs";
+                        } else if (val === "count:pages") {
+                          updatedSub = "Published pages";
+                          updatedUrl = "/admin/pages";
+                        } else if (val === "count:posts") {
+                          updatedSub = "Published posts";
+                          updatedUrl = "/admin/posts";
+                        }
+                      }
+                      setFormData({
+                        ...formData,
+                        metricSource: val,
+                        metricSub: updatedSub,
+                        targetUrl: updatedUrl,
+                      });
+                    }}
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Select dynamic metric source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="count:artworks">Total Catalog Items / Inventory</SelectItem>
+                      <SelectItem value="count:categories">Total Categories & Classifications</SelectItem>
+                      <SelectItem value="count:events">Total Active Events & Showcases</SelectItem>
+                      <SelectItem value="count:leads">Total Inbound Inquiries & Leads</SelectItem>
+                      <SelectItem value="count:event_rsvps">Total Event RSVPs (All Events)</SelectItem>
+                      <SelectItem value="count:event_specific_rsvp">Specific Event RSVPs...</SelectItem>
+                      <SelectItem value="count:catalogs">Total Digital e-Catalogs</SelectItem>
+                      <SelectItem value="count:pages">Total Published Pages</SelectItem>
+                      <SelectItem value="count:posts">Total Articles & Publications</SelectItem>
+                      <SelectItem value="static:manual">Manual / Custom Static Value</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[11px] text-muted-foreground">
+                    Automatically derives live statistical counts from database records.
                   </p>
                 </div>
+
+                {formData.metricSource === "count:event_specific_rsvp" && (
+                  <div className="space-y-1.5 p-2.5 rounded-md border border-border/80 bg-background/60">
+                    <Label className="text-xs font-medium">Target Event for RSVPs</Label>
+                    <Select
+                      value={formData.metricFilterId}
+                      onValueChange={(val) => setFormData({ ...formData, metricFilterId: val })}
+                    >
+                      <SelectTrigger className="text-xs">
+                        <SelectValue placeholder="Select target event..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {eventsList.length === 0 ? (
+                          <SelectItem value="__none__" disabled>
+                            No active events found
+                          </SelectItem>
+                        ) : (
+                          eventsList.map((evt) => (
+                            <SelectItem key={evt.id} value={evt.id}>
+                              {evt.title}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[11px] text-muted-foreground">
+                      Displays attendee registrations count specifically for this event.
+                    </p>
+                  </div>
+                )}
+
+                {formData.metricSource === "static:manual" ? (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium">Metric Value (Required for Manual)</Label>
+                    <Input
+                      value={formData.metricValue}
+                      onChange={(e) => setFormData({ ...formData, metricValue: e.target.value })}
+                      placeholder="e.g., 24, Live, 99.8%"
+                      className="text-xs"
+                      required
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Static display value or custom alphanumeric metric.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20 p-2.5 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-300 font-medium">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Database Auto-Calculated:</span>
+                    </div>
+                    <Badge variant="outline" className="font-mono font-semibold bg-emerald-100 text-emerald-900 dark:bg-emerald-900/60 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700">
+                      {getResolvedMetricPreview(formData.metricSource, formData.metricFilterId)} Records
+                    </Badge>
+                  </div>
+                )}
 
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium">Sub-label</Label>
                   <Input
                     value={formData.metricSub}
                     onChange={(e) => setFormData({ ...formData, metricSub: e.target.value })}
-                    placeholder="e.g., In the last 30 days"
+                    placeholder="e.g., Active catalog items, Total registrations"
                     className="text-xs"
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    Context label displayed directly below the metric integer.
+                  </p>
                 </div>
               </div>
             )}
@@ -617,7 +796,7 @@ export function DashboardLayoutManager({
               <Input
                 value={formData.targetUrl}
                 onChange={(e) => setFormData({ ...formData, targetUrl: e.target.value })}
-                placeholder="e.g., /admin/artworks, /admin/blogs"
+                placeholder="e.g., /admin/artworks, /admin/events, /admin/leads"
                 className="text-xs font-mono"
               />
             </div>
@@ -627,7 +806,7 @@ export function DashboardLayoutManager({
               <Input
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Brief summary for this tile"
+                placeholder="e.g., Comprehensive count of published records and assets"
                 className="text-xs"
               />
             </div>

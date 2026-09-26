@@ -35,6 +35,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         metricSub: body.metricSub,
         targetUrl: body.targetUrl,
         iconName: body.iconName,
+        metricSource: body.metricSource,
+        metricFilterId: body.metricFilterId,
         order: body.order,
         isArchived: body.isArchived,
       },

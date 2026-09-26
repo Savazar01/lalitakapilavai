@@ -188,4 +188,11 @@ All code generation and architectural modifications must adhere to the specializ
 - **Dynamic Organization Token Resolution**: System notification and auto-responder email templates resolve `{organization_name}` dynamically from `SystemSetting.siteName` (with graceful fallback to platform branding). Zero artist-specific strings are hardcoded in seeder presets or defaults.
 - **Unified Lead Ingestion**: Form submissions routed through `/api/forms/submit` map generic inquiries cleanly to the `contact` trigger template and CRM Lead pipeline, delivering alerts to `adminAlertEmail` with encrypted transmission notices.
 
+### H. Dynamic Admin Dashboard Metric Calculation Engine
+- **Decoupled Overview Tiles**: Dashboard overview cards are decoupled from single-client or single-medium terminology. All default tiles adhere to enterprise taxonomy: Catalog & Assets, Categories & Classifications, Events & Showcases, Inbound Inquiries & Leads, Digital e-Catalogs, Articles & Publications, System Health & Services, and Quick Operations.
+- **Dynamic Metric Source Resolver**: The backend resolver (`/api/admin/overview/metrics` and `DashboardWidget.metricSource`) aggregates live counts across PostgreSQL tables (`count:artworks`, `count:categories`, `count:events`, `count:leads`, `count:event_rsvps`, `count:event_specific_rsvp`, `count:catalogs`, `count:pages`, `count:posts`) with zero-latency parallel queries.
+- **Specific Event Filtering**: When `count:event_specific_rsvp` is selected, `metricFilterId` scopes registrations dynamically to the specified scheduled event.
+- **SSR Pre-Computation**: `src/app/admin/(dashboard)/page.tsx` executes parallel count queries on the server, guaranteeing that initial renders and full page reloads display live metrics without client-side pop-in or hydration lag.
+
+
 
