@@ -10,6 +10,7 @@ import {
   Play,
   Pause,
   QrCode,
+  RotateCcw,
 } from "lucide-react";
 import { MediaGalleryItem } from "../media-gallery-block";
 import {
@@ -113,19 +114,33 @@ function computePlacements(
   for (let w = 0; w < numWalls; w++) {
     const wallItems = items.slice(w * safeMax, (w + 1) * safeMax);
     const wallCenterX = w * wallSpacing;
+    const count = wallItems.length;
+    const minGap = 0.7; // Guaranteed minimum clearance between outer frame edges
 
     if (layout === "linear") {
-      const count = wallItems.length;
-      const spacing = Math.min(2.8, 10.0 / Math.max(1, count - 1 || 1));
-      const startX = wallCenterX - ((count - 1) * spacing) / 2;
+      const frameSizes = wallItems.map((item) => {
+        const ar = parseArtworkAspectRatio(item);
+        return calculateFrameSize(ar, 1.6);
+      });
+
+      const sumWidths = frameSizes.reduce((acc, s) => acc + s.width, 0);
+      const idealWallSpan = 11.0;
+      const calculatedGap =
+        count > 1
+          ? Math.max(minGap, Math.min(1.4, (idealWallSpan - sumWidths) / (count - 1)))
+          : 0;
+      const totalWallWidth = sumWidths + (count - 1) * calculatedGap;
+      let currentLeft = wallCenterX - totalWallWidth / 2;
 
       wallItems.forEach((item, localIdx) => {
         const globalIdx = w * safeMax + localIdx;
-        const ar = parseArtworkAspectRatio(item);
-        const { width, height } = calculateFrameSize(ar, 1.6);
+        const { width, height } = frameSizes[localIdx];
+        const xPos = currentLeft + width / 2;
+        currentLeft += width + calculatedGap;
+
         placements.push({
           item,
-          x: startX + localIdx * spacing,
+          x: xPos,
           y: 2.3,
           width,
           height,
@@ -136,22 +151,43 @@ function computePlacements(
         });
       });
     } else if (layout === "grid") {
-      const count = wallItems.length;
       const cols = Math.min(count, count > 4 ? 3 : 2);
-      const colSpacing = 2.4;
-      const rowSpacing = 2.0;
-      const startX = wallCenterX - ((cols - 1) * colSpacing) / 2;
+      const minColGap = 0.7;
+      const minRowGap = 0.6;
+
+      const frameSizes = wallItems.map((item) => {
+        const ar = parseArtworkAspectRatio(item);
+        return calculateFrameSize(ar, 1.4);
+      });
+
+      // Compute max width per column
+      const colWidths: number[] = Array(cols).fill(0);
+      frameSizes.forEach((size, idx) => {
+        const col = idx % cols;
+        colWidths[col] = Math.max(colWidths[col], size.width);
+      });
+
+      const sumColWidths = colWidths.reduce((a, b) => a + b, 0);
+      const totalGridWidth = sumColWidths + (cols - 1) * minColGap;
+
+      // Calculate column centers
+      const colCenters: number[] = [];
+      let currentX = wallCenterX - totalGridWidth / 2;
+      for (let c = 0; c < cols; c++) {
+        colCenters.push(currentX + colWidths[c] / 2);
+        currentX += colWidths[c] + minColGap;
+      }
 
       wallItems.forEach((item, localIdx) => {
         const globalIdx = w * safeMax + localIdx;
         const col = localIdx % cols;
         const row = Math.floor(localIdx / cols);
-        const ar = parseArtworkAspectRatio(item);
-        const { width, height } = calculateFrameSize(ar, 1.45);
+        const { width, height } = frameSizes[localIdx];
+
         placements.push({
           item,
-          x: startX + col * colSpacing,
-          y: 3.2 - row * rowSpacing,
+          x: colCenters[col],
+          y: 3.3 - row * (1.5 + minRowGap),
           width,
           height,
           wallIndex: w,
@@ -166,76 +202,110 @@ function computePlacements(
         });
       });
     } else {
-      // "salon" layout per wall
-      const count = wallItems.length;
+      // "salon" layout per wall with dynamic clearance
+      const frameSizes = wallItems.map((item) => {
+        const ar = parseArtworkAspectRatio(item);
+        const maxDim = count === 1 ? 2.0 : count <= 3 ? 1.7 : 1.4;
+        return calculateFrameSize(ar, maxDim);
+      });
+
       let localSlots: {
         x: number;
         y: number;
-        maxDim: number;
         frame: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
       }[] = [];
 
       if (count === 1) {
-        localSlots = [{ x: 0, y: 2.4, maxDim: 2.0, frame: "gold-teak" }];
+        localSlots = [{ x: 0, y: 2.4, frame: "gold-teak" }];
       } else if (count === 2) {
+        const w0 = frameSizes[0].width;
+        const w1 = frameSizes[1].width;
+        const dist = w0 / 2 + minGap + w1 / 2;
         localSlots = [
-          { x: -1.8, y: 2.4, maxDim: 1.7, frame: "gold-teak" },
-          { x: 1.8, y: 2.4, maxDim: 1.7, frame: "rosewood-ivory" },
+          { x: -dist / 2, y: 2.4, frame: "gold-teak" },
+          { x: dist / 2, y: 2.4, frame: "rosewood-ivory" },
         ];
       } else if (count === 3) {
+        const w0 = frameSizes[0].width;
+        const w1 = frameSizes[1].width;
+        const w2 = frameSizes[2].width;
         localSlots = [
-          { x: 0, y: 2.5, maxDim: 1.8, frame: "gold-teak" },
-          { x: -2.3, y: 2.4, maxDim: 1.5, frame: "rosewood-ivory" },
-          { x: 2.3, y: 2.4, maxDim: 1.5, frame: "light-oak" },
+          { x: 0, y: 2.5, frame: "gold-teak" },
+          { x: -(w0 / 2 + minGap + w1 / 2), y: 2.4, frame: "rosewood-ivory" },
+          { x: w0 / 2 + minGap + w2 / 2, y: 2.4, frame: "light-oak" },
         ];
       } else if (count === 4) {
+        const leftColW = Math.max(frameSizes[0].width, frameSizes[1].width);
+        const rightColW = Math.max(frameSizes[2].width, frameSizes[3].width);
+        const colDist = leftColW / 2 + minGap + rightColW / 2;
         localSlots = [
-          { x: 1.5, y: 2.4, maxDim: 1.8, frame: "gold-teak" }, // Right primary focal
-          { x: -1.8, y: 3.2, maxDim: 1.3, frame: "light-oak" }, // Left upper
-          { x: -1.8, y: 1.6, maxDim: 1.3, frame: "rosewood-ivory" }, // Left lower
-          { x: 3.6, y: 2.4, maxDim: 1.1, frame: "white-float" }, // Right flank
+          { x: -colDist / 2, y: 3.3, frame: "light-oak" },
+          { x: -colDist / 2, y: 1.6, frame: "rosewood-ivory" },
+          { x: colDist / 2, y: 3.3, frame: "gold-teak" },
+          { x: colDist / 2, y: 1.6, frame: "white-float" },
         ];
       } else if (count === 5) {
+        const centerW = frameSizes[0].width;
+        const leftColW = Math.max(frameSizes[1].width, frameSizes[2].width);
+        const rightColW = Math.max(frameSizes[3].width, frameSizes[4].width);
+        const leftOffset = -(centerW / 2 + minGap + leftColW / 2);
+        const rightOffset = centerW / 2 + minGap + rightColW / 2;
         localSlots = [
-          { x: 0, y: 2.5, maxDim: 1.8, frame: "gold-teak" },
-          { x: -2.2, y: 3.2, maxDim: 1.2, frame: "light-oak" },
-          { x: -2.2, y: 1.6, maxDim: 1.2, frame: "rosewood-ivory" },
-          { x: 2.2, y: 3.2, maxDim: 1.2, frame: "light-oak" },
-          { x: 2.2, y: 1.6, maxDim: 1.2, frame: "rosewood-ivory" },
+          { x: 0, y: 2.5, frame: "gold-teak" },
+          { x: leftOffset, y: 3.3, frame: "light-oak" },
+          { x: leftOffset, y: 1.6, frame: "rosewood-ivory" },
+          { x: rightOffset, y: 3.3, frame: "light-oak" },
+          { x: rightOffset, y: 1.6, frame: "rosewood-ivory" },
         ];
       } else if (count === 6) {
+        const col0W = Math.max(frameSizes[0].width, frameSizes[1].width);
+        const col1W = Math.max(frameSizes[2].width, frameSizes[3].width);
+        const col2W = Math.max(frameSizes[4].width, frameSizes[5].width);
+        const leftOffset = -(col1W / 2 + minGap + col0W / 2);
+        const rightOffset = col1W / 2 + minGap + col2W / 2;
         localSlots = [
-          { x: -1.2, y: 3.2, maxDim: 1.3, frame: "gold-teak" },
-          { x: 1.2, y: 3.2, maxDim: 1.3, frame: "rosewood-ivory" },
-          { x: -1.2, y: 1.6, maxDim: 1.3, frame: "light-oak" },
-          { x: 1.2, y: 1.6, maxDim: 1.3, frame: "gold-teak" },
-          { x: -3.4, y: 2.4, maxDim: 1.4, frame: "rosewood-ivory" },
-          { x: 3.4, y: 2.4, maxDim: 1.4, frame: "light-oak" },
+          { x: leftOffset, y: 3.3, frame: "rosewood-ivory" },
+          { x: leftOffset, y: 1.6, frame: "light-oak" },
+          { x: 0, y: 3.3, frame: "gold-teak" },
+          { x: 0, y: 1.6, frame: "rosewood-ivory" },
+          { x: rightOffset, y: 3.3, frame: "light-oak" },
+          { x: rightOffset, y: 1.6, frame: "gold-teak" },
         ];
       } else {
-        // 7 or 8 pieces
+        const colWidths = [
+          Math.max(frameSizes[0].width, frameSizes[1]?.width || 1.2),
+          Math.max(frameSizes[2]?.width || 1.2, frameSizes[3]?.width || 1.2),
+          Math.max(frameSizes[4]?.width || 1.2, frameSizes[5]?.width || 1.2),
+          Math.max(frameSizes[6]?.width || 1.2, frameSizes[7]?.width || 1.2),
+        ];
+        const totalSpan = colWidths.reduce((a, b) => a + b, 0) + 3 * minGap;
+        let cur = -totalSpan / 2;
+        const centers = colWidths.map((cw) => {
+          const c = cur + cw / 2;
+          cur += cw + minGap;
+          return c;
+        });
+
         localSlots = [
-          { x: 0, y: 2.5, maxDim: 1.8, frame: "gold-teak" },
-          { x: -2.0, y: 3.3, maxDim: 1.1, frame: "light-oak" },
-          { x: -2.0, y: 1.7, maxDim: 1.1, frame: "rosewood-ivory" },
-          { x: 2.0, y: 3.3, maxDim: 1.1, frame: "light-oak" },
-          { x: 2.0, y: 1.7, maxDim: 1.1, frame: "rosewood-ivory" },
-          { x: -3.8, y: 2.5, maxDim: 1.2, frame: "white-float" },
-          { x: 3.8, y: 2.5, maxDim: 1.2, frame: "gold-teak" },
-          { x: 0, y: 4.1, maxDim: 0.9, frame: "light-oak" },
+          { x: centers[0], y: 3.3, frame: "gold-teak" },
+          { x: centers[0], y: 1.6, frame: "rosewood-ivory" },
+          { x: centers[1], y: 3.3, frame: "light-oak" },
+          { x: centers[1], y: 1.6, frame: "gold-teak" },
+          { x: centers[2], y: 3.3, frame: "rosewood-ivory" },
+          { x: centers[2], y: 1.6, frame: "light-oak" },
+          { x: centers[3], y: 3.3, frame: "white-float" },
+          { x: centers[3], y: 1.6, frame: "gold-teak" },
         ];
       }
 
       wallItems.forEach((item, localIdx) => {
         const slot = localSlots[localIdx] || {
-          x: -3.0 + localIdx * 1.2,
+          x: -3.0 + localIdx * 1.5,
           y: 2.4,
-          maxDim: 1.2,
           frame: "gold-teak" as const,
         };
         const globalIdx = w * safeMax + localIdx;
-        const ar = parseArtworkAspectRatio(item);
-        const { width, height } = calculateFrameSize(ar, slot.maxDim);
+        const { width, height } = frameSizes[localIdx];
         placements.push({
           item,
           x: wallCenterX + slot.x,
@@ -278,9 +348,79 @@ export function ExhibitionWallBlock({
     (activeEnvId === "custom" || activeEnvId.toLowerCase().includes("custom")) &&
     !!activeCustomWallUrl;
 
-  const validItems = React.useMemo(() => {
-    return (items || []).filter((item) => item && typeof item.url === "string" && item.url.trim() !== "");
+  const [liveItems, setLiveItems] = React.useState<MediaGalleryItem[]>(items);
+
+  React.useEffect(() => {
+    setLiveItems(items);
+
+    const artIds: string[] = [];
+    const slugs: string[] = [];
+
+    items.forEach((it) => {
+      if (it.artworkId) artIds.push(it.artworkId);
+      if (it.artwork?.id) artIds.push(it.artwork.id);
+      if (it.linkType === "artwork" && it.linkTarget) slugs.push(it.linkTarget);
+      if (it.artwork?.slug) slugs.push(it.artwork.slug);
+      if (it.slug) slugs.push(it.slug);
+    });
+
+    const uniqueIds = Array.from(new Set(artIds));
+    const uniqueSlugs = Array.from(new Set(slugs));
+
+    if (uniqueIds.length === 0 && uniqueSlugs.length === 0) return;
+
+    let cancelled = false;
+    const query = new URLSearchParams();
+    if (uniqueIds.length > 0) query.set("ids", uniqueIds.join(","));
+    if (uniqueSlugs.length > 0) query.set("slugs", uniqueSlugs.join(","));
+
+    fetch(`/api/artworks/resolve?${query.toString()}`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((dbArtworks: any[]) => {
+        if (cancelled || !Array.isArray(dbArtworks) || dbArtworks.length === 0) return;
+        setLiveItems((prev) =>
+          prev.map((it) => {
+            const artId = it.artworkId || it.artwork?.id;
+            const targetSlug = (it.linkType === "artwork" ? it.linkTarget : null) || it.artwork?.slug || it.slug;
+            const match = dbArtworks.find(
+              (a) => (artId && a.id === artId) || (targetSlug && a.slug === targetSlug)
+            );
+            if (!match) return it;
+            return {
+              ...it,
+              title: match.title || it.title,
+              medium: match.medium || it.medium,
+              dimensions: match.dimensions || it.dimensions,
+              year: match.yearCreated ? String(match.yearCreated) : it.year,
+              traditionalSchool: match.category?.name || it.traditionalSchool,
+              description: match.description || it.description,
+              url: match.watermarkedWebpUrl || match.primaryImageUrl || it.url,
+              artwork: {
+                ...it.artwork,
+                id: match.id,
+                title: match.title,
+                slug: match.slug,
+                medium: match.medium,
+                dimensions: match.dimensions,
+                yearCreated: match.yearCreated,
+                primaryImageUrl: match.primaryImageUrl,
+                watermarkedWebpUrl: match.watermarkedWebpUrl,
+                category: match.category,
+              },
+            };
+          })
+        );
+      })
+      .catch((err) => console.warn("Live artwork sync warning:", err));
+
+    return () => {
+      cancelled = true;
+    };
   }, [items]);
+
+  const validItems = React.useMemo(() => {
+    return (liveItems || []).filter((item) => item && typeof item.url === "string" && item.url.trim() !== "");
+  }, [liveItems]);
 
   const placements = React.useMemo(() => {
     return computePlacements(validItems, wallLayout, maxArtworksPerWall);
@@ -908,9 +1048,15 @@ export function ExhibitionWallBlock({
       const delta = state.clock.getDelta();
       const elapsed = state.clock.getElapsedTime();
 
-      // Smooth camera interpolation
-      state.camera.position.lerp(state.targetCamPos, Math.min(1, delta * 3.2));
-      state.currentLookAt.lerp(state.targetLookAt, Math.min(1, delta * 3.5));
+      // Smooth camera interpolation with damp
+      state.camera.position.x = THREE.MathUtils.damp(state.camera.position.x, state.targetCamPos.x, 3.2, delta);
+      state.camera.position.y = THREE.MathUtils.damp(state.camera.position.y, state.targetCamPos.y, 3.2, delta);
+      state.camera.position.z = THREE.MathUtils.damp(state.camera.position.z, state.targetCamPos.z, 3.2, delta);
+
+      state.currentLookAt.x = THREE.MathUtils.damp(state.currentLookAt.x, state.targetLookAt.x, 3.5, delta);
+      state.currentLookAt.y = THREE.MathUtils.damp(state.currentLookAt.y, state.targetLookAt.y, 3.5, delta);
+      state.currentLookAt.z = THREE.MathUtils.damp(state.currentLookAt.z, state.targetLookAt.z, 3.5, delta);
+
       state.camera.lookAt(state.currentLookAt);
 
       // Keep main spotlight tracking camera center
@@ -1052,7 +1198,13 @@ export function ExhibitionWallBlock({
         : Math.max(3, tourSpeedSeconds) * 1000;
 
     const timer = setTimeout(() => {
-      setTourStepIdx((prev) => (prev + 1) % tourSequence.length);
+      setTourStepIdx((prev) => {
+        if (prev >= tourSequence.length - 1) {
+          setIsTourPlaying(false);
+          return prev;
+        }
+        return prev + 1;
+      });
     }, dwellTime);
 
     return () => clearTimeout(timer);
@@ -1139,7 +1291,8 @@ export function ExhibitionWallBlock({
         <canvas
           ref={canvasRef}
           onClick={handleCanvasClick}
-          className="w-full h-full block cursor-pointer touch-none"
+          className="w-full h-full block cursor-pointer touch-pan-y"
+          style={{ touchAction: "pan-y" }}
         />
 
         {/* Multi-Wall Bay Selector Pills (Visible if more than 1 wall) */}
@@ -1272,25 +1425,46 @@ export function ExhibitionWallBlock({
 
         {/* Minimalist Frosted Glass Top-Right Controls: Strictly Touring / Pause & Fullscreen */}
         <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2 z-20 pointer-events-auto">
-          {/* Play / Pause Tour Button */}
-          <button
-            type="button"
-            onClick={() => setIsTourPlaying((prev) => !prev)}
-            title={isTourPlaying ? "Pause Cinematic Walkthrough" : "Start Director-Guided Walkthrough"}
-            className={cn(
-              "h-8 px-3 rounded-full border text-xs font-serif flex items-center gap-1.5 backdrop-blur-sm transition-all shadow-xs cursor-pointer",
-              isTourPlaying
-                ? "bg-amber-500/20 border-amber-400 text-amber-900 dark:text-amber-200 ring-1 ring-amber-400/40"
-                : "bg-white/70 hover:bg-white/90 text-slate-800 border-slate-300 dark:bg-slate-900/70 dark:hover:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700"
-            )}
-          >
-            {isTourPlaying ? (
-              <Pause className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            ) : (
-              <Play className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            )}
-            <span>{isTourPlaying ? "Touring" : "Tour"}</span>
-          </button>
+          {/* Play / Pause / Replay Tour Button */}
+          {(() => {
+            const isTourFinished =
+              !isTourPlaying && tourStepIdx >= tourSequence.length - 1 && tourSequence.length > 1;
+            return (
+              <button
+                type="button"
+                onClick={() => {
+                  if (isTourFinished) {
+                    setTourStepIdx(0);
+                    setIsTourPlaying(true);
+                  } else {
+                    setIsTourPlaying((prev) => !prev);
+                  }
+                }}
+                title={
+                  isTourFinished
+                    ? "Replay Cinematic Walkthrough"
+                    : isTourPlaying
+                    ? "Pause Cinematic Walkthrough"
+                    : "Start Director-Guided Walkthrough"
+                }
+                className={cn(
+                  "h-8 px-3 rounded-full border text-xs font-serif flex items-center gap-1.5 backdrop-blur-sm transition-all shadow-xs cursor-pointer",
+                  isTourPlaying
+                    ? "bg-amber-500/20 border-amber-400 text-amber-900 dark:text-amber-200 ring-1 ring-amber-400/40"
+                    : "bg-white/70 hover:bg-white/90 text-slate-800 border-slate-300 dark:bg-slate-900/70 dark:hover:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700"
+                )}
+              >
+                {isTourFinished ? (
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                ) : isTourPlaying ? (
+                  <Pause className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                ) : (
+                  <Play className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                )}
+                <span>{isTourFinished ? "Replay Tour" : isTourPlaying ? "Touring" : "Tour"}</span>
+              </button>
+            );
+          })()}
 
           {/* Fullscreen Button */}
           <button
@@ -1337,26 +1511,26 @@ export function ExhibitionWallBlock({
 
         return (
           <div
-            className="w-full max-w-4xl mx-auto mt-6 p-6 rounded-xl border border-stone-200/90 shadow-xl transition-all text-left isolate [color-scheme:light]"
-            style={{ backgroundColor: "#FFFFFF", color: "#111827" }}
+            className="w-full max-w-4xl mx-auto mt-6 p-6 sm:p-7 rounded-2xl border border-border/70 bg-card text-card-foreground shadow-xl transition-all text-left"
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <span className="text-xs font-mono font-semibold tracking-widest uppercase text-amber-800 block">
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-300 text-[11px] font-mono font-semibold tracking-wider uppercase mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                   {categoryName}
-                </span>
-                <h3 className="text-xl md:text-2xl font-serif font-bold text-stone-950 mt-1">
+                </div>
+                <h3 className="text-xl sm:text-2xl font-serif font-bold text-foreground tracking-tight">
                   {artworkTitle}
                 </h3>
                 {artworkMeta && (
-                  <p className="text-sm text-stone-600 mt-1 font-serif">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 font-sans flex items-center gap-1.5">
                     {artworkMeta}
                   </p>
                 )}
               </div>
               {artworkHref && (
                 <Link
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-serif font-semibold uppercase tracking-wider bg-stone-900 text-white hover:bg-stone-800 transition-colors shrink-0 cursor-pointer shadow-xs"
+                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs font-serif font-semibold tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 transition-all shrink-0 cursor-pointer shadow-sm"
                   href={artworkHref}
                 >
                   View Details
@@ -1364,7 +1538,7 @@ export function ExhibitionWallBlock({
               )}
             </div>
             {artworkDesc && (
-              <p className="text-sm text-stone-700 mt-4 pt-4 border-t border-stone-200/90 leading-relaxed font-sans">
+              <p className="text-sm text-foreground/80 mt-4 pt-4 border-t border-border/60 leading-relaxed font-sans">
                 {artworkDesc}
               </p>
             )}

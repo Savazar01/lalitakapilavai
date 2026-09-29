@@ -315,14 +315,19 @@ export default function AdminLeadsPage() {
                               <ExternalLink className="w-2.5 h-2.5" />
                             </Link>
                           </div>
-                        ) : lead.sourceEvent ? (
-                          <div className="flex flex-col gap-1">
-                            <Badge variant="outline" className="w-fit text-[10px]">
+                        ) : lead.sourceEvent || lead.source === "EVENT_RSVP" ? (
+                          <div className="flex flex-col gap-0.5">
+                            <Badge variant="outline" className="w-fit text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30">
                               Event RSVP
                             </Badge>
-                            <span className="text-[11px] text-muted-foreground">
-                              {lead.sourceEvent.title}
+                            <span className="text-[11px] font-medium text-foreground truncate max-w-[180px]">
+                              {lead.sourceEvent?.title || "Special Event"}
                             </span>
+                            {Boolean(lead.customFields?.selectedDate || lead.customFields?.selectedSlot) && (
+                              <span className="text-[10px] font-mono text-primary">
+                                {String(lead.customFields?.selectedDate || "")} {lead.customFields?.selectedSlot ? `(${String(lead.customFields?.selectedSlot)})` : ""}
+                              </span>
+                            )}
                           </div>
                         ) : lead.formTitle || lead.pageSlug ? (
                           <div className="flex flex-col gap-1">
@@ -503,6 +508,31 @@ export default function AdminLeadsPage() {
                   >
                     View Masterwork Detail <ExternalLink className="w-2.5 h-2.5" />
                   </Link>
+                </div>
+              )}
+
+              {(selectedLead.sourceEvent || selectedLead.source === "EVENT_RSVP" || Boolean(selectedLead.customFields?.selectedDate) || Boolean(selectedLead.customFields?.selectedSlot)) && (
+                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 uppercase font-semibold flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Event Attendance Reservation
+                  </span>
+                  {selectedLead.sourceEvent && (
+                    <p className="text-foreground font-semibold">
+                      {selectedLead.sourceEvent.title}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-3 text-[11px] pt-0.5">
+                    {Boolean(selectedLead.customFields?.selectedDate) && (
+                      <span className="text-muted-foreground">
+                        Date: <strong className="text-foreground font-mono">{String(selectedLead.customFields?.selectedDate)}</strong>
+                      </span>
+                    )}
+                    {Boolean(selectedLead.customFields?.selectedSlot) && (
+                      <span className="text-muted-foreground">
+                        Time Slot: <strong className="text-primary font-mono">{String(selectedLead.customFields?.selectedSlot)}</strong>
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
 

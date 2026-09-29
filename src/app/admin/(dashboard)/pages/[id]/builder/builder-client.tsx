@@ -92,6 +92,9 @@ interface SubSectionData {
 interface SectionData {
   id: string;
   title: string;
+  subtitle?: string | null;
+  description?: string | null;
+  titleAlignment?: "left" | "center" | "right" | string | null;
   gridSpan: number;
   layoutType?: "PRESET" | "MATRIX" | string;
   matrixConfig?: PageMatrixConfig | null;
@@ -2570,6 +2573,10 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
             <StyleInspector
               isSubSection={selectedSubIndex !== null}
               style={{
+                title: currentSection.title || "",
+                subtitle: currentSection.subtitle || "",
+                description: currentSection.description || "",
+                titleAlignment: (currentSection.titleAlignment as "left" | "center" | "right") || "center",
                 backgroundColor:
                   (selectedSubIndex !== null
                     ? (subStyle.backgroundColor as string) || currentSection.backgroundColor
@@ -2676,6 +2683,10 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
                     }
                     return {
                       ...sec,
+                      title: updated.title || sec.title,
+                      subtitle: updated.subtitle || null,
+                      description: updated.description || null,
+                      titleAlignment: updated.titleAlignment || null,
                       backgroundColor: updated.backgroundColor,
                       backgroundType: updated.backgroundType || "COLOR",
                       backgroundPattern: updated.backgroundPattern || null,

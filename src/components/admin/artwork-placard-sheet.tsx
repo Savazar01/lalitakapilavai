@@ -17,7 +17,11 @@ import {
   Palette,
   Sliders,
   FileText,
+  ArrowUp,
+  ArrowDown,
+  DollarSign,
 } from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -55,6 +59,8 @@ export interface PlacardArtwork {
   dimensions?: string;
   traditionalSchool?: string;
   yearCreated?: number | string;
+  price?: number | string | null;
+  currency?: string;
   description?: string;
   additionalNotes?: string;
   category?: { name: string };
@@ -77,6 +83,8 @@ export interface EditablePlacardItem {
   medium: string;
   dimensions: string;
   year: string;
+  price?: string;
+  currency?: string;
   additionalNotes?: string;
   thumbnail?: string;
   slug: string;
@@ -97,6 +105,21 @@ export const DEFAULT_PLACARD_STYLING: PlacardStylingConfig = {
   showCategory: true,
   showArtist: true,
   showCropMarks: true,
+  showTitle: true,
+  showMedium: true,
+  showDimensions: true,
+  showYear: true,
+  showPrice: true,
+  showNotes: true,
+  fieldOrder: [
+    "header",
+    "title",
+    "medium",
+    "dimensions_year",
+    "visual_cluster",
+    "price",
+    "notes",
+  ],
 };
 
 // Preset Swatches for Quick Customization
@@ -138,8 +161,18 @@ export function ArtworkPlacardSheet({
   const [cardFormat, setCardFormat] = React.useState<"visiting-card" | "museum-placard">("visiting-card");
   const [orientation, setOrientation] = React.useState<"landscape" | "portrait">("portrait");
 
-  // Customizer Studio Styling State
-  const [styling, setStyling] = React.useState<PlacardStylingConfig>(DEFAULT_PLACARD_STYLING);
+  // Customizer Studio Styling State with LocalStorage Persistence
+  const [styling, setStyling] = React.useState<PlacardStylingConfig>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("savazai_placard_layout_prefs");
+        if (saved) {
+          return { ...DEFAULT_PLACARD_STYLING, ...JSON.parse(saved) };
+        }
+      } catch {}
+    }
+    return DEFAULT_PLACARD_STYLING;
+  });
 
   // Active View Tab: "preview" vs "edit"
   const [activeTab, setActiveTab] = React.useState<"preview" | "edit">("preview");
@@ -152,7 +185,15 @@ export function ArtworkPlacardSheet({
   const [qrCodeDataUrls, setQrCodeDataUrls] = React.useState<Record<string, string>>({});
 
   const updateStyling = <K extends keyof PlacardStylingConfig>(key: K, value: PlacardStylingConfig[K]) => {
-    setStyling((prev) => ({ ...prev, [key]: value }));
+    setStyling((prev) => {
+      const next = { ...prev, [key]: value };
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("savazai_placard_layout_prefs", JSON.stringify(next));
+        } catch {}
+      }
+      return next;
+    });
   };
 
   const getItemData = React.useCallback(
@@ -166,6 +207,8 @@ export function ArtworkPlacardSheet({
         medium: over.medium ?? art.medium ?? "22k Gold Foil, Gesso, Teak Wood",
         dimensions: over.dimensions ?? art.dimensions ?? "",
         year: over.year ?? (art.yearCreated ? String(art.yearCreated) : ""),
+        price: over.price ?? (art.price ? String(art.price) : ""),
+        currency: over.currency ?? art.currency ?? "INR",
         additionalNotes: over.additionalNotes ?? art.additionalNotes ?? art.description ?? "",
         thumbnail: over.thumbnail ?? art.watermarkedWebpUrl ?? art.primaryImageUrl,
         slug: over.slug ?? art.slug ?? "",
@@ -562,23 +605,27 @@ export function ArtworkPlacardSheet({
 
                     {/* ORIENTATION-AWARE EDITORIAL FLOW (Zero Dead Space) */}
                     {orientation === "portrait" ? (
-                      /* PORTRAIT ORIENTATION: Continuous Vertical Flow */
-                      <div className="relative z-10 flex-1 flex flex-col justify-between overflow-hidden">
-                        {/* Block 1, 2, 3: Title, Medium, Dimensions */}
+                      /* PORTRAIT ORIENTATION: Continuous Vertical Flow with Strict Hierarchy */
+                      <div className="relative z-10 flex-1 flex flex-col justify-between overflow-hidden pb-[18mm]">
+                        {/* 1. Header (Rendered above) */}
+                        {/* 2. Artwork Title */}
                         <div className="space-y-0.5">
-                          <h4
-                            className={cn(
-                              "card-title font-bold leading-tight italic",
-                              styling.titleScale === "compact" && "text-[12px] sm:text-[13px]",
-                              styling.titleScale === "standard" && "text-[13.5px] sm:text-[14.5px]",
-                              styling.titleScale === "large" && "text-[15.5px] sm:text-[16.5px]"
-                            )}
-                            style={{ color: styling.titleColor }}
-                          >
-                            {itemData.title || "Untitled Masterwork"}
-                          </h4>
+                          {styling.showTitle !== false && (
+                            <h4
+                              className={cn(
+                                "card-title font-bold leading-tight italic",
+                                styling.titleScale === "compact" && "text-[12px] sm:text-[13px]",
+                                styling.titleScale === "standard" && "text-[13.5px] sm:text-[14.5px]",
+                                styling.titleScale === "large" && "text-[15.5px] sm:text-[16.5px]"
+                              )}
+                              style={{ color: styling.titleColor }}
+                            >
+                              {itemData.title || "Untitled Masterwork"}
+                            </h4>
+                          )}
 
-                          {itemData.medium && (
+                          {/* 3. Medium / Technique */}
+                          {styling.showMedium !== false && itemData.medium && (
                             <p
                               className={cn(
                                 "card-medium italic leading-snug",
@@ -592,17 +639,23 @@ export function ArtworkPlacardSheet({
                             </p>
                           )}
 
-                          {itemData.dimensions && (
+                          {/* 4. Dimensions & Year (located directly ABOVE visual cluster) */}
+                          {(styling.showDimensions !== false || styling.showYear !== false) && (
                             <p
                               className="card-dimensions font-mono text-[8px] leading-tight"
                               style={{ color: styling.textColor + "cc" }}
                             >
-                              {itemData.dimensions}
+                              {[
+                                styling.showDimensions !== false ? itemData.dimensions : "",
+                                styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
+                              ]
+                                .filter(Boolean)
+                                .join(" • ")}
                             </p>
                           )}
                         </div>
 
-                        {/* Visual Media Cluster: Artwork Thumbnail & Vector QR Code paired side-by-side */}
+                        {/* 5. Visual Media Cluster: Artwork Thumbnail & Direct QR Code */}
                         {(styling.showThumbnail || styling.showQr) && (
                           <div
                             className={cn(
@@ -641,49 +694,60 @@ export function ArtworkPlacardSheet({
                           </div>
                         )}
 
-                        {/* Block 4 & 5: Year Created & Additional Curatorial Notes */}
-                        <div className="space-y-0.5">
-                          {itemData.year && (
-                            <p
-                              className="card-year font-mono text-[8px] leading-tight"
-                              style={{ color: styling.textColor + "cc" }}
+                        {/* 6. Valuation / Acquisition Price (Positioned immediately BENEATH Visual Cluster) */}
+                        {styling.showPrice !== false && itemData.price && (
+                          <div
+                            className={cn(
+                              "card-price-row flex items-center my-0.5 shrink-0",
+                              styling.textAlign === "center"
+                                ? "justify-center"
+                                : styling.textAlign === "right"
+                                ? "justify-end"
+                                : "justify-start"
+                            )}
+                          >
+                            <span
+                              className="font-mono font-bold text-[9px] px-1.5 py-0.5 rounded border bg-amber-500/10 border-amber-500/30"
+                              style={{ color: styling.headerColor }}
                             >
-                              Year: {itemData.year}
-                            </p>
-                          )}
+                              {formatCurrency(itemData.price, itemData.currency || "INR")}
+                            </span>
+                          </div>
+                        )}
 
-                          {itemData.additionalNotes && (
+                        {/* 7. Curatorial Commentary / Notes */}
+                        {styling.showNotes !== false && itemData.additionalNotes && (
+                          <div className="space-y-0.5">
                             <p
                               className="card-additional-notes text-[8px] italic leading-tight line-clamp-3"
                               style={{ color: styling.textColor }}
                             >
                               {itemData.additionalNotes}
                             </p>
-                          )}
-                        </div>
-
-                        {/* Base Holder Safe Clearance Margin */}
-                        <div className="h-2 shrink-0" />
+                          </div>
+                        )}
                       </div>
                     ) : (
                       /* LANDSCAPE ORIENTATION: Balanced Two-Column Proportional Flow */
-                      <div className="relative z-10 flex-1 flex items-stretch justify-between gap-3 overflow-hidden">
-                        {/* Left Column (60%): Title, Medium, Dimensions, Notes */}
-                        <div className="w-[60%] flex flex-col justify-between h-full pr-1 overflow-hidden">
+                      <div className="relative z-10 flex-1 flex items-stretch justify-between gap-3 overflow-hidden pb-[18mm]">
+                        {/* Left Column (58%): Title, Medium, Dimensions, Year & Notes */}
+                        <div className="w-[58%] flex flex-col justify-between h-full pr-1 overflow-hidden">
                           <div className="space-y-0.5">
-                            <h4
-                              className={cn(
-                                "card-title font-bold leading-tight italic",
-                                styling.titleScale === "compact" && "text-[11.5px] sm:text-[12.5px]",
-                                styling.titleScale === "standard" && "text-[13px] sm:text-[14px]",
-                                styling.titleScale === "large" && "text-[14.5px] sm:text-[15.5px]"
-                              )}
-                              style={{ color: styling.titleColor }}
-                            >
-                              {itemData.title || "Untitled Masterwork"}
-                            </h4>
+                            {styling.showTitle !== false && (
+                              <h4
+                                className={cn(
+                                  "card-title font-bold leading-tight italic",
+                                  styling.titleScale === "compact" && "text-[11.5px] sm:text-[12.5px]",
+                                  styling.titleScale === "standard" && "text-[13px] sm:text-[14px]",
+                                  styling.titleScale === "large" && "text-[14.5px] sm:text-[15.5px]"
+                                )}
+                                style={{ color: styling.titleColor }}
+                              >
+                                {itemData.title || "Untitled Masterwork"}
+                              </h4>
+                            )}
 
-                            {itemData.medium && (
+                            {styling.showMedium !== false && itemData.medium && (
                               <p
                                 className={cn(
                                   "card-medium italic leading-snug",
@@ -699,14 +763,21 @@ export function ArtworkPlacardSheet({
                           </div>
 
                           <div className="space-y-0.5 mt-auto">
-                            <p
-                              className="card-dimensions font-mono text-[8px] leading-tight"
-                              style={{ color: styling.textColor + "cc" }}
-                            >
-                              {[itemData.dimensions, itemData.year ? `Year: ${itemData.year}` : ""].filter(Boolean).join(" • ")}
-                            </p>
+                            {(styling.showDimensions !== false || styling.showYear !== false) && (
+                              <p
+                                className="card-dimensions font-mono text-[8px] leading-tight"
+                                style={{ color: styling.textColor + "cc" }}
+                              >
+                                {[
+                                  styling.showDimensions !== false ? itemData.dimensions : "",
+                                  styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
+                                ]
+                                  .filter(Boolean)
+                                  .join(" • ")}
+                              </p>
+                            )}
 
-                            {itemData.additionalNotes && (
+                            {styling.showNotes !== false && itemData.additionalNotes && (
                               <p
                                 className="card-additional-notes text-[7.5px] italic leading-tight line-clamp-2"
                                 style={{ color: styling.textColor }}
@@ -717,8 +788,8 @@ export function ArtworkPlacardSheet({
                           </div>
                         </div>
 
-                        {/* Right Column (40%): Paired Thumbnail & QR with Provenance */}
-                        <div className="w-[40%] flex flex-col items-center justify-center h-full pl-1 shrink-0">
+                        {/* Right Column (42%): Paired Thumbnail & QR with Price immediately beneath */}
+                        <div className="w-[42%] flex flex-col items-center justify-center h-full pl-1 shrink-0 space-y-1">
                           {(styling.showThumbnail || styling.showQr) && (
                             <div className="flex items-center gap-1.5 shrink-0">
                               {styling.showThumbnail && itemData.thumbnail && (
@@ -746,6 +817,16 @@ export function ArtworkPlacardSheet({
                                 </div>
                               )}
                             </div>
+                          )}
+
+                          {/* Price immediately BENEATH Thumbnail & QR cluster */}
+                          {styling.showPrice !== false && itemData.price && (
+                            <span
+                              className="font-mono font-bold text-[8px] px-1 py-0.5 rounded border bg-amber-500/10 border-amber-500/30 text-center leading-none"
+                              style={{ color: styling.headerColor }}
+                            >
+                              {formatCurrency(itemData.price, itemData.currency || "INR")}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -1024,6 +1105,211 @@ export function ArtworkPlacardSheet({
                     />
                   </div>
                 </div>
+            </div>
+
+            {/* PLACARD FIELD VISIBILITY & SEQUENCE CUSTOMIZER */}
+            <div className="p-4 rounded-xl border border-border bg-card shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <div className="space-y-0.5">
+                  <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                    <Sliders className="w-4 h-4 text-primary" />
+                    Placard Field Visibility &amp; Ordering Engine
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    Toggle field displays and order priority. Preferences are persistently saved in your workspace.
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-[10px]">
+                  Layout Hierarchy
+                </Badge>
+              </div>
+
+              {/* Field Visibility Toggles */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                  Field Display Toggles
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showTitle !== false}
+                      onChange={(e) => updateStyling("showTitle", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Artwork Title</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showMedium !== false}
+                      onChange={(e) => updateStyling("showMedium", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Medium &amp; Materials</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showDimensions !== false}
+                      onChange={(e) => updateStyling("showDimensions", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Dimensions</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showYear !== false}
+                      onChange={(e) => updateStyling("showYear", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Year Created</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showPrice !== false}
+                      onChange={(e) => updateStyling("showPrice", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Valuation / Price</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showThumbnail !== false}
+                      onChange={(e) => updateStyling("showThumbnail", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Artwork Thumbnail</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showQr !== false}
+                      onChange={(e) => updateStyling("showQr", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>QR Provenance Code</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showNotes !== false}
+                      onChange={(e) => updateStyling("showNotes", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Curatorial Commentary</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showCategory !== false}
+                      onChange={(e) => updateStyling("showCategory", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Category / School</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showArtist !== false}
+                      onChange={(e) => updateStyling("showArtist", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Artist Credit</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={styling.showCropMarks !== false}
+                      onChange={(e) => updateStyling("showCropMarks", e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span>Crop Guides</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Field Sequence Reordering */}
+              <div className="space-y-2 pt-2 border-t border-border/60">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                  Field Sequence Priority (Up / Down Reordering)
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                  {(styling.fieldOrder || [
+                    "header",
+                    "title",
+                    "medium",
+                    "dimensions_year",
+                    "visual_cluster",
+                    "price",
+                    "notes",
+                  ]).map((fieldKey, fIdx, arr) => {
+                    const labelMap: Record<string, string> = {
+                      header: "1. Header (School & Artist)",
+                      title: "2. Artwork Title",
+                      medium: "3. Medium & Technique",
+                      dimensions_year: "4. Dimensions & Year",
+                      visual_cluster: "5. Visual Media (Thumbnail & QR)",
+                      price: "6. Valuation / Acquisition Price",
+                      notes: "7. Curatorial Commentary / Notes",
+                    };
+                    return (
+                      <div
+                        key={fieldKey}
+                        className="p-2 rounded-lg border border-border bg-muted/20 flex items-center justify-between text-xs"
+                      >
+                        <span className="font-medium text-foreground truncate">
+                          {labelMap[fieldKey] || fieldKey}
+                        </span>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            disabled={fIdx === 0}
+                            onClick={() => {
+                              const newArr = [...arr];
+                              const temp = newArr[fIdx];
+                              newArr[fIdx] = newArr[fIdx - 1];
+                              newArr[fIdx - 1] = temp;
+                              updateStyling("fieldOrder", newArr);
+                            }}
+                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                            title="Move Up"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={fIdx === arr.length - 1}
+                            onClick={() => {
+                              const newArr = [...arr];
+                              const temp = newArr[fIdx];
+                              newArr[fIdx] = newArr[fIdx + 1];
+                              newArr[fIdx + 1] = temp;
+                              updateStyling("fieldOrder", newArr);
+                            }}
+                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                            title="Move Down"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -1174,6 +1460,21 @@ export function ArtworkPlacardSheet({
                           placeholder="e.g. 2026"
                         />
                       </div>
+
+                      {/* Valuation / Price */}
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                          <DollarSign className="w-3 h-3 text-amber-600" />
+                          Valuation / Price
+                        </Label>
+                        <Input
+                          type="text"
+                          value={itemData.price || ""}
+                          onChange={(e) => updateCardItem(art.id, "price", e.target.value)}
+                          className="h-8 text-xs font-mono"
+                          placeholder="e.g. 150000 or ₹ 1,50,000"
+                        />
+                      </div>
                     </div>
 
                     {/* Block 5: Additional Curatorial Notes */}
@@ -1193,6 +1494,7 @@ export function ArtworkPlacardSheet({
                 );
               })}
             </div>
+          </div>
           </div>
         )}
 

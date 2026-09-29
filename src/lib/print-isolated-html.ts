@@ -20,6 +20,13 @@ export interface PlacardStylingConfig {
   showCategory: boolean;
   showArtist: boolean;
   showCropMarks: boolean;
+  showTitle?: boolean;
+  showMedium?: boolean;
+  showDimensions?: boolean;
+  showYear?: boolean;
+  showPrice?: boolean;
+  showNotes?: boolean;
+  fieldOrder?: string[];
 }
 
 export interface PlacardPrintOptions {

@@ -21,6 +21,9 @@ import {
   Compass,
   Shield,
   Volume2,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -38,6 +41,11 @@ import { Separator } from "@/components/ui/separator";
 import { BACKGROUND_PATTERNS } from "@/lib/background-patterns";
 
 export interface SectionStyle {
+  // Section Headings & Curatorial Meta
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  titleAlignment?: "left" | "center" | "right";
   // Background Mode & Styling
   backgroundType?: "COLOR" | "PATTERN" | "IMAGE";
   backgroundColor?: string;
@@ -213,6 +221,96 @@ export function StyleInspector({
           <span>{isSubSection ? "Column Inspector" : "Section Inspector"}</span>
         </div>
       </div>
+
+      {/* Section Headings & Curatorial Meta (When at Section level) */}
+      {!isSubSection && (
+        <div className="space-y-3.5 p-3.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+          <label className="text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 font-bold flex items-center gap-1.5">
+            <Type className="w-3.5 h-3.5 text-primary" />
+            Section Header & Narrative
+          </label>
+
+          {/* Section Eyebrow / Subtitle */}
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground font-medium">Eyebrow / Subtitle</label>
+            <Input
+              value={style.subtitle || ""}
+              onChange={(e) => update("subtitle", e.target.value)}
+              placeholder="e.g. CURATORIAL RETROSPECTIVE"
+              className="text-xs font-mono uppercase"
+            />
+          </div>
+
+          {/* Section Title */}
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground font-medium">Section Title</label>
+            <Input
+              value={style.title || ""}
+              onChange={(e) => update("title", e.target.value)}
+              placeholder="e.g. Divine Iconography & Tanjore Plates"
+              className="text-xs font-serif font-semibold"
+            />
+          </div>
+
+          {/* Curatorial Description / Narrative */}
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground font-medium">Curatorial Description / Narrative</label>
+            <textarea
+              value={style.description || ""}
+              onChange={(e) => update("description", e.target.value)}
+              placeholder="Contextual narrative or curatorial overview rendered above the section grid..."
+              rows={3}
+              className="w-full text-xs rounded-md border border-input bg-transparent px-3 py-2 text-foreground shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y"
+            />
+          </div>
+
+          {/* Title Alignment */}
+          <div className="space-y-1 pt-1">
+            <label className="text-[11px] text-muted-foreground font-medium">Header Alignment</label>
+            <div className="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-md border border-border">
+              <button
+                type="button"
+                onClick={() => update("titleAlignment", "left")}
+                className={cn(
+                  "flex items-center justify-center gap-1 py-1 rounded text-xs font-medium cursor-pointer transition-colors",
+                  (style.titleAlignment || "center") === "left"
+                    ? "bg-white dark:bg-slate-700 text-foreground shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <AlignLeft className="w-3.5 h-3.5" />
+                <span>Left</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => update("titleAlignment", "center")}
+                className={cn(
+                  "flex items-center justify-center gap-1 py-1 rounded text-xs font-medium cursor-pointer transition-colors",
+                  (style.titleAlignment || "center") === "center"
+                    ? "bg-white dark:bg-slate-700 text-foreground shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <AlignCenter className="w-3.5 h-3.5" />
+                <span>Center</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => update("titleAlignment", "right")}
+                className={cn(
+                  "flex items-center justify-center gap-1 py-1 rounded text-xs font-medium cursor-pointer transition-colors",
+                  style.titleAlignment === "right"
+                    ? "bg-white dark:bg-slate-700 text-foreground shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <AlignRight className="w-3.5 h-3.5" />
+                <span>Right</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Grid Span (if Column/SubSection) */}
       {isSubSection && (

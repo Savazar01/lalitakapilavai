@@ -68,6 +68,8 @@ export async function GET(request: NextRequest) {
         "Page Slug",
         "Source Artwork",
         "Source Event",
+        "Selected Event Date",
+        "Selected Time Slot",
         "Message",
         "Created At",
       ];
@@ -84,6 +86,8 @@ export async function GET(request: NextRequest) {
         `"${(l.pageSlug || "").replace(/"/g, '""')}"`,
         `"${(l.sourceArtwork?.title || "").replace(/"/g, '""')}"`,
         `"${(l.sourceEvent?.title || "").replace(/"/g, '""')}"`,
+        `"${String((l.customFields as Record<string, unknown> | null)?.selectedDate || "").replace(/"/g, '""')}"`,
+        `"${String((l.customFields as Record<string, unknown> | null)?.selectedSlot || "").replace(/"/g, '""')}"`,
         `"${l.message.replace(/"/g, '""').replace(/\n/g, " ")}"`,
         `"${new Date(l.createdAt).toISOString()}"`,
       ]);

@@ -269,6 +269,10 @@ export default async function EventDetailPage({ params }: PageProps) {
               currency={event.currency || "INR"}
               maxCapacity={event.maxCapacity}
               rsvpConfig={event.rsvpConfig as unknown as import("@/components/public/event-rsvp-form").EventRsvpConfig}
+              startDate={event.startDate.toISOString()}
+              endDate={event.endDate ? event.endDate.toISOString() : null}
+              timezone={event.timezone}
+              dailySchedules={event.dailySchedules as unknown as import("@/components/public/event-rsvp-form").EventDailySchedule[] | null}
             />
 
             <div className="p-3 rounded-xl border border-border/60 bg-muted/20 text-center text-xs text-muted-foreground">

@@ -141,6 +141,7 @@ export async function PUT(
           contactEmail: contactEmail !== undefined ? contactEmail : undefined,
           contactPhone: contactPhone !== undefined ? contactPhone : undefined,
           rsvpConfig: body.rsvpConfig !== undefined ? body.rsvpConfig : undefined,
+          dailySchedules: body.dailySchedules !== undefined ? body.dailySchedules : undefined,
           statusOverride: statusOverride !== undefined ? statusOverride : undefined,
           isArchived: isArchived !== undefined ? !!isArchived : undefined,
         },

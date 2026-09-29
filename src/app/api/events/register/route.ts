@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { eventId, attendeeName, attendeeEmail, attendeePhone, ticketCount, customAnswers } = body;
+    const { eventId, attendeeName, attendeeEmail, attendeePhone, ticketCount, selectedDate, selectedSlot, customAnswers } = body;
 
     if (!eventId || !attendeeName || !attendeeEmail) {
       return NextResponse.json(
@@ -80,17 +80,29 @@ export async function POST(request: NextRequest) {
           attendeePhone: attendeePhone || null,
           ticketCount: tickets,
           paymentStatus: "CONFIRMED",
+          selectedDate: selectedDate || null,
+          selectedSlot: selectedSlot || null,
         },
       });
 
       // Also record as inbound Lead
+      const dateDisplay = selectedDate || event.startDate.toLocaleDateString();
+      const slotDisplay = selectedSlot ? ` [Slot: ${selectedSlot}]` : "";
       await tx.lead.create({
         data: {
           name: attendeeName,
           email: attendeeEmail,
           phone: attendeePhone || null,
           subject: `RSVP: ${event.title}`,
-          message: `Registered for ${event.title} (${tickets} ticket(s)). Event date: ${event.startDate.toLocaleDateString()}.${customAnswersText ? `\n\nCustom Intake Responses:${customAnswersText}` : ""}`,
+          message: `Registered for ${event.title} (${tickets} ticket(s)). Event date: ${dateDisplay}${slotDisplay}.${customAnswersText ? `\n\nCustom Intake Responses:${customAnswersText}` : ""}`,
+          source: "EVENT_RSVP",
+          formTitle: "Event Attendance RSVP",
+          customFields: {
+            selectedDate: selectedDate || null,
+            selectedSlot: selectedSlot || null,
+            ticketCount: tickets,
+            ...(customAnswers && typeof customAnswers === "object" ? customAnswers : {}),
+          },
           sourceEventId: eventId,
         },
       });
@@ -110,7 +122,7 @@ export async function POST(request: NextRequest) {
           phone: attendeePhone || "Not specified",
           subject: `RSVP: ${event.title}`,
           event_title: event.title,
-          event_date: `${event.startDate.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}${event.venue ? ` — ${event.venue}` : ""}`,
+          event_date: `${selectedDate || event.startDate.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}${selectedSlot ? ` (${selectedSlot})` : ""}${event.venue ? ` — ${event.venue}` : ""}`,
           guest_count: tickets,
           message: customAnswersText || `Registration confirmed for ${tickets} attendee(s).`,
           form_data: customAnswersText

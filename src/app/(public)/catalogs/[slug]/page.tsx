@@ -5,8 +5,9 @@ import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { TiptapRenderer } from "@/components/public/tiptap-renderer";
-import { CatalogPrintButton } from "@/components/public/catalog-print-button";
 import { cn } from "@/lib/utils";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import {
   ECatalogThemeTokens,
   DEFAULT_CATALOG_THEME_TOKENS,
@@ -21,6 +22,7 @@ import {
   Download,
   ExternalLink,
   Compass,
+  Lock,
 } from "lucide-react";
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
 import { ProtectedImage } from "@/components/public/protected-image";
@@ -39,6 +41,7 @@ import {
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ adminPrint?: string }>;
 }
 
 export const dynamic = "force-dynamic";
@@ -423,8 +426,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function ECatalogReaderPage({ params }: PageProps) {
+export default async function ECatalogReaderPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const search = searchParams ? await searchParams : {};
+  const reqHeaders = await headers();
+  const session = await auth.api.getSession({ headers: reqHeaders }).catch(() => null);
+  const isAdmin = Boolean(session?.user);
+  const isAdminPrint = isAdmin && search.adminPrint === "true";
 
   const [catalog, settings] = await Promise.all([
     prisma.eCatalog.findUnique({
@@ -447,7 +455,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
     prisma.systemSetting.findFirst(),
   ]);
 
-  if (!catalog || !catalog.isActive || catalog.isDeleted || (!catalog.isPublished && process.env.NODE_ENV === "production")) {
+  if (!catalog || !catalog.isActive || catalog.isDeleted || (!catalog.isPublished && !isAdmin && process.env.NODE_ENV === "production")) {
     notFound();
   }
 
@@ -668,6 +676,18 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                 display: none !important;
                 visibility: hidden !important;
               }
+              ${
+                !isAdminPrint
+                  ? `
+              .catalog-document > *:not(.public-catalog-print-guard) {
+                display: none !important;
+              }
+              .public-catalog-print-guard {
+                display: flex !important;
+              }
+              `
+                  : ""
+              }
             }
           `,
         }}
@@ -682,6 +702,26 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         className="catalog-document flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-12 print:p-0 print:m-0 print:max-w-none print:space-y-0"
         style={{ maxWidth: `${geometry.maxWidthPx}px` }}
       >
+        {/* Public Anti-Print Guard Banner (Displays only during window.print for unauthenticated/public viewers) */}
+        {!isAdminPrint && (
+          <div className="public-catalog-print-guard hidden print:flex flex-col items-center justify-center p-12 text-center min-h-[60vh] space-y-5 bg-white text-slate-900 border-2 border-amber-300 rounded-2xl mx-auto my-12 max-w-xl">
+            <div className="p-4 rounded-full bg-amber-50 border border-amber-200 shadow-xs">
+              <Lock className="w-8 h-8 text-amber-700" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-serif font-bold text-slate-900 tracking-tight">
+                Restricted Curatorial Publication
+              </h2>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Direct browser printing is disabled for this archival catalog. Please contact the Atelier administration to request an authenticated, high-resolution physical publication copy.
+              </p>
+            </div>
+            <div className="pt-2 text-[11px] font-mono uppercase tracking-widest text-amber-800/80">
+              {settings?.siteName || "SavazAI Atelier"} • Archival Protection
+            </div>
+          </div>
+        )}
+
         {/* Navigation & Actions Top Bar */}
         <div
           data-catalog-toolbar="true"
@@ -696,8 +736,6 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
           </Link>
 
           <div className="flex items-center gap-3">
-            <CatalogPrintButton catalogTitle={catalog.title} />
-
             {catalog.downloadablePdfUrl ? (
               <a
                 href={catalog.downloadablePdfUrl}

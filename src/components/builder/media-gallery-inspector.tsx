@@ -36,6 +36,11 @@ import { MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/b
 import { WALL_ENVIRONMENTS } from "@/components/public/blocks/gallery-exhibition-wall/exhibition-environments";
 import { cn } from "@/lib/utils";
 
+export function stripHtmlTags(str?: string | null): string {
+  if (!str) return "";
+  return str.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+}
+
 export interface MediaGalleryBlockData {
   displayMode?: MediaGalleryDisplayMode;
   autoplayTimer?: number;
@@ -315,12 +320,12 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           (input.title && a.title.toLowerCase().trim() === input.title.toLowerCase().trim())
       );
 
-      const resolvedTitle = input.title && input.title !== "Classical Masterwork Detail" ? input.title : (matchingArt?.title || input.title || "Classical Masterwork Detail");
-      const resolvedSchool = input.traditionalSchool || matchingArt?.category?.name || (matchingArt ? "Thanjavur (Tanjore) Classical" : "");
-      const resolvedMedium = input.medium || matchingArt?.medium || (matchingArt ? "22k Gold Foil, Gesso, Teak Wood" : "");
-      const resolvedDimensions = input.dimensions || matchingArt?.dimensions || "";
-      const resolvedYear = input.year || (matchingArt?.yearCreated ? String(matchingArt.yearCreated) : "");
-      const resolvedDesc = input.description || matchingArt?.description || "";
+      const resolvedTitle = stripHtmlTags(input.title && input.title !== "Classical Masterwork Detail" ? input.title : (matchingArt?.title || input.title || "Classical Masterwork Detail"));
+      const resolvedSchool = stripHtmlTags(input.traditionalSchool || matchingArt?.category?.name || (matchingArt ? "Thanjavur (Tanjore) Classical" : ""));
+      const resolvedMedium = stripHtmlTags(input.medium || matchingArt?.medium || (matchingArt ? "22k Gold Foil, Gesso, Teak Wood" : ""));
+      const resolvedDimensions = stripHtmlTags(input.dimensions || matchingArt?.dimensions || "");
+      const resolvedYear = stripHtmlTags(input.year || (matchingArt?.yearCreated ? String(matchingArt.yearCreated) : ""));
+      const resolvedDesc = stripHtmlTags(input.description || matchingArt?.description || "");
       const resolvedLinkType = input.linkType && input.linkType !== "none" ? input.linkType : matchingArt ? "artwork" : "none";
       const resolvedLinkTarget = input.linkTarget || matchingArt?.slug || "";
 
@@ -328,8 +333,8 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
         id: input.id || `mg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         url: input.url,
         title: resolvedTitle,
-        caption: input.caption || (matchingArt ? `Authentic ${resolvedSchool} sacred panel with 22k gold relief.` : "Sacred iconographic panel rendered in authentic 22k gold foil."),
-        alt: input.alt || input.originalFileName || resolvedTitle,
+        caption: input.caption || "",
+        alt: input.alt || "",
         medium: resolvedMedium,
         dimensions: resolvedDimensions,
         traditionalSchool: resolvedSchool,
@@ -1327,21 +1332,22 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                     onValueChange={(artId) => {
                       const art = artworksList.find((a) => a.id === artId);
                       if (art) {
-                        const materials = art.medium || "22k Gold Foil, Gesso, Teak Wood";
+                        const materials = stripHtmlTags(art.medium) || "22k Gold Foil, Gesso, Teak Wood";
                         handleUpdateItem(activeItemIndex, {
                           artworkId: art.id,
-                          title: art.title,
+                          title: stripHtmlTags(art.title),
                           medium: materials,
-                          dimensions: art.dimensions || "",
-                          traditionalSchool: art.category?.name || "Thanjavur (Tanjore) Classical",
+                          dimensions: stripHtmlTags(art.dimensions) || "",
+                          traditionalSchool: stripHtmlTags(art.category?.name) || "Thanjavur (Tanjore) Classical",
                           year: art.yearCreated ? String(art.yearCreated) : "",
-                          description: art.description || "",
+                          description: stripHtmlTags(art.description) || "",
                           linkType: "artwork",
                           linkTarget: art.slug,
-                          alt: art.title,
+                          alt: activeItem.alt || "",
+                          caption: activeItem.caption || "",
                           url: art.watermarkedWebpUrl || art.primaryImageUrl || activeItem.url,
                         });
-                        toast.success(`Auto-mapped all curatorial metadata for "${art.title}"!`);
+                        toast.success(`Auto-mapped all curatorial metadata for "${stripHtmlTags(art.title)}"!`);
                       }
                     }}
                   >
@@ -1417,16 +1423,16 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                             if (matched) {
                               handleUpdateItem(activeItemIndex, {
                                 artworkId: matched.id,
-                                title: matched.title,
-                                medium: matched.medium || activeItem.medium || "22k Gold Foil, Gesso, Teak Wood",
-                                dimensions: matched.dimensions || activeItem.dimensions || "",
-                                traditionalSchool: matched.category?.name || activeItem.traditionalSchool || "Thanjavur (Tanjore) Classical",
+                                title: stripHtmlTags(matched.title),
+                                medium: stripHtmlTags(matched.medium) || activeItem.medium || "22k Gold Foil, Gesso, Teak Wood",
+                                dimensions: stripHtmlTags(matched.dimensions) || activeItem.dimensions || "",
+                                traditionalSchool: stripHtmlTags(matched.category?.name) || activeItem.traditionalSchool || "Thanjavur (Tanjore) Classical",
                                 year: matched.yearCreated ? String(matched.yearCreated) : activeItem.year,
-                                description: matched.description || activeItem.description || "",
+                                description: stripHtmlTags(matched.description) || activeItem.description || "",
                                 linkType: "artwork",
                                 linkTarget: matched.slug,
                               });
-                              toast.success(`Synchronized metadata from "${matched.title}"!`);
+                              toast.success(`Synchronized metadata from "${stripHtmlTags(matched.title)}"!`);
                             }
                           }}
                           className="text-[10px] font-bold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
@@ -1545,15 +1551,15 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                                 if (art) {
                                   handleUpdateItem(activeItemIndex, {
                                     artworkId: art.id,
-                                    title: art.title,
-                                    medium: art.medium || activeItem.medium,
-                                    dimensions: art.dimensions || activeItem.dimensions,
+                                    title: stripHtmlTags(art.title),
+                                    medium: stripHtmlTags(art.medium) || activeItem.medium,
+                                    dimensions: stripHtmlTags(art.dimensions) || activeItem.dimensions,
                                     year: art.yearCreated ? String(art.yearCreated) : activeItem.year,
-                                    traditionalSchool: art.category?.name || activeItem.traditionalSchool,
-                                    description: art.description || activeItem.description,
+                                    traditionalSchool: stripHtmlTags(art.category?.name) || activeItem.traditionalSchool,
+                                    description: stripHtmlTags(art.description) || activeItem.description,
                                     url: art.watermarkedWebpUrl || art.primaryImageUrl || activeItem.url,
                                   });
-                                  toast.success(`Ingested metadata from "${art.title}"`);
+                                  toast.success(`Ingested metadata from "${stripHtmlTags(art.title)}"`);
                                 }
                               }}
                               className="text-[10px] font-bold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
@@ -1571,18 +1577,18 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                               ...(art
                                 ? {
                                     artworkId: art.id,
-                                    title: art.title,
-                                    medium: art.medium || activeItem.medium,
-                                    dimensions: art.dimensions || activeItem.dimensions,
+                                    title: stripHtmlTags(art.title),
+                                    medium: stripHtmlTags(art.medium) || activeItem.medium,
+                                    dimensions: stripHtmlTags(art.dimensions) || activeItem.dimensions,
                                     year: art.yearCreated ? String(art.yearCreated) : activeItem.year,
-                                    traditionalSchool: art.category?.name || activeItem.traditionalSchool,
-                                    description: art.description || activeItem.description,
+                                    traditionalSchool: stripHtmlTags(art.category?.name) || activeItem.traditionalSchool,
+                                    description: stripHtmlTags(art.description) || activeItem.description,
                                     url: art.watermarkedWebpUrl || art.primaryImageUrl || activeItem.url,
                                   }
                                 : {}),
                             });
                             if (art) {
-                              toast.success(`Ingested curatorial metadata for "${art.title}"`);
+                              toast.success(`Ingested curatorial metadata for "${stripHtmlTags(art.title)}"`);
                             }
                           }}
                         >

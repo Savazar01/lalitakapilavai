@@ -52,6 +52,7 @@ import {
   type CatalogPageSize,
   type CatalogOrientation,
 } from "@/lib/catalog-geometry";
+import { printIsolatedHtml } from "@/lib/print-isolated-html";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -359,6 +360,7 @@ export default function AdminCatalogStudioPage() {
   const [events, setEvents] = React.useState<{ id: string; title: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
+  const [isExportingPdf, setIsExportingPdf] = React.useState(false);
 
   // Studio form state
   const [title, setTitle] = React.useState("");
@@ -876,6 +878,44 @@ export default function AdminCatalogStudioPage() {
     }
   };
 
+  // High-Resolution Archival Publication Exporter
+  const handleAdminPrintCatalog = async () => {
+    if (isExportingPdf) return;
+    setIsExportingPdf(true);
+    const toastId = toast.loading("Generating High-Resolution Archival Publication PDF...");
+    try {
+      const res = await fetch(`/catalogs/${slug}?adminPrint=true`, {
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to load catalog reader (${res.status})`);
+      }
+      const htmlText = await res.text();
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, "text/html");
+
+      const toolbar = doc.querySelector("[data-catalog-toolbar='true']");
+      if (toolbar) toolbar.remove();
+      const guard = doc.querySelector(".public-catalog-print-guard");
+      if (guard) guard.remove();
+
+      const catalogDoc = doc.querySelector(".catalog-document") || doc.body;
+
+      toast.loading("Preloading and decoding all masterwork plates...", { id: toastId });
+      await printIsolatedHtml(
+        catalogDoc.outerHTML,
+        `${title || "Catalog"} — Archival Publication`
+      );
+      toast.success("Catalog Print / PDF Dialog ready", { id: toastId });
+    } catch (err: unknown) {
+      console.error("Admin catalog print failed:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to generate High-Res PDF", { id: toastId });
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
   // Reorder Plates
   const movePlate = (index: number, direction: "up" | "down") => {
     const targetIdx = direction === "up" ? index - 1 : index + 1;
@@ -1088,6 +1128,23 @@ export default function AdminCatalogStudioPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAdminPrintCatalog}
+            disabled={isExportingPdf}
+            className="text-xs h-8.5 gap-1.5 border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 shadow-xs cursor-pointer font-medium"
+            title="Export complete high-resolution e-catalog as PDF or print archival document"
+          >
+            {isExportingPdf ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+            ) : (
+              <FileDown className="w-3.5 h-3.5 text-primary" />
+            )}
+            <span>{isExportingPdf ? "Compiling PDF..." : "Download High-Res PDF / Print"}</span>
+          </Button>
+
           <Button
             type="button"
             variant="outline"

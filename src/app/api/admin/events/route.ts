@@ -147,6 +147,7 @@ export async function POST(request: NextRequest) {
           contactEmail: contactEmail || null,
           contactPhone: contactPhone || null,
           rsvpConfig: body.rsvpConfig !== undefined ? body.rsvpConfig : undefined,
+          dailySchedules: body.dailySchedules !== undefined ? body.dailySchedules : undefined,
           statusOverride: statusOverride || "AUTO",
           isArchived: isArchived !== undefined ? !!isArchived : false,
         },

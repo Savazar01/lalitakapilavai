@@ -133,8 +133,11 @@ export async function PUT(
           const sec = sections[sIdx];
           const newSection = await tx.pageSection.create({
             data: {
-              pageId: id,
-              title: sec.title || `Section ${sIdx + 1}`,
+              pageId: resolvedId,
+              title: sec.title !== undefined ? sec.title : `Section ${sIdx + 1}`,
+              subtitle: sec.subtitle || null,
+              description: sec.description || null,
+              titleAlignment: sec.titleAlignment || "center",
               orderIndex: sIdx + 1,
               gridSpan: sec.gridSpan || 12,
               layoutType: sec.layoutType || "PRESET",

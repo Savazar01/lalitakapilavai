@@ -106,6 +106,8 @@ interface EventItem {
   contactName?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;
+  dailySchedules?: any;
+  rsvpConfig?: any;
   _count?: { registrations: number; artworks: number };
 }
 

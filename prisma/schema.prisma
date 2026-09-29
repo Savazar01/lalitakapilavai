@@ -218,6 +218,9 @@ model PageSection {
   id                       String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   pageId                   String        @db.Uuid
   title                    String?
+  subtitle                 String?
+  description              String?
+  titleAlignment           String?       @default("center") // "left" | "center" | "right"
   slug                     String?
   orderIndex               Int           @default(0)
   gridSpan                 Int           @default(12) // 1 to 12 responsive grid span
@@ -470,6 +473,7 @@ model Event {
   showOnHomepage     Boolean             @default(false)
   sortOrder          Int                 @default(0)
   rsvpConfig         Json?               // Dynamic RSVP Form Builder Settings (EventRsvpConfig)
+  dailySchedules     Json?               // Multi-Day Daily Schedules ({ date: string, startTime: string, endTime: string, label?: string }[])
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
@@ -491,6 +495,8 @@ model EventRegistration {
   attendeePhone String?
   ticketCount   Int      @default(1)
   paymentStatus String   @default("CONFIRMED")
+  selectedDate  String?
+  selectedSlot  String?
   registeredAt  DateTime @default(now())
 
   event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)

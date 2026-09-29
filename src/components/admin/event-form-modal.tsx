@@ -80,6 +80,13 @@ export interface EventRsvpConfig {
   customFields?: EventRsvpCustomField[];
 }
 
+export interface EventDailySchedule {
+  date: string; // YYYY-MM-DD
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
+  label?: string; // e.g. "Day 1 - Vernissage & Monograph Presentation"
+}
+
 export interface EventFormData {
   id?: string;
   title: string;
@@ -121,6 +128,7 @@ export interface EventFormData {
   sortOrder?: number;
   artworkIds?: string[];
   rsvpConfig?: EventRsvpConfig | null;
+  dailySchedules?: EventDailySchedule[] | null;
 }
 
 interface ArtworkSummary {
@@ -197,6 +205,9 @@ function EventFormContent({
   const [timezone, setTimezone] = React.useState(initialEvent?.timezone || "Asia/Kolkata");
   const [startDate, setStartDate] = React.useState(initialEvent?.startDate || "");
   const [endDate, setEndDate] = React.useState(initialEvent?.endDate || "");
+  const [dailySchedules, setDailySchedules] = React.useState<EventDailySchedule[]>(
+    Array.isArray(initialEvent?.dailySchedules) ? (initialEvent.dailySchedules as EventDailySchedule[]) : []
+  );
   const [venue, setVenue] = React.useState(
     initialEvent?.venue || initialEvent?.venueName || "SavazAI Heritage Studio"
   );
@@ -578,6 +589,7 @@ function EventFormContent({
         successMessage: rsvpSuccessMessage,
         customFields: rsvpCustomFields,
       },
+      dailySchedules: dailySchedules.length > 0 ? dailySchedules : null,
     };
 
     try {
@@ -935,6 +947,150 @@ function EventFormContent({
                   </Badge>
                 </div>
               )}
+
+              {/* Multi-Day Daily Schedule Builder */}
+              <div className="pt-4 border-t border-border/60 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-primary" />
+                      Multi-Day Daily Schedules (RSVP Slot Allocation)
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      Define distinct daily time windows (e.g. Day 1, Day 2) for dynamic 30-minute RSVP booking slots.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const nextDayIdx = dailySchedules.length + 1;
+                      let defaultDate = new Date().toISOString().slice(0, 10);
+                      if (dailySchedules.length > 0) {
+                        const lastDate = new Date(dailySchedules[dailySchedules.length - 1].date);
+                        lastDate.setDate(lastDate.getDate() + 1);
+                        defaultDate = lastDate.toISOString().slice(0, 10);
+                      } else if (startDate) {
+                        try {
+                          defaultDate = new Date(startDate).toISOString().slice(0, 10);
+                        } catch {}
+                      }
+                      setDailySchedules([
+                        ...dailySchedules,
+                        {
+                          date: defaultDate,
+                          startTime: "10:00",
+                          endTime: "18:00",
+                          label: `Day ${nextDayIdx} - Exhibition & Walkthrough`,
+                        },
+                      ]);
+                    }}
+                    className="h-7 text-xs px-2.5 cursor-pointer shrink-0"
+                  >
+                    + Add Schedule Day
+                  </Button>
+                </div>
+
+                {dailySchedules.length === 0 ? (
+                  <div className="p-3.5 rounded-xl border border-dashed border-border/80 bg-muted/10 text-center text-xs text-muted-foreground">
+                    No individual daily schedules defined. The master start date &amp; time will be used for single-day RSVP slot generation.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {dailySchedules.map((day, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-xl border border-border bg-card/60 space-y-2.5 relative"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-mono font-semibold text-primary">
+                            Day {idx + 1}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setDailySchedules(dailySchedules.filter((_, i) => i !== idx));
+                            }}
+                            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive cursor-pointer"
+                            title="Remove Day"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                              Date *
+                            </label>
+                            <Input
+                              type="date"
+                              value={day.date}
+                              onChange={(e) => {
+                                const updated = [...dailySchedules];
+                                updated[idx].date = e.target.value;
+                                setDailySchedules(updated);
+                              }}
+                              className="h-8 text-xs font-mono"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                              Start Time *
+                            </label>
+                            <Input
+                              type="time"
+                              value={day.startTime}
+                              onChange={(e) => {
+                                const updated = [...dailySchedules];
+                                updated[idx].startTime = e.target.value;
+                                setDailySchedules(updated);
+                              }}
+                              className="h-8 text-xs font-mono"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                              End Time *
+                            </label>
+                            <Input
+                              type="time"
+                              value={day.endTime}
+                              onChange={(e) => {
+                                const updated = [...dailySchedules];
+                                updated[idx].endTime = e.target.value;
+                                setDailySchedules(updated);
+                              }}
+                              className="h-8 text-xs font-mono"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                              Day Label / Focus
+                            </label>
+                            <Input
+                              value={day.label || ""}
+                              onChange={(e) => {
+                                const updated = [...dailySchedules];
+                                updated[idx].label = e.target.value;
+                                setDailySchedules(updated);
+                              }}
+                              placeholder="e.g. Masterclass & Recital"
+                              className="h-8 text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </TabsContent>
 
             {/* TAB 3: VENUE & ADDRESS */}
