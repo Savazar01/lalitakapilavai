@@ -192,7 +192,7 @@ export function printIsolatedElement(
   `);
   doc.close();
 
-  // 5. Wait for images to load, then trigger print driver
+  // 5. Wait for images to load and decode, then trigger print driver
   const triggerPrint = () => {
     try {
       iframe.contentWindow?.focus();
@@ -206,35 +206,23 @@ export function printIsolatedElement(
   if (images.length === 0) {
     setTimeout(triggerPrint, 150);
   } else {
-    let loadedCount = 0;
-    const totalCount = images.length;
-    let finished = false;
-
-    const checkAllLoaded = () => {
-      if (finished) return;
-      loadedCount++;
-      if (loadedCount >= totalCount) {
-        finished = true;
-        setTimeout(triggerPrint, 150);
+    const imagePromises = images.map((img) => {
+      img.loading = "eager";
+      img.decoding = "sync";
+      if (img.complete && img.naturalHeight !== 0) {
+        return img.decode().catch(() => Promise.resolve());
       }
-    };
-
-    images.forEach((img) => {
-      if (img.complete) {
-        checkAllLoaded();
-      } else {
-        img.onload = checkAllLoaded;
-        img.onerror = checkAllLoaded;
-      }
+      return new Promise<void>((resolve) => {
+        img.onload = () => {
+          img.decode().then(() => resolve()).catch(() => resolve());
+        };
+        img.onerror = () => resolve();
+      });
     });
 
-    // Fallback safety timeout if any remote image stalls
-    setTimeout(() => {
-      if (!finished) {
-        finished = true;
-        triggerPrint();
-      }
-    }, 600);
+    Promise.all(imagePromises).then(() => {
+      setTimeout(triggerPrint, 300);
+    });
   }
 
   // 6. Cleanup iframe after print
@@ -251,3 +239,148 @@ export function printIsolatedElement(
   iframe.contentWindow?.addEventListener("afterprint", cleanup);
   setTimeout(cleanup, 60000); // 1 minute safety GC
 }
+
+/**
+ * Headless Isolated HTML Print Driver with Asynchronous Preloader Barrier
+ * Forces all images to eager/sync decoding and guarantees all nested images
+ * are completely downloaded & decoded before triggering print rasterization.
+ */
+export async function printIsolatedHtml(
+  htmlContent: string,
+  title: string = "Document"
+): Promise<void> {
+  if (typeof document === "undefined") return;
+
+  return new Promise<void>((resolve) => {
+    const existing = document.getElementById("isolated-html-print-iframe");
+    if (existing) {
+      existing.remove();
+    }
+
+    const iframe = document.createElement("iframe");
+    iframe.id = "isolated-html-print-iframe";
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    iframe.style.visibility = "hidden";
+    iframe.setAttribute("aria-hidden", "true");
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) {
+      resolve();
+      return;
+    }
+
+    // Force all images to eager loading & sync decoding
+    const normalizedHtml = htmlContent
+      .replace(/loading=["']lazy["']/gi, 'loading="eager"')
+      .replace(/decoding=["']async["']/gi, 'decoding="sync"');
+
+    // Collect parent stylesheets and font declarations
+    const parentStyles = Array.from(
+      document.querySelectorAll("style, link[rel='stylesheet']")
+    )
+      .map((node) => node.outerHTML)
+      .join("\n");
+
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>${title}</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+          ${parentStyles}
+          <style>
+            @media print {
+              @page {
+                size: auto;
+                margin: 0 !important;
+              }
+              *, *::before, *::after {
+                box-sizing: border-box !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              html, body {
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                overflow: visible !important;
+              }
+              img {
+                max-width: 100% !important;
+                height: auto !important;
+                display: block !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              .catalog-plate-page, .plate-page, .catalog-page {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                page-break-after: always !important;
+                break-after: page !important;
+              }
+              .print-hidden, .print\\:hidden {
+                display: none !important;
+                visibility: hidden !important;
+              }
+            }
+          </style>
+        </head>
+        <body class="bg-white text-black p-0 m-0">
+          ${normalizedHtml}
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    // Asynchronous image preloader decoding barrier
+    const images = Array.from(doc.images);
+    const imagePromises = images.map((img) => {
+      img.loading = "eager";
+      img.decoding = "sync";
+      if (img.complete && img.naturalHeight !== 0) {
+        return img.decode().catch(() => Promise.resolve());
+      }
+      return new Promise<void>((imgResolve) => {
+        img.onload = () => {
+          img.decode().then(() => imgResolve()).catch(() => imgResolve());
+        };
+        img.onerror = () => imgResolve();
+      });
+    });
+
+    Promise.all(imagePromises).then(() => {
+      // 500ms safety buffer for SVG filters or layout recalculation
+      setTimeout(() => {
+        try {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        } catch (e) {
+          console.error("Print execution failed:", e);
+        } finally {
+          setTimeout(() => {
+            if (iframe && iframe.parentNode) {
+              iframe.parentNode.removeChild(iframe);
+            }
+            resolve();
+          }, 1000);
+        }
+      }, 500);
+    });
+  });
+}
+

@@ -207,6 +207,9 @@ function CatalogSinglePlateView({
         <div className="absolute inset-0 z-0 overflow-hidden">
           <ProtectedImage
             useImg={true}
+            priority={true}
+            loading="eager"
+            decoding="sync"
             src={primaryImageUrl}
             alt="Masterwork Plate"
             className="w-full h-full object-cover"
@@ -271,6 +274,9 @@ function CatalogSinglePlateView({
                 <div className={cn("rounded-xl overflow-hidden border border-primary/30 shadow-2xl", imageMaxHeightClass)}>
                   <ProtectedImage
                     useImg={true}
+                    priority={true}
+                    loading="eager"
+                    decoding="sync"
                     src={primaryImageUrl}
                     alt="Masterwork Plate"
                     className={cn("w-full h-auto object-contain mx-auto", imageMaxHeightClass)}
@@ -621,7 +627,7 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
         geometry.isLandscape ? "catalog-landscape" : "catalog-portrait"
       }`}
     >
-      {/* Dynamic Print Page Size Override */}
+      {/* Dynamic Print Page Size Override & Robust Color/Page-Break Print Engine */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -629,6 +635,38 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
               @page {
                 size: ${geometry.cssSize} !important;
                 margin: 0 !important;
+              }
+              *, *::before, *::after {
+                box-sizing: border-box !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              html, body {
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #FAF7F2 !important;
+                overflow: visible !important;
+              }
+              img {
+                max-width: 100% !important;
+                height: auto !important;
+                display: block !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              .catalog-plate-page, .plate-page, .catalog-page {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                page-break-after: always !important;
+                break-after: page !important;
+              }
+              .print-hidden, .print\\:hidden {
+                display: none !important;
+                visibility: hidden !important;
               }
             }
           `,
@@ -1309,6 +1347,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group">
                         <ProtectedImage
                           useImg={true}
+                          priority={true}
+                          loading="eager"
+                          decoding="sync"
                           src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                           alt={displayTitle}
                           className="max-h-[52vh] print:max-h-[46vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
@@ -1413,6 +1454,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                           <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group max-h-full">
                             <ProtectedImage
                               useImg={true}
+                              priority={true}
+                              loading="eager"
+                              decoding="sync"
                               src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                               alt={displayTitle}
                               className="max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
@@ -1493,6 +1537,9 @@ export default async function ECatalogReaderPage({ params }: PageProps) {
                       <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-md group max-h-[50vh] print:max-h-[52vh]">
                         <ProtectedImage
                           useImg={true}
+                          priority={true}
+                          loading="eager"
+                          decoding="sync"
                           src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                           alt={displayTitle}
                           className="w-full h-auto object-contain max-h-[48vh] print:max-h-[52vh] mx-auto group-hover:scale-101 transition-transform duration-500"

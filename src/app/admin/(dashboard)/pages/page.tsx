@@ -41,7 +41,11 @@ import {
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
-
+import {
+  LANDING_PAGE_ARCHETYPES,
+  type LandingPageArchetypeKey,
+} from "@/lib/landing-page-archetypes";
+import { cn } from "@/lib/utils";
 
 interface PageConfig {
   upcomingBadge?: string;
@@ -68,6 +72,9 @@ interface PageItem {
   showOnHomepage: boolean;
   sortOrder: number;
   isPublished: boolean;
+  pageType?: string;
+  archetype?: string | null;
+  isHomepage?: boolean;
   updatedAt: string;
   _count?: { sections: number };
 }
@@ -113,6 +120,18 @@ export default function PagesAdminPage() {
   const [title, setTitle] = React.useState("");
   const [slug, setSlug] = React.useState("");
   const [metaDescription, setMetaDescription] = React.useState("");
+
+  // Landing Page Studio Modal State
+  const [landingModalOpen, setLandingModalOpen] = React.useState(false);
+  const [selectedArchetype, setSelectedArchetype] = React.useState<LandingPageArchetypeKey>("PROFESSIONAL");
+  const [landingTitle, setLandingTitle] = React.useState("Strategic Advisory & Asset Stewardship");
+  const [landingSlug, setLandingSlug] = React.useState("advisory");
+  const [landingDescription, setLandingDescription] = React.useState(
+    "Clean executive hero with real-time metric counter tickers, split expertise grid, and consultation scheduling."
+  );
+  const [landingIsHomepage, setLandingIsHomepage] = React.useState(false);
+  const [creatingLanding, setCreatingLanding] = React.useState(false);
+  const [promotingId, setPromotingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -170,6 +189,102 @@ export default function PagesAdminPage() {
       toast.error("Error creating page");
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleSelectArchetype = (archKey: LandingPageArchetypeKey) => {
+    setSelectedArchetype(archKey);
+    const arch = LANDING_PAGE_ARCHETYPES.find((a) => a.key === archKey);
+    if (arch) {
+      setLandingTitle(arch.label);
+      setLandingSlug(arch.key.toLowerCase());
+      setLandingDescription(arch.description);
+    }
+  };
+
+  const handleCreateLandingPage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreatingLanding(true);
+
+    try {
+      const res = await fetch("/api/admin/pages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: landingTitle,
+          slug: landingSlug,
+          metaDescription: landingDescription,
+          pageType: "LANDING_PAGE",
+          archetype: selectedArchetype,
+          isHomepage: landingIsHomepage,
+        }),
+      });
+
+      if (res.ok) {
+        const newPage = await res.json();
+        toast.success(`Landing page created with ${selectedArchetype} archetype! Launching visual builder...`);
+        setLandingModalOpen(false);
+        const refreshed = await fetch("/api/admin/pages").then((r) => (r.ok ? r.json() : []));
+        setPages(refreshed);
+        router.push(`/admin/pages/${newPage.id}/builder`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to create landing page");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Error creating landing page");
+    } finally {
+      setCreatingLanding(false);
+    }
+  };
+
+  const handlePromoteHomepage = async (page: PageItem) => {
+    setPromotingId(page.id);
+    try {
+      const res = await fetch(`/api/admin/pages/${page.id}/promote`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        setPages((prev) =>
+          prev.map((p) => ({
+            ...p,
+            isHomepage: p.id === page.id,
+          }))
+        );
+        toast.success(`"${page.title}" is now active Primary Homepage!`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to promote page");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Error promoting page");
+    } finally {
+      setPromotingId(null);
+    }
+  };
+
+  const handleDemoteHomepage = async (page: PageItem) => {
+    setPromotingId(page.id);
+    try {
+      const res = await fetch(`/api/admin/pages/${page.id}/promote`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setPages((prev) =>
+          prev.map((p) => (p.id === page.id ? { ...p, isHomepage: false } : p))
+        );
+        toast.success(`"${page.title}" demoted from Homepage. Default fallback restored.`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to demote page");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Error demoting page");
+    } finally {
+      setPromotingId(null);
     }
   };
 
@@ -312,13 +427,23 @@ export default function PagesAdminPage() {
         defaultSubtitle="Build dynamic 12-column pages with inline Tiptap editing and responsive preview emulators."
         badgeLabel="Visual Page Builder"
       >
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2 shrink-0 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 shadow-xs">
-              <Plus className="w-4 h-4" />
-              Create New Page
-            </Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setLandingModalOpen(true)}
+            variant="outline"
+            className="gap-2 shrink-0 text-xs font-bold border-primary/50 text-primary hover:bg-primary/10 shadow-xs"
+          >
+            <Sparkles className="w-4 h-4 text-primary" />
+            Create Landing Page
+          </Button>
+
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 shrink-0 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 shadow-xs">
+                <Plus className="w-4 h-4" />
+                Create New Page
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <form onSubmit={handleCreatePage}>
               <DialogHeader>
@@ -391,6 +516,7 @@ export default function PagesAdminPage() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </EditablePageHeader>
 
       {/* Pages Grid / List */}
@@ -431,7 +557,17 @@ export default function PagesAdminPage() {
                         {p.title}
                       </CardTitle>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0 flex-wrap justify-end">
+                      {p.isHomepage && (
+                        <Badge className="bg-amber-500 text-stone-950 font-bold text-[9px] hover:bg-amber-400">
+                          Active Homepage
+                        </Badge>
+                      )}
+                      {p.pageType === "LANDING_PAGE" && (
+                        <Badge variant="outline" className="text-[9px] bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-800 font-semibold">
+                          Landing: {p.archetype || "Custom"}
+                        </Badge>
+                      )}
                       {isCorePage && (
                         <Badge variant="outline" className="text-[9px] border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold">
                           Core
@@ -509,7 +645,41 @@ export default function PagesAdminPage() {
                     View Live
                   </Link>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {p.isHomepage ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDemoteHomepage(p)}
+                        disabled={promotingId === p.id}
+                        className="h-8 text-xs gap-1 border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 font-medium"
+                        title="Demote from primary homepage (restores default fallback)"
+                      >
+                        {promotingId === p.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Home className="w-3.5 h-3.5 text-amber-500" />
+                        )}
+                        Demote Home
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePromoteHomepage(p)}
+                        disabled={promotingId === p.id}
+                        className="h-8 text-xs gap-1 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium"
+                        title="Promote this page to be the active primary homepage"
+                      >
+                        {promotingId === p.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Home className="w-3.5 h-3.5" />
+                        )}
+                        Set as Home
+                      </Button>
+                    )}
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -813,6 +983,171 @@ export default function PagesAdminPage() {
               </DialogFooter>
             </form>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Landing Page Archetype Studio Modal */}
+      <Dialog open={landingModalOpen} onOpenChange={setLandingModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <form onSubmit={handleCreateLandingPage} className="space-y-6">
+            <DialogHeader>
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                  <Sparkles className="w-5 h-5" />
+                </span>
+                <div>
+                  <DialogTitle className="text-xl font-serif">
+                    Enterprise Landing Page Studio
+                  </DialogTitle>
+                  <DialogDescription className="text-xs">
+                    Select an industry archetype to scaffold animated showcase sections, metric tickers, and conversion blocks.
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+
+            {/* Archetype Selector Grid */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                1. Select Industry Archetype
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {LANDING_PAGE_ARCHETYPES.map((arch) => {
+                  const isSelected = selectedArchetype === arch.key;
+                  return (
+                    <div
+                      key={arch.key}
+                      onClick={() => handleSelectArchetype(arch.key)}
+                      className={cn(
+                        "p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between space-y-2",
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs"
+                          : "border-border bg-card hover:border-border/80 hover:bg-muted/30"
+                      )}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary truncate">
+                            {arch.industry}
+                          </span>
+                          <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
+                            {arch.recommendedBadge}
+                          </span>
+                        </div>
+                        <h4 className="font-serif font-bold text-sm text-foreground">
+                          {arch.label}
+                        </h4>
+                        <p className="text-[11px] text-muted-foreground line-clamp-2 mt-1 leading-relaxed">
+                          {arch.description}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {arch.features.slice(0, 3).map((f, fIdx) => (
+                          <span
+                            key={fIdx}
+                            className="text-[9px] px-1.5 py-0.5 rounded bg-background border border-border/60 text-muted-foreground"
+                          >
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Page Configuration Form */}
+            <div className="space-y-4 pt-2 border-t border-border/60 text-left">
+              <label className="text-xs font-semibold uppercase tracking-wider text-foreground block">
+                2. Configure Page Identity & Routing
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">Page Title</label>
+                  <Input
+                    value={landingTitle}
+                    onChange={(e) => {
+                      setLandingTitle(e.target.value);
+                      setLandingSlug(
+                        e.target.value
+                          .toLowerCase()
+                          .replace(/[^a-z0-9]+/g, "-")
+                          .replace(/(^-|-$)/g, "")
+                      );
+                    }}
+                    placeholder="e.g. Masterwork Exhibition"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">URL Slug</label>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-muted-foreground font-mono">/</span>
+                    <Input
+                      value={landingSlug}
+                      onChange={(e) => setLandingSlug(e.target.value)}
+                      placeholder="advisory"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">Meta Description (SEO & OpenGraph)</label>
+                <Input
+                  value={landingDescription}
+                  onChange={(e) => setLandingDescription(e.target.value)}
+                  placeholder="Summary for search engines and social cards..."
+                />
+              </div>
+
+              {/* Homepage Promotion Toggle */}
+              <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="landingIsHomepage"
+                  checked={landingIsHomepage}
+                  onChange={(e) => setLandingIsHomepage(e.target.checked)}
+                  className="mt-0.5 rounded border-input text-primary focus:ring-primary h-4 w-4"
+                />
+                <label htmlFor="landingIsHomepage" className="text-xs text-foreground cursor-pointer space-y-0.5">
+                  <span className="font-semibold block text-primary">
+                    Promote to Active Primary Homepage Immediately
+                  </span>
+                  <span className="text-muted-foreground block text-[11px]">
+                    Routes root URL (/) to this landing page. Existing pages and layouts remain intact and can be restored anytime with a single click.
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <DialogFooter className="pt-2 border-t border-border/60">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setLandingModalOpen(false)}
+                disabled={creatingLanding}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" variant="default" disabled={creatingLanding}>
+                {creatingLanding ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Generating Landing Page...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-1.5" />
+                    Generate Landing Page & Launch Studio
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

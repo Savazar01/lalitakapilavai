@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { createArchetypePageData, type LandingPageArchetypeKey } from "@/lib/landing-page-archetypes";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const pages = await prisma.page.findMany({
       where: { isDeleted: false },
-      orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }],
+      orderBy: [{ isHomepage: "desc" }, { sortOrder: "asc" }, { updatedAt: "desc" }],
       include: {
         _count: {
           select: { sections: true },
@@ -51,6 +52,9 @@ export async function POST(request: NextRequest) {
       isActive,
       showOnHomepage,
       sortOrder,
+      pageType,
+      archetype,
+      isHomepage,
     } = body;
 
     if (!title || !slug) {
@@ -77,7 +81,77 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create page with an initial Hero Section and SubSection
+    // If marked as homepage, atomically demote existing homepage
+    if (isHomepage) {
+      await prisma.page.updateMany({
+        where: { isHomepage: true },
+        data: { isHomepage: false },
+      });
+    }
+
+    const isLanding = pageType === "LANDING_PAGE";
+    const selectedArchetype: LandingPageArchetypeKey = (archetype as LandingPageArchetypeKey) || "BLANK";
+
+    // Determine initial sections based on archetype or standard default hero
+    let sectionsData;
+    if (isLanding) {
+      const archetypeSections = createArchetypePageData(selectedArchetype, title, cleanSlug);
+      sectionsData = archetypeSections.map((sec) => ({
+        title: sec.title,
+        orderIndex: sec.orderIndex,
+        gridSpan: sec.gridSpan,
+        backgroundColor: sec.backgroundColor || null,
+        backgroundType: sec.backgroundType || null,
+        customCssClass: sec.customCssClass || null,
+        subSections: {
+          create: sec.subSections.map((sub) => ({
+            title: sub.title,
+            orderIndex: sub.orderIndex,
+            gridSpan: sub.gridSpan,
+            content: sub.content as object,
+          })),
+        },
+      }));
+    } else {
+      sectionsData = [
+        {
+          title: "Hero Section",
+          orderIndex: 1,
+          gridSpan: 12,
+          backgroundColor: "#FAF7F2",
+          subSections: {
+            create: [
+              {
+                title: "Hero Content",
+                orderIndex: 1,
+                gridSpan: 12,
+                content: {
+                  type: "doc",
+                  content: [
+                    {
+                      type: "heading",
+                      attrs: { level: 1 },
+                      content: [{ type: "text", text: title }],
+                    },
+                    {
+                      type: "paragraph",
+                      content: [
+                        {
+                          type: "text",
+                          text: "Sacred Tanjore gold foil art, classical Mysore paintings, and Carnatic musical archives.",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ];
+    }
+
+    // Create page with sections
     const newPage = await prisma.page.create({
       data: {
         title,
@@ -90,43 +164,11 @@ export async function POST(request: NextRequest) {
         isActive: isActive !== undefined ? !!isActive : true,
         showOnHomepage: showOnHomepage !== undefined ? !!showOnHomepage : false,
         sortOrder: sortOrder !== undefined ? parseInt(String(sortOrder), 10) : 0,
+        pageType: isLanding ? "LANDING_PAGE" : "STANDARD",
+        archetype: isLanding ? selectedArchetype : null,
+        isHomepage: !!isHomepage,
         sections: {
-          create: [
-            {
-              title: "Hero Section",
-              orderIndex: 1,
-              gridSpan: 12,
-              backgroundColor: "#FAF7F2",
-              subSections: {
-                create: [
-                  {
-                    title: "Hero Content",
-                    orderIndex: 1,
-                    gridSpan: 12,
-                    content: {
-                      type: "doc",
-                      content: [
-                        {
-                          type: "heading",
-                          attrs: { level: 1 },
-                          content: [{ type: "text", text: title }],
-                        },
-                        {
-                          type: "paragraph",
-                          content: [
-                            {
-                              type: "text",
-                              text: "Sacred Tanjore gold foil art, classical Mysore paintings, and Carnatic musical archives.",
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  },
-                ],
-              },
-            },
-          ],
+          create: sectionsData,
         },
       },
       include: {

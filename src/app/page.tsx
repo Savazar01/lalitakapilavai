@@ -16,11 +16,12 @@ export async function generateMetadata(): Promise<Metadata> {
     settings = await prisma.systemSetting.findFirst();
     const page = await prisma.page.findFirst({
       where: {
-        OR: [{ slug: "home" }, { slug: "index" }],
+        OR: [{ isHomepage: true }, { slug: "home" }, { slug: "index" }],
         isPublished: true,
         isActive: true,
         isDeleted: false,
       },
+      orderBy: [{ isHomepage: "desc" }, { updatedAt: "desc" }],
     });
 
     const archiveTitle = settings?.siteName || "SavazAI WebApps";
@@ -55,11 +56,12 @@ export default async function HomePage() {
   try {
     homePage = await prisma.page.findFirst({
       where: {
-        OR: [{ slug: "home" }, { slug: "index" }],
+        OR: [{ isHomepage: true }, { slug: "home" }, { slug: "index" }],
         isPublished: true,
         isActive: true,
         isDeleted: false,
       },
+      orderBy: [{ isHomepage: "desc" }, { updatedAt: "desc" }],
       include: {
         sections: {
           orderBy: { orderIndex: "asc" },

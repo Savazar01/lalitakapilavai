@@ -8,17 +8,33 @@ import prisma from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
 import { Readable } from "stream";
+import {
+  GoogleServicesConfig,
+  uploadToGoogleDrive,
+} from "@/lib/storage/google-drive-driver";
+import {
+  NextcloudConfig,
+  uploadToNextcloud,
+} from "@/lib/storage/nextcloud-driver";
 
 export interface StorageConfig {
+  provider: "LOCAL" | "R2" | "S3" | "GOOGLE_DRIVE" | "NEXTCLOUD";
   bucket: string;
   publicUrl: string;
   isLocalStorage: boolean;
   endpoint?: string;
   region?: string;
+  googleConfig?: GoogleServicesConfig | null;
+  nextcloudConfig?: NextcloudConfig | null;
 }
 
 let cachedS3Client: S3Client | null = null;
 let cachedConfig: StorageConfig | null = null;
+
+export function clearStorageCache(): void {
+  cachedConfig = null;
+  cachedS3Client = null;
+}
 
 /**
  * Dynamically resolves storage configuration from PostgreSQL SystemSetting
@@ -34,6 +50,45 @@ export async function getStorageConfig(): Promise<StorageConfig> {
     dbSettings = await prisma.systemSetting.findFirst();
   } catch {
     // Database might be initializing during build or migrations
+  }
+
+  const rawProvider = (dbSettings?.storageProvider || "LOCAL").toUpperCase();
+  const provider: StorageConfig["provider"] =
+    rawProvider === "GOOGLE_DRIVE" || rawProvider === "GOOGLE"
+      ? "GOOGLE_DRIVE"
+      : rawProvider === "NEXTCLOUD"
+      ? "NEXTCLOUD"
+      : rawProvider === "R2"
+      ? "R2"
+      : rawProvider === "S3"
+      ? "S3"
+      : "LOCAL";
+
+  const googleConfig = (dbSettings?.googleServicesConfig || null) as GoogleServicesConfig | null;
+  const nextcloudConfig = (dbSettings?.nextcloudConfig || null) as NextcloudConfig | null;
+
+  if (provider === "GOOGLE_DRIVE" && googleConfig?.enabled) {
+    cachedConfig = {
+      provider: "GOOGLE_DRIVE",
+      bucket: "google-drive",
+      publicUrl: "https://lh3.googleusercontent.com",
+      isLocalStorage: false,
+      googleConfig,
+      nextcloudConfig,
+    };
+    return cachedConfig;
+  }
+
+  if (provider === "NEXTCLOUD" && nextcloudConfig?.enabled) {
+    cachedConfig = {
+      provider: "NEXTCLOUD",
+      bucket: "nextcloud",
+      publicUrl: nextcloudConfig.serverUrl,
+      isLocalStorage: false,
+      googleConfig,
+      nextcloudConfig,
+    };
+    return cachedConfig;
   }
 
   const accountId =
@@ -66,9 +121,12 @@ export async function getStorageConfig(): Promise<StorageConfig> {
 
   if (isDummyCredential) {
     cachedConfig = {
+      provider: "LOCAL",
       bucket,
       publicUrl: publicUrl.startsWith("http") ? publicUrl : "/media",
       isLocalStorage: true,
+      googleConfig,
+      nextcloudConfig,
     };
     return cachedConfig;
   }
@@ -79,11 +137,14 @@ export async function getStorageConfig(): Promise<StorageConfig> {
     : process.env.S3_ENDPOINT;
 
   cachedConfig = {
+    provider: provider === "R2" ? "R2" : "S3",
     bucket,
     publicUrl,
     isLocalStorage: false,
     endpoint,
     region,
+    googleConfig,
+    nextcloudConfig,
   };
 
   return cachedConfig;
@@ -135,6 +196,29 @@ export async function uploadBuffer(
   const sanitizedKey = key
     .replace(/^[/\\]+/, "")
     .replace(/^(media[/\\]|public[/\\]|vault[/\\])+/g, "");
+
+  // 1. Google Workspace Drive Upload
+  if (config.provider === "GOOGLE_DRIVE" && config.googleConfig) {
+    const filename = path.basename(sanitizedKey);
+    const driveResult = await uploadToGoogleDrive(
+      buffer,
+      filename,
+      contentType,
+      config.googleConfig
+    );
+    return { key: driveResult.fileId, publicUrl: driveResult.publicUrl };
+  }
+
+  // 2. Nextcloud WebDAV Storage Upload
+  if (config.provider === "NEXTCLOUD" && config.nextcloudConfig) {
+    const nextcloudResult = await uploadToNextcloud(
+      buffer,
+      sanitizedKey,
+      contentType,
+      config.nextcloudConfig
+    );
+    return { key: nextcloudResult.key, publicUrl: nextcloudResult.publicUrl };
+  }
 
   if (config.isLocalStorage || !client) {
     // Local filesystem storage fallback

@@ -20,6 +20,7 @@ import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/tim
 import { DynamicFormBlock, FormFieldConfig, DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryBlock, MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
 import { HeroShowcaseBlock, type HeroArchetype, type HotspotPin } from "@/components/public/blocks/hero-showcase-block";
+import { ArchetypeShowcaseBlock } from "@/components/public/blocks/landing/archetype-showcase-blocks";
 import { cn } from "@/lib/utils";
 import { getShapeDefinition } from "@/components/builder/shapes/shape-definitions";
 import {
@@ -1083,6 +1084,11 @@ export function TiptapRenderer({
   }
 
   const rawObj = content as Record<string, unknown>;
+
+  // Check if content is a landing page showcase block
+  if (typeof rawObj?.type === "string" && rawObj.type.startsWith("landing_")) {
+    return <ArchetypeShowcaseBlock content={rawObj} contrast={legacyContrast} className={className} />;
+  }
 
   // Check if content has nested multi-row blocks
   if (Array.isArray(rawObj.blocks) && rawObj.blocks.length > 0) {

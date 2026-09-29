@@ -106,6 +106,8 @@ export async function PUT(request: NextRequest) {
       adminConfig: body.adminConfig !== undefined ? body.adminConfig : undefined,
       themeConfig: body.themeConfig !== undefined ? body.themeConfig : undefined,
       watermarkConfig: body.watermarkConfig !== undefined ? body.watermarkConfig : undefined,
+      googleServicesConfig: body.googleServicesConfig !== undefined ? body.googleServicesConfig : undefined,
+      nextcloudConfig: body.nextcloudConfig !== undefined ? body.nextcloudConfig : undefined,
     };
 
     let updated;
@@ -118,6 +120,13 @@ export async function PUT(request: NextRequest) {
       updated = await prisma.systemSetting.create({
         data,
       });
+    }
+
+    try {
+      const { clearStorageCache } = await import("@/lib/storage");
+      clearStorageCache();
+    } catch {
+      // Ignore if cache clearing fails
     }
 
     // Purge full site cache hierarchy so Navbar, Footer, and Public layouts reflect immediately

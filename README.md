@@ -34,7 +34,7 @@ The **SavazAI WebApps Platform** is an enterprise-grade digital publishing, arch
 - **Database & Vector Storage**: PostgreSQL 17 with `pgvector` (`pgvector/pgvector:pg17`).
 - **ORM**: Prisma ORM with `postgresqlExtensions` preview feature enabling `vector` and `uuid-ossp` extensions.
 - **Authentication**: Better-Auth for private admin authentication, RBAC, and session management (public self-registration disabled).
-- **Object Storage & Media Vault**: Cloudflare R2 / AWS S3 with signed private URLs and dynamic image watermarking (Sharp).
+- **Object Storage & Media Vault**: Universal multi-cloud storage driver supporting Local Disk, Cloudflare R2, AWS S3, Google Workspace (Drive file upload + Sheets lead sync), and Nextcloud (WebDAV + OCS Share API) with dynamic image watermarking (Sharp).
 - **Email Delivery**: Nodemailer with SMTP/Gmail integration, dynamic token resolution, CID inline logo embedding, and automated audit logging.
 - **Container Infrastructure**: Multi-stage Debian 12 Bookworm Slim (`node:22-bookworm-slim`) for full binary compatibility with Sharp (libvips) and native Prisma query engines.
 
@@ -133,18 +133,26 @@ SavazAI WebApps Platform
 - Excel bulk import/export with automated XLSX template generation.
 - Integrated Museum Placard Print button for single and batch production.
 
-#### 2. Museum Placard Print Studio (`src/lib/print-isolated-html.ts`)
+#### 2. Museum Placard & e-Catalog Print Engine (`src/lib/print-isolated-html.ts`)
 - **Exact Physical Dimensions**: Supports Standard Visiting Cards ($3.5 \times 2\text{ in}$ / $88.9 \times 50.8\text{ mm}$) and Museum Wall Placards ($4 \times 2.5\text{ in}$ / $101.6 \times 63.5\text{ mm}$) in both Landscape and Portrait orientations.
 - **Isolated Iframe Print Driver**: Renders print layouts in a dedicated, headless `<iframe>`, eliminating modal background bleed and Chromium $0\times0\text{ px}$ blank page collapses.
+- **e-Catalog Synchronous Image Decoding Barrier**: Normalizes all image markup to `loading="eager"` and `decoding="sync"`, executing `Promise.all(images.map(img => img.decode()))` before triggering print. A responsive loading indicator in `catalog-print-button.tsx` guarantees that plates 2+ render with 100% asset fidelity in browser PDF downloads.
 - **Editorial Hierarchy**: Header -> Title -> Medium -> Dimensions -> Thumbnail/QR Provenance -> Year -> Curatorial Notes.
 - **Stand Clamp Safety Margin**: Enforces an $18\text{ mm}$ safe base margin to prevent acrylic or brass gallery clamps from occluding typography.
 - **Cross-Module Availability**: Accessible from `/admin/artworks`, `/admin/catalogs/[id]`, and `/admin/events`.
 
-#### 3. Visual Drag-and-Drop Page Builder (`/admin/pages/[id]/builder`)
-- Modular block studio supporting Hero Showcase, 3D Exhibition Salon Wall, Text Blocks, Image Blocks, Media Carousels, and Dynamic Form Blocks.
-- Universal Form Block scaffolding 5 standard inquiry fields: Full Name, Email Address, Phone (optional), Subject Line, and Message with dynamic CSRF-protected submission routing.
-- Real-time live preview with responsive device breakpoints (Desktop, Tablet, Mobile) and integrated `@tiptap/extension-placeholder` zero-state styling.
-- Clean JSON serialization stored in the `Page.content` database column.
+#### 3. Visual Page Builder & Enterprise Landing Page Studio (`/admin/pages`)
+- **Modular Visual Studio (`/admin/pages/[id]/builder`)**: Drag-and-drop 12-column layout builder supporting Hero Showcase, 3D Exhibition Salon Wall, Text Blocks, Image Blocks, Media Carousels, and Dynamic Form Blocks.
+- **Enterprise Landing Page Studio**: One-click generation of industry landing pages across 7 curated archetypes:
+  - *Professional*: Executive advisory hero, live metric ticker counters, split practice grid, consultation scheduler CTA.
+  - *Portfolio*: Living digital atelier hero, curated masterwork exhibition strip, authenticated monograph badges.
+  - *Restaurant*: Atmospheric fine dining banner, interactive menu matrix with dietary badges (Chef Signature, Vegan, Gluten-Free).
+  - *Hospitality*: Luxury sanctuary hero, signature suite cards (area, occupancy, view), curated amenity icon strip.
+  - *Healthcare*: Accredited clinic hero, clinical department specialty grid, physician practitioner cards.
+  - *Corporate*: Modern SaaS glow hero, elevated feature grid, and expandable FAQ accordion.
+  - *Blank*: Unconstrained responsive 12-column sandbox canvas.
+- **Atomic Homepage Promotion & Demotion**: Dedicated `/api/admin/pages/[id]/promote` endpoint allows promoting any custom landing page to replace the root `/` homepage atomically, with instant single-click demotion restoring the default platform homepage.
+- **Universal Form Block**: Standard 5-field inquiry scaffolding (Full Name, Email Address, Phone, Subject Line, Message) with CSRF protection and decoupled alert routing.
 
 #### 4. Interactive e-Catalog Studio (`/admin/catalogs`)
 - Digital monograph creator with cover design, curatorial essays, and multi-artwork curation.
@@ -178,7 +186,10 @@ SavazAI WebApps Platform
 - **Header Integration**: Dynamic subtitle rendering in public `Navbar` and mobile navigation drawer, cleanly suppressed when omitted without empty layout artifacts.
 - **Theme Studio**: Live palette selector with the flagship **"Imperial Atelier"** preset, custom primary/accent hex picker, and strict binary theme preview.
 - **Gmail / SMTP Configuration**: Dynamic SMTP host, port, credentials, and admin alert routing recipient.
-- **Media Vault Settings**: Cloudflare R2 / AWS S3 storage provider selection with clean placeholder guidance, endpoint, bucket name, access keys, and public CDN domain.
+- **Multi-Cloud Storage & Media Vault**:
+  - *Cloudflare R2 / AWS S3*: Storage provider selection with clean placeholder guidance, endpoint, bucket name, access keys, and public CDN domain.
+  - *Google Workspace Storage & Sheets Sync*: Dedicated admin tab configuring Client ID, Client Secret, Refresh Token, Root Drive Folder ID, and CRM Google Sheets ID with live connection testing.
+  - *Nextcloud Storage (WebDAV)*: Dedicated admin tab configuring Server URL, WebDAV Username, App Password / Token, Root Storage Directory, and public share generation with live connection testing.
 
 #### 10. Security, Better-Auth RBAC & User Administration (`/admin/users`)
 - Role-Based Access Control (`SUPER_ADMIN`, `ADMIN`, `EDITOR`).

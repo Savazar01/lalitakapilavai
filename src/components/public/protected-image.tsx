@@ -19,6 +19,8 @@ export interface ProtectedImageProps {
   style?: React.CSSProperties;
   unoptimized?: boolean;
   useImg?: boolean;
+  loading?: "eager" | "lazy";
+  decoding?: "sync" | "async" | "auto";
   children?: React.ReactNode;
   onContextMenu?: (e: React.MouseEvent) => void;
 }
@@ -38,6 +40,8 @@ export function ProtectedImage({
   style,
   unoptimized,
   useImg = false,
+  loading,
+  decoding,
   children,
   onContextMenu,
 }: ProtectedImageProps) {
@@ -56,6 +60,9 @@ export function ProtectedImage({
   const shouldUseNativeImg = useImg || isExternal;
   const effectiveWrapperClass = wrapperClassName || containerClassName;
 
+  const effectiveLoading = loading || (priority ? "eager" : "lazy");
+  const effectiveDecoding = decoding || (priority ? "sync" : "async");
+
   return (
     <div
       className={cn(
@@ -69,7 +76,8 @@ export function ProtectedImage({
         <img
           src={src}
           alt={alt}
-          loading={priority ? undefined : "lazy"}
+          loading={effectiveLoading}
+          decoding={effectiveDecoding}
           className={cn(
             "protect-image select-none pointer-events-none transition-all duration-300",
             fill && "absolute inset-0 w-full h-full object-cover",
@@ -87,7 +95,9 @@ export function ProtectedImage({
           fill={fill}
           width={!fill ? width : undefined}
           height={!fill ? height : undefined}
-          priority={priority}
+          priority={priority || effectiveLoading === "eager"}
+          loading={effectiveLoading}
+          decoding={effectiveDecoding}
           sizes={sizes}
           quality={quality}
           style={style}

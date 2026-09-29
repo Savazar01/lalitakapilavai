@@ -140,6 +140,8 @@ model SystemSetting {
   adminConfig       Json?
   themeConfig       Json?   // Public design token overrides: { light: { "--background": "#...", ... }, dark: { ... } }
   watermarkConfig   Json?   // Watermark & Foil Earmarks config: { text?: string, position?: string, opacity?: number, defaultFoilEarmarkText?: string, showFoilEarmark?: boolean }
+  googleServicesConfig Json? // Google Workspace { enabled: boolean, clientId: string, clientSecret: string, refreshToken: string, driveFolderId: string, sheetId: string, defaultServices: string[] }
+  nextcloudConfig      Json? // Nextcloud WebDAV { enabled: boolean, serverUrl: string, username: string, appPassword: string, baseFolder: string }
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -195,6 +197,9 @@ model Page {
   isDeleted       Boolean       @default(false)
   showOnHomepage  Boolean       @default(false)
   sortOrder       Int           @default(0)
+  pageType        String        @default("STANDARD") // "STANDARD" | "LANDING_PAGE"
+  isHomepage      Boolean       @default(false)
+  archetype       String?       @default("BLANK")
   eyebrowTag      String?
   heroTitle       String?
   heroSubtitle    String?       @db.Text

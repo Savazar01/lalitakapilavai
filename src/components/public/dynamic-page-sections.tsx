@@ -1,6 +1,7 @@
 import * as React from "react";
 import { AnimatedSection } from "@/components/public/animated-section";
 import { TiptapRenderer, renderColumnBlock } from "@/components/public/tiptap-renderer";
+import { ArchetypeShowcaseBlock } from "@/components/public/blocks/landing/archetype-showcase-blocks";
 import { getPatternById } from "@/lib/background-patterns";
 import type { PageMatrixConfig } from "@/components/builder/page-matrix-studio";
 import { cn } from "@/lib/utils";
@@ -357,7 +358,11 @@ export function DynamicPageSections({
                             <div className="absolute bottom-1 right-1 w-3.5 h-3.5 border-b-2 border-r-2 border-[#D4AF37] pointer-events-none z-10" />
                           </>
                         )}
-                        <TiptapRenderer content={col.content as Record<string, unknown>} contrast={colScope.contrastMode} />
+                        {colObj?.type && typeof colObj.type === "string" && colObj.type.startsWith("landing_") ? (
+                          <ArchetypeShowcaseBlock content={colObj} contrast={colScope.contrastMode} />
+                        ) : (
+                          <TiptapRenderer content={col.content as Record<string, unknown>} contrast={colScope.contrastMode} />
+                        )}
                       </div>
                     );
                   })}

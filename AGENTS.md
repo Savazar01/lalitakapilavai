@@ -139,6 +139,10 @@ All code generation and architectural modifications must adhere to the specializ
     - **Museum Placard (Portrait)**: $63.5\text{ mm} \times 101.6\text{ mm}$ ($2.5 \times 4\text{ in}$).
   - All cards enforce `page-break-inside: avoid !important; break-inside: avoid !important;`.
   - Maintain an $18\text{ mm}$ safe margin at the base of every card to prevent physical acrylic/brass stand clamps from occluding metadata.
+- **e-Catalog Synchronous Preloader & Asynchronous Decoding Barrier**:
+  - In `src/lib/print-isolated-html.ts`, normalize all HTML images to force `loading="eager"` and `decoding="sync"`.
+  - The driver awaits `Promise.all(images.map(img => img.decode().catch(...)))` followed by a safety buffer before invoking `iframe.contentWindow.print()`.
+  - In `src/components/public/catalog-print-button.tsx`, an in-situ decoding preloader displays a responsive progress indicator while decoding offscreen plates, completely eliminating blank image omissions on plates 2+ in browser PDF exports.
 
 ### B. 3D WebGL Exhibition Salon Wall Engine
 - **Aspect Ratio Preservation**:
@@ -193,6 +197,32 @@ All code generation and architectural modifications must adhere to the specializ
 - **Dynamic Metric Source Resolver**: The backend resolver (`/api/admin/overview/metrics` and `DashboardWidget.metricSource`) aggregates live counts across PostgreSQL tables (`count:artworks`, `count:categories`, `count:events`, `count:leads`, `count:event_rsvps`, `count:event_specific_rsvp`, `count:catalogs`, `count:pages`, `count:posts`) with zero-latency parallel queries.
 - **Specific Event Filtering**: When `count:event_specific_rsvp` is selected, `metricFilterId` scopes registrations dynamically to the specified scheduled event.
 - **SSR Pre-Computation**: `src/app/admin/(dashboard)/page.tsx` executes parallel count queries on the server, guaranteeing that initial renders and full page reloads display live metrics without client-side pop-in or hydration lag.
+
+### I. Multi-Cloud Storage Architecture (Google Workspace & Nextcloud WebDAV)
+- **Universal Provider Dispatch**: Object storage supports `LOCAL`, `S3`, `R2`, `GOOGLE_DRIVE`, and `NEXTCLOUD` with transparent failover and zero-downtime reconfiguration.
+- **Google Workspace Storage & Sheets Sync**:
+  - `src/lib/storage/google-drive-driver.ts`: Implements OAuth2 token refresh, multipart asset upload, public thumbnail link generation (`lh3.googleusercontent.com/d/`), and Google Sheets lead append integration for CRM synchronization.
+- **Nextcloud WebDAV & OCS Share Engine**:
+  - `src/lib/storage/nextcloud-driver.ts`: Executes HTTP PUT uploads with recursive `MKCOL` directory provisioning, authenticated via App Passwords or Basic Auth, and provisions public read-only shares via the Nextcloud OCS Share API (`/ocs/v2.php/apps/files_sharing/api/v1/shares`).
+- **Dynamic Driver Caching & Test Validation**:
+  - Dedicated test connection endpoint at `/api/admin/settings/test-storage` allows verifying credentials prior to saving. `clearStorageCache()` guarantees that administrative config updates take effect immediately without requiring process restarts.
+
+### J. Dynamic Enterprise Landing Page Studio & Atomic Homepage Promotion
+- **Decoupled Sandbox Invariant**: Creating or editing landing pages never mutates or overwrites the active homepage (`isHomepage: false` by default).
+- **7 Industry Archetype Blueprints**:
+  - `PROFESSIONAL`: Executive hero, metric ticker counters, split practice areas grid, institutional CTA.
+  - `PORTFOLIO`: Living atelier hero, horizontal exhibition strip, authenticated monograph tags, 24K gold foil badges.
+  - `RESTAURANT`: Atmospheric banner, multi-category dining matrix, dietary pill chips (Chef Signature, Gluten-Free, Vegan).
+  - `HOSPITALITY`: Luxury retreat hero, signature suite cards (area, occupancy, view), curated amenity icon strip.
+  - `HEALTHCARE`: NABH/ISO accredited clinic hero, department specialty grid, physician practitioner cards.
+  - `CORPORATE`: SaaS glow hero with hover elevation grids, SLA performance cards, and expandable FAQ accordion.
+  - `BLANK`: 12-column unconstrained canvas ready for custom visual builder blocks.
+- **Atomic Homepage Promotion & Demotion**:
+  - Backend route `/api/admin/pages/[id]/promote` executes atomic Prisma transactions: sets `isHomepage: false` across all pages, then marks the target page `isHomepage: true`.
+  - Demotion (`DELETE`) cleanly unsets `isHomepage`, restoring the default curated homepage fallback instantly.
+- **Root URL Priority Engine**:
+  - `src/app/page.tsx` queries `where: { OR: [{ isHomepage: true }, { slug: "home" }, { slug: "index" }] }` with `orderBy: [{ isHomepage: "desc" }, { updatedAt: "desc" }]`, prioritizing promoted landing pages with zero hydration lag.
+
 
 
 

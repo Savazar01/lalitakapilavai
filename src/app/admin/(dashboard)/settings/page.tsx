@@ -27,6 +27,11 @@ import {
   Sun,
   Moon,
   Globe,
+  HardDrive,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Server,
 } from "lucide-react";
 import {
   DetailedThemeConfig,
@@ -108,6 +113,24 @@ interface AiConfig {
   temperature: number;
 }
 
+interface GoogleServicesConfig {
+  enabled: boolean;
+  clientId: string;
+  clientSecret: string;
+  refreshToken: string;
+  driveFolderId?: string;
+  sheetId?: string;
+  defaultServices?: string[];
+}
+
+interface NextcloudConfig {
+  enabled: boolean;
+  serverUrl: string;
+  username: string;
+  appPassword: string;
+  baseFolder?: string;
+}
+
 export default function AdminSettingsPage() {
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
@@ -133,6 +156,33 @@ export default function AdminSettingsPage() {
   const [themeConfig, setThemeConfig] = React.useState<DetailedThemeConfig>(DEFAULT_DETAILED_THEME_CONFIG);
   const [activeThemeSubTab, setActiveThemeSubTab] = React.useState<"common" | "light" | "dark">("common");
   const [savingTheme, setSavingTheme] = React.useState(false);
+
+  // Active Main Tab State
+  const [activeTab, setActiveTab] = React.useState("general");
+
+  // Google Workspace Config State
+  const [googleServicesConfig, setGoogleServicesConfig] = React.useState<GoogleServicesConfig>({
+    enabled: false,
+    clientId: "",
+    clientSecret: "",
+    refreshToken: "",
+    driveFolderId: "",
+    sheetId: "",
+    defaultServices: ["drive", "sheets"],
+  });
+  const [testingGoogle, setTestingGoogle] = React.useState(false);
+  const [showGoogleSecret, setShowGoogleSecret] = React.useState(false);
+
+  // Nextcloud Storage Config State
+  const [nextcloudConfig, setNextcloudConfig] = React.useState<NextcloudConfig>({
+    enabled: false,
+    serverUrl: "",
+    username: "",
+    appPassword: "",
+    baseFolder: "SavazAI-Media",
+  });
+  const [testingNextcloud, setTestingNextcloud] = React.useState(false);
+  const [showNextcloudPassword, setShowNextcloudPassword] = React.useState(false);
 
   const PALETTE_TOKEN_DEFINITIONS: { key: keyof ThemeModeTokens; label: string; description: string }[] = [
     { key: "canvasBg", label: "Canvas Background", description: "Base page canvas color (--background)" },
@@ -335,6 +385,12 @@ export default function AdminSettingsPage() {
           if (data.themeConfig) {
             setThemeConfig(sanitizeDetailedThemeConfig(data.themeConfig));
           }
+          if (data.googleServicesConfig) {
+            setGoogleServicesConfig((prev) => ({ ...prev, ...data.googleServicesConfig }));
+          }
+          if (data.nextcloudConfig) {
+            setNextcloudConfig((prev) => ({ ...prev, ...data.nextcloudConfig }));
+          }
         }
         setLoading(false);
       })
@@ -518,6 +574,8 @@ export default function AdminSettingsPage() {
         footerConfig: updatedFooterConfig,
         emailConfig,
         aiConfig,
+        googleServicesConfig,
+        nextcloudConfig,
         watermarkConfig: {
           defaultFoilEarmarkText: form.defaultFoilEarmarkText?.trim() || "Gold Foil",
           showFoilEarmark: form.showFoilEarmark,
@@ -542,6 +600,48 @@ export default function AdminSettingsPage() {
       toast.error(msg);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleTestGoogle = async () => {
+    setTestingGoogle(true);
+    try {
+      const res = await fetch("/api/admin/settings/test-storage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "google", config: googleServicesConfig }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message || "Google Workspace connected successfully!");
+      } else {
+        toast.error(data.message || "Failed to connect to Google Workspace");
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error testing Google Workspace");
+    } finally {
+      setTestingGoogle(false);
+    }
+  };
+
+  const handleTestNextcloud = async () => {
+    setTestingNextcloud(true);
+    try {
+      const res = await fetch("/api/admin/settings/test-storage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "nextcloud", config: nextcloudConfig }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message || "Nextcloud WebDAV connected successfully!");
+      } else {
+        toast.error(data.message || "Failed to connect to Nextcloud WebDAV");
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error testing Nextcloud");
+    } finally {
+      setTestingNextcloud(false);
     }
   };
 
@@ -649,8 +749,8 @@ export default function AdminSettingsPage() {
         </div>
       ) : (
         <form onSubmit={handleSave}>
-          <Tabs defaultValue="general" className="w-full space-y-6">
-            <TabsList className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-9 gap-1.5 w-full h-auto p-1.5 bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+            <TabsList className="flex flex-wrap gap-1.5 w-full h-auto p-1.5 bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl">
               <TabsTrigger
                 value="general"
                 className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
@@ -674,6 +774,18 @@ export default function AdminSettingsPage() {
                 className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
               >
                 <Cloud className="w-3.5 h-3.5 mr-1" /> R2 / S3
+              </TabsTrigger>
+              <TabsTrigger
+                value="google-workspace"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
+                <Globe className="w-3.5 h-3.5 mr-1" /> Google Workspace
+              </TabsTrigger>
+              <TabsTrigger
+                value="nextcloud"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
+                <Server className="w-3.5 h-3.5 mr-1" /> Nextcloud Storage
               </TabsTrigger>
               <TabsTrigger
                 value="footer"
@@ -1312,9 +1424,59 @@ export default function AdminSettingsPage() {
                         <SelectItem value="LOCAL">Local Filesystem (/public/media)</SelectItem>
                         <SelectItem value="R2">Cloudflare R2 Object Storage</SelectItem>
                         <SelectItem value="S3">Amazon S3 Object Storage</SelectItem>
+                        <SelectItem value="GOOGLE_DRIVE">Google Drive Object Vault</SelectItem>
+                        <SelectItem value="NEXTCLOUD">Nextcloud WebDAV Storage</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* When GOOGLE DRIVE: Show shortcut callout */}
+                  {form.storageProvider === "GOOGLE_DRIVE" && (
+                    <div className="p-4 rounded-lg border border-primary/30 bg-primary/5 text-xs text-foreground space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <p className="font-semibold text-foreground text-sm flex items-center gap-1.5">
+                          <Globe className="w-4 h-4 text-primary" />
+                          Google Drive Vault Mode Active
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setActiveTab("google-workspace")}
+                          className="text-xs font-semibold cursor-pointer"
+                        >
+                          Configure in Google Workspace Tab →
+                        </Button>
+                      </div>
+                      <p className="text-muted-foreground leading-relaxed">
+                        Media assets will be saved directly into your configured Google Drive folder. Ensure your Client ID, Secret, and Refresh Token are set in the Google Workspace tab.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* When NEXTCLOUD: Show shortcut callout */}
+                  {form.storageProvider === "NEXTCLOUD" && (
+                    <div className="p-4 rounded-lg border border-primary/30 bg-primary/5 text-xs text-foreground space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <p className="font-semibold text-foreground text-sm flex items-center gap-1.5">
+                          <Server className="w-4 h-4 text-primary" />
+                          Nextcloud WebDAV Storage Active
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setActiveTab("nextcloud")}
+                          className="text-xs font-semibold cursor-pointer"
+                        >
+                          Configure in Nextcloud Storage Tab →
+                        </Button>
+                      </div>
+                      <p className="text-muted-foreground leading-relaxed">
+                        Media assets will be uploaded directly to your Nextcloud instance via WebDAV. Ensure your Server URL, Username, and App Password are set in the Nextcloud Storage tab.
+                      </p>
+                    </div>
+                  )}
 
                   {/* When LOCAL: Show clear info callout and hide cloud inputs */}
                   {form.storageProvider === "LOCAL" && (
@@ -1460,6 +1622,277 @@ export default function AdminSettingsPage() {
                       </div>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab: Google Workspace */}
+            <TabsContent value="google-workspace">
+              <Card className="border border-border/80 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="font-serif text-lg flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-primary" />
+                      Google Workspace &amp; Cloud Services
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleTestGoogle}
+                      disabled={testingGoogle}
+                      className="text-xs font-semibold cursor-pointer"
+                    >
+                      {testingGoogle ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      ) : (
+                        <Globe className="w-3.5 h-3.5 mr-1.5" />
+                      )}
+                      Test Connection
+                    </Button>
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Connect Google Drive as an asset vault and Google Sheets to automatically sync CRM leads and visitor inquiries.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 text-xs">
+                  {/* Enable Switch */}
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-card/60">
+                    <div className="space-y-0.5">
+                      <Label className="font-semibold text-sm text-foreground">Enable Google Workspace Integration</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Activate Google Drive uploads and automated CRM lead syncing to Google Sheets.
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={googleServicesConfig.enabled}
+                        onChange={(e) =>
+                          setGoogleServicesConfig({ ...googleServicesConfig, enabled: e.target.checked })
+                        }
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-muted-foreground pb-2 border-b border-border/60">
+                    <span>Configure your Google Cloud Project OAuth2 credentials (API Console).</span>
+                    <a
+                      href="https://developers.google.com/drive/api/guides/about-sdk"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                    >
+                      Google Drive SDK Setup Guide <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">OAuth Client ID</Label>
+                      <Input
+                        value={googleServicesConfig.clientId}
+                        onChange={(e) =>
+                          setGoogleServicesConfig({ ...googleServicesConfig, clientId: e.target.value })
+                        }
+                        className="text-xs font-mono"
+                        placeholder="e.g. 123456789-abc.apps.googleusercontent.com"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">OAuth Client Secret</Label>
+                      <div className="relative">
+                        <Input
+                          type={showGoogleSecret ? "text" : "password"}
+                          value={googleServicesConfig.clientSecret}
+                          onChange={(e) =>
+                            setGoogleServicesConfig({ ...googleServicesConfig, clientSecret: e.target.value })
+                          }
+                          className="text-xs font-mono pr-9"
+                          placeholder="e.g. GOCSPX-xxxxxxxxxxxxxxxx"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowGoogleSecret(!showGoogleSecret)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          {showGoogleSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="font-semibold text-foreground">OAuth2 Refresh Token</Label>
+                    <Input
+                      value={googleServicesConfig.refreshToken}
+                      onChange={(e) =>
+                        setGoogleServicesConfig({ ...googleServicesConfig, refreshToken: e.target.value })
+                      }
+                      className="text-xs font-mono"
+                      placeholder="e.g. 1//04xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Obtained via Google OAuth Playground or CLI script with Drive &amp; Sheets scopes.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Target Google Drive Folder ID</Label>
+                      <Input
+                        value={googleServicesConfig.driveFolderId || ""}
+                        onChange={(e) =>
+                          setGoogleServicesConfig({ ...googleServicesConfig, driveFolderId: e.target.value })
+                        }
+                        className="text-xs font-mono"
+                        placeholder="e.g. 1a2b3c4d5e6f7g8h9_folder_id"
+                      />
+                      <p className="text-[11px] text-muted-foreground">
+                        Extracted from your Google Drive folder URL (e.g. drive.google.com/drive/folders/&lt;ID&gt;).
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Lead Sync Google Sheet ID</Label>
+                      <Input
+                        value={googleServicesConfig.sheetId || ""}
+                        onChange={(e) =>
+                          setGoogleServicesConfig({ ...googleServicesConfig, sheetId: e.target.value })
+                        }
+                        className="text-xs font-mono"
+                        placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+                      />
+                      <p className="text-[11px] text-muted-foreground">
+                        Inbound inquiries and RSVP submissions will automatically append as new rows in this spreadsheet.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab: Nextcloud Storage */}
+            <TabsContent value="nextcloud">
+              <Card className="border border-border/80 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="font-serif text-lg flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Server className="w-5 h-5 text-primary" />
+                      Nextcloud WebDAV Sovereign Storage
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleTestNextcloud}
+                      disabled={testingNextcloud}
+                      className="text-xs font-semibold cursor-pointer"
+                    >
+                      {testingNextcloud ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      ) : (
+                        <Server className="w-3.5 h-3.5 mr-1.5" />
+                      )}
+                      Test Connection
+                    </Button>
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Store high-fidelity artwork assets and media vaults on your self-hosted or managed Nextcloud cloud infrastructure via WebDAV protocol.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 text-xs">
+                  {/* Enable Switch */}
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-card/60">
+                    <div className="space-y-0.5">
+                      <Label className="font-semibold text-sm text-foreground">Enable Nextcloud WebDAV Storage</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Route uploads and media vaults to your sovereign Nextcloud instance.
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={nextcloudConfig.enabled}
+                        onChange={(e) =>
+                          setNextcloudConfig({ ...nextcloudConfig, enabled: e.target.checked })
+                        }
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Nextcloud Server URL</Label>
+                      <Input
+                        value={nextcloudConfig.serverUrl}
+                        onChange={(e) =>
+                          setNextcloudConfig({ ...nextcloudConfig, serverUrl: e.target.value })
+                        }
+                        className="text-xs font-mono"
+                        placeholder="https://cloud.your-organization.com"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Nextcloud Username</Label>
+                      <Input
+                        value={nextcloudConfig.username}
+                        onChange={(e) =>
+                          setNextcloudConfig({ ...nextcloudConfig, username: e.target.value })
+                        }
+                        className="text-xs font-mono"
+                        placeholder="e.g. atelier_admin"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">App Password / Token</Label>
+                      <div className="relative">
+                        <Input
+                          type={showNextcloudPassword ? "text" : "password"}
+                          value={nextcloudConfig.appPassword}
+                          onChange={(e) =>
+                            setNextcloudConfig({ ...nextcloudConfig, appPassword: e.target.value })
+                          }
+                          className="text-xs font-mono pr-9"
+                          placeholder="e.g. xxxxx-xxxxx-xxxxx-xxxxx"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNextcloudPassword(!showNextcloudPassword)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          {showNextcloudPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        Generated in Nextcloud Settings &rarr; Security &rarr; Devices &amp; Client App Passwords.
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold text-foreground">Base Folder Path</Label>
+                      <Input
+                        value={nextcloudConfig.baseFolder || ""}
+                        onChange={(e) =>
+                          setNextcloudConfig({ ...nextcloudConfig, baseFolder: e.target.value })
+                        }
+                        className="text-xs font-mono"
+                        placeholder="SavazAI-Media"
+                      />
+                      <p className="text-[11px] text-muted-foreground">
+                        Root folder in your Nextcloud account where assets will be organized (created automatically).
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
