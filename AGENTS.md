@@ -223,6 +223,16 @@ All code generation and architectural modifications must adhere to the specializ
 - **Root URL Priority Engine**:
   - `src/app/page.tsx` queries `where: { OR: [{ isHomepage: true }, { slug: "home" }, { slug: "index" }] }` with `orderBy: [{ isHomepage: "desc" }, { updatedAt: "desc" }]`, prioritizing promoted landing pages with zero hydration lag.
 
+### K. SavazAI Multi-Tenant Brand Neutrality Invariant
+- **Total Decoupling from Single-Tenant Data**: The codebase, seeders, administration forms, input placeholders, and system defaults must never contain hardcoded client-specific names, domains, or administrative emails (e.g. `admin@lalitakapilavai.com`, `lalitakapilavai.com`).
+- **Standardized Neutral Formats**:
+  - Placeholders must strictly utilize generic, industry-standard examples: `yourdomain.com`, `admin@yourdomain.com`, `https://cloud.yourdomain.com`, `1234567890-abc.apps.googleusercontent.com`, `GOCSPX-xxxxxxxxxxxxxxxx`, `AKIAIOSFODNN7EXAMPLE`.
+- **Browser Autofill & Credential Guard**:
+  - Administrative configuration inputs (OAuth client IDs, usernames, passwords, API tokens) must declare explicit non-credential field names (`name="..."`, `id="..."`), `autoComplete="off"` or `autoComplete="new-password"`, and password manager ignore tags (`data-1p-ignore="true"`, `data-lpignore="true"`).
+  - This guarantees that Chromium or browser password managers never involuntarily inject the currently logged-in administrator's email or credentials into cloud storage or configuration input fields.
+- **Dynamic Configuration Invariant**: All branding, identities, domains, emails, and archive titles must resolve at runtime through database configuration (`SystemSetting`, `WhiteLabelConfig`, `ThemeConfig`). Zero client data shall be baked into code artifacts.
+
+
 
 
 

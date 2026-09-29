@@ -53,6 +53,8 @@ interface SidebarProps {
   className?: string;
 }
 
+const emptySubscribe = () => () => {};
+
 export function Sidebar({
   logoUrl,
   config = DEFAULT_ADMIN_CONFIG,
@@ -62,6 +64,11 @@ export function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const handleSignOut = async () => {
     try {
@@ -74,7 +81,7 @@ export function Sidebar({
     }
   };
 
-  const isSuperAdmin = (session?.user as { role?: string } | undefined)?.role === "SUPER_ADMIN";
+  const isSuperAdmin = mounted && (session?.user as { role?: string } | undefined)?.role === "SUPER_ADMIN";
 
   const brandTitle = config.sidebarBrandTitle || DEFAULT_ADMIN_CONFIG.sidebarBrandTitle;
   const brandSubtitle = config.sidebarBrandSubtitle || DEFAULT_ADMIN_CONFIG.sidebarBrandSubtitle;
@@ -151,14 +158,16 @@ export function Sidebar({
         >
           <div className="flex flex-col truncate">
             <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
-              {session?.user?.name || "Superadmin"}
+              {mounted && session?.user?.name ? session.user.name : "Administrator"}
             </span>
             <span className="text-[11px] text-muted-foreground truncate">
-              {session?.user?.email || "admin@savazar.com"}
+              {mounted && session?.user?.email ? session.user.email : "admin@savazar.com"}
             </span>
           </div>
           <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-semibold">
-            {(session?.user as { role?: string } | undefined)?.role || "SUPER_ADMIN"}
+            {mounted && (session?.user as { role?: string } | undefined)?.role
+              ? (session?.user as { role?: string } | undefined)?.role
+              : "SUPER_ADMIN"}
           </Badge>
         </Link>
 

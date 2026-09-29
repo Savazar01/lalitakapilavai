@@ -252,6 +252,47 @@ export function createArchetypePageData(
             },
           ],
         },
+        {
+          title: "Masterwork Monograph & Authenticity",
+          orderIndex: 2,
+          gridSpan: 12,
+          customCssClass: "py-16 bg-card border-b border-border/60",
+          subSections: [
+            {
+              title: "Authenticated Monograph Showcase",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_artist_monograph",
+                archetype: "PORTFOLIO",
+                title: "Authenticated Curatorial Monograph & Provenance",
+                subtitle: "Every composition leaves our atelier accompanied by consecrated iconographic documentation, assay certificates, and physical museum placards.",
+              },
+            },
+          ],
+        },
+        {
+          title: "Curatorial Acquisition Inquiry",
+          orderIndex: 3,
+          gridSpan: 12,
+          customCssClass: "py-20 bg-background",
+          subSections: [
+            {
+              title: "Acquisition CTA",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_cta",
+                archetype: "PORTFOLIO",
+                title: "Commission or Acquire an Authentic Masterwork",
+                subtitle: "Private curatorial viewings, custom dimensions, and traditional iconographic consultations arranged by private appointment.",
+                buttonText: "Schedule Private Curatorial Inquiry",
+                actionUrl: "/commission",
+                secondaryText: "Worldwide secure insured white-glove art transit available.",
+              },
+            },
+          ],
+        },
       ];
 
     case "RESTAURANT":
@@ -281,8 +322,27 @@ export function createArchetypePageData(
           ],
         },
         {
-          title: "Categorized Dining Menu Matrix",
+          title: "Interactive Table Reservations",
           orderIndex: 1,
+          gridSpan: 12,
+          customCssClass: "py-12 bg-muted/20 border-b border-border/60",
+          subSections: [
+            {
+              title: "Reservation Booking Bar",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_reservation_bar",
+                archetype: "RESTAURANT",
+                title: "Reserve an Atelier Dining Experience",
+                subtitle: "Private salon tables and chef's tasting degustations by reservation only.",
+              },
+            },
+          ],
+        },
+        {
+          title: "Categorized Dining Menu Matrix",
+          orderIndex: 2,
           gridSpan: 12,
           customCssClass: "py-16 bg-card border-b border-border/60",
           subSections: [
@@ -310,6 +370,28 @@ export function createArchetypePageData(
                     ],
                   },
                 ],
+              },
+            },
+          ],
+        },
+        {
+          title: "Private Dining & Group Banquets",
+          orderIndex: 3,
+          gridSpan: 12,
+          customCssClass: "py-20 bg-background",
+          subSections: [
+            {
+              title: "Banquet CTA",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_cta",
+                archetype: "RESTAURANT",
+                title: "Host an Exclusive Atelier Salon Dinner",
+                subtitle: "Private salon chambers accommodate up to 32 distinguished guests for custom paired tasting menus and bespoke sommelier curations.",
+                buttonText: "Inquire Private Dining Chamber",
+                actionUrl: "/contact",
+                secondaryText: "Custom dietary bespoke tasting menus accommodated with 48 hours notice.",
               },
             },
           ],
@@ -343,10 +425,29 @@ export function createArchetypePageData(
           ],
         },
         {
-          title: "Suite Showcase & Amenities",
+          title: "Suite Availability Search Engine",
           orderIndex: 1,
           gridSpan: 12,
-          customCssClass: "py-16 bg-muted/20 border-b border-border/60",
+          customCssClass: "py-12 bg-muted/20 border-b border-border/60",
+          subSections: [
+            {
+              title: "Availability Bar",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_availability_bar",
+                archetype: "HOSPITALITY",
+                title: "Check Sanctuary Suite Availability",
+                subtitle: "Direct reservations receive complimentary private butler service & airport transfers.",
+              },
+            },
+          ],
+        },
+        {
+          title: "Suite Showcase & Amenities",
+          orderIndex: 2,
+          gridSpan: 12,
+          customCssClass: "py-16 bg-card border-b border-border/60",
           subSections: [
             {
               title: "Suites & Amenities",
@@ -361,6 +462,28 @@ export function createArchetypePageData(
                   { name: "The Royal Heritage Villa", area: "2,400 sq.ft", occupancy: "2-4 Guests", view: "Valley & Mist Panorama" },
                   { name: "The Courtyard Verandah Suite", area: "1,200 sq.ft", occupancy: "2 Guests", view: "Private Zen Lotus Pond" },
                 ],
+              },
+            },
+          ],
+        },
+        {
+          title: "Bespoke Concierge & Arrival",
+          orderIndex: 3,
+          gridSpan: 12,
+          customCssClass: "py-20 bg-background",
+          subSections: [
+            {
+              title: "Hospitality CTA",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_cta",
+                archetype: "HOSPITALITY",
+                title: "Reserve Your Private Sanctuary Escape",
+                subtitle: "Experience transcendent silence, personalized wellness therapies, and Michelin-inspired regional menus.",
+                buttonText: "Request Bespoke Concierge Booking",
+                actionUrl: "/contact",
+                secondaryText: "Tailored private helicopter transfers available from metropolitan airports.",
               },
             },
           ],
@@ -394,10 +517,29 @@ export function createArchetypePageData(
           ],
         },
         {
-          title: "Clinical Specialties & Practitioners",
+          title: "Clinical Specialties & Consulting Faculty",
           orderIndex: 1,
           gridSpan: 12,
           customCssClass: "py-16 bg-muted/20 border-b border-border/60",
+          subSections: [
+            {
+              title: "Specialty Filter & Doctor Grid",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_specialty_filter",
+                archetype: "HEALTHCARE",
+                title: "Clinical Specialties & Consulting Faculty",
+                subtitle: "Filter by medical discipline to review lead consultants, diagnostic equipment, and consultation timings.",
+              },
+            },
+          ],
+        },
+        {
+          title: "Clinical Departments & Specialized Centers",
+          orderIndex: 2,
+          gridSpan: 12,
+          customCssClass: "py-16 bg-card border-b border-border/60",
           subSections: [
             {
               title: "Specialties Grid",
@@ -411,6 +553,34 @@ export function createArchetypePageData(
                   { name: "Preventive Cardiology", lead: "Dr. A. Sharma, MD (Card)", focus: "Non-invasive hemodynamics & risk stratification" },
                   { name: "Orthopedics & Joint Rejuvenation", lead: "Dr. S. Venkat, MS (Ortho)", focus: "Minimally invasive arthroscopy & sports rehabilitation" },
                   { name: "Integrative Metabolic Health", lead: "Dr. R. Nair, MD, Dip. Endo", focus: "Personalized reversal of metabolic syndromes" },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          title: "Patient Assurance & Clinical FAQ",
+          orderIndex: 3,
+          gridSpan: 12,
+          customCssClass: "py-16 bg-background",
+          subSections: [
+            {
+              title: "Healthcare FAQ",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_faq",
+                archetype: "HEALTHCARE",
+                title: "Frequently Asked Healthcare Questions",
+                faqs: [
+                  {
+                    question: "Do you accept health insurance and cashless claims?",
+                    answer: "Yes. We maintain direct cashless tie-ups with all major health insurance providers and third-party administrators (TPAs) for both inpatient and day-care procedures.",
+                  },
+                  {
+                    question: "How quickly are radiological and lab results delivered?",
+                    answer: "Digital imaging (MRI, CT, X-ray) and core biochemical panels are processed same-day and accessible securely through your patient health portal.",
+                  },
                 ],
               },
             },
@@ -450,10 +620,29 @@ export function createArchetypePageData(
           ],
         },
         {
-          title: "Feature Matrix & Hover Elevation Grid",
+          title: "Interactive Archive Performance & ROI Engine",
           orderIndex: 1,
           gridSpan: 12,
-          customCssClass: "py-20 bg-muted/20 border-b border-border/60",
+          customCssClass: "py-16 bg-muted/20 border-b border-border/60",
+          subSections: [
+            {
+              title: "ROI Calculator",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_roi_calculator",
+                archetype: "CORPORATE",
+                title: "Interactive Archive Performance & ROI Engine",
+                subtitle: "Calculate your latency acceleration, storage sovereign savings, and curatorial verification efficiency.",
+              },
+            },
+          ],
+        },
+        {
+          title: "Feature Matrix & Hover Elevation Grid",
+          orderIndex: 2,
+          gridSpan: 12,
+          customCssClass: "py-20 bg-card border-b border-border/60",
           subSections: [
             {
               title: "SaaS Features",
@@ -482,8 +671,27 @@ export function createArchetypePageData(
           ],
         },
         {
+          title: "Transparent Sovereign Tiers",
+          orderIndex: 3,
+          gridSpan: 12,
+          customCssClass: "py-16 bg-muted/20 border-b border-border/60",
+          subSections: [
+            {
+              title: "Pricing Matrix",
+              orderIndex: 0,
+              gridSpan: 12,
+              content: {
+                type: "landing_pricing_table",
+                archetype: "CORPORATE",
+                title: "Transparent Sovereign Tiers",
+                subtitle: "Deploy with zero licensing lock-in. Scale from an artisanal studio to a multi-national museum network.",
+              },
+            },
+          ],
+        },
+        {
           title: "Enterprise FAQ Accordion",
-          orderIndex: 2,
+          orderIndex: 4,
           gridSpan: 12,
           customCssClass: "py-16 bg-background",
           subSections: [

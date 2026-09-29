@@ -1691,23 +1691,33 @@ export default function AdminSettingsPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">OAuth Client ID</Label>
+                      <Label className="font-semibold text-foreground" htmlFor="googleWorkspaceClientId">OAuth Client ID</Label>
                       <Input
-                        value={googleServicesConfig.clientId}
+                        id="googleWorkspaceClientId"
+                        name="googleWorkspaceClientId"
+                        autoComplete="off"
+                        data-1p-ignore="true"
+                        data-lpignore="true"
+                        value={googleServicesConfig.clientId || ""}
                         onChange={(e) =>
                           setGoogleServicesConfig({ ...googleServicesConfig, clientId: e.target.value })
                         }
                         className="text-xs font-mono"
-                        placeholder="e.g. 123456789-abc.apps.googleusercontent.com"
+                        placeholder="e.g. 1234567890-abc.apps.googleusercontent.com"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">OAuth Client Secret</Label>
+                      <Label className="font-semibold text-foreground" htmlFor="googleWorkspaceClientSecret">OAuth Client Secret</Label>
                       <div className="relative">
                         <Input
+                          id="googleWorkspaceClientSecret"
+                          name="googleWorkspaceClientSecret"
+                          autoComplete="new-password"
+                          data-1p-ignore="true"
+                          data-lpignore="true"
                           type={showGoogleSecret ? "text" : "password"}
-                          value={googleServicesConfig.clientSecret}
+                          value={googleServicesConfig.clientSecret || ""}
                           onChange={(e) =>
                             setGoogleServicesConfig({ ...googleServicesConfig, clientSecret: e.target.value })
                           }
@@ -1835,28 +1845,38 @@ export default function AdminSettingsPage() {
                           setNextcloudConfig({ ...nextcloudConfig, serverUrl: e.target.value })
                         }
                         className="text-xs font-mono"
-                        placeholder="https://cloud.your-organization.com"
+                        placeholder="https://cloud.yourdomain.com"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">Nextcloud Username</Label>
+                      <Label className="font-semibold text-foreground" htmlFor="nextcloudStorageUsername">Nextcloud Username</Label>
                       <Input
+                        id="nextcloudStorageUsername"
+                        name="nextcloudStorageUsername"
+                        autoComplete="off"
+                        data-1p-ignore="true"
+                        data-lpignore="true"
                         value={nextcloudConfig.username}
                         onChange={(e) =>
                           setNextcloudConfig({ ...nextcloudConfig, username: e.target.value })
                         }
                         className="text-xs font-mono"
-                        placeholder="e.g. atelier_admin"
+                        placeholder="e.g. admin@yourdomain.com"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label className="font-semibold text-foreground">App Password / Token</Label>
+                      <Label className="font-semibold text-foreground" htmlFor="nextcloudStoragePassword">App Password / Token</Label>
                       <div className="relative">
                         <Input
+                          id="nextcloudStoragePassword"
+                          name="nextcloudStoragePassword"
+                          autoComplete="new-password"
+                          data-1p-ignore="true"
+                          data-lpignore="true"
                           type={showNextcloudPassword ? "text" : "password"}
                           value={nextcloudConfig.appPassword}
                           onChange={(e) =>
@@ -1886,7 +1906,7 @@ export default function AdminSettingsPage() {
                           setNextcloudConfig({ ...nextcloudConfig, baseFolder: e.target.value })
                         }
                         className="text-xs font-mono"
-                        placeholder="SavazAI-Media"
+                        placeholder="/Media-Vault"
                       />
                       <p className="text-[11px] text-muted-foreground">
                         Root folder in your Nextcloud account where assets will be organized (created automatically).

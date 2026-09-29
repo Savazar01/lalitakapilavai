@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1790657239.1931858,
+    "mtime": 1790659243.5677998,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\AGENTS.md": {
-    "mtime": 1790407537.6104226,
-    "ast_hash": "b3802a9dd7066375933ca06677743a45",
+    "mtime": 1790658739.7720327,
+    "ast_hash": "ef6699705bb504f7d1d6cd13017a1ea6",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\CLAUDE.md": {
@@ -285,8 +285,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\README.md": {
-    "mtime": 1790407649.4876606,
-    "ast_hash": "167e1d62c56d484b9818f8e83243242d",
+    "mtime": 1790657390.1356895,
+    "ast_hash": "7bf2e5b93ea9d32ca2a293c24fcd7a95",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\.skills\\better-auth-best-practices.md": {
@@ -455,8 +455,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\settings\\page.tsx": {
-    "mtime": 1790656516.9639452,
-    "ast_hash": "7783d2e56d43565ff7be8215c19dc780",
+    "mtime": 1790658705.530398,
+    "ast_hash": "bf8544eb4c524cfc9d6817aa185238cc",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\admin\\(dashboard)\\users\\page.tsx": {
@@ -790,8 +790,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\sidebar.tsx": {
-    "mtime": 1790396504.118493,
-    "ast_hash": "a73b85b74fd66cfa203296cf2d9d9507",
+    "mtime": 1790659135.2960856,
+    "ast_hash": "ac97fee58d265dc014f9b47dfad6905c",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\admin-config.ts": {
@@ -1115,13 +1115,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\blocks\\landing\\archetype-showcase-blocks.tsx": {
-    "mtime": 1790657166.8712952,
-    "ast_hash": "0458d9074894f40ac3019ac22a85864b",
+    "mtime": 1790659159.8727517,
+    "ast_hash": "fc0d9927714323fcb5292330c5d9015e",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\landing-page-archetypes.ts": {
-    "mtime": 1790657171.450937,
-    "ast_hash": "31287111a9399dbc43ebc2eab38850fc",
+    "mtime": 1790658972.513495,
+    "ast_hash": "2367a63e4ff1e47631f2fe4e5e44394d",
     "semantic_hash": ""
   }
 }
