@@ -108,7 +108,9 @@ SavazAI WebApps Platform
 2. **3D WebGL Spatial Exhibition Salon Corridor**:
    - Museum standard eye-level centerline hanging strictly aligned to $1.55\text{ m}$ (58–60 inches from floor) with an absolute minimum floor clearance of $0.98\text{ m}$ for any bottom-row frame (`Math.max(1.28, 0.98 + H/2)`).
    - Natural artwork aspect ratio preservation (`naturalWidth / naturalHeight`), wrapping canvas, gilded fillets, and outer timber frames without cropping.
-   - Realistic PBR visitor furnishings: dark American walnut plinths, cognac tufted leather cushions, and cylindrical champagne brass legs ($z = 6.2\text{ m}$, height $0.32\text{ m}$), with dynamic visibility toggling (`decorGroup.visible = isOverview`) during artwork focus steps to guarantee zero foreground occlusion.
+   - Symmetrical architectural framing with divider pilasters placed at every wall bay boundary ($w \cdot 14.0 \pm 7.0\text{ m}$) ensuring bilateral balance and identical outer margins.
+   - Salon cluster positioning dynamically centering the total cluster span symmetrically around the wall midpoint ($X = wallCenterX$).
+   - Realistic PBR visitor furnishings: dark American walnut plinths, warm cognac tufted leather cushions (`0x8c4a24`, `roughness: 0.45`, `metalness: 0.15`), and cylindrical champagne brass legs ($z = 6.2\text{ m}$, height $0.32\text{ m}$), illuminated with warm visitor gallery fill lights, with dynamic visibility toggling (`decorGroup.visible = isOverview`) during artwork focus steps to guarantee zero foreground occlusion.
    - Cinematic damped camera transitions using `THREE.MathUtils.damp` for position and target `lookAt`, establishing an initial wide salon shot at `(0, 1.85, 9.4)` looking at `(0, 1.55, 0)` and executing smooth panoramic sweeps across adjacent gallery walls.
    - 7 Procedural architectural environments (Modern Minimalist, Imperial Palace, Indian Atelier, Residential Salon, Heritage Villa, Corporate Gallery, Custom).
    - Multi-wall corridor partitioning (`maxArtworksPerWall`) automatically dividing collections across navigable gallery walls.
@@ -150,6 +152,7 @@ SavazAI WebApps Platform
 
 #### 3. Visual Page Builder & Enterprise Landing Page Studio (`/admin/pages`)
 - **Modular Visual Studio (`/admin/pages/[id]/builder`)**: Drag-and-drop 12-column layout builder supporting Hero Showcase, 3D Exhibition Salon Wall, Text Blocks, Image Blocks, Media Carousels, and Dynamic Form Blocks.
+- **Deterministic DND Hydration Guard**: Implements static ID `<DndContext id="savazai-page-builder-sections-dnd">` and client mounting guard (`mounted`), completely preventing SSR/CSR `aria-describedby` hydration mismatches that previously de-synchronized React 19 synthetic event listeners.
 - **Radix UI Sliders & Switches**: Media Gallery Inspector utilizes accessible `@radix-ui/react-slider` and `@radix-ui/react-switch` primitives for "Max Artworks Per Wall", "Overview Wall Dwell", "Artwork Focus Dwell", "Autoplay Tour", and "Display Metadata Card Below Wall", eliminating range drag trapping.
 - **Sanitized Catalog Ingestion**: "Auto-Fill from Catalog & Asset Repository" strips UUID filenames and legacy devotional fallbacks, defaulting alt text strictly to empty `""` unless authored by user.
 - **Enterprise Landing Page Studio**: One-click generation of industry landing pages across 7 curated archetypes:

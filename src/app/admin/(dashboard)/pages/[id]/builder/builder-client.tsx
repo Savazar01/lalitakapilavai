@@ -578,6 +578,9 @@ function SortableSection({
     frameHeaderBg?: string;
     frameHeaderTextColor?: string;
     items?: MediaGalleryItem[];
+    maxArtworksPerWall?: number;
+    overviewWallDwell?: number;
+    showMetadataCardBelowWall?: boolean;
   } | null>(null);
 
   const [activeHeroModal, setActiveHeroModal] = React.useState<{
@@ -1457,6 +1460,9 @@ function SortableSection({
                                   frameHeaderBg: block.galleryFrameHeaderBg,
                                   frameHeaderTextColor: block.galleryFrameHeaderTextColor,
                                   items: block.galleryItems,
+                                  maxArtworksPerWall: block.galleryMaxArtworksPerWall,
+                                  overviewWallDwell: block.galleryOverviewWallDwell,
+                                  showMetadataCardBelowWall: block.galleryShowMetadataCardBelowWall,
                                 })
                               }
                               className="text-xs h-7 border-primary/40 text-primary hover:bg-primary/10 gap-1 cursor-pointer"
@@ -1489,6 +1495,9 @@ function SortableSection({
                               showFrameHeader={block.galleryShowFrameHeader}
                               frameHeaderBg={block.galleryFrameHeaderBg}
                               frameHeaderTextColor={block.galleryFrameHeaderTextColor}
+                              maxArtworksPerWall={block.galleryMaxArtworksPerWall}
+                              overviewDwellSeconds={block.galleryOverviewWallDwell}
+                              showMetadataCardBelowWall={block.galleryShowMetadataCardBelowWall}
                             />
                           </div>
                         </div>
@@ -1951,8 +1960,16 @@ function SortableSection({
                 frameHeaderBg: activeGalleryModal.frameHeaderBg,
                 frameHeaderTextColor: activeGalleryModal.frameHeaderTextColor,
                 items: activeGalleryModal.items,
+                maxArtworksPerWall: activeGalleryModal.maxArtworksPerWall,
+                overviewWallDwell: activeGalleryModal.overviewWallDwell,
+                overviewDwellSeconds: activeGalleryModal.overviewWallDwell,
+                showMetadataCardBelowWall: activeGalleryModal.showMetadataCardBelowWall,
               }}
               onChange={(updated) => {
+                const nextMaxArtworks = updated.maxArtworksPerWall ?? activeGalleryModal.maxArtworksPerWall;
+                const nextDwell = updated.overviewWallDwell ?? updated.overviewDwellSeconds ?? activeGalleryModal.overviewWallDwell;
+                const nextShowCard = updated.showMetadataCardBelowWall ?? activeGalleryModal.showMetadataCardBelowWall;
+
                 updateBlock(activeGalleryModal.colIdx, activeGalleryModal.blockId, {
                   galleryDisplayMode: updated.displayMode,
                   galleryAutoplayTimer: updated.autoplayTimer,
@@ -1975,6 +1992,9 @@ function SortableSection({
                   galleryFrameHeaderBg: updated.frameHeaderBg,
                   galleryFrameHeaderTextColor: updated.frameHeaderTextColor,
                   galleryItems: updated.items,
+                  galleryMaxArtworksPerWall: nextMaxArtworks,
+                  galleryOverviewWallDwell: nextDwell,
+                  galleryShowMetadataCardBelowWall: nextShowCard,
                 });
                 setActiveGalleryModal((prev) =>
                   prev
@@ -2001,6 +2021,9 @@ function SortableSection({
                         frameHeaderBg: updated.frameHeaderBg,
                         frameHeaderTextColor: updated.frameHeaderTextColor,
                         items: updated.items,
+                        maxArtworksPerWall: nextMaxArtworks,
+                        overviewWallDwell: nextDwell,
+                        showMetadataCardBelowWall: nextShowCard,
                       }
                     : null
                 );
@@ -2074,8 +2097,13 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
 
   const [page, setPage] = React.useState<PageData | null>(initialPage || null);
   const [loading, setLoading] = React.useState(!initialPage);
+  const [mounted, setMounted] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
   const [savedSuccess, setSavedSuccess] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Viewport mode: desktop, tablet, mobile
   const [viewport, setViewport] = React.useState<ViewportMode>("desktop");
@@ -2378,7 +2406,7 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
     }
   };
 
-  if (loading || !page) {
+  if (!mounted || loading || !page) {
     return (
       <div className="h-[80vh] flex flex-col items-center justify-center gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -2501,6 +2529,7 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
           >
             {/* Sections DND List */}
             <DndContext
+              id="savazai-page-builder-sections-dnd"
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}

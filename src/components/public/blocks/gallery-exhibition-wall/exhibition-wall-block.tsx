@@ -237,24 +237,27 @@ function computePlacements(
       } else if (count === 2) {
         const w0 = frameSizes[0].width;
         const w1 = frameSizes[1].width;
-        const dist = w0 / 2 + minGap + w1 / 2;
+        const totalSpan = w0 + minGap + w1;
         localSlots = [
-          { x: -dist / 2, y: Math.max(1.55, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" },
-          { x: dist / 2, y: Math.max(1.55, 0.98 + frameSizes[1].height / 2), frame: "rosewood-ivory" },
+          { x: -totalSpan / 2 + w0 / 2, y: Math.max(1.55, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" },
+          { x: totalSpan / 2 - w1 / 2, y: Math.max(1.55, 0.98 + frameSizes[1].height / 2), frame: "rosewood-ivory" },
         ];
       } else if (count === 3) {
         const w0 = frameSizes[0].width;
         const w1 = frameSizes[1].width;
         const w2 = frameSizes[2].width;
+        const totalSpan = w1 + minGap + w0 + minGap + w2;
         localSlots = [
           { x: 0, y: Math.max(1.60, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" },
-          { x: -(w0 / 2 + minGap + w1 / 2), y: Math.max(1.52, 0.98 + frameSizes[1].height / 2), frame: "rosewood-ivory" },
-          { x: w0 / 2 + minGap + w2 / 2, y: Math.max(1.52, 0.98 + frameSizes[2].height / 2), frame: "light-oak" },
+          { x: -totalSpan / 2 + w1 / 2, y: Math.max(1.52, 0.98 + frameSizes[1].height / 2), frame: "rosewood-ivory" },
+          { x: totalSpan / 2 - w2 / 2, y: Math.max(1.52, 0.98 + frameSizes[2].height / 2), frame: "light-oak" },
         ];
       } else if (count === 4) {
         const leftColW = Math.max(frameSizes[0].width, frameSizes[1].width);
         const rightColW = Math.max(frameSizes[2].width, frameSizes[3].width);
-        const colDist = leftColW / 2 + minGap + rightColW / 2;
+        const totalSpan = leftColW + minGap + rightColW;
+        const leftColX = -totalSpan / 2 + leftColW / 2;
+        const rightColX = totalSpan / 2 - rightColW / 2;
 
         const bY0 = Math.max(1.28, 0.98 + frameSizes[1].height / 2);
         const tY0 = Math.max(2.15, bY0 + frameSizes[1].height / 2 + 0.32 + frameSizes[0].height / 2);
@@ -263,17 +266,18 @@ function computePlacements(
         const tY1 = Math.max(2.15, bY1 + frameSizes[3].height / 2 + 0.32 + frameSizes[2].height / 2);
 
         localSlots = [
-          { x: -colDist / 2, y: tY0, frame: "light-oak" },
-          { x: -colDist / 2, y: bY0, frame: "rosewood-ivory" },
-          { x: colDist / 2, y: tY1, frame: "gold-teak" },
-          { x: colDist / 2, y: bY1, frame: "white-float" },
+          { x: leftColX, y: tY0, frame: "light-oak" },
+          { x: leftColX, y: bY0, frame: "rosewood-ivory" },
+          { x: rightColX, y: tY1, frame: "gold-teak" },
+          { x: rightColX, y: bY1, frame: "white-float" },
         ];
       } else if (count === 5) {
         const centerW = frameSizes[0].width;
         const leftColW = Math.max(frameSizes[1].width, frameSizes[2].width);
         const rightColW = Math.max(frameSizes[3].width, frameSizes[4].width);
-        const leftOffset = -(centerW / 2 + minGap + leftColW / 2);
-        const rightOffset = centerW / 2 + minGap + rightColW / 2;
+        const totalSpan = leftColW + minGap + centerW + minGap + rightColW;
+        const leftColX = -totalSpan / 2 + leftColW / 2;
+        const rightColX = totalSpan / 2 - rightColW / 2;
 
         const centerY = Math.max(1.55, 0.98 + frameSizes[0].height / 2);
 
@@ -285,17 +289,19 @@ function computePlacements(
 
         localSlots = [
           { x: 0, y: centerY, frame: "gold-teak" },
-          { x: leftOffset, y: tYL, frame: "light-oak" },
-          { x: leftOffset, y: bYL, frame: "rosewood-ivory" },
-          { x: rightOffset, y: tYR, frame: "light-oak" },
-          { x: rightOffset, y: bYR, frame: "rosewood-ivory" },
+          { x: leftColX, y: tYL, frame: "light-oak" },
+          { x: leftColX, y: bYL, frame: "rosewood-ivory" },
+          { x: rightColX, y: tYR, frame: "light-oak" },
+          { x: rightColX, y: bYR, frame: "rosewood-ivory" },
         ];
       } else if (count === 6) {
         const col0W = Math.max(frameSizes[0].width, frameSizes[1].width);
         const col1W = Math.max(frameSizes[2].width, frameSizes[3].width);
         const col2W = Math.max(frameSizes[4].width, frameSizes[5].width);
-        const leftOffset = -(col1W / 2 + minGap + col0W / 2);
-        const rightOffset = col1W / 2 + minGap + col2W / 2;
+        const totalSpan = col0W + col1W + col2W + 2 * minGap;
+        const col0X = -totalSpan / 2 + col0W / 2;
+        const col1X = -totalSpan / 2 + col0W + minGap + col1W / 2;
+        const col2X = totalSpan / 2 - col2W / 2;
 
         const bY0 = Math.max(1.28, 0.98 + frameSizes[1].height / 2);
         const tY0 = Math.max(2.15, bY0 + frameSizes[1].height / 2 + 0.32 + frameSizes[0].height / 2);
@@ -307,12 +313,12 @@ function computePlacements(
         const tY2 = Math.max(2.15, bY2 + frameSizes[5].height / 2 + 0.32 + frameSizes[4].height / 2);
 
         localSlots = [
-          { x: leftOffset, y: tY0, frame: "rosewood-ivory" },
-          { x: leftOffset, y: bY0, frame: "light-oak" },
-          { x: 0, y: tY1, frame: "gold-teak" },
-          { x: 0, y: bY1, frame: "rosewood-ivory" },
-          { x: rightOffset, y: tY2, frame: "light-oak" },
-          { x: rightOffset, y: bY2, frame: "gold-teak" },
+          { x: col0X, y: tY0, frame: "rosewood-ivory" },
+          { x: col0X, y: bY0, frame: "light-oak" },
+          { x: col1X, y: tY1, frame: "gold-teak" },
+          { x: col1X, y: bY1, frame: "rosewood-ivory" },
+          { x: col2X, y: tY2, frame: "light-oak" },
+          { x: col2X, y: bY2, frame: "gold-teak" },
         ];
       } else {
         const colWidths = [
@@ -680,6 +686,11 @@ export function ExhibitionWallBlock({
       const rightFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 6, 16);
       rightFill.position.set(bayX + 5.0, 4.2, 4.0);
       scene.add(rightFill);
+
+      // Subtle warm visitor gallery floor/bench fill light to illuminate foreground decor
+      const visitorFill = new THREE.PointLight(0xffeedd, 1.2, 10);
+      visitorFill.position.set(bayX, 2.0, 7.5);
+      scene.add(visitorFill);
     }
 
     // Per-Artwork Radial Falloff Spotlights (Focused Light Pools)
@@ -817,35 +828,37 @@ export function ExhibitionWallBlock({
     skirtingMesh.receiveShadow = true;
     scene.add(skirtingMesh);
 
-    // Architectural Divider Pilasters between Wall Bays
-    if (numWalls > 1) {
-      const pilasterMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(env.skirtingColor),
-        roughness: 0.6,
-        metalness: 0.15,
-      });
-      const capMat = new THREE.MeshStandardMaterial({
-        color: 0xd4af37,
-        roughness: 0.35,
-        metalness: 0.65,
-      });
+    // Architectural Divider Pilasters framing every Wall Bay symmetrically
+    const pilasterMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(env.skirtingColor),
+      roughness: 0.6,
+      metalness: 0.15,
+    });
+    const capMat = new THREE.MeshStandardMaterial({
+      color: 0xd4af37,
+      roughness: 0.35,
+      metalness: 0.65,
+    });
 
-      for (let w = 0; w < numWalls - 1; w++) {
-        const dividerX = w * wallSpacing + wallSpacing / 2;
-        const pilasterGeo = new THREE.BoxGeometry(0.38, 5.8, 0.18);
-        const pilasterMesh = new THREE.Mesh(pilasterGeo, pilasterMat);
-        pilasterMesh.position.set(dividerX, 2.9, 0.09);
-        pilasterMesh.castShadow = true;
-        pilasterMesh.receiveShadow = true;
-        scene.add(pilasterMesh);
-
-        // Gilded accent fillet capital
-        const capGeo = new THREE.BoxGeometry(0.5, 0.12, 0.22);
-        const capMesh = new THREE.Mesh(capGeo, capMat);
-        capMesh.position.set(dividerX, 5.75, 0.11);
-        scene.add(capMesh);
-      }
+    const pilasterPositions: number[] = [];
+    for (let w = 0; w <= numWalls; w++) {
+      pilasterPositions.push(w * wallSpacing - wallSpacing / 2);
     }
+
+    pilasterPositions.forEach((dividerX) => {
+      const pilasterGeo = new THREE.BoxGeometry(0.38, 5.8, 0.18);
+      const pilasterMesh = new THREE.Mesh(pilasterGeo, pilasterMat);
+      pilasterMesh.position.set(dividerX, 2.9, 0.09);
+      pilasterMesh.castShadow = true;
+      pilasterMesh.receiveShadow = true;
+      scene.add(pilasterMesh);
+
+      // Gilded accent fillet capital
+      const capGeo = new THREE.BoxGeometry(0.5, 0.12, 0.22);
+      const capMesh = new THREE.Mesh(capGeo, capMat);
+      capMesh.position.set(dividerX, 5.75, 0.11);
+      scene.add(capMesh);
+    });
 
     // Hardwood / Stone Floor Plane spanning corridor
     const floorGeo = new THREE.PlaneGeometry(corridorLength, 20);
@@ -905,9 +918,9 @@ export function ExhibitionWallBlock({
         // Hand-tufted cognac leather cushion
         const cushionGeo = new THREE.BoxGeometry(2.2, 0.12, 0.58);
         const cushionMat = new THREE.MeshStandardMaterial({
-          color: 0x4c2b18,
-          roughness: 0.52,
-          metalness: 0.12,
+          color: 0x8c4a24,
+          roughness: 0.45,
+          metalness: 0.15,
         });
         const cushionMesh = new THREE.Mesh(cushionGeo, cushionMat);
         cushionMesh.position.set(benchX, 0.27, 6.2);
@@ -992,9 +1005,9 @@ export function ExhibitionWallBlock({
 
         const cushionGeo = new THREE.BoxGeometry(2.2, 0.13, 0.6);
         const cushionMat = new THREE.MeshStandardMaterial({
-          color: 0x382419,
-          roughness: 0.55,
-          metalness: 0.1,
+          color: 0x8c4a24,
+          roughness: 0.45,
+          metalness: 0.15,
         });
         const cushionMesh = new THREE.Mesh(cushionGeo, cushionMat);
         cushionMesh.position.set(benchX, 0.27, 6.2);

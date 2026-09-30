@@ -793,6 +793,9 @@ export interface ColumnBlock {
   galleryFrameHeaderBg?: string;
   galleryFrameHeaderTextColor?: string;
   galleryItems?: MediaGalleryItem[];
+  galleryMaxArtworksPerWall?: number;
+  galleryOverviewWallDwell?: number;
+  galleryShowMetadataCardBelowWall?: boolean;
   // Hero Showcase Properties
   heroArchetype?: HeroArchetype;
   heroTitle?: string;
@@ -964,6 +967,9 @@ export function renderColumnBlock(
           showFrameHeader={block.galleryShowFrameHeader}
           frameHeaderBg={block.galleryFrameHeaderBg}
           frameHeaderTextColor={block.galleryFrameHeaderTextColor}
+          maxArtworksPerWall={block.galleryMaxArtworksPerWall}
+          overviewDwellSeconds={block.galleryOverviewWallDwell}
+          showMetadataCardBelowWall={block.galleryShowMetadataCardBelowWall}
         />
       </div>
     );

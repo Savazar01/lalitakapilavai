@@ -75,6 +75,7 @@ export interface MediaGalleryBlockData {
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
   overviewDwellSeconds?: number;
+  overviewWallDwell?: number;
   showExhibitionBadge?: boolean;
   maxArtworksPerWall?: number;
   showMetadataCardBelowWall?: boolean;
@@ -108,7 +109,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const cameraTransitionStyle = data.cameraTransitionStyle ?? "pan-zoom";
   const wallLayout = data.wallLayout ?? "salon";
   const autoplayTour = data.autoplayTour ?? true;
-  const overviewDwellSeconds = data.overviewDwellSeconds ?? 4;
+  const overviewDwellSeconds = data.overviewDwellSeconds ?? (data as Record<string, unknown>).overviewWallDwell as number ?? 4;
   const maxArtworksPerWall = data.maxArtworksPerWall ?? 4;
   const showMetadataCardBelowWall = data.showMetadataCardBelowWall ?? true;
   const showFrameHeader = data.showFrameHeader ?? false;
@@ -313,7 +314,8 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       overviewDwellSeconds: val,
-    });
+      overviewWallDwell: val,
+    } as typeof data);
   };
 
   const handleMaxArtworksPerWallChange = (val: number) => {

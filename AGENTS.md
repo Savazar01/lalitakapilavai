@@ -249,10 +249,12 @@ All code generation and architectural modifications must adhere to the specializ
 - **Museum Standard Hanging Heights & Elevation**:
   - Center-line eye level strictly enforced at $y = 1.55\text{ m}$ (58–60 inches from floor) across single-row, grid, and salon layouts.
   - Absolute minimum floor clearance of $0.98\text{ m}$ enforced for bottom-tier frames via dynamic clamping (`Math.max(1.28, 0.98 + H / 2)`), preventing artworks from visually colliding with baseboards.
-  - Multi-tier layouts preserve a minimum $0.32\text{ m}$ vertical clearance gap between rows and $0.8\text{ m}$ horizontal clearance between adjacent outer frames.
+  - Multi-tier layouts preserve a minimum $0.32\text{ m}$ vertical clearance gap between rows and $0.85\text{ m}$ horizontal clearance between adjacent outer frames.
+  - Exact Bilateral Centering: Salon layouts dynamically calculate combined cluster bounding boxes (`totalSpan`) to guarantee that left and right outer margins to the wall boundaries are mathematically identical.
 - **7 Procedural Architectural Environments & PBR Furnishings**:
   - `modern-minimalist`, `imperial-palace`, `indian-atelier`, `residential-salon`, `heritage-villa`, `corporate-gallery`, and `custom`.
-  - Foreground visitor benches are crafted with realistic PBR materials: dark American walnut plinths, cognac tufted leather cushions, and cylindrical champagne brass legs ($z = 6.2\text{ m}$, total height $0.32\text{ m}$).
+  - Symmetrical Architectural Framing: Gilded capital pilasters are positioned at every wall bay boundary ($w \cdot 14.0 - 7.0\text{ m}$ through $(numWalls - 1) \cdot 14.0 + 7.0\text{ m}$), ensuring Wall 0 and all bays are framed with bilateral balance.
+  - Foreground visitor benches are crafted with realistic PBR materials: dark American walnut plinths, warm cognac tufted leather cushions (`0x8c4a24`, `roughness: 0.45`, `metalness: 0.15`), and cylindrical champagne brass legs ($z = 6.2\text{ m}$, total height $0.32\text{ m}$), illuminated by warm gallery fill lights at $z = 7.5\text{ m}$.
   - Dynamic Occlusion Guard: `decorGroup.visible` is dynamically set to `isOverview` in the animation loop, automatically hiding foreground furniture during artwork focus steps so paintings are never occluded.
 - **Cinematic Damped Camera Transitions**:
   - Camera transitions use frame-rate independent `THREE.MathUtils.damp` for both camera position and target `lookAt`, starting from a wide salon establishing shot at `(0, 1.85, 9.4)` looking at `(0, 1.55, 0)` without snapping.
@@ -268,6 +270,8 @@ All code generation and architectural modifications must adhere to the specializ
   - "Save Placard Customizations" persists overrides locally and synchronizes updates directly to the PostgreSQL database via `PUT /api/admin/artworks/[id]`.
 
 ### O. Enterprise Page Builder Studio & Sanitized Ingestion
+- **Deterministic DND Hydration Guard**:
+  - Page Builder declares deterministic static ID `<DndContext id="savazai-page-builder-sections-dnd">` and client mounting guard (`mounted`), completely preventing SSR/CSR `aria-describedby` hydration mismatches that previously de-synchronized React 19 synthetic event listeners.
 - **Radix UI Sliders & Switches**:
   - Inspector controls use accessible `@radix-ui/react-slider` and `@radix-ui/react-switch` primitives for "Max Artworks Per Wall" ($1–8$), "Overview Wall Dwell" ($2–15\text{s}$), "Artwork Focus Dwell" ($2–15\text{s}$), "Autoplay Tour", and "Display Metadata Card Below Wall".
   - Pointer events and dragging interactions are isolated to prevent modal drag-trapping or z-index event occlusion.
