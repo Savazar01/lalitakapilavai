@@ -25,6 +25,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -35,6 +37,16 @@ import {
 import { MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
 import { WALL_ENVIRONMENTS } from "@/components/public/blocks/gallery-exhibition-wall/exhibition-environments";
 import { cn } from "@/lib/utils";
+
+export function isRawFilenameOrUuid(str?: string | null): boolean {
+  if (!str) return false;
+  return (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(str) ||
+    /\.(webp|jpg|jpeg|png|gif|svg|avif)$/i.test(str) ||
+    /^[0-9a-f-]{20,}/i.test(str) ||
+    /^https?:\/\/.*\.(webp|jpg|jpeg|png|gif|svg|avif)$/i.test(str)
+  );
+}
 
 export function stripHtmlTags(str?: string | null): string {
   if (!str) return "";
@@ -338,21 +350,36 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           (input.title && a.title.toLowerCase().trim() === input.title.toLowerCase().trim())
       );
 
-      const resolvedTitle = stripHtmlTags(input.title && input.title !== "Classical Masterwork Detail" ? input.title : (matchingArt?.title || input.title || "Classical Masterwork Detail"));
-      const resolvedSchool = stripHtmlTags(input.traditionalSchool || matchingArt?.category?.name || (matchingArt ? "Thanjavur (Tanjore) Classical" : ""));
-      const resolvedMedium = stripHtmlTags(input.medium || matchingArt?.medium || (matchingArt ? "22k Gold Foil, Gesso, Teak Wood" : ""));
+      const rawAlt = input.alt?.trim();
+      // Alt Text MUST strictly remain completely blank unless manually authored by the user (no filenames, no UUIDs)
+      const resolvedAlt = !rawAlt || isRawFilenameOrUuid(rawAlt) ? "" : stripHtmlTags(rawAlt);
+
+      const resolvedTitle = stripHtmlTags(
+        input.title && input.title !== "Classical Masterwork Detail" && input.title !== "Exhibition Artwork"
+          ? input.title
+          : matchingArt?.title || input.title || "Exhibition Artwork"
+      );
+      const resolvedSchool = stripHtmlTags(input.traditionalSchool || matchingArt?.category?.name || "");
+      const resolvedMedium = stripHtmlTags(input.medium || matchingArt?.medium || "");
       const resolvedDimensions = stripHtmlTags(input.dimensions || matchingArt?.dimensions || "");
       const resolvedYear = stripHtmlTags(input.year || (matchingArt?.yearCreated ? String(matchingArt.yearCreated) : ""));
       const resolvedDesc = stripHtmlTags(input.description || matchingArt?.description || "");
       const resolvedLinkType = input.linkType && input.linkType !== "none" ? input.linkType : matchingArt ? "artwork" : "none";
       const resolvedLinkTarget = input.linkTarget || matchingArt?.slug || "";
 
+      const rawCaption = input.caption?.trim() || "";
+      const isLegacyCaption =
+        rawCaption.includes("Sacred gold relief") ||
+        rawCaption.includes("Sacred iconographic") ||
+        rawCaption.includes("rendered in authentic 22k gold foil");
+      const resolvedCaption = isLegacyCaption ? (resolvedDesc || "") : rawCaption;
+
       return {
         id: input.id || `mg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         url: input.url,
         title: resolvedTitle,
-        caption: input.caption || "",
-        alt: input.alt || "",
+        caption: resolvedCaption,
+        alt: resolvedAlt,
         medium: resolvedMedium,
         dimensions: resolvedDimensions,
         traditionalSchool: resolvedSchool,
@@ -370,8 +397,8 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     const url = newUrl || "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=1200";
     const enriched = enrichItemWithArtwork({
       url,
-      title: newTitle,
-      alt: newAlt,
+      title: newTitle || "Exhibition Artwork",
+      alt: isRawFilenameOrUuid(newAlt) ? "" : newAlt,
       ...extra,
     });
     const updated = [...items, enriched].slice(0, 12);
@@ -727,70 +754,57 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                   Cycles camera between walls and pieces.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => handleAutoplayTourChange(!autoplayTour)}
-                className={cn(
-                  "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
-                  autoplayTour ? "bg-amber-600" : "bg-muted"
-                )}
-              >
-                <span
-                  className={cn(
-                    "block w-4 h-4 rounded-full bg-white transition-transform transform",
-                    autoplayTour ? "translate-x-6" : "translate-x-1"
-                  )}
-                />
-              </button>
+              <Switch
+                checked={autoplayTour}
+                onCheckedChange={(checked) => handleAutoplayTourChange(checked)}
+                className="cursor-pointer pointer-events-auto"
+              />
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
                 <span>Max Artworks Per Wall</span>
                 <span className="text-primary font-mono text-xs">{maxArtworksPerWall}</span>
               </Label>
-              <input
-                type="range"
+              <Slider
                 min={1}
                 max={8}
                 step={1}
-                value={maxArtworksPerWall}
-                onChange={(e) => handleMaxArtworksPerWallChange(Number(e.target.value))}
-                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+                value={[maxArtworksPerWall]}
+                onValueChange={([val]) => handleMaxArtworksPerWallChange(val)}
+                className="py-1 cursor-pointer pointer-events-auto"
               />
               <span className="text-[10px] text-muted-foreground">Partitions corridor (1 to 8)</span>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
                 <span>Overview Wall Dwell</span>
                 <span className="text-primary font-mono text-xs">{overviewDwellSeconds}s</span>
               </Label>
-              <input
-                type="range"
+              <Slider
                 min={2}
                 max={15}
                 step={1}
-                value={overviewDwellSeconds}
-                onChange={(e) => handleOverviewDwellSecondsChange(Number(e.target.value))}
-                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+                value={[overviewDwellSeconds]}
+                onValueChange={([val]) => handleOverviewDwellSecondsChange(val)}
+                className="py-1 cursor-pointer pointer-events-auto"
               />
               <span className="text-[10px] text-muted-foreground">Panoramic wall hold (2s - 15s)</span>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
                 <span>Artwork Focus Dwell</span>
                 <span className="text-primary font-mono text-xs">{autoplayTimer}s</span>
               </Label>
-              <input
-                type="range"
+              <Slider
                 min={2}
                 max={15}
                 step={1}
-                value={autoplayTimer}
-                onChange={(e) => handleTimerChange(Number(e.target.value))}
-                className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+                value={[autoplayTimer]}
+                onValueChange={([val]) => handleTimerChange(val)}
+                className="py-1 cursor-pointer pointer-events-auto"
               />
               <span className="text-[10px] text-muted-foreground">Focus dwell (2s - 15s)</span>
             </div>
@@ -804,21 +818,11 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 Renders curatorial title, medium, dimensions, and catalog link below the 3D gallery wall canvas.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => handleShowMetadataCardBelowWallChange(!showMetadataCardBelowWall)}
-              className={cn(
-                "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
-                showMetadataCardBelowWall ? "bg-amber-600" : "bg-muted"
-              )}
-            >
-              <span
-                className={cn(
-                  "block w-4 h-4 rounded-full bg-white transition-transform transform",
-                  showMetadataCardBelowWall ? "translate-x-6" : "translate-x-1"
-                )}
-              />
-            </button>
+            <Switch
+              checked={showMetadataCardBelowWall}
+              onCheckedChange={(checked) => handleShowMetadataCardBelowWallChange(checked)}
+              className="cursor-pointer pointer-events-auto"
+            />
           </div>
         </div>
       )}
@@ -842,21 +846,11 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 When disabled (default), artwork expands to the top border with zero black masking bands.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => onChange({ ...data, showFrameHeader: !showFrameHeader })}
-              className={cn(
-                "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
-                showFrameHeader ? "bg-primary" : "bg-muted"
-              )}
-            >
-              <span
-                className={cn(
-                  "block w-4 h-4 rounded-full bg-white transition-transform transform",
-                  showFrameHeader ? "translate-x-6" : "translate-x-1"
-                )}
-              />
-            </button>
+            <Switch
+              checked={showFrameHeader}
+              onCheckedChange={(checked) => onChange({ ...data, showFrameHeader: checked })}
+              className="cursor-pointer pointer-events-auto"
+            />
           </div>
 
           {showFrameHeader && (
@@ -1021,21 +1015,11 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               Renders an unobtrusive caption outside the image frame (Default: False for clean visual focus).
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => handleShowCaptionRibbonChange(!showCaptionRibbon)}
-            className={cn(
-              "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
-              showCaptionRibbon ? "bg-primary" : "bg-muted"
-            )}
-          >
-            <span
-              className={cn(
-                "block w-4 h-4 rounded-full bg-white transition-transform transform",
-                showCaptionRibbon ? "translate-x-6" : "translate-x-1"
-              )}
-            />
-          </button>
+          <Switch
+            checked={showCaptionRibbon}
+            onCheckedChange={(checked) => handleShowCaptionRibbonChange(checked)}
+            className="cursor-pointer pointer-events-auto"
+          />
         </div>
       </div>
 
@@ -1047,14 +1031,13 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               <span>Autoplay Duration</span>
               <span className="text-primary font-mono text-xs">{autoplayTimer}s</span>
             </Label>
-            <input
-              type="range"
+            <Slider
               min={2}
               max={10}
               step={1}
-              value={autoplayTimer}
-              onChange={(e) => handleTimerChange(Number(e.target.value))}
-              className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
+              value={[autoplayTimer]}
+              onValueChange={([val]) => handleTimerChange(val)}
+              className="py-1 cursor-pointer pointer-events-auto"
             />
             <span className="text-[10px] text-muted-foreground">Slides advance automatically (2s - 10s)</span>
           </div>
@@ -1379,12 +1362,12 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                   </div>
                 </div>
 
-                {/* 1-Click Masterwork Ingestion Helper */}
+                {/* 1-Click Catalog Ingestion Helper */}
                 <div className="p-3 rounded-lg border border-amber-500/40 bg-amber-500/10 space-y-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-xs font-bold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                      Auto-Fill from Masterwork Catalog
+                      Auto-Fill from Catalog &amp; Asset Repository
                     </Label>
                     <Badge variant="outline" className="text-[9px] bg-background/80 border-amber-500/40 text-amber-900 dark:text-amber-300 font-semibold">
                       Instant Ingestion
@@ -1398,19 +1381,19 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                     onValueChange={(artId) => {
                       const art = artworksList.find((a) => a.id === artId);
                       if (art) {
-                        const materials = stripHtmlTags(art.medium) || "22k Gold Foil, Gesso, Teak Wood";
+                        const materials = stripHtmlTags(art.medium) || "";
                         handleUpdateItem(activeItemIndex, {
                           artworkId: art.id,
                           title: stripHtmlTags(art.title),
                           medium: materials,
                           dimensions: stripHtmlTags(art.dimensions) || "",
-                          traditionalSchool: stripHtmlTags(art.category?.name) || "Thanjavur (Tanjore) Classical",
+                          traditionalSchool: stripHtmlTags(art.category?.name) || "",
                           year: art.yearCreated ? String(art.yearCreated) : "",
                           description: stripHtmlTags(art.description) || "",
                           linkType: "artwork",
                           linkTarget: art.slug,
-                          alt: activeItem.alt || "",
-                          caption: activeItem.caption || "",
+                          alt: "", // Strictly blank unless manually authored
+                          caption: stripHtmlTags(art.description) || "",
                           url: art.watermarkedWebpUrl || art.primaryImageUrl || activeItem.url,
                         });
                         toast.success(`Auto-mapped all curatorial metadata for "${stripHtmlTags(art.title)}"!`);
@@ -1418,7 +1401,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                     }}
                   >
                     <SelectTrigger className="h-8 text-xs bg-background">
-                      <SelectValue placeholder="-- Select catalog masterwork to auto-fill --" />
+                      <SelectValue placeholder="-- Select catalog artwork to auto-fill --" />
                     </SelectTrigger>
                     <SelectContent className="max-h-60">
                       {artworksList.map((art) => (
@@ -1437,7 +1420,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                       type="text"
                       value={activeItem.title || ""}
                       onChange={(e) => handleUpdateItem(activeItemIndex, { title: e.target.value })}
-                      placeholder="e.g. Ashta Lakshmi Tanjore Gold Foil"
+                      placeholder="e.g. Oil on Canvas Masterwork"
                       className="h-8 text-xs"
                     />
                   </div>
@@ -1447,7 +1430,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                       type="text"
                       value={activeItem.alt || ""}
                       onChange={(e) => handleUpdateItem(activeItemIndex, { alt: e.target.value })}
-                      placeholder="e.g. Tanjore panel showing 22k gold embossing"
+                      placeholder="Leave empty or author brief description (no filenames)"
                       className="h-8 text-xs"
                     />
                   </div>
@@ -1490,13 +1473,15 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                               handleUpdateItem(activeItemIndex, {
                                 artworkId: matched.id,
                                 title: stripHtmlTags(matched.title),
-                                medium: stripHtmlTags(matched.medium) || activeItem.medium || "22k Gold Foil, Gesso, Teak Wood",
+                                medium: stripHtmlTags(matched.medium) || activeItem.medium || "",
                                 dimensions: stripHtmlTags(matched.dimensions) || activeItem.dimensions || "",
-                                traditionalSchool: stripHtmlTags(matched.category?.name) || activeItem.traditionalSchool || "Thanjavur (Tanjore) Classical",
+                                traditionalSchool: stripHtmlTags(matched.category?.name) || activeItem.traditionalSchool || "",
                                 year: matched.yearCreated ? String(matched.yearCreated) : activeItem.year,
                                 description: stripHtmlTags(matched.description) || activeItem.description || "",
                                 linkType: "artwork",
                                 linkTarget: matched.slug,
+                                alt: isRawFilenameOrUuid(activeItem.alt) ? "" : (activeItem.alt || ""),
+                                caption: stripHtmlTags(matched.description) || (activeItem.caption?.includes("Sacred") ? "" : activeItem.caption) || "",
                               });
                               toast.success(`Synchronized metadata from "${stripHtmlTags(matched.title)}"!`);
                             }
@@ -1519,7 +1504,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                         type="text"
                         value={activeItem.medium || ""}
                         onChange={(e) => handleUpdateItem(activeItemIndex, { medium: e.target.value })}
-                        placeholder="e.g. 22k Gold Foil, Gesso, Teak Wood"
+                        placeholder="e.g. Oil on Belgian Linen, Bronze, Mixed Media"
                         className="h-8 text-xs"
                       />
                     </div>
@@ -1543,7 +1528,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                         type="text"
                         value={activeItem.traditionalSchool || ""}
                         onChange={(e) => handleUpdateItem(activeItemIndex, { traditionalSchool: e.target.value })}
-                        placeholder="e.g. Thanjavur (Tanjore) Classical"
+                        placeholder="e.g. Contemporary Realism, Impressionism, Modern Fine Art"
                         className="h-8 text-xs"
                       />
                     </div>
@@ -1607,7 +1592,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                     {activeItem.linkType === "artwork" && (
                       <div className="sm:col-span-2 space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-muted-foreground">Select Masterwork</span>
+                          <span className="text-[10px] text-muted-foreground">Select Artwork</span>
                           {artworksList.length > 0 && (
                             <button
                               type="button"

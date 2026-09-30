@@ -246,12 +246,17 @@ All code generation and architectural modifications must adhere to the specializ
   - CRM Leads table, details dialog, and CSV export display attendance dates and time slot badges.
 
 ### M. 3D WebGL Exhibition Salon Wall Studio & Realistic Environments
-- **7 Procedural Architectural Environments**:
+- **Museum Standard Hanging Heights & Elevation**:
+  - Center-line eye level strictly enforced at $y = 1.55\text{ m}$ (58–60 inches from floor) across single-row, grid, and salon layouts.
+  - Absolute minimum floor clearance of $0.98\text{ m}$ enforced for bottom-tier frames via dynamic clamping (`Math.max(1.28, 0.98 + H / 2)`), preventing artworks from visually colliding with baseboards.
+  - Multi-tier layouts preserve a minimum $0.32\text{ m}$ vertical clearance gap between rows and $0.8\text{ m}$ horizontal clearance between adjacent outer frames.
+- **7 Procedural Architectural Environments & PBR Furnishings**:
   - `modern-minimalist`, `imperial-palace`, `indian-atelier`, `residential-salon`, `heritage-villa`, `corporate-gallery`, and `custom`.
-  - Architectural 3D decor objects (benches, fluted plinths, brass urlis, stanchions) are positioned procedurally and strictly outside artwork display bounds ($y \le 0.45\text{ m}$ or flanking perimeter) to eliminate visual occlusion.
-- **Cinematic Interpolation & Proportional Clearance**:
-  - Camera transitions use damped cubic easing (`lerp(target, delta * 3.5)` in `useFrame`) starting from wide-angle establishing shots, gliding smoothly toward focused artworks, and executing sweeping curves between adjacent corridor walls.
-  - Dynamic proportional artwork spacing enforces a mandatory $0.8\text{ m}$ minimum clearance gap between adjacent frames, eliminating visual collisions regardless of orientation.
+  - Foreground visitor benches are crafted with realistic PBR materials: dark American walnut plinths, cognac tufted leather cushions, and cylindrical champagne brass legs ($z = 6.2\text{ m}$, total height $0.32\text{ m}$).
+  - Dynamic Occlusion Guard: `decorGroup.visible` is dynamically set to `isOverview` in the animation loop, automatically hiding foreground furniture during artwork focus steps so paintings are never occluded.
+- **Cinematic Damped Camera Transitions**:
+  - Camera transitions use frame-rate independent `THREE.MathUtils.damp` for both camera position and target `lookAt`, starting from a wide salon establishing shot at `(0, 1.85, 9.4)` looking at `(0, 1.55, 0)` without snapping.
+  - Wall transitions execute smooth panoramic camera sweeps, establishing the new wall overview before focusing on its first artwork.
 - **Responsive High-Contrast Presentation**:
   - Bottom metadata placard is locked to high-contrast dark slate (`bg-slate-900 text-white`) in Light Mode, preventing black-on-black button clashes.
   - On viewports < 768px, a floating mobile provenance drawer provides full metadata and navigation controls.
@@ -261,8 +266,15 @@ All code generation and architectural modifications must adhere to the specializ
   - Modal opening triggers automatic background synchronization from the artworks database (`/api/admin/artworks`), populating fallback valuation maps.
   - Card-level overrides allow editing titles, medium, dimensions, year, price, and currency (INR, USD, EUR, GBP, AED, SGD).
   - "Save Placard Customizations" persists overrides locally and synchronizes updates directly to the PostgreSQL database via `PUT /api/admin/artworks/[id]`.
-- **Sanitized Alt Text**:
-  - Media uploader and vault dialogs default alt text to an empty string `""` rather than raw filenames.
+
+### O. Enterprise Page Builder Studio & Sanitized Ingestion
+- **Radix UI Sliders & Switches**:
+  - Inspector controls use accessible `@radix-ui/react-slider` and `@radix-ui/react-switch` primitives for "Max Artworks Per Wall" ($1–8$), "Overview Wall Dwell" ($2–15\text{s}$), "Artwork Focus Dwell" ($2–15\text{s}$), "Autoplay Tour", and "Display Metadata Card Below Wall".
+  - Pointer events and dragging interactions are isolated to prevent modal drag-trapping or z-index event occlusion.
+- **Sanitized Alt Text & Metadata Ingestion**:
+  - Ingestion routines and "Auto-Fill from Catalog & Asset Repository" force `alt: ""` unless explicitly authored by the user.
+  - Raw UUID filenames (e.g. `e09874c5-4fed-4176...`) and legacy single-artist or devotional captions are strictly stripped on catalog enrichment.
+
 
 
 

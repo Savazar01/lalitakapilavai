@@ -109,7 +109,7 @@ function computePlacements(
   if (items.length === 0) return [];
 
   const wallSpacing = 14.0;
-  const safeMax = Math.max(2, Math.min(8, maxPerWall));
+  const safeMax = Math.max(1, Math.min(8, maxPerWall));
   const numWalls = Math.ceil(items.length / safeMax);
   const placements: ArtworkPlacement[] = [];
 
@@ -117,12 +117,13 @@ function computePlacements(
     const wallItems = items.slice(w * safeMax, (w + 1) * safeMax);
     const wallCenterX = w * wallSpacing;
     const count = wallItems.length;
-    const minGap = 0.8; // Guaranteed minimum clearance between outer frame edges (0.8m)
+    const minGap = 0.85; // Guaranteed minimum clearance between outer frame edges (0.85m)
 
     if (layout === "linear") {
       const frameSizes = wallItems.map((item) => {
         const ar = parseArtworkAspectRatio(item);
-        return calculateFrameSize(ar, 1.6);
+        const maxDim = count === 1 ? 2.0 : count <= 3 ? 1.6 : 1.35;
+        return calculateFrameSize(ar, maxDim);
       });
 
       const sumWidths = frameSizes.reduce((acc, s) => acc + s.width, 0);
@@ -140,10 +141,13 @@ function computePlacements(
         const xPos = currentLeft + width / 2;
         currentLeft += width + calculatedGap;
 
+        // Eye-level center line at 1.55m, guaranteed minimum floor clearance of 0.98m
+        const yPos = Math.max(1.55, 0.98 + height / 2);
+
         placements.push({
           item,
           x: xPos,
-          y: 2.3,
+          y: yPos,
           width,
           height,
           wallIndex: w,
@@ -154,12 +158,11 @@ function computePlacements(
       });
     } else if (layout === "grid") {
       const cols = Math.min(count, count > 4 ? 3 : 2);
-      const minColGap = 0.8;
-      const minRowGap = 0.8;
+      const minColGap = 0.85;
 
       const frameSizes = wallItems.map((item) => {
         const ar = parseArtworkAspectRatio(item);
-        return calculateFrameSize(ar, 1.4);
+        return calculateFrameSize(ar, 1.3);
       });
 
       // Compute max width per column
@@ -180,16 +183,28 @@ function computePlacements(
         currentX += colWidths[c] + minColGap;
       }
 
+      const totalRows = Math.ceil(count / cols);
+
       wallItems.forEach((item, localIdx) => {
         const globalIdx = w * safeMax + localIdx;
         const col = localIdx % cols;
         const row = Math.floor(localIdx / cols);
         const { width, height } = frameSizes[localIdx];
 
+        let yPos = 1.55;
+        if (totalRows === 1) {
+          yPos = Math.max(1.55, 0.98 + height / 2);
+        } else {
+          // 2 rows: row 0 (top row) at ~2.15m, row 1 (bottom row) at ~1.28m
+          const bottomRowY = Math.max(1.28, 0.98 + height / 2);
+          const topRowY = Math.max(2.15, bottomRowY + height / 2 + 0.32 + height / 2);
+          yPos = row === 0 ? topRowY : bottomRowY;
+        }
+
         placements.push({
           item,
           x: colCenters[col],
-          y: 3.3 - row * (1.5 + minRowGap),
+          y: yPos,
           width,
           height,
           wallIndex: w,
@@ -207,7 +222,7 @@ function computePlacements(
       // "salon" layout per wall with dynamic clearance
       const frameSizes = wallItems.map((item) => {
         const ar = parseArtworkAspectRatio(item);
-        const maxDim = count === 1 ? 2.0 : count <= 3 ? 1.7 : 1.4;
+        const maxDim = count === 1 ? 2.0 : count <= 3 ? 1.65 : 1.35;
         return calculateFrameSize(ar, maxDim);
       });
 
@@ -218,33 +233,40 @@ function computePlacements(
       }[] = [];
 
       if (count === 1) {
-        localSlots = [{ x: 0, y: 2.4, frame: "gold-teak" }];
+        localSlots = [{ x: 0, y: Math.max(1.55, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" }];
       } else if (count === 2) {
         const w0 = frameSizes[0].width;
         const w1 = frameSizes[1].width;
         const dist = w0 / 2 + minGap + w1 / 2;
         localSlots = [
-          { x: -dist / 2, y: 2.4, frame: "gold-teak" },
-          { x: dist / 2, y: 2.4, frame: "rosewood-ivory" },
+          { x: -dist / 2, y: Math.max(1.55, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" },
+          { x: dist / 2, y: Math.max(1.55, 0.98 + frameSizes[1].height / 2), frame: "rosewood-ivory" },
         ];
       } else if (count === 3) {
         const w0 = frameSizes[0].width;
         const w1 = frameSizes[1].width;
         const w2 = frameSizes[2].width;
         localSlots = [
-          { x: 0, y: 2.5, frame: "gold-teak" },
-          { x: -(w0 / 2 + minGap + w1 / 2), y: 2.4, frame: "rosewood-ivory" },
-          { x: w0 / 2 + minGap + w2 / 2, y: 2.4, frame: "light-oak" },
+          { x: 0, y: Math.max(1.60, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" },
+          { x: -(w0 / 2 + minGap + w1 / 2), y: Math.max(1.52, 0.98 + frameSizes[1].height / 2), frame: "rosewood-ivory" },
+          { x: w0 / 2 + minGap + w2 / 2, y: Math.max(1.52, 0.98 + frameSizes[2].height / 2), frame: "light-oak" },
         ];
       } else if (count === 4) {
         const leftColW = Math.max(frameSizes[0].width, frameSizes[1].width);
         const rightColW = Math.max(frameSizes[2].width, frameSizes[3].width);
         const colDist = leftColW / 2 + minGap + rightColW / 2;
+
+        const bY0 = Math.max(1.28, 0.98 + frameSizes[1].height / 2);
+        const tY0 = Math.max(2.15, bY0 + frameSizes[1].height / 2 + 0.32 + frameSizes[0].height / 2);
+
+        const bY1 = Math.max(1.28, 0.98 + frameSizes[3].height / 2);
+        const tY1 = Math.max(2.15, bY1 + frameSizes[3].height / 2 + 0.32 + frameSizes[2].height / 2);
+
         localSlots = [
-          { x: -colDist / 2, y: 3.3, frame: "light-oak" },
-          { x: -colDist / 2, y: 1.6, frame: "rosewood-ivory" },
-          { x: colDist / 2, y: 3.3, frame: "gold-teak" },
-          { x: colDist / 2, y: 1.6, frame: "white-float" },
+          { x: -colDist / 2, y: tY0, frame: "light-oak" },
+          { x: -colDist / 2, y: bY0, frame: "rosewood-ivory" },
+          { x: colDist / 2, y: tY1, frame: "gold-teak" },
+          { x: colDist / 2, y: bY1, frame: "white-float" },
         ];
       } else if (count === 5) {
         const centerW = frameSizes[0].width;
@@ -252,12 +274,21 @@ function computePlacements(
         const rightColW = Math.max(frameSizes[3].width, frameSizes[4].width);
         const leftOffset = -(centerW / 2 + minGap + leftColW / 2);
         const rightOffset = centerW / 2 + minGap + rightColW / 2;
+
+        const centerY = Math.max(1.55, 0.98 + frameSizes[0].height / 2);
+
+        const bYL = Math.max(1.28, 0.98 + frameSizes[2].height / 2);
+        const tYL = Math.max(2.15, bYL + frameSizes[2].height / 2 + 0.32 + frameSizes[1].height / 2);
+
+        const bYR = Math.max(1.28, 0.98 + frameSizes[4].height / 2);
+        const tYR = Math.max(2.15, bYR + frameSizes[4].height / 2 + 0.32 + frameSizes[3].height / 2);
+
         localSlots = [
-          { x: 0, y: 2.5, frame: "gold-teak" },
-          { x: leftOffset, y: 3.3, frame: "light-oak" },
-          { x: leftOffset, y: 1.6, frame: "rosewood-ivory" },
-          { x: rightOffset, y: 3.3, frame: "light-oak" },
-          { x: rightOffset, y: 1.6, frame: "rosewood-ivory" },
+          { x: 0, y: centerY, frame: "gold-teak" },
+          { x: leftOffset, y: tYL, frame: "light-oak" },
+          { x: leftOffset, y: bYL, frame: "rosewood-ivory" },
+          { x: rightOffset, y: tYR, frame: "light-oak" },
+          { x: rightOffset, y: bYR, frame: "rosewood-ivory" },
         ];
       } else if (count === 6) {
         const col0W = Math.max(frameSizes[0].width, frameSizes[1].width);
@@ -265,13 +296,23 @@ function computePlacements(
         const col2W = Math.max(frameSizes[4].width, frameSizes[5].width);
         const leftOffset = -(col1W / 2 + minGap + col0W / 2);
         const rightOffset = col1W / 2 + minGap + col2W / 2;
+
+        const bY0 = Math.max(1.28, 0.98 + frameSizes[1].height / 2);
+        const tY0 = Math.max(2.15, bY0 + frameSizes[1].height / 2 + 0.32 + frameSizes[0].height / 2);
+
+        const bY1 = Math.max(1.28, 0.98 + frameSizes[3].height / 2);
+        const tY1 = Math.max(2.15, bY1 + frameSizes[3].height / 2 + 0.32 + frameSizes[2].height / 2);
+
+        const bY2 = Math.max(1.28, 0.98 + frameSizes[5].height / 2);
+        const tY2 = Math.max(2.15, bY2 + frameSizes[5].height / 2 + 0.32 + frameSizes[4].height / 2);
+
         localSlots = [
-          { x: leftOffset, y: 3.3, frame: "rosewood-ivory" },
-          { x: leftOffset, y: 1.6, frame: "light-oak" },
-          { x: 0, y: 3.3, frame: "gold-teak" },
-          { x: 0, y: 1.6, frame: "rosewood-ivory" },
-          { x: rightOffset, y: 3.3, frame: "light-oak" },
-          { x: rightOffset, y: 1.6, frame: "gold-teak" },
+          { x: leftOffset, y: tY0, frame: "rosewood-ivory" },
+          { x: leftOffset, y: bY0, frame: "light-oak" },
+          { x: 0, y: tY1, frame: "gold-teak" },
+          { x: 0, y: bY1, frame: "rosewood-ivory" },
+          { x: rightOffset, y: tY2, frame: "light-oak" },
+          { x: rightOffset, y: bY2, frame: "gold-teak" },
         ];
       } else {
         const colWidths = [
@@ -288,22 +329,35 @@ function computePlacements(
           return c;
         });
 
+        const getColSlots = (
+          colIdx: number,
+          topItemIdx: number,
+          btmItemIdx: number,
+          fTop: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float",
+          fBtm: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float"
+        ) => {
+          const bH = frameSizes[btmItemIdx]?.height || 1.2;
+          const tH = frameSizes[topItemIdx]?.height || 1.2;
+          const bY = Math.max(1.28, 0.98 + bH / 2);
+          const tY = Math.max(2.15, bY + bH / 2 + 0.32 + tH / 2);
+          return [
+            { x: centers[colIdx], y: tY, frame: fTop },
+            { x: centers[colIdx], y: bY, frame: fBtm },
+          ];
+        };
+
         localSlots = [
-          { x: centers[0], y: 3.3, frame: "gold-teak" },
-          { x: centers[0], y: 1.6, frame: "rosewood-ivory" },
-          { x: centers[1], y: 3.3, frame: "light-oak" },
-          { x: centers[1], y: 1.6, frame: "gold-teak" },
-          { x: centers[2], y: 3.3, frame: "rosewood-ivory" },
-          { x: centers[2], y: 1.6, frame: "light-oak" },
-          { x: centers[3], y: 3.3, frame: "white-float" },
-          { x: centers[3], y: 1.6, frame: "gold-teak" },
+          ...getColSlots(0, 0, 1, "gold-teak", "rosewood-ivory"),
+          ...getColSlots(1, 2, 3, "light-oak", "gold-teak"),
+          ...getColSlots(2, 4, 5, "rosewood-ivory", "light-oak"),
+          ...getColSlots(3, 6, 7, "white-float", "gold-teak"),
         ];
       }
 
       wallItems.forEach((item, localIdx) => {
         const slot = localSlots[localIdx] || {
           x: -3.0 + localIdx * 1.5,
-          y: 2.4,
+          y: 1.55,
           frame: "gold-teak" as const,
         };
         const globalIdx = w * safeMax + localIdx;
@@ -529,6 +583,7 @@ export function ExhibitionWallBlock({
     artSpotlights: THREE.SpotLight[];
     ambientLight: THREE.AmbientLight;
     wallMesh: THREE.Mesh;
+    decorGroup?: THREE.Group;
     animationId: number;
     clock: THREE.Clock;
     raycaster: THREE.Raycaster;
@@ -565,7 +620,8 @@ export function ExhibitionWallBlock({
     }
 
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    camera.position.set(0, 2.4, 9.2);
+    // Museum eye-level camera baseline at 1.85m height, 9.4m distance for wide salon establishing shot
+    camera.position.set(0, 1.85, 9.4);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -826,38 +882,54 @@ export function ExhibitionWallBlock({
     floorMesh.receiveShadow = true;
     scene.add(floorMesh);
 
-    // Procedural Architectural 3D Decor Objects per Environment (Positioned strictly outside artwork bounds)
+    // Procedural Architectural 3D Decor Objects per Environment (Positioned strictly in visitor foreground z=6.2m or outer flanks)
     const decorGroup = new THREE.Group();
     if (env.decorType === "minimalist-bench") {
-      // Modern Minimalist gallery benches (low height y = 0.21, z = 4.2)
+      // Modern Minimalist gallery benches (low visitor seat height 0.32m, pushed to foreground z = 6.2)
       for (let w = 0; w < numWalls; w++) {
         const benchX = w * wallSpacing;
-        const benchGeo = new THREE.BoxGeometry(2.4, 0.42, 0.65);
-        const benchMat = new THREE.MeshStandardMaterial({
-          color: 0x1e293b,
-          roughness: 0.8,
-          metalness: 0.1,
-        });
-        const benchMesh = new THREE.Mesh(benchGeo, benchMat);
-        benchMesh.position.set(benchX, 0.21, 4.2);
-        benchMesh.castShadow = true;
-        benchMesh.receiveShadow = true;
-        decorGroup.add(benchMesh);
 
-        // Chrome legs
-        const legGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.42, 16);
-        const legMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.2, metalness: 0.8 });
-        [[-1.1, -0.25], [1.1, -0.25], [-1.1, 0.25], [1.1, 0.25]].forEach(([lx, lz]) => {
+        // Dark walnut / smoked oak base plinth
+        const baseGeo = new THREE.BoxGeometry(2.3, 0.08, 0.62);
+        const baseMat = new THREE.MeshStandardMaterial({
+          color: 0x2b1e16,
+          roughness: 0.65,
+          metalness: 0.08,
+        });
+        const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+        baseMesh.position.set(benchX, 0.17, 6.2);
+        baseMesh.castShadow = true;
+        baseMesh.receiveShadow = true;
+        decorGroup.add(baseMesh);
+
+        // Hand-tufted cognac leather cushion
+        const cushionGeo = new THREE.BoxGeometry(2.2, 0.12, 0.58);
+        const cushionMat = new THREE.MeshStandardMaterial({
+          color: 0x4c2b18,
+          roughness: 0.52,
+          metalness: 0.12,
+        });
+        const cushionMesh = new THREE.Mesh(cushionGeo, cushionMat);
+        cushionMesh.position.set(benchX, 0.27, 6.2);
+        cushionMesh.castShadow = true;
+        cushionMesh.receiveShadow = true;
+        decorGroup.add(cushionMesh);
+
+        // Satin champagne brass tapered legs
+        const legGeo = new THREE.CylinderGeometry(0.02, 0.015, 0.13, 16);
+        const legMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.25, metalness: 0.8 });
+        [[-1.0, -0.22], [1.0, -0.22], [-1.0, 0.22], [1.0, 0.22]].forEach(([lx, lz]) => {
           const leg = new THREE.Mesh(legGeo, legMat);
-          leg.position.set(benchX + lx, 0.21, 4.2 + lz);
+          leg.position.set(benchX + lx, 0.065, 6.2 + lz);
+          leg.castShadow = true;
           decorGroup.add(leg);
         });
       }
     } else if (env.decorType === "palace-pedestal") {
-      // Palatial gilded marble pedestals & urns on outer flanks
+      // Palatial gilded marble pedestals & urns on outer flanks (strictly clear of artwork bounds)
       for (let w = 0; w < numWalls; w++) {
         const wallX = w * wallSpacing;
-        [-5.8, 5.8].forEach((flankOffset) => {
+        [-6.4, 6.4].forEach((flankOffset) => {
           const pedGeo = new THREE.CylinderGeometry(0.32, 0.38, 0.9, 24);
           const pedMat = new THREE.MeshStandardMaterial({
             color: 0xfaf7f2,
@@ -882,10 +954,10 @@ export function ExhibitionWallBlock({
         });
       }
     } else if (env.decorType === "atelier-brass") {
-      // Traditional Indian Brass Urlis & Floor Lamps on room flanks
+      // Traditional Indian Brass Urlis & Floor Lamps on outer room flanks
       for (let w = 0; w < numWalls; w++) {
         const wallX = w * wallSpacing;
-        [-5.6, 5.6].forEach((flankOffset) => {
+        [-6.4, 6.4].forEach((flankOffset) => {
           const urliGeo = new THREE.CylinderGeometry(0.45, 0.25, 0.22, 24);
           const urliMat = new THREE.MeshStandardMaterial({
             color: 0xd4af37,
@@ -903,25 +975,45 @@ export function ExhibitionWallBlock({
         });
       }
     } else if (env.decorType === "salon-bench") {
-      // Classical collector upholstered salon bench
+      // Classical collector upholstered salon bench (low seat height at z = 6.2)
       for (let w = 0; w < numWalls; w++) {
         const benchX = w * wallSpacing;
-        const cushionGeo = new THREE.BoxGeometry(2.2, 0.38, 0.7);
-        const cushionMat = new THREE.MeshStandardMaterial({
-          color: 0x4a3b32,
-          roughness: 0.85,
+
+        const baseGeo = new THREE.BoxGeometry(2.3, 0.08, 0.62);
+        const baseMat = new THREE.MeshStandardMaterial({
+          color: 0x22130c,
+          roughness: 0.6,
           metalness: 0.05,
         });
+        const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+        baseMesh.position.set(benchX, 0.17, 6.2);
+        baseMesh.castShadow = true;
+        decorGroup.add(baseMesh);
+
+        const cushionGeo = new THREE.BoxGeometry(2.2, 0.13, 0.6);
+        const cushionMat = new THREE.MeshStandardMaterial({
+          color: 0x382419,
+          roughness: 0.55,
+          metalness: 0.1,
+        });
         const cushionMesh = new THREE.Mesh(cushionGeo, cushionMat);
-        cushionMesh.position.set(benchX, 0.25, 4.2);
+        cushionMesh.position.set(benchX, 0.27, 6.2);
         cushionMesh.castShadow = true;
         decorGroup.add(cushionMesh);
+
+        const legGeo = new THREE.CylinderGeometry(0.02, 0.015, 0.13, 16);
+        const legMat = new THREE.MeshStandardMaterial({ color: 0x8a6240, roughness: 0.4, metalness: 0.3 });
+        [[-1.0, -0.22], [1.0, -0.22], [-1.0, 0.22], [1.0, 0.22]].forEach(([lx, lz]) => {
+          const leg = new THREE.Mesh(legGeo, legMat);
+          leg.position.set(benchX + lx, 0.065, 6.2 + lz);
+          decorGroup.add(leg);
+        });
       }
     } else if (env.decorType === "villa-urn") {
       // Terracotta amphora urns on far flanks
       for (let w = 0; w < numWalls; w++) {
         const wallX = w * wallSpacing;
-        [-5.7, 5.7].forEach((flankOffset) => {
+        [-6.4, 6.4].forEach((flankOffset) => {
           const urnGeo = new THREE.CylinderGeometry(0.28, 0.18, 0.8, 16);
           const urnMat = new THREE.MeshStandardMaterial({
             color: 0x9c5134,
@@ -934,19 +1026,26 @@ export function ExhibitionWallBlock({
         });
       }
     } else if (env.decorType === "corporate-bench") {
-      // Sleek brushed steel & black leather bench
+      // Sleek brushed steel & charcoal leather bench (low seat height at z = 6.2)
       for (let w = 0; w < numWalls; w++) {
         const benchX = w * wallSpacing;
-        const benchGeo = new THREE.BoxGeometry(2.5, 0.38, 0.6);
-        const benchMat = new THREE.MeshStandardMaterial({
-          color: 0x0f172a,
-          roughness: 0.7,
-          metalness: 0.3,
+        const cushionGeo = new THREE.BoxGeometry(2.3, 0.12, 0.58);
+        const cushionMat = new THREE.MeshStandardMaterial({
+          color: 0x181c22,
+          roughness: 0.6,
+          metalness: 0.2,
         });
-        const benchMesh = new THREE.Mesh(benchGeo, benchMat);
-        benchMesh.position.set(benchX, 0.19, 4.2);
-        benchMesh.castShadow = true;
-        decorGroup.add(benchMesh);
+        const cushionMesh = new THREE.Mesh(cushionGeo, cushionMat);
+        cushionMesh.position.set(benchX, 0.26, 6.2);
+        cushionMesh.castShadow = true;
+        decorGroup.add(cushionMesh);
+
+        // Brushed stainless steel cantilever frame
+        const frameGeo = new THREE.BoxGeometry(2.36, 0.05, 0.6);
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.25, metalness: 0.85 });
+        const frameMesh = new THREE.Mesh(frameGeo, frameMat);
+        frameMesh.position.set(benchX, 0.17, 6.2);
+        decorGroup.add(frameMesh);
       }
     }
     scene.add(decorGroup);
@@ -1152,9 +1251,9 @@ export function ExhibitionWallBlock({
       });
     });
 
-    const targetCamPos = new THREE.Vector3(0, 2.4, 8.8);
-    const targetLookAt = new THREE.Vector3(0, 2.4, 0);
-    const currentLookAt = new THREE.Vector3(0, 2.4, 0);
+    const targetCamPos = new THREE.Vector3(0, 1.85, 9.4);
+    const targetLookAt = new THREE.Vector3(0, 1.55, 0);
+    const currentLookAt = new THREE.Vector3(0, 1.55, 0);
     const clock = new THREE.Clock();
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2(-999, -999);
@@ -1171,6 +1270,7 @@ export function ExhibitionWallBlock({
       artSpotlights,
       ambientLight,
       wallMesh,
+      decorGroup,
       animationId: 0,
       clock,
       raycaster,
@@ -1185,10 +1285,15 @@ export function ExhibitionWallBlock({
       const delta = state.clock.getDelta();
       const elapsed = state.clock.getElapsedTime();
 
-      // Smooth camera interpolation with damped cubic lerp (delta * 3.5)
-      const lerpFactor = Math.min(1.0, delta * 3.5);
-      state.camera.position.lerp(state.targetCamPos, lerpFactor);
-      state.currentLookAt.lerp(state.targetLookAt, lerpFactor);
+      // Smooth frame-rate independent camera damping
+      state.camera.position.x = THREE.MathUtils.damp(state.camera.position.x, state.targetCamPos.x, 3.2, delta);
+      state.camera.position.y = THREE.MathUtils.damp(state.camera.position.y, state.targetCamPos.y, 3.2, delta);
+      state.camera.position.z = THREE.MathUtils.damp(state.camera.position.z, state.targetCamPos.z, 2.8, delta);
+
+      state.currentLookAt.x = THREE.MathUtils.damp(state.currentLookAt.x, state.targetLookAt.x, 3.5, delta);
+      state.currentLookAt.y = THREE.MathUtils.damp(state.currentLookAt.y, state.targetLookAt.y, 3.5, delta);
+      state.currentLookAt.z = THREE.MathUtils.damp(state.currentLookAt.z, state.targetLookAt.z, 3.5, delta);
+
       state.camera.lookAt(state.currentLookAt);
 
       // Keep main spotlight tracking camera center
@@ -1205,6 +1310,11 @@ export function ExhibitionWallBlock({
       const stepWall = step.wallIndex;
       const targetArtIdx = step.type === "artwork" ? step.artworkIndex : -1;
       const dissolveRate = cameraTransitionStyle === "crossfade" ? 2.5 : 5.0;
+
+      // Keep foreground room decor visible during overview wall shots; hide during focus so it never occludes artworks
+      if (state.decorGroup) {
+        state.decorGroup.visible = isStepOverview;
+      }
 
       state.artworkMeshes.forEach((art) => {
         let targetOpacity = 0.0;
@@ -1278,8 +1388,8 @@ export function ExhibitionWallBlock({
 
     if (isOverview) {
       const wallCenterX = activeWallIndex * 14.0;
-      state.targetCamPos.set(wallCenterX, 2.6, 9.6);
-      state.targetLookAt.set(wallCenterX, 2.4, 0);
+      state.targetCamPos.set(wallCenterX, 1.85, 9.4);
+      state.targetLookAt.set(wallCenterX, 1.55, 0);
     } else if (activePlacement) {
       const frameH = activePlacement.height + 0.16;
       const frameW = activePlacement.width + 0.16;
@@ -1498,13 +1608,13 @@ export function ExhibitionWallBlock({
                 {activePlacement.item.artwork?.traditionalSchool ||
                   activePlacement.item.artwork?.category?.name ||
                   activePlacement.item.traditionalSchool ||
-                  "Traditional Indian Art"}
+                  "Fine Art Collection"}
               </span>
               <span
                 className="font-serif text-[8.5px] sm:text-[9.5px] tracking-wide font-semibold shrink-0"
                 style={{ color: "#374151" }}
               >
-                Master Artist
+                Authentic Archive
               </span>
             </div>
 
@@ -1514,7 +1624,7 @@ export function ExhibitionWallBlock({
                 className="font-serif font-bold text-sm sm:text-base leading-snug italic"
                 style={{ color: "#111827" }}
               >
-                {activePlacement.item.title || activePlacement.item.artwork?.title || "Masterwork"}
+                {activePlacement.item.title || activePlacement.item.artwork?.title || "Exhibition Artwork"}
               </h3>
 
               {/* Medium */}
@@ -1525,7 +1635,7 @@ export function ExhibitionWallBlock({
                 {activePlacement.item.artwork?.medium ||
                   activePlacement.item.medium ||
                   activePlacement.item.description ||
-                  "22k Gold Foil, Gesso, Teak Wood"}
+                  "Original Fine Art"}
               </p>
 
               {/* Dimensions & Year */}
@@ -1638,7 +1748,7 @@ export function ExhibitionWallBlock({
                 {activePlacement.item.artwork?.traditionalSchool || activePlacement.item.traditionalSchool || "Curated Artwork"}
               </span>
               <h4 className="text-xs font-serif font-bold text-stone-900 dark:text-stone-100 truncate">
-                {activePlacement.item.title || activePlacement.item.artwork?.title || "Masterwork"}
+                {activePlacement.item.title || activePlacement.item.artwork?.title || "Exhibition Artwork"}
               </h4>
               <p className="text-[10px] text-stone-600 dark:text-stone-400 font-mono truncate">
                 {[activePlacement.item.artwork?.medium || activePlacement.item.medium, activePlacement.item.artwork?.dimensions || activePlacement.item.dimensions].filter(Boolean).join(" • ")}
@@ -1678,7 +1788,7 @@ export function ExhibitionWallBlock({
           activeArtwork.traditionalSchool ||
           "Curated Work";
         const artworkTitle =
-          activeArtwork.artwork?.title || activeArtwork.title || "Curated Masterwork";
+          activeArtwork.artwork?.title || activeArtwork.title || "Curated Artwork";
         const artworkMeta = [
           activeArtwork.artwork?.medium || activeArtwork.medium,
           activeArtwork.artwork?.dimensions || activeArtwork.dimensions,

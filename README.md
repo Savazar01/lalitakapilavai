@@ -106,10 +106,13 @@ SavazAI WebApps Platform
    - Full-bleed media hero blocks with dynamic title, subtitle, and primary call-to-action buttons.
    - Interactive timeline blocks highlighting master artist lineages, exhibitions, and classical vocal performances.
 2. **3D WebGL Spatial Exhibition Salon Corridor**:
+   - Museum standard eye-level centerline hanging strictly aligned to $1.55\text{ m}$ (58–60 inches from floor) with an absolute minimum floor clearance of $0.98\text{ m}$ for any bottom-row frame (`Math.max(1.28, 0.98 + H/2)`).
    - Natural artwork aspect ratio preservation (`naturalWidth / naturalHeight`), wrapping canvas, gilded fillets, and outer timber frames without cropping.
-   - Procedural gallery lighting rigs with directional spotlights.
+   - Realistic PBR visitor furnishings: dark American walnut plinths, cognac tufted leather cushions, and cylindrical champagne brass legs ($z = 6.2\text{ m}$, height $0.32\text{ m}$), with dynamic visibility toggling (`decorGroup.visible = isOverview`) during artwork focus steps to guarantee zero foreground occlusion.
+   - Cinematic damped camera transitions using `THREE.MathUtils.damp` for position and target `lookAt`, establishing an initial wide salon shot at `(0, 1.85, 9.4)` looking at `(0, 1.55, 0)` and executing smooth panoramic sweeps across adjacent gallery walls.
+   - 7 Procedural architectural environments (Modern Minimalist, Imperial Palace, Indian Atelier, Residential Salon, Heritage Villa, Corporate Gallery, Custom).
    - Multi-wall corridor partitioning (`maxArtworksPerWall`) automatically dividing collections across navigable gallery walls.
-   - Mobile-responsive layout cleanly hiding on-wall placards on mobile (`< 768px`) with metadata rendered beneath the canvas.
+   - Mobile-responsive layout cleanly hiding on-wall placards on mobile (`< 768px`) with floating provenance drawer rendered beneath the canvas.
 3. **Archival Fine Art Gallery & High-Res Inspection**:
    - Filterable masonry artwork grid by traditional schools and categories.
    - Deep-zoom lightbox modal for inspecting fine brushstrokes and gold relief.
@@ -118,9 +121,9 @@ SavazAI WebApps Platform
    - Virtual page-flip presentation simulating high-end physical exhibition catalogs.
    - Curatorial essays, high-resolution artwork plates, and provenance notes.
    - One-click downloadable PDF generation.
-5. **Cultural Events, Recitals & RSVP Hub**:
-   - Exhibition calendars and recital schedules with venue maps and dynamic hero earmark badges (`{event.earmarkText}`).
-   - Seamless attendee RSVP registration modal with instant email confirmation.
+5. **Cultural Events, Recitals & Multi-Day RSVP Hub**:
+   - Multi-day exhibition calendars and daily schedule agendas with venue maps and dynamic hero earmark badges (`{event.earmarkText}`).
+   - Configurable RSVP booking modal supporting multi-day date selections, configurable time slots (Mandatory / Optional / Disabled), flexible arrival windows, and automated confirmation emails.
 6. **Curatorial Essays & Blog Archive**:
    - Editorial blog repository formatted with high-elegance typography.
    - Category filtering, author attribution, and reading-time estimations.
@@ -147,6 +150,8 @@ SavazAI WebApps Platform
 
 #### 3. Visual Page Builder & Enterprise Landing Page Studio (`/admin/pages`)
 - **Modular Visual Studio (`/admin/pages/[id]/builder`)**: Drag-and-drop 12-column layout builder supporting Hero Showcase, 3D Exhibition Salon Wall, Text Blocks, Image Blocks, Media Carousels, and Dynamic Form Blocks.
+- **Radix UI Sliders & Switches**: Media Gallery Inspector utilizes accessible `@radix-ui/react-slider` and `@radix-ui/react-switch` primitives for "Max Artworks Per Wall", "Overview Wall Dwell", "Artwork Focus Dwell", "Autoplay Tour", and "Display Metadata Card Below Wall", eliminating range drag trapping.
+- **Sanitized Catalog Ingestion**: "Auto-Fill from Catalog & Asset Repository" strips UUID filenames and legacy devotional fallbacks, defaulting alt text strictly to empty `""` unless authored by user.
 - **Enterprise Landing Page Studio**: One-click generation of industry landing pages across 7 curated archetypes:
   - *Professional*: Executive advisory hero, live metric ticker counters, split practice grid, consultation scheduler CTA.
   - *Portfolio*: Living digital atelier hero, curated masterwork exhibition strip, authenticated monograph badges.
@@ -164,9 +169,10 @@ SavazAI WebApps Platform
 - Virtual flip-book preview and batch placard printing for featured collection items.
 
 #### 5. Events & Concerts Studio (`/admin/events`)
-- Exhibition, recital, and workshop management with venue locations and dates.
+- Exhibition, recital, and workshop management with multi-day daily schedules (`dailySchedules`) and structured RSVP configuration (`EventRsvpConfig`).
+- Full administrative control over date selection requirement, multi-date attendance checkboxes, time-slot requirement (*Mandatory / Optional / Disabled*), slot duration intervals (15m, 30m, 45m, 60m, 120m), and slot capacities.
 - Dynamic "Hero Earmark / Subtitle Badge" editor configuring public hero labels.
-- Real-time RSVP attendee tracker with guest count management and CSV roster export.
+- Real-time RSVP attendee tracker with attendance date badges, arrival time slot tracking, and CSV roster export.
 
 #### 6. Dynamic Mail Message Studio & Audit Telemetry (`/admin/settings` -> Mail Msg Config)
 - **Decoupled Alert Routing**: Inbound submissions route to `systemSetting.adminAlertEmail`, never to administrative superadmin credentials.

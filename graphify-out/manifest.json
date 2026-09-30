@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1790743190.5772142,
+    "mtime": 1790748105.4336073,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\package.json": {
-    "mtime": 1790404432.3038146,
-    "ast_hash": "bdafad3f35fafc2e9ffbb68617caccad",
+    "mtime": 1790746817.088778,
+    "ast_hash": "e041e018282c1c7a6840fb8ab289e870",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\postcss.config.mjs": {
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\AGENTS.md": {
-    "mtime": 1790658739.7720327,
-    "ast_hash": "ef6699705bb504f7d1d6cd13017a1ea6",
+    "mtime": 1790743267.7402556,
+    "ast_hash": "b16232a49eac3bb29cb272901c4ab91a",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\CLAUDE.md": {
@@ -285,8 +285,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\README.md": {
-    "mtime": 1790659358.184835,
-    "ast_hash": "3ea95068c971f2404a2ac0776fe0d790",
+    "mtime": 1790743284.2045803,
+    "ast_hash": "ba7abd767d01c615c5db0a78b47346a3",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\.skills\\better-auth-best-practices.md": {
@@ -735,8 +735,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\media-gallery-inspector.tsx": {
-    "mtime": 1790741808.4099307,
-    "ast_hash": "977b628bc1672d927c273da58885961e",
+    "mtime": 1790747495.8196912,
+    "ast_hash": "55bb95da47006bb947543f2d5d076097",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\blocks\\dynamic-form-block.tsx": {
@@ -800,8 +800,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\page-matrix-studio.tsx": {
-    "mtime": 1790404735.013481,
-    "ast_hash": "9f26ee3d2f7ef9ef2eed95f852bd1fce",
+    "mtime": 1790747349.7380173,
+    "ast_hash": "d157888e4b72d9019c1ee51e7847ea9c",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\admin\\artworks\\export\\route.ts": {
@@ -1055,8 +1055,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\blocks\\gallery-exhibition-wall\\exhibition-wall-block.tsx": {
-    "mtime": 1790743051.485608,
-    "ast_hash": "c840cf2adfdb0ca541e3f57b6733dc21",
+    "mtime": 1790747736.05956,
+    "ast_hash": "67a37ba29ae802fb9bbaf8cfedb6dee4",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\artwork-placard-sheet.tsx": {
@@ -1127,6 +1127,16 @@
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\app\\api\\artworks\\resolve\\route.ts": {
     "mtime": 1790696061.0346777,
     "ast_hash": "57a181a15015afc0d6ccf24da7081920",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\ui\\slider.tsx": {
+    "mtime": 1790746858.4459043,
+    "ast_hash": "326ffa41c1e2496cbbaeabb0e94d3463",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\ui\\switch.tsx": {
+    "mtime": 1790746863.0204973,
+    "ast_hash": "d6a8a40ba6cb97f0a5c81264334bd008",
     "semantic_hash": ""
   }
 }
