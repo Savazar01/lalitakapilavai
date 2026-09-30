@@ -97,11 +97,13 @@ export interface MediaGalleryBlockProps {
   customWallUrl?: string;
   customWallBackdropUrl?: string;
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
+  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
   overviewDwellSeconds?: number;
   showExhibitionBadge?: boolean;
   maxArtworksPerWall?: number;
+  showMetadataCardBelowWall?: boolean;
   showFrameHeader?: boolean;
   frameHeaderBg?: string;
   frameHeaderTextColor?: string;
@@ -329,11 +331,13 @@ export function MediaGalleryBlock({
   customWallUrl,
   customWallBackdropUrl,
   cameraTourStyle = "drone",
+  cameraTransitionStyle = "pan-zoom",
   wallLayout = "salon",
   autoplayTour = true,
   overviewDwellSeconds = 4,
   showExhibitionBadge = true,
   maxArtworksPerWall = 4,
+  showMetadataCardBelowWall = true,
   showFrameHeader = false,
   frameHeaderBg = "",
   frameHeaderTextColor = "",
@@ -440,12 +444,14 @@ export function MediaGalleryBlock({
         customWallUrl={customWallUrl}
         customWallBackdropUrl={customWallBackdropUrl}
         cameraTourStyle={cameraTourStyle}
+        cameraTransitionStyle={cameraTransitionStyle}
         wallLayout={wallLayout}
         autoplayTour={autoplayTour}
         tourSpeedSeconds={autoplayTimer}
         overviewDwellSeconds={overviewDwellSeconds}
         showExhibitionBadge={showExhibitionBadge}
         maxArtworksPerWall={maxArtworksPerWall}
+        showMetadataCardBelowWall={showMetadataCardBelowWall}
         className={className}
       />
     );

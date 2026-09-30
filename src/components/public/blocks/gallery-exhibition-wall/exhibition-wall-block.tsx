@@ -9,8 +9,8 @@ import {
   Minimize2,
   Play,
   Pause,
-  QrCode,
   RotateCcw,
+  QrCode,
 } from "lucide-react";
 import { MediaGalleryItem } from "../media-gallery-block";
 import {
@@ -29,12 +29,14 @@ export interface ExhibitionWallBlockProps {
   customWallUrl?: string;
   customWallBackdropUrl?: string;
   cameraTourStyle?: CameraTourStyle;
+  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
   wallLayout?: WallLayoutMatrix;
   autoplayTour?: boolean;
   tourSpeedSeconds?: number;
   overviewDwellSeconds?: number;
   showExhibitionBadge?: boolean;
   maxArtworksPerWall?: number;
+  showMetadataCardBelowWall?: boolean;
   className?: string;
 }
 
@@ -115,7 +117,7 @@ function computePlacements(
     const wallItems = items.slice(w * safeMax, (w + 1) * safeMax);
     const wallCenterX = w * wallSpacing;
     const count = wallItems.length;
-    const minGap = 0.7; // Guaranteed minimum clearance between outer frame edges
+    const minGap = 0.8; // Guaranteed minimum clearance between outer frame edges (0.8m)
 
     if (layout === "linear") {
       const frameSizes = wallItems.map((item) => {
@@ -152,8 +154,8 @@ function computePlacements(
       });
     } else if (layout === "grid") {
       const cols = Math.min(count, count > 4 ? 3 : 2);
-      const minColGap = 0.7;
-      const minRowGap = 0.6;
+      const minColGap = 0.8;
+      const minRowGap = 0.8;
 
       const frameSizes = wallItems.map((item) => {
         const ar = parseArtworkAspectRatio(item);
@@ -326,33 +328,74 @@ function computePlacements(
 
 export function ExhibitionWallBlock({
   items = [],
-  environmentId = "london-school-arts",
+  environmentId = "modern-minimalist",
   culturalEnvironment,
   customWallUrl,
   customWallBackdropUrl,
   cameraTourStyle = "drone",
+  cameraTransitionStyle = "pan-zoom",
   wallLayout = "salon",
   autoplayTour = true,
   tourSpeedSeconds = 5,
   overviewDwellSeconds = 4,
   showExhibitionBadge: _showExhibitionBadge = true,
   maxArtworksPerWall = 4,
+  showMetadataCardBelowWall = true,
   className = "",
 }: ExhibitionWallBlockProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
-  const activeEnvId = culturalEnvironment || environmentId || "london-school-arts";
+  const activeEnvId = culturalEnvironment || environmentId || "modern-minimalist";
   const activeCustomWallUrl = customWallBackdropUrl || customWallUrl;
   const isCustomBackdrop =
     (activeEnvId === "custom" || activeEnvId.toLowerCase().includes("custom")) &&
     !!activeCustomWallUrl;
 
-  const [liveItems, setLiveItems] = React.useState<MediaGalleryItem[]>(items);
+  const isMounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
+  const [liveDbArtworks, setLiveDbArtworks] = React.useState<Array<Record<string, unknown>>>([]);
+
+  const liveItems = React.useMemo<MediaGalleryItem[]>(() => {
+    if (liveDbArtworks.length === 0) return items;
+    return items.map((it) => {
+      const artId = it.artworkId || it.artwork?.id;
+      const targetSlug = (it.linkType === "artwork" ? it.linkTarget : null) || it.artwork?.slug || it.slug;
+      const match = liveDbArtworks.find(
+        (a) => (artId && a.id === artId) || (targetSlug && a.slug === targetSlug)
+      );
+      if (!match) return it;
+      const cat = match.category as { name?: string } | undefined;
+      return {
+        ...it,
+        title: (match.title as string) || it.title,
+        medium: (match.medium as string) || it.medium,
+        dimensions: (match.dimensions as string) || it.dimensions,
+        year: match.yearCreated ? String(match.yearCreated) : it.year,
+        traditionalSchool: cat?.name || it.traditionalSchool,
+        description: (match.description as string) || it.description,
+        url: (match.watermarkedWebpUrl as string) || (match.primaryImageUrl as string) || it.url,
+        artwork: {
+          ...it.artwork,
+          id: (match.id as string) || it.artwork?.id || "",
+          title: (match.title as string) || it.artwork?.title || it.title,
+          slug: (match.slug as string) || it.artwork?.slug || it.slug || "",
+          medium: (match.medium as string) || it.artwork?.medium || it.medium,
+          dimensions: (match.dimensions as string) || it.artwork?.dimensions || it.dimensions,
+          yearCreated: match.yearCreated !== undefined ? Number(match.yearCreated) : it.artwork?.yearCreated,
+          primaryImageUrl: (match.primaryImageUrl as string) || it.artwork?.primaryImageUrl || it.url,
+          watermarkedWebpUrl: (match.watermarkedWebpUrl as string) || it.artwork?.watermarkedWebpUrl,
+          category: cat ? { name: cat.name || "" } : it.artwork?.category,
+        },
+      };
+    });
+  }, [items, liveDbArtworks]);
 
   React.useEffect(() => {
-    setLiveItems(items);
-
     const artIds: string[] = [];
     const slugs: string[] = [];
 
@@ -376,40 +419,9 @@ export function ExhibitionWallBlock({
 
     fetch(`/api/artworks/resolve?${query.toString()}`)
       .then((res) => (res.ok ? res.json() : []))
-      .then((dbArtworks: any[]) => {
+      .then((dbArtworks: Array<Record<string, unknown>>) => {
         if (cancelled || !Array.isArray(dbArtworks) || dbArtworks.length === 0) return;
-        setLiveItems((prev) =>
-          prev.map((it) => {
-            const artId = it.artworkId || it.artwork?.id;
-            const targetSlug = (it.linkType === "artwork" ? it.linkTarget : null) || it.artwork?.slug || it.slug;
-            const match = dbArtworks.find(
-              (a) => (artId && a.id === artId) || (targetSlug && a.slug === targetSlug)
-            );
-            if (!match) return it;
-            return {
-              ...it,
-              title: match.title || it.title,
-              medium: match.medium || it.medium,
-              dimensions: match.dimensions || it.dimensions,
-              year: match.yearCreated ? String(match.yearCreated) : it.year,
-              traditionalSchool: match.category?.name || it.traditionalSchool,
-              description: match.description || it.description,
-              url: match.watermarkedWebpUrl || match.primaryImageUrl || it.url,
-              artwork: {
-                ...it.artwork,
-                id: match.id,
-                title: match.title,
-                slug: match.slug,
-                medium: match.medium,
-                dimensions: match.dimensions,
-                yearCreated: match.yearCreated,
-                primaryImageUrl: match.primaryImageUrl,
-                watermarkedWebpUrl: match.watermarkedWebpUrl,
-                category: match.category,
-              },
-            };
-          })
-        );
+        setLiveDbArtworks(dbArtworks);
       })
       .catch((err) => console.warn("Live artwork sync warning:", err));
 
@@ -814,6 +826,131 @@ export function ExhibitionWallBlock({
     floorMesh.receiveShadow = true;
     scene.add(floorMesh);
 
+    // Procedural Architectural 3D Decor Objects per Environment (Positioned strictly outside artwork bounds)
+    const decorGroup = new THREE.Group();
+    if (env.decorType === "minimalist-bench") {
+      // Modern Minimalist gallery benches (low height y = 0.21, z = 4.2)
+      for (let w = 0; w < numWalls; w++) {
+        const benchX = w * wallSpacing;
+        const benchGeo = new THREE.BoxGeometry(2.4, 0.42, 0.65);
+        const benchMat = new THREE.MeshStandardMaterial({
+          color: 0x1e293b,
+          roughness: 0.8,
+          metalness: 0.1,
+        });
+        const benchMesh = new THREE.Mesh(benchGeo, benchMat);
+        benchMesh.position.set(benchX, 0.21, 4.2);
+        benchMesh.castShadow = true;
+        benchMesh.receiveShadow = true;
+        decorGroup.add(benchMesh);
+
+        // Chrome legs
+        const legGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.42, 16);
+        const legMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.2, metalness: 0.8 });
+        [[-1.1, -0.25], [1.1, -0.25], [-1.1, 0.25], [1.1, 0.25]].forEach(([lx, lz]) => {
+          const leg = new THREE.Mesh(legGeo, legMat);
+          leg.position.set(benchX + lx, 0.21, 4.2 + lz);
+          decorGroup.add(leg);
+        });
+      }
+    } else if (env.decorType === "palace-pedestal") {
+      // Palatial gilded marble pedestals & urns on outer flanks
+      for (let w = 0; w < numWalls; w++) {
+        const wallX = w * wallSpacing;
+        [-5.8, 5.8].forEach((flankOffset) => {
+          const pedGeo = new THREE.CylinderGeometry(0.32, 0.38, 0.9, 24);
+          const pedMat = new THREE.MeshStandardMaterial({
+            color: 0xfaf7f2,
+            roughness: 0.3,
+            metalness: 0.15,
+          });
+          const pedMesh = new THREE.Mesh(pedGeo, pedMat);
+          pedMesh.position.set(wallX + flankOffset, 0.45, 1.2);
+          pedMesh.castShadow = true;
+          decorGroup.add(pedMesh);
+
+          const urnGeo = new THREE.SphereGeometry(0.24, 16, 16);
+          urnGeo.scale(1, 1.4, 1);
+          const urnMat = new THREE.MeshStandardMaterial({
+            color: 0xd4af37,
+            roughness: 0.25,
+            metalness: 0.75,
+          });
+          const urnMesh = new THREE.Mesh(urnGeo, urnMat);
+          urnMesh.position.set(wallX + flankOffset, 1.15, 1.2);
+          decorGroup.add(urnMesh);
+        });
+      }
+    } else if (env.decorType === "atelier-brass") {
+      // Traditional Indian Brass Urlis & Floor Lamps on room flanks
+      for (let w = 0; w < numWalls; w++) {
+        const wallX = w * wallSpacing;
+        [-5.6, 5.6].forEach((flankOffset) => {
+          const urliGeo = new THREE.CylinderGeometry(0.45, 0.25, 0.22, 24);
+          const urliMat = new THREE.MeshStandardMaterial({
+            color: 0xd4af37,
+            roughness: 0.35,
+            metalness: 0.8,
+          });
+          const urliMesh = new THREE.Mesh(urliGeo, urliMat);
+          urliMesh.position.set(wallX + flankOffset, 0.11, 1.0);
+          urliMesh.castShadow = true;
+          decorGroup.add(urliMesh);
+
+          const candleLight = new THREE.PointLight(0xffaa33, 0.8, 3.5);
+          candleLight.position.set(wallX + flankOffset, 0.25, 1.0);
+          decorGroup.add(candleLight);
+        });
+      }
+    } else if (env.decorType === "salon-bench") {
+      // Classical collector upholstered salon bench
+      for (let w = 0; w < numWalls; w++) {
+        const benchX = w * wallSpacing;
+        const cushionGeo = new THREE.BoxGeometry(2.2, 0.38, 0.7);
+        const cushionMat = new THREE.MeshStandardMaterial({
+          color: 0x4a3b32,
+          roughness: 0.85,
+          metalness: 0.05,
+        });
+        const cushionMesh = new THREE.Mesh(cushionGeo, cushionMat);
+        cushionMesh.position.set(benchX, 0.25, 4.2);
+        cushionMesh.castShadow = true;
+        decorGroup.add(cushionMesh);
+      }
+    } else if (env.decorType === "villa-urn") {
+      // Terracotta amphora urns on far flanks
+      for (let w = 0; w < numWalls; w++) {
+        const wallX = w * wallSpacing;
+        [-5.7, 5.7].forEach((flankOffset) => {
+          const urnGeo = new THREE.CylinderGeometry(0.28, 0.18, 0.8, 16);
+          const urnMat = new THREE.MeshStandardMaterial({
+            color: 0x9c5134,
+            roughness: 0.9,
+            metalness: 0.05,
+          });
+          const urnMesh = new THREE.Mesh(urnGeo, urnMat);
+          urnMesh.position.set(wallX + flankOffset, 0.4, 1.1);
+          decorGroup.add(urnMesh);
+        });
+      }
+    } else if (env.decorType === "corporate-bench") {
+      // Sleek brushed steel & black leather bench
+      for (let w = 0; w < numWalls; w++) {
+        const benchX = w * wallSpacing;
+        const benchGeo = new THREE.BoxGeometry(2.5, 0.38, 0.6);
+        const benchMat = new THREE.MeshStandardMaterial({
+          color: 0x0f172a,
+          roughness: 0.7,
+          metalness: 0.3,
+        });
+        const benchMesh = new THREE.Mesh(benchGeo, benchMat);
+        benchMesh.position.set(benchX, 0.19, 4.2);
+        benchMesh.castShadow = true;
+        decorGroup.add(benchMesh);
+      }
+    }
+    scene.add(decorGroup);
+
     // Build Artwork Meshes & Frames with Aspect-Ratio Precision
     const artworkMeshes: {
       mesh: THREE.Mesh;
@@ -1048,15 +1185,10 @@ export function ExhibitionWallBlock({
       const delta = state.clock.getDelta();
       const elapsed = state.clock.getElapsedTime();
 
-      // Smooth camera interpolation with damp
-      state.camera.position.x = THREE.MathUtils.damp(state.camera.position.x, state.targetCamPos.x, 3.2, delta);
-      state.camera.position.y = THREE.MathUtils.damp(state.camera.position.y, state.targetCamPos.y, 3.2, delta);
-      state.camera.position.z = THREE.MathUtils.damp(state.camera.position.z, state.targetCamPos.z, 3.2, delta);
-
-      state.currentLookAt.x = THREE.MathUtils.damp(state.currentLookAt.x, state.targetLookAt.x, 3.5, delta);
-      state.currentLookAt.y = THREE.MathUtils.damp(state.currentLookAt.y, state.targetLookAt.y, 3.5, delta);
-      state.currentLookAt.z = THREE.MathUtils.damp(state.currentLookAt.z, state.targetLookAt.z, 3.5, delta);
-
+      // Smooth camera interpolation with damped cubic lerp (delta * 3.5)
+      const lerpFactor = Math.min(1.0, delta * 3.5);
+      state.camera.position.lerp(state.targetCamPos, lerpFactor);
+      state.currentLookAt.lerp(state.targetLookAt, lerpFactor);
       state.camera.lookAt(state.currentLookAt);
 
       // Keep main spotlight tracking camera center
@@ -1072,6 +1204,7 @@ export function ExhibitionWallBlock({
       const isStepOverview = step.type === "overview";
       const stepWall = step.wallIndex;
       const targetArtIdx = step.type === "artwork" ? step.artworkIndex : -1;
+      const dissolveRate = cameraTransitionStyle === "crossfade" ? 2.5 : 5.0;
 
       state.artworkMeshes.forEach((art) => {
         let targetOpacity = 0.0;
@@ -1085,7 +1218,7 @@ export function ExhibitionWallBlock({
 
         art.materials.forEach((mat) => {
           if ("opacity" in mat) {
-            mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, Math.min(1, delta * 5.0));
+            mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, Math.min(1, delta * dissolveRate));
             mat.visible = mat.opacity > 0.01;
           }
         });
@@ -1115,7 +1248,7 @@ export function ExhibitionWallBlock({
         threeRef.current.renderer.dispose();
       }
     };
-  }, [placements, env, activeTourStyle, isCustomBackdrop, numWalls]);
+  }, [placements, env, activeTourStyle, isCustomBackdrop, numWalls, cameraTransitionStyle]);
 
   // Update Environment Lighting dynamically
   React.useEffect(() => {
@@ -1145,7 +1278,7 @@ export function ExhibitionWallBlock({
 
     if (isOverview) {
       const wallCenterX = activeWallIndex * 14.0;
-      state.targetCamPos.set(wallCenterX, 2.4, 8.8);
+      state.targetCamPos.set(wallCenterX, 2.6, 9.6);
       state.targetLookAt.set(wallCenterX, 2.4, 0);
     } else if (activePlacement) {
       const frameH = activePlacement.height + 0.16;
@@ -1161,7 +1294,14 @@ export function ExhibitionWallBlock({
         (containerRef.current?.clientWidth || (typeof window !== "undefined" ? window.innerWidth : 1024)) < 768;
       const sideShiftX = isMobileViewport ? 0 : idealDistance * Math.tan(vFovRad / 2) * aspect * 0.28;
 
-      if (activeTourStyle === "inspection") {
+      if (cameraTransitionStyle === "dolly") {
+        state.targetCamPos.set(
+          activePlacement.x + sideShiftX,
+          2.0,
+          Math.max(idealDistance * 0.9, 1.8)
+        );
+        state.targetLookAt.set(activePlacement.x + sideShiftX, activePlacement.y, 0);
+      } else if (activeTourStyle === "inspection") {
         state.targetCamPos.set(
           activePlacement.x + sideShiftX * 0.4,
           activePlacement.y,
@@ -1184,7 +1324,7 @@ export function ExhibitionWallBlock({
         state.targetLookAt.set(activePlacement.x + sideShiftX, activePlacement.y, 0);
       }
     }
-  }, [tourStepIdx, isOverview, activeWallIndex, activePlacement, activeTourStyle]);
+  }, [tourStepIdx, isOverview, activeWallIndex, activePlacement, activeTourStyle, cameraTransitionStyle]);
 
   // Director-Driven Multi-Wall Autoplay Tour Sequencer:
   // Loops across Wall 0 Overview -> Wall 0 pieces -> Wall 1 Overview -> Wall 1 pieces -> ...
@@ -1257,6 +1397,19 @@ export function ExhibitionWallBlock({
       setIsFullscreen(false);
     }
   };
+
+  if (!isMounted) {
+    return (
+      <div className={cn("w-full flex flex-col", className)}>
+        <div className="relative w-full rounded-2xl overflow-hidden border border-border/60 bg-stone-950 flex items-center justify-center h-[540px] sm:h-[640px] shadow-2xl">
+          <div className="flex flex-col items-center gap-3 text-stone-400">
+            <div className="w-8 h-8 rounded-full border-2 border-amber-500/40 border-t-amber-500 animate-spin" />
+            <span className="text-xs font-serif tracking-widest uppercase text-stone-300">Initializing 3D Exhibition Salon...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (validItems.length === 0) {
     return (
@@ -1476,10 +1629,39 @@ export function ExhibitionWallBlock({
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
+
+        {/* Mobile Floating Provenance Drawer (Viewport < 768px) */}
+        {!isOverview && activePlacement && (
+          <div className="md:hidden absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-white/95 dark:bg-stone-900/95 border border-stone-200 dark:border-stone-800 shadow-2xl backdrop-blur-md z-30 flex items-center justify-between gap-3 text-left animate-in fade-in slide-in-from-bottom-2">
+            <div className="min-w-0 flex-1">
+              <span className="text-[9px] font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400 block truncate">
+                {activePlacement.item.artwork?.traditionalSchool || activePlacement.item.traditionalSchool || "Curated Artwork"}
+              </span>
+              <h4 className="text-xs font-serif font-bold text-stone-900 dark:text-stone-100 truncate">
+                {activePlacement.item.title || activePlacement.item.artwork?.title || "Masterwork"}
+              </h4>
+              <p className="text-[10px] text-stone-600 dark:text-stone-400 font-mono truncate">
+                {[activePlacement.item.artwork?.medium || activePlacement.item.medium, activePlacement.item.artwork?.dimensions || activePlacement.item.dimensions].filter(Boolean).join(" • ")}
+              </p>
+            </div>
+            {(() => {
+              const mSlug = activePlacement.item.artwork?.slug || activePlacement.item.slug || (activePlacement.item.linkType === "artwork" ? activePlacement.item.linkTarget : null);
+              const mHref = mSlug ? (mSlug.startsWith("/") ? mSlug : `/artwork/${mSlug}`) : activePlacement.item.linkTarget || null;
+              return mHref ? (
+                <Link
+                  href={mHref}
+                  className="px-3 py-1.5 rounded-lg text-[10px] font-serif font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shrink-0 shadow-xs cursor-pointer"
+                >
+                  Details
+                </Link>
+              ) : null;
+            })()}
+          </div>
+        )}
       </div>
 
-      {/* Artwork details (Title, Medium, Dimensions) ONLY rendered below the exhibition container in standard HTML flow */}
-      {!isFullscreen && activePlacement && (() => {
+      {/* Artwork details (Title, Medium, Dimensions) rendered below the exhibition container if enabled */}
+      {!isFullscreen && showMetadataCardBelowWall && activePlacement && (() => {
         const activeArtwork = activePlacement.item;
         const artworkSlug =
           activeArtwork.artwork?.slug ||
@@ -1511,7 +1693,7 @@ export function ExhibitionWallBlock({
 
         return (
           <div
-            className="w-full max-w-4xl mx-auto mt-6 p-6 sm:p-7 rounded-2xl border border-border/70 bg-card text-card-foreground shadow-xl transition-all text-left"
+            className="w-full max-w-4xl mx-auto mt-6 p-6 sm:p-7 rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xl transition-all text-left"
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
@@ -1530,7 +1712,7 @@ export function ExhibitionWallBlock({
               </div>
               {artworkHref && (
                 <Link
-                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs font-serif font-semibold tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 transition-all shrink-0 cursor-pointer shadow-sm"
+                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs font-serif font-semibold tracking-wider bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white transition-all shrink-0 cursor-pointer shadow-sm border border-transparent dark:border-slate-300"
                   href={artworkHref}
                 >
                   View Details

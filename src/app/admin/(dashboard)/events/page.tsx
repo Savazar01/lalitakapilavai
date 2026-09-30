@@ -19,7 +19,6 @@ import {
   QrCode,
   Download,
   History,
-  CheckCircle2,
   Eye,
   EyeOff,
   Home,
@@ -40,7 +39,7 @@ import {
 import { toast } from "sonner";
 import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { EventFormModal, EventFormData } from "@/components/admin/event-form-modal";
+import { EventFormModal, EventFormData, type EventDailySchedule, type EventRsvpConfig } from "@/components/admin/event-form-modal";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
 import { formatEventSchedule } from "@/lib/geo-timezone";
 import { formatCurrency } from "@/lib/formatters";
@@ -106,8 +105,8 @@ interface EventItem {
   contactName?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;
-  dailySchedules?: any;
-  rsvpConfig?: any;
+  dailySchedules?: EventDailySchedule[] | null;
+  rsvpConfig?: EventRsvpConfig | null;
   _count?: { registrations: number; artworks: number };
 }
 
@@ -214,6 +213,8 @@ export default function EventsAdminPage() {
           contactEmail: fullEvent.contactEmail || "",
           contactPhone: fullEvent.contactPhone || "",
           artworkIds: fullEvent.artworks?.map((a: { artworkId: string }) => a.artworkId) || [],
+          dailySchedules: Array.isArray(fullEvent.dailySchedules) ? fullEvent.dailySchedules : [],
+          rsvpConfig: fullEvent.rsvpConfig || null,
         });
       } else {
         setEditingEvent(ev as unknown as EventFormData);
@@ -374,13 +375,15 @@ export default function EventsAdminPage() {
       
       const artworksList: PlacardArtwork[] = (data.artworks || [])
         .filter((item: { artwork?: { id: string } }) => Boolean(item && item.artwork))
-        .map((item: { artwork: { id: string; title: string; slug: string; medium?: string; dimensions?: string; yearCreated?: number; primaryImageUrl?: string; category?: { name: string } | null; description?: string } }) => ({
+        .map((item: { artwork: { id: string; title: string; slug: string; medium?: string; dimensions?: string; yearCreated?: number; primaryImageUrl?: string; category?: { name: string } | null; description?: string; price?: number | string | null; currency?: string } }) => ({
           id: item.artwork.id,
           title: item.artwork.title,
           slug: item.artwork.slug,
           medium: item.artwork.medium,
           dimensions: item.artwork.dimensions,
           yearCreated: item.artwork.yearCreated,
+          price: item.artwork.price,
+          currency: item.artwork.currency || "INR",
           category: item.artwork.category ? { name: item.artwork.category.name } : undefined,
           primaryImageUrl: item.artwork.primaryImageUrl,
           additionalNotes: undefined,
@@ -402,22 +405,22 @@ export default function EventsAdminPage() {
   };
 
   // Date Segmentation Logic
-  const now = new Date();
-  const isPast = (ev: EventItem) => {
+  const isPast = React.useCallback((ev: EventItem) => {
     if (ev.statusOverride === "FORCE_PAST") return true;
     if (ev.statusOverride === "FORCE_UPCOMING") return false;
+    const now = new Date();
     const compareDate = ev.endDate ? new Date(ev.endDate) : new Date(ev.startDate);
     return compareDate < now;
-  };
+  }, []);
 
   const upcomingEvents = React.useMemo(
     () => events.filter((ev) => !isPast(ev)).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()),
-    [events]
+    [events, isPast]
   );
 
   const pastEvents = React.useMemo(
     () => events.filter((ev) => isPast(ev)).sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()),
-    [events]
+    [events, isPast]
   );
 
   const displayedEvents = React.useMemo(() => {

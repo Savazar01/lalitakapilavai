@@ -26,6 +26,11 @@ export interface EventRsvpConfig {
   maxGuestsPerRsvp?: number;
   submitButtonLabel?: string;
   successMessage?: string;
+  requireDateSelection?: boolean; // Default true
+  allowMultipleDates?: boolean; // Default false
+  timeSlotRequirement?: "MANDATORY" | "OPTIONAL" | "DISABLED"; // Default "MANDATORY"
+  slotIntervalMinutes?: number; // 15, 30, 45, 60, 120, or custom
+  slotCapacity?: number | null;
   customFields?: EventRsvpCustomField[];
 }
 
@@ -63,23 +68,25 @@ function formatTime12h(timeStr: string): string {
   return `${h}:${mFormatted} ${ampm}`;
 }
 
-function generateTimeSlots(startTime: string, endTime: string): string[] {
-  const [startH, startM] = startTime.split(":").map((v) => parseInt(v, 10));
-  const [endH, endM] = endTime.split(":").map((v) => parseInt(v, 10));
+function generateTimeSlots(startTime: string, endTime: string, intervalMinutes: number = 30): string[] {
+  const [startH, startM] = (startTime || "10:00").split(":").map((v) => parseInt(v, 10));
+  const [endH, endM] = (endTime || "18:00").split(":").map((v) => parseInt(v, 10));
 
   const startTotalMinutes = (isNaN(startH) ? 10 : startH) * 60 + (isNaN(startM) ? 0 : startM);
   let endTotalMinutes = (isNaN(endH) ? 18 : endH) * 60 + (isNaN(endM) ? 0 : endM);
 
+  const step = Math.max(5, intervalMinutes || 30);
+
   if (endTotalMinutes <= startTotalMinutes) {
-    endTotalMinutes = startTotalMinutes + 60;
+    endTotalMinutes = startTotalMinutes + step;
   }
 
   const slots: string[] = [];
-  for (let min = startTotalMinutes; min + 30 <= endTotalMinutes; min += 30) {
+  for (let min = startTotalMinutes; min + step <= endTotalMinutes; min += step) {
     const slotStartH = Math.floor(min / 60);
     const slotStartM = min % 60;
-    const slotEndH = Math.floor((min + 30) / 60);
-    const slotEndM = (min + 30) % 60;
+    const slotEndH = Math.floor((min + step) / 60);
+    const slotEndM = (min + step) % 60;
 
     const slotStartStr = `${String(slotStartH).padStart(2, "0")}:${String(slotStartM).padStart(2, "0")}`;
     const slotEndStr = `${String(slotEndH).padStart(2, "0")}:${String(slotEndM).padStart(2, "0")}`;
@@ -114,13 +121,27 @@ export function EventRsvpForm({
 
   // Multi-Day & Slot Booking State
   const hasDailySchedules = Array.isArray(dailySchedules) && dailySchedules.length > 0;
-  const [selectedDayIdx, setSelectedDayIdx] = React.useState(0);
+  const allowMultipleDates = rsvpConfig?.allowMultipleDates === true;
+  const requireDateSelection = rsvpConfig?.requireDateSelection !== false;
+  const slotRequirement = rsvpConfig?.timeSlotRequirement || "MANDATORY";
+  const slotInterval = rsvpConfig?.slotIntervalMinutes || 30;
+
+  const [selectedDates, setSelectedDates] = React.useState<string[]>(() => {
+    if (hasDailySchedules && dailySchedules[0]?.date) {
+      return [dailySchedules[0].date];
+    }
+    return [];
+  });
+  const [activeDayIdx, setActiveDayIdx] = React.useState(0);
   const [selectedSlot, setSelectedSlot] = React.useState<string>("");
 
-  // Determine active date and start/end time window
+  // Determine active date string for single or primary date
   const activeDate = React.useMemo(() => {
+    if (selectedDates.length > 0) {
+      return selectedDates.join(", ");
+    }
     if (hasDailySchedules) {
-      return dailySchedules[selectedDayIdx]?.date || "";
+      return dailySchedules[activeDayIdx]?.date || "";
     }
     if (startDate) {
       try {
@@ -130,12 +151,14 @@ export function EventRsvpForm({
       }
     }
     return "";
-  }, [hasDailySchedules, dailySchedules, selectedDayIdx, startDate]);
+  }, [selectedDates, hasDailySchedules, dailySchedules, activeDayIdx, startDate]);
 
   const activeSlots = React.useMemo(() => {
+    if (slotRequirement === "DISABLED") return [];
+
     if (hasDailySchedules) {
-      const day = dailySchedules[selectedDayIdx];
-      return generateTimeSlots(day?.startTime || "10:00", day?.endTime || "18:00");
+      const day = dailySchedules[activeDayIdx] || dailySchedules[0];
+      return generateTimeSlots(day?.startTime || "10:00", day?.endTime || "18:00", slotInterval);
     }
 
     let startH = "10:00";
@@ -155,8 +178,8 @@ export function EventRsvpForm({
       } catch {}
     }
 
-    return generateTimeSlots(startH, endH);
-  }, [hasDailySchedules, dailySchedules, selectedDayIdx, startDate, endDate]);
+    return generateTimeSlots(startH, endH, slotInterval);
+  }, [slotRequirement, hasDailySchedules, dailySchedules, activeDayIdx, slotInterval, startDate, endDate]);
 
   const isEnabled = rsvpConfig?.enabled !== false && isRegistrationOpen;
 
@@ -181,17 +204,40 @@ export function EventRsvpForm({
   const successMsg = rsvpConfig?.successMessage || `We look forward to welcoming you to "${eventTitle}". A confirmation has been registered with our desk.`;
   const customFields = rsvpConfig?.customFields || [];
 
+  const handleToggleDate = (dateStr: string, idx: number) => {
+    setActiveDayIdx(idx);
+    if (allowMultipleDates) {
+      setSelectedDates((prev) => {
+        if (prev.includes(dateStr)) {
+          // If unselecting, keep at least one if required
+          const updated = prev.filter((d) => d !== dateStr);
+          return updated;
+        } else {
+          return [...prev, dateStr];
+        }
+      });
+    } else {
+      setSelectedDates([dateStr]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (activeSlots.length > 0 && !selectedSlot) {
-      toast.error("Please select a 30-minute arrival time slot");
+    if (hasDailySchedules && requireDateSelection && selectedDates.length === 0) {
+      toast.error("Please select at least one attendance date");
+      return;
+    }
+
+    if (slotRequirement === "MANDATORY" && activeSlots.length > 0 && !selectedSlot) {
+      toast.error("Please select an arrival time slot");
       return;
     }
 
     setSubmitting(true);
 
     try {
+      const datesToSubmit = selectedDates.length > 0 ? selectedDates : (activeDate ? [activeDate] : []);
       const res = await fetch("/api/events/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -201,8 +247,9 @@ export function EventRsvpForm({
           attendeeEmail: email,
           attendeePhone: phone || undefined,
           ticketCount: allowGuestCount ? (parseInt(tickets, 10) || 1) : 1,
-          selectedDate: activeDate || undefined,
-          selectedSlot: selectedSlot || undefined,
+          selectedDate: datesToSubmit.join(", ") || undefined,
+          selectedDates: datesToSubmit,
+          selectedSlot: selectedSlot || (slotRequirement === "OPTIONAL" ? "Anytime / Flexible Arrival" : undefined),
           customAnswers: Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
         }),
       });
@@ -230,11 +277,16 @@ export function EventRsvpForm({
           RSVP Confirmed
         </CardTitle>
         <div className="space-y-1 text-xs text-muted-foreground">
-          {activeDate && (
+          {selectedDates.length > 0 ? (
+            <p className="font-medium text-foreground">
+              Date{selectedDates.length > 1 ? "s" : ""}:{" "}
+              <span className="font-mono text-primary">{selectedDates.join(", ")}</span>
+            </p>
+          ) : activeDate ? (
             <p className="font-medium text-foreground">
               Date: <span className="font-mono text-primary">{activeDate}</span>
             </p>
-          )}
+          ) : null}
           {selectedSlot && (
             <p className="font-medium text-foreground">
               Time Slot: <span className="font-mono text-primary">{selectedSlot}</span>
@@ -269,23 +321,27 @@ export function EventRsvpForm({
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-3 text-left">
           {/* Multi-Day Schedule Selector */}
-          {hasDailySchedules && dailySchedules && dailySchedules.length > 1 && (
+          {hasDailySchedules && dailySchedules && dailySchedules.length > 0 && (
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-primary" />
-                Select Attendance Day *
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-primary" />
+                  {allowMultipleDates ? "Select Attendance Dates (Multi-Select)" : "Select Attendance Date"} {requireDateSelection && "*"}
+                </label>
+                {allowMultipleDates && (
+                  <span className="text-[10px] text-muted-foreground font-mono">
+                    {selectedDates.length} day{selectedDates.length === 1 ? "" : "s"} selected
+                  </span>
+                )}
+              </div>
               <div className="space-y-1.5">
                 {dailySchedules.map((day, idx) => {
-                  const isDaySelected = selectedDayIdx === idx;
+                  const isDaySelected = selectedDates.includes(day.date);
                   return (
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => {
-                        setSelectedDayIdx(idx);
-                        setSelectedSlot("");
-                      }}
+                      onClick={() => handleToggleDate(day.date, idx)}
                       className={cn(
                         "w-full text-left p-2.5 rounded-lg border text-xs transition-all flex items-center justify-between cursor-pointer",
                         isDaySelected
@@ -293,17 +349,27 @@ export function EventRsvpForm({
                           : "border-border/80 bg-background hover:border-primary/40 text-muted-foreground"
                       )}
                     >
-                      <div>
-                        <span className="block text-foreground font-medium">
-                          {day.label || `Day ${idx + 1}`}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground font-mono">
-                          {new Date(day.date + "T00:00:00").toLocaleDateString(undefined, {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
+                      <div className="flex items-center gap-2">
+                        {allowMultipleDates && (
+                          <input
+                            type="checkbox"
+                            checked={isDaySelected}
+                            readOnly
+                            className="w-3.5 h-3.5 accent-primary rounded pointer-events-none"
+                          />
+                        )}
+                        <div>
+                          <span className="block text-foreground font-medium">
+                            {day.label || `Day ${idx + 1}`}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground font-mono">
+                            {new Date(day.date + "T00:00:00").toLocaleDateString(undefined, {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
+                        </div>
                       </div>
                       <span className="text-[11px] font-mono text-primary font-medium">
                         {formatTime12h(day.startTime)} – {formatTime12h(day.endTime)}
@@ -315,20 +381,40 @@ export function EventRsvpForm({
             </div>
           )}
 
-          {/* 30-Minute Dynamic Time Slots */}
-          {activeSlots.length > 0 && (
+          {/* Dynamic Time Slots (Mandatory or Optional) */}
+          {slotRequirement !== "DISABLED" && activeSlots.length > 0 && (
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-primary" />
-                  Select 30-Minute Time Slot *
+                  Select Time Slot {slotRequirement === "MANDATORY" ? "*" : "(Optional)"}
                 </label>
                 {selectedSlot ? (
                   <span className="text-[10px] font-mono text-primary font-bold">Selected</span>
-                ) : (
+                ) : slotRequirement === "MANDATORY" ? (
                   <span className="text-[10px] text-destructive font-mono">* Required</span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground font-mono">Optional</span>
                 )}
               </div>
+
+              {slotRequirement === "OPTIONAL" && (
+                <div className="mb-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSlot("Anytime / Flexible Arrival")}
+                    className={cn(
+                      "w-full py-1.5 px-3 rounded-md border text-xs font-medium transition-all text-center cursor-pointer",
+                      selectedSlot === "Anytime / Flexible Arrival"
+                        ? "border-primary bg-primary text-primary-foreground font-bold shadow-xs"
+                        : "border-border/80 bg-background hover:border-primary/50 text-foreground"
+                    )}
+                  >
+                    ✨ Anytime / Flexible Arrival (Full Day Access)
+                  </button>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-1.5 max-h-36 overflow-y-auto pr-1">
                 {activeSlots.map((slot) => {
                   const isSlotSelected = selectedSlot === slot;

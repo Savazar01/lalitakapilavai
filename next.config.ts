@@ -4,6 +4,7 @@ import path from "path";
 const nextConfig: NextConfig = {
   output: "standalone",
   serverExternalPackages: ["sharp", "heic-convert"],
+  transpilePackages: ["lucide-react", "three", "@react-three/fiber", "@react-three/drei"],
   outputFileTracingRoot: path.join(__dirname, "./"),
   typescript: {
     // Type-checking is strictly validated in Step 1 of quality gates prior to push

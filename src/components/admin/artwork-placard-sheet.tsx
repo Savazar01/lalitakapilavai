@@ -20,7 +20,11 @@ import {
   ArrowUp,
   ArrowDown,
   DollarSign,
+  Save,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { formatCurrency } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import {
@@ -177,9 +181,55 @@ export function ArtworkPlacardSheet({
   // Active View Tab: "preview" vs "edit"
   const [activeTab, setActiveTab] = React.useState<"preview" | "edit">("preview");
 
-  // Editable In-Modal Card Data Overrides
-  const [userOverrides, setUserOverrides] = React.useState<Record<string, Partial<EditablePlacardItem>>>({});
+  // Editable In-Modal Card Data Overrides with LocalStorage Persistence
+  const [userOverrides, setUserOverrides] = React.useState<Record<string, Partial<EditablePlacardItem>>>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("savazai_placard_card_overrides");
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return {};
+  });
   const [globalArtistName, setGlobalArtistName] = React.useState(defaultArtistName);
+
+  // Live Artwork Synchronization State
+  const [liveArtworkData, setLiveArtworkData] = React.useState<Record<string, { price?: number | null; currency?: string | null }>>({});
+  const [syncingPrices, setSyncingPrices] = React.useState(false);
+  const [savingOverrides, setSavingOverrides] = React.useState(false);
+
+  // Auto-sync live prices and currencies from artworks API on open
+  React.useEffect(() => {
+    if (!open) return;
+    let active = true;
+    const syncLiveArtworks = async () => {
+      try {
+        setSyncingPrices(true);
+        const res = await fetch("/api/admin/artworks?limit=200");
+        if (res.ok) {
+          const data = await res.json();
+          const arts: Array<{ id: string; price?: number | null; currency?: string | null }> = data.artworks || data || [];
+          if (active && Array.isArray(arts)) {
+            const map: Record<string, { price?: number | null; currency?: string | null }> = {};
+            arts.forEach((a) => {
+              if (a.id) {
+                map[a.id] = { price: a.price, currency: a.currency };
+              }
+            });
+            setLiveArtworkData(map);
+          }
+        }
+      } catch (e) {
+        console.warn("Could not sync live prices for placards:", e);
+      } finally {
+        if (active) setSyncingPrices(false);
+      }
+    };
+    syncLiveArtworks();
+    return () => {
+      active = false;
+    };
+  }, [open]);
 
   // QR Code batch mapping
   const [qrCodeDataUrls, setQrCodeDataUrls] = React.useState<Record<string, string>>({});
@@ -199,6 +249,16 @@ export function ArtworkPlacardSheet({
   const getItemData = React.useCallback(
     (art: PlacardArtwork): EditablePlacardItem => {
       const over = userOverrides[art.id] || {};
+      const live = liveArtworkData[art.id];
+      const effectivePrice = over.price !== undefined
+        ? over.price
+        : live?.price !== undefined && live.price !== null
+        ? String(live.price)
+        : art.price !== undefined && art.price !== null
+        ? String(art.price)
+        : "";
+      const effectiveCurrency = over.currency || live?.currency || art.currency || "INR";
+
       return {
         id: art.id,
         title: over.title ?? art.title ?? "",
@@ -207,14 +267,14 @@ export function ArtworkPlacardSheet({
         medium: over.medium ?? art.medium ?? "22k Gold Foil, Gesso, Teak Wood",
         dimensions: over.dimensions ?? art.dimensions ?? "",
         year: over.year ?? (art.yearCreated ? String(art.yearCreated) : ""),
-        price: over.price ?? (art.price ? String(art.price) : ""),
-        currency: over.currency ?? art.currency ?? "INR",
+        price: effectivePrice,
+        currency: effectiveCurrency,
         additionalNotes: over.additionalNotes ?? art.additionalNotes ?? art.description ?? "",
         thumbnail: over.thumbnail ?? art.watermarkedWebpUrl ?? art.primaryImageUrl,
         slug: over.slug ?? art.slug ?? "",
       };
     },
-    [userOverrides, globalArtistName]
+    [userOverrides, liveArtworkData, globalArtistName]
   );
 
   // Generate QR codes for all artworks in batch
@@ -257,13 +317,21 @@ export function ArtworkPlacardSheet({
   }, [open, artworks]);
 
   const updateCardItem = (id: string, field: keyof EditablePlacardItem, value: string) => {
-    setUserOverrides((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        [field]: value,
-      },
-    }));
+    setUserOverrides((prev) => {
+      const next = {
+        ...prev,
+        [id]: {
+          ...prev[id],
+          [field]: value,
+        },
+      };
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("savazai_placard_card_overrides", JSON.stringify(next));
+        } catch {}
+      }
+      return next;
+    });
   };
 
   const applyGlobalArtistToAll = () => {
@@ -272,8 +340,56 @@ export function ArtworkPlacardSheet({
       for (const art of artworks) {
         next[art.id] = { ...next[art.id], artistName: globalArtistName };
       }
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("savazai_placard_card_overrides", JSON.stringify(next));
+        } catch {}
+      }
       return next;
     });
+    toast.success("Applied artist credit to all display cards");
+  };
+
+  const handleSaveCustomizationsToDb = async () => {
+    const modifiedIds = Object.keys(userOverrides);
+    if (modifiedIds.length === 0) {
+      toast.info("No card customizations to save yet.");
+      return;
+    }
+    setSavingOverrides(true);
+    try {
+      let savedCount = 0;
+      for (const id of modifiedIds) {
+        const over = userOverrides[id];
+        if (!over) continue;
+        const payload: Record<string, unknown> = {};
+        if (over.title) payload.title = over.title;
+        if (over.medium) payload.medium = over.medium;
+        if (over.dimensions) payload.dimensions = over.dimensions;
+        if (over.year) payload.yearCreated = over.year;
+        if (over.price !== undefined) {
+          const cleanNum = over.price ? parseFloat(String(over.price).replace(/[^0-9.]/g, "")) : null;
+          payload.price = isNaN(cleanNum as number) ? null : cleanNum;
+        }
+        if (over.currency) payload.currency = over.currency;
+        if (over.additionalNotes) payload.description = over.additionalNotes;
+
+        if (Object.keys(payload).length > 0) {
+          const res = await fetch(`/api/admin/artworks/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) savedCount++;
+        }
+      }
+      toast.success(`Successfully synchronized ${savedCount} card override(s) to artwork database.`);
+    } catch (e) {
+      console.error("Failed to save placard overrides to DB", e);
+      toast.error("Failed to sync some changes to database.");
+    } finally {
+      setSavingOverrides(false);
+    }
   };
 
   const handlePrint = () => {
@@ -1313,33 +1429,67 @@ export function ArtworkPlacardSheet({
               </div>
             </div>
 
-            {/* Global Artist Name Action Bar */}
-            <div className="p-3.5 rounded-xl border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-              <div className="space-y-0.5">
-                <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Apply Artist Name to All Cards
-                </Label>
-                <p className="text-[11px] text-muted-foreground">
-                  Update the artist credit across all selected display cards simultaneously.
-                </p>
+            {/* Global Actions & Sync Bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Apply Artist Name */}
+              <div className="p-3.5 rounded-xl border border-border bg-card flex flex-col justify-between gap-3 shadow-xs">
+                <div className="space-y-0.5">
+                  <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Apply Artist Name to All Cards
+                  </Label>
+                  <p className="text-[11px] text-muted-foreground">
+                    Update the artist credit across all selected display cards simultaneously.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={globalArtistName}
+                    onChange={(e) => setGlobalArtistName(e.target.value)}
+                    className="h-8 text-xs flex-1 bg-background"
+                    placeholder="e.g. Master Artist"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={applyGlobalArtistToAll}
+                    className="h-8 text-xs shrink-0 cursor-pointer border-amber-500/40 text-amber-800 dark:text-amber-200"
+                  >
+                    Apply All
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="text"
-                  value={globalArtistName}
-                  onChange={(e) => setGlobalArtistName(e.target.value)}
-                  className="h-8 text-xs w-48 bg-background"
-                  placeholder="e.g. Master Artist"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={applyGlobalArtistToAll}
-                  className="h-8 text-xs shrink-0 cursor-pointer border-amber-500/40 text-amber-800 dark:text-amber-200"
-                >
-                  Apply All
-                </Button>
+
+              {/* Save & Sync Overrides to Database */}
+              <div className="p-3.5 rounded-xl border border-border bg-card flex flex-col justify-between gap-3 shadow-xs">
+                <div className="space-y-0.5">
+                  <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                    <Save className="w-3.5 h-3.5 text-amber-600" /> Save Placard Customizations
+                  </Label>
+                  <p className="text-[11px] text-muted-foreground">
+                    Persist edited card prices, titles, dimensions, and medium directly to the database.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px] font-mono border-amber-500/40">
+                    {Object.keys(userOverrides).length} customized
+                  </Badge>
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={savingOverrides || Object.keys(userOverrides).length === 0}
+                    onClick={handleSaveCustomizationsToDb}
+                    className="h-8 text-xs ml-auto gap-1.5 bg-amber-600 hover:bg-amber-700 text-white cursor-pointer font-semibold shadow-xs"
+                  >
+                    {savingOverrides ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Save className="w-3.5 h-3.5" />
+                    )}
+                    Sync &amp; Save DB
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -1461,19 +1611,37 @@ export function ArtworkPlacardSheet({
                         />
                       </div>
 
-                      {/* Valuation / Price */}
+                      {/* Valuation / Price & Currency */}
                       <div className="space-y-1">
                         <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                           <DollarSign className="w-3 h-3 text-amber-600" />
-                          Valuation / Price
+                          Valuation &amp; Currency
                         </Label>
-                        <Input
-                          type="text"
-                          value={itemData.price || ""}
-                          onChange={(e) => updateCardItem(art.id, "price", e.target.value)}
-                          className="h-8 text-xs font-mono"
-                          placeholder="e.g. 150000 or ₹ 1,50,000"
-                        />
+                        <div className="flex items-center gap-1.5">
+                          <Input
+                            type="text"
+                            value={itemData.price || ""}
+                            onChange={(e) => updateCardItem(art.id, "price", e.target.value)}
+                            className="h-8 text-xs font-mono flex-1"
+                            placeholder="e.g. 150000"
+                          />
+                          <Select
+                            value={itemData.currency || "INR"}
+                            onValueChange={(val) => updateCardItem(art.id, "currency", val)}
+                          >
+                            <SelectTrigger className="h-8 text-xs w-24 shrink-0 bg-background">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="INR">INR (₹)</SelectItem>
+                              <SelectItem value="USD">USD ($)</SelectItem>
+                              <SelectItem value="EUR">EUR (€)</SelectItem>
+                              <SelectItem value="GBP">GBP (£)</SelectItem>
+                              <SelectItem value="AED">AED</SelectItem>
+                              <SelectItem value="SGD">SGD ($)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
 
@@ -1503,6 +1671,23 @@ export function ArtworkPlacardSheet({
             Tip: In print dialog, select &quot;Margins: None&quot; and check &quot;Background graphics&quot; for accurate double-fillet borders.
           </p>
           <div className="flex items-center gap-2">
+            {Object.keys(userOverrides).length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={savingOverrides}
+                onClick={handleSaveCustomizationsToDb}
+                className="text-xs gap-1.5 border-amber-500/40 text-amber-900 dark:text-amber-200 hover:bg-amber-500/10 cursor-pointer"
+              >
+                {savingOverrides ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Save className="w-3.5 h-3.5 text-amber-600" />
+                )}
+                Save DB Overrides ({Object.keys(userOverrides).length})
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"

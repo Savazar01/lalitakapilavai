@@ -74,23 +74,31 @@ export async function GET(request: NextRequest) {
         "Created At",
       ];
 
-      const csvRows = leads.map((l) => [
-        `"${l.id}"`,
-        `"${l.name.replace(/"/g, '""')}"`,
-        `"${l.email.replace(/"/g, '""')}"`,
-        `"${(l.phone || "").replace(/"/g, '""')}"`,
-        `"${l.status}"`,
-        `"${(l.subject || "").replace(/"/g, '""')}"`,
-        `"${(l.source || "").replace(/"/g, '""')}"`,
-        `"${(l.formTitle || "").replace(/"/g, '""')}"`,
-        `"${(l.pageSlug || "").replace(/"/g, '""')}"`,
-        `"${(l.sourceArtwork?.title || "").replace(/"/g, '""')}"`,
-        `"${(l.sourceEvent?.title || "").replace(/"/g, '""')}"`,
-        `"${String((l.customFields as Record<string, unknown> | null)?.selectedDate || "").replace(/"/g, '""')}"`,
-        `"${String((l.customFields as Record<string, unknown> | null)?.selectedSlot || "").replace(/"/g, '""')}"`,
-        `"${l.message.replace(/"/g, '""').replace(/\n/g, " ")}"`,
-        `"${new Date(l.createdAt).toISOString()}"`,
-      ]);
+      const csvRows = leads.map((l) => {
+        const customFields = l.customFields as Record<string, unknown> | null;
+        const selectedDateVal = Array.isArray(customFields?.selectedDates) && (customFields.selectedDates as string[]).length > 0
+          ? (customFields.selectedDates as string[]).join("; ")
+          : String(customFields?.selectedDate || "");
+        const selectedSlotVal = String(customFields?.selectedSlot || "");
+
+        return [
+          `"${l.id}"`,
+          `"${l.name.replace(/"/g, '""')}"`,
+          `"${l.email.replace(/"/g, '""')}"`,
+          `"${(l.phone || "").replace(/"/g, '""')}"`,
+          `"${l.status}"`,
+          `"${(l.subject || "").replace(/"/g, '""')}"`,
+          `"${(l.source || "").replace(/"/g, '""')}"`,
+          `"${(l.formTitle || "").replace(/"/g, '""')}"`,
+          `"${(l.pageSlug || "").replace(/"/g, '""')}"`,
+          `"${(l.sourceArtwork?.title || "").replace(/"/g, '""')}"`,
+          `"${(l.sourceEvent?.title || "").replace(/"/g, '""')}"`,
+          `"${selectedDateVal.replace(/"/g, '""')}"`,
+          `"${selectedSlotVal.replace(/"/g, '""')}"`,
+          `"${l.message.replace(/"/g, '""').replace(/\n/g, " ")}"`,
+          `"${new Date(l.createdAt).toISOString()}"`,
+        ];
+      });
 
       const csvContent = [headers.join(","), ...csvRows.map((r) => r.join(","))].join("\n");
 

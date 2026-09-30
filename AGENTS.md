@@ -232,6 +232,39 @@ All code generation and architectural modifications must adhere to the specializ
   - This guarantees that Chromium or browser password managers never involuntarily inject the currently logged-in administrator's email or credentials into cloud storage or configuration input fields.
 - **Dynamic Configuration Invariant**: All branding, identities, domains, emails, and archive titles must resolve at runtime through database configuration (`SystemSetting`, `WhiteLabelConfig`, `ThemeConfig`). Zero client data shall be baked into code artifacts.
 
+### L. Multi-Day Event RSVP Interval Engine & Dynamic Attendance Tracking
+- **Configurable RSVP Settings**:
+  - `EventRsvpConfig` provides full administrative control over:
+    - `requireDateSelection` (boolean)
+    - `allowMultipleDates` (boolean, enabling multi-day selection via interactive day cards/checkboxes)
+    - `timeSlotRequirement` (`"mandatory"` | `"optional"` | `"disabled"`)
+    - `slotIntervalMinutes` (15, 30, 45, 60, 120 minutes or custom)
+    - `slotCapacity` (optional integer limit per slot).
+  - Public booking `/events/[slug]` dynamically calculates time slots per selected day using its specific `startTime` and `endTime`.
+  - For optional slot modes, a clean "Anytime / Flexible Arrival" option is provided.
+  - Submissions to `/api/events/register` persist `selectedDates` and `selectedSlot` into CRM Lead custom fields and registration models.
+  - CRM Leads table, details dialog, and CSV export display attendance dates and time slot badges.
+
+### M. 3D WebGL Exhibition Salon Wall Studio & Realistic Environments
+- **7 Procedural Architectural Environments**:
+  - `modern-minimalist`, `imperial-palace`, `indian-atelier`, `residential-salon`, `heritage-villa`, `corporate-gallery`, and `custom`.
+  - Architectural 3D decor objects (benches, fluted plinths, brass urlis, stanchions) are positioned procedurally and strictly outside artwork display bounds ($y \le 0.45\text{ m}$ or flanking perimeter) to eliminate visual occlusion.
+- **Cinematic Interpolation & Proportional Clearance**:
+  - Camera transitions use damped cubic easing (`lerp(target, delta * 3.5)` in `useFrame`) starting from wide-angle establishing shots, gliding smoothly toward focused artworks, and executing sweeping curves between adjacent corridor walls.
+  - Dynamic proportional artwork spacing enforces a mandatory $0.8\text{ m}$ minimum clearance gap between adjacent frames, eliminating visual collisions regardless of orientation.
+- **Responsive High-Contrast Presentation**:
+  - Bottom metadata placard is locked to high-contrast dark slate (`bg-slate-900 text-white`) in Light Mode, preventing black-on-black button clashes.
+  - On viewports < 768px, a floating mobile provenance drawer provides full metadata and navigation controls.
+
+### N. Placard Customizer Live Data Sync & Currency Overrides
+- **Live Price Synchronization**:
+  - Modal opening triggers automatic background synchronization from the artworks database (`/api/admin/artworks`), populating fallback valuation maps.
+  - Card-level overrides allow editing titles, medium, dimensions, year, price, and currency (INR, USD, EUR, GBP, AED, SGD).
+  - "Save Placard Customizations" persists overrides locally and synchronizes updates directly to the PostgreSQL database via `PUT /api/admin/artworks/[id]`.
+- **Sanitized Alt Text**:
+  - Media uploader and vault dialogs default alt text to an empty string `""` rather than raw filenames.
+
+
 
 
 

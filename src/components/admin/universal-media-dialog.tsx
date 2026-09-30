@@ -30,6 +30,7 @@ export interface UniversalMediaItem {
   url: string;
   originalFileName?: string;
   title?: string;
+  alt?: string;
   artworkId?: string;
   slug?: string;
   medium?: string;
@@ -150,6 +151,7 @@ export function UniversalMediaDialog({
       url: item.url,
       originalFileName: item.fileName,
       title: item.title,
+      alt: "",
       artworkId: item.source === "artwork" ? item.id : undefined,
       slug: item.slug,
       medium: item.medium,
@@ -224,6 +226,7 @@ export function UniversalMediaDialog({
           url: finalUrl,
           originalFileName: file.name,
           title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+          alt: "",
         });
       }
 
@@ -253,6 +256,7 @@ export function UniversalMediaDialog({
       url: remoteUrl.trim(),
       originalFileName: remoteUrl.trim().split("/").pop()?.split("?")[0],
       title: remoteTitle.trim() || undefined,
+      alt: "",
     };
 
     if (allowMultiple && onSelectMultiple) {

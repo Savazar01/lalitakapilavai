@@ -169,6 +169,8 @@ interface ArtworkOption {
   medium: string | null;
   dimensions: string | null;
   yearCreated: number | null;
+  price?: number | string | null;
+  currency?: string | null;
   category?: {
     name: string;
   };
@@ -446,6 +448,8 @@ export default function AdminCatalogStudioPage() {
         medium: plate.artwork.medium || undefined,
         dimensions: plate.artwork.dimensions || undefined,
         yearCreated: plate.artwork.yearCreated || undefined,
+        price: plate.artwork.price ?? undefined,
+        currency: plate.artwork.currency ?? "INR",
         category: plate.artwork.category ? { name: plate.artwork.category.name } : undefined,
         primaryImageUrl: plate.artwork.primaryImageUrl,
         additionalNotes: plate.curatorialNote || undefined,

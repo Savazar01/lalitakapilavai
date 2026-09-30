@@ -77,6 +77,11 @@ export interface EventRsvpConfig {
   maxGuestsPerRsvp?: number;
   submitButtonLabel?: string;
   successMessage?: string;
+  requireDateSelection?: boolean; // Default true
+  allowMultipleDates?: boolean; // Default false (allow multi-date selection)
+  timeSlotRequirement?: "MANDATORY" | "OPTIONAL" | "DISABLED"; // Default "MANDATORY"
+  slotIntervalMinutes?: number; // 15, 30, 45, 60, 120, or custom
+  slotCapacity?: number | null; // Max attendees per slot
   customFields?: EventRsvpCustomField[];
 }
 
@@ -298,6 +303,26 @@ function EventFormContent({
   const [rsvpSuccessMessage, setRsvpSuccessMessage] = React.useState<string>(
     initialRsvpConfig.successMessage || "We look forward to welcoming you. A confirmation has been registered with our desk."
   );
+  const [rsvpRequireDateSelection, setRsvpRequireDateSelection] = React.useState<boolean>(
+    initialRsvpConfig.requireDateSelection !== false
+  );
+  const [rsvpAllowMultipleDates, setRsvpAllowMultipleDates] = React.useState<boolean>(
+    initialRsvpConfig.allowMultipleDates === true
+  );
+  const [rsvpTimeSlotRequirement, setRsvpTimeSlotRequirement] = React.useState<"MANDATORY" | "OPTIONAL" | "DISABLED">(
+    initialRsvpConfig.timeSlotRequirement || "MANDATORY"
+  );
+  const [rsvpSlotIntervalMinutes, setRsvpSlotIntervalMinutes] = React.useState<number>(
+    initialRsvpConfig.slotIntervalMinutes ?? 30
+  );
+  const [rsvpCustomSlotInterval, setRsvpCustomSlotInterval] = React.useState<string>(
+    initialRsvpConfig.slotIntervalMinutes && ![15, 30, 45, 60, 120].includes(initialRsvpConfig.slotIntervalMinutes)
+      ? String(initialRsvpConfig.slotIntervalMinutes)
+      : ""
+  );
+  const [rsvpSlotCapacity, setRsvpSlotCapacity] = React.useState<string>(
+    initialRsvpConfig.slotCapacity ? String(initialRsvpConfig.slotCapacity) : ""
+  );
   const [rsvpCustomFields, setRsvpCustomFields] = React.useState<EventRsvpCustomField[]>(
     initialRsvpConfig.customFields || []
   );
@@ -411,7 +436,7 @@ function EventFormContent({
             url: imgUrl,
             title: cleanName,
             caption: "",
-            alt: cleanName,
+            alt: "",
             linkType: "none",
             linkTarget: "",
           });
@@ -587,6 +612,14 @@ function EventFormContent({
         maxGuestsPerRsvp: rsvpMaxGuests,
         submitButtonLabel: rsvpButtonLabel,
         successMessage: rsvpSuccessMessage,
+        requireDateSelection: rsvpRequireDateSelection,
+        allowMultipleDates: rsvpAllowMultipleDates,
+        timeSlotRequirement: rsvpTimeSlotRequirement,
+        slotIntervalMinutes:
+          rsvpSlotIntervalMinutes === 0
+            ? parseInt(rsvpCustomSlotInterval, 10) || 30
+            : rsvpSlotIntervalMinutes,
+        slotCapacity: rsvpSlotCapacity ? parseInt(rsvpSlotCapacity, 10) : null,
         customFields: rsvpCustomFields,
       },
       dailySchedules: dailySchedules.length > 0 ? dailySchedules : null,
@@ -1090,6 +1123,85 @@ function EventFormContent({
                     ))}
                   </div>
                 )}
+
+                {/* Quick Scheduling Controls */}
+                <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <Sliders className="w-3.5 h-3.5 text-primary" />
+                      RSVP Scheduling Rules for Defined Dates
+                    </span>
+                    <Badge variant="outline" className="text-[10px] font-mono border-primary/40 text-primary">
+                      Configurable Slots
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <label className="flex items-center gap-2 text-xs font-medium text-foreground cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={rsvpRequireDateSelection}
+                        onChange={(e) => setRsvpRequireDateSelection(e.target.checked)}
+                        className="w-4 h-4 accent-primary rounded cursor-pointer"
+                      />
+                      <span>Require Date Selection</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 text-xs font-medium text-foreground cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={rsvpAllowMultipleDates}
+                        onChange={(e) => setRsvpAllowMultipleDates(e.target.checked)}
+                        className="w-4 h-4 accent-primary rounded cursor-pointer"
+                      />
+                      <span>Allow Selecting Multiple Attendance Dates</span>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-primary/10">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium text-foreground block">Time Slot Requirement</label>
+                      <select
+                        value={rsvpTimeSlotRequirement}
+                        onChange={(e) => setRsvpTimeSlotRequirement(e.target.value as "MANDATORY" | "OPTIONAL" | "DISABLED")}
+                        className="w-full bg-card border border-border text-foreground text-xs rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-primary focus:outline-none"
+                      >
+                        <option value="MANDATORY">Mandatory (Guest must pick a time slot)</option>
+                        <option value="OPTIONAL">Optional (Guest may pick slot or flexible pass)</option>
+                        <option value="DISABLED">Disabled (No time slots, open attendance)</option>
+                      </select>
+                    </div>
+
+                    {rsvpTimeSlotRequirement !== "DISABLED" && (
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-medium text-foreground block">Slot Interval Duration</label>
+                        <select
+                          value={rsvpSlotIntervalMinutes}
+                          onChange={(e) => setRsvpSlotIntervalMinutes(parseInt(e.target.value, 10))}
+                          className="w-full bg-card border border-border text-foreground text-xs rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-primary focus:outline-none"
+                        >
+                          <option value={15}>15 minutes</option>
+                          <option value={30}>30 minutes</option>
+                          <option value={45}>45 minutes</option>
+                          <option value={60}>60 minutes (1 hour)</option>
+                          <option value={120}>2 hours (120 minutes)</option>
+                          <option value={0}>Custom Interval...</option>
+                        </select>
+                        {rsvpSlotIntervalMinutes === 0 && (
+                          <Input
+                            type="number"
+                            min="5"
+                            max="360"
+                            placeholder="Minutes (e.g. 90)"
+                            value={rsvpCustomSlotInterval}
+                            onChange={(e) => setRsvpCustomSlotInterval(e.target.value)}
+                            className="h-7 text-xs mt-1 font-mono"
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
@@ -1323,20 +1435,96 @@ function EventFormContent({
                       />
                     </div>
 
-                    {rsvpAllowGuestCount && (
-                      <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-border/60">
-                        <div>
-                          <span className="text-xs font-medium text-foreground block">Max Guests per RSVP</span>
-                          <span className="text-[10px] text-muted-foreground">Limit total tickets per submission</span>
+                    {/* Date Requirement Toggle */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-medium text-foreground block">Require Date Selection</span>
+                        <span className="text-[10px] text-muted-foreground">Guest must pick an attendance day</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={rsvpRequireDateSelection}
+                        onChange={(e) => setRsvpRequireDateSelection(e.target.checked)}
+                        className="w-4 h-4 accent-primary rounded cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Multi-Date Selection Toggle */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-medium text-foreground block">Allow Selecting Multiple Attendance Dates</span>
+                        <span className="text-[10px] text-muted-foreground">Allow guests to check multiple exhibition days</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={rsvpAllowMultipleDates}
+                        onChange={(e) => setRsvpAllowMultipleDates(e.target.checked)}
+                        className="w-4 h-4 accent-primary rounded cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Time Slot Requirement */}
+                    <div className="space-y-1 sm:col-span-2 pt-2 border-t border-border/60">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium text-foreground block">Time Slot Requirement</span>
+                        <span className="text-[10px] text-muted-foreground">Arrival window enforcement</span>
+                      </div>
+                      <select
+                        value={rsvpTimeSlotRequirement}
+                        onChange={(e) => setRsvpTimeSlotRequirement(e.target.value as "MANDATORY" | "OPTIONAL" | "DISABLED")}
+                        className="w-full bg-card border border-border text-foreground text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-primary focus:outline-none"
+                      >
+                        <option value="MANDATORY">Mandatory (Guest must pick a time slot)</option>
+                        <option value="OPTIONAL">Optional (Guest may pick an arrival slot or full-day pass)</option>
+                        <option value="DISABLED">Disabled (No time slots, open attendance)</option>
+                      </select>
+                    </div>
+
+                    {/* Time Slot Interval & Capacity when not disabled */}
+                    {rsvpTimeSlotRequirement !== "DISABLED" && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:col-span-2 pt-1">
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-medium text-foreground block">Slot Interval Duration</label>
+                          <select
+                            value={rsvpSlotIntervalMinutes}
+                            onChange={(e) => {
+                              const v = parseInt(e.target.value, 10);
+                              setRsvpSlotIntervalMinutes(v);
+                            }}
+                            className="w-full bg-card border border-border text-foreground text-xs rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-primary focus:outline-none"
+                          >
+                            <option value={15}>15 minutes</option>
+                            <option value={30}>30 minutes</option>
+                            <option value={45}>45 minutes</option>
+                            <option value={60}>60 minutes (1 hour)</option>
+                            <option value={120}>2 hours (120 minutes)</option>
+                            <option value={0}>Custom Interval...</option>
+                          </select>
+                          {rsvpSlotIntervalMinutes === 0 && (
+                            <Input
+                              type="number"
+                              min="5"
+                              max="360"
+                              placeholder="Minutes (e.g. 90)"
+                              value={rsvpCustomSlotInterval}
+                              onChange={(e) => setRsvpCustomSlotInterval(e.target.value)}
+                              className="h-7 text-xs mt-1 font-mono"
+                            />
+                          )}
                         </div>
-                        <Input
-                          type="number"
-                          min="1"
-                          max="20"
-                          value={rsvpMaxGuests}
-                          onChange={(e) => setRsvpMaxGuests(parseInt(e.target.value, 10) || 1)}
-                          className="w-24 h-8 text-xs text-right"
-                        />
+
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-medium text-foreground block">Slot Capacity / Limit per Slot</label>
+                          <Input
+                            type="number"
+                            min="1"
+                            placeholder="e.g. 25 (optional)"
+                            value={rsvpSlotCapacity}
+                            onChange={(e) => setRsvpSlotCapacity(e.target.value)}
+                            className="h-8 text-xs font-mono"
+                          />
+                          <span className="text-[10px] text-muted-foreground block">Leave blank for unlimited slot capacity</span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -2070,7 +2258,7 @@ function EventFormContent({
               url: item.url,
               title: cleanName,
               caption: "",
-              alt: cleanName,
+              alt: "",
               linkType: "none",
               linkTarget: "",
             };

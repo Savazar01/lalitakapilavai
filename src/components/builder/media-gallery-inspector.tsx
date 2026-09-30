@@ -59,11 +59,13 @@ export interface MediaGalleryBlockData {
   customWallUrl?: string;
   customWallBackdropUrl?: string;
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
+  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
   overviewDwellSeconds?: number;
   showExhibitionBadge?: boolean;
   maxArtworksPerWall?: number;
+  showMetadataCardBelowWall?: boolean;
   showFrameHeader?: boolean;
   frameHeaderBg?: string;
   frameHeaderTextColor?: string;
@@ -88,13 +90,15 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const borderWidth = data.borderWidth ?? 0;
   const framePadding = data.framePadding ?? 0;
   const showCaptionRibbon = data.showCaptionRibbon ?? false;
-  const environmentId = data.culturalEnvironment ?? data.environmentId ?? "london-school-arts";
+  const environmentId = data.culturalEnvironment ?? data.environmentId ?? "modern-minimalist";
   const customWallUrl = data.customWallBackdropUrl ?? data.customWallUrl ?? "";
   const cameraTourStyle = data.cameraTourStyle ?? "drone";
+  const cameraTransitionStyle = data.cameraTransitionStyle ?? "pan-zoom";
   const wallLayout = data.wallLayout ?? "salon";
   const autoplayTour = data.autoplayTour ?? true;
   const overviewDwellSeconds = data.overviewDwellSeconds ?? 4;
   const maxArtworksPerWall = data.maxArtworksPerWall ?? 4;
+  const showMetadataCardBelowWall = data.showMetadataCardBelowWall ?? true;
   const showFrameHeader = data.showFrameHeader ?? false;
   const frameHeaderBg = data.frameHeaderBg ?? "#0F0E0D";
   const frameHeaderTextColor = data.frameHeaderTextColor ?? "#F5EBE1";
@@ -304,6 +308,20 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       maxArtworksPerWall: val,
+    });
+  };
+
+  const handleCameraTransitionStyleChange = (style: "pan-zoom" | "dolly" | "crossfade") => {
+    onChange({
+      ...data,
+      cameraTransitionStyle: style,
+    });
+  };
+
+  const handleShowMetadataCardBelowWallChange = (show: boolean) => {
+    onChange({
+      ...data,
+      showMetadataCardBelowWall: show,
     });
   };
 
@@ -582,7 +600,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             </Badge>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Cultural Environment Preset */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">Cultural Environment</Label>
@@ -591,7 +609,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                   <SelectValue placeholder="Select Environment" />
                 </SelectTrigger>
                 <SelectContent>
-                  {WALL_ENVIRONMENTS.map((e) => (
+                  {WALL_ENVIRONMENTS.slice(0, 7).map((e) => (
                     <SelectItem key={e.id} value={e.id}>
                       {e.name}
                     </SelectItem>
@@ -599,7 +617,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 </SelectContent>
               </Select>
               <p className="text-[10px] text-muted-foreground">
-                Authentic lighting, architectural moulding &amp; floorboards.
+                Authentic lighting, moulding &amp; floor.
               </p>
             </div>
 
@@ -627,6 +645,29 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               </p>
             </div>
 
+            {/* Camera Transition Style */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">Camera Transition Style</Label>
+              <Select
+                value={cameraTransitionStyle}
+                onValueChange={(val: "pan-zoom" | "dolly" | "crossfade") =>
+                  handleCameraTransitionStyleChange(val)
+                }
+              >
+                <SelectTrigger className="h-8 text-xs bg-card">
+                  <SelectValue placeholder="Select Transition" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pan-zoom">Cinematic Pan &amp; Gentle Zoom</SelectItem>
+                  <SelectItem value="dolly">Smooth Dolly Track</SelectItem>
+                  <SelectItem value="crossfade">Soft Crossfade / Dissolve</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-[10px] text-muted-foreground">
+                Damped cubic camera glide physics.
+              </p>
+            </div>
+
             {/* Wall Layout Matrix */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">Wall Hanging Layout</Label>
@@ -638,13 +679,13 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                   <SelectValue placeholder="Select Layout" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="salon">Asymmetrical Salon (London School)</SelectItem>
+                  <SelectItem value="salon">Asymmetrical Salon (Classical)</SelectItem>
                   <SelectItem value="linear">Linear Eye-Level Promenade</SelectItem>
                   <SelectItem value="grid">Balanced Curatorial Grid</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-[10px] text-muted-foreground">
-                Proportional fine-art salon spacing.
+                0.8m minimum clearance spacing.
               </p>
             </div>
           </div>
@@ -677,7 +718,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             </div>
           )}
 
-          {/* Autoplay Tour & Dwell Speeds */}
+          {/* Autoplay Tour, Dwell Speeds, and Bottom Card Toggle */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-amber-500/20">
             <div className="flex items-center justify-between sm:flex-col sm:items-start sm:justify-center gap-1.5">
               <div>
@@ -710,14 +751,14 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               </Label>
               <input
                 type="range"
-                min={2}
+                min={1}
                 max={8}
                 step={1}
                 value={maxArtworksPerWall}
                 onChange={(e) => handleMaxArtworksPerWallChange(Number(e.target.value))}
                 className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
               />
-              <span className="text-[10px] text-muted-foreground">Partitions corridor (2 to 8)</span>
+              <span className="text-[10px] text-muted-foreground">Partitions corridor (1 to 8)</span>
             </div>
 
             <div className="space-y-1">
@@ -728,13 +769,13 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               <input
                 type="range"
                 min={2}
-                max={10}
+                max={15}
                 step={1}
                 value={overviewDwellSeconds}
                 onChange={(e) => handleOverviewDwellSecondsChange(Number(e.target.value))}
                 className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
               />
-              <span className="text-[10px] text-muted-foreground">Panoramic wall hold (2s - 10s)</span>
+              <span className="text-[10px] text-muted-foreground">Panoramic wall hold (2s - 15s)</span>
             </div>
 
             <div className="space-y-1">
@@ -744,15 +785,40 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               </Label>
               <input
                 type="range"
-                min={3}
+                min={2}
                 max={15}
                 step={1}
                 value={autoplayTimer}
                 onChange={(e) => handleTimerChange(Number(e.target.value))}
                 className="w-full accent-primary cursor-pointer h-2 bg-muted rounded-lg"
               />
-              <span className="text-[10px] text-muted-foreground">Focus dwell (3s - 15s)</span>
+              <span className="text-[10px] text-muted-foreground">Focus dwell (2s - 15s)</span>
             </div>
+          </div>
+
+          {/* Toggle: Show Metadata Card Below Wall */}
+          <div className="pt-2 flex items-center justify-between border-t border-amber-500/20">
+            <div className="space-y-0.5">
+              <Label className="text-xs font-semibold text-foreground">Display Metadata Card Below Wall</Label>
+              <p className="text-[10px] text-muted-foreground">
+                Renders curatorial title, medium, dimensions, and catalog link below the 3D gallery wall canvas.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleShowMetadataCardBelowWallChange(!showMetadataCardBelowWall)}
+              className={cn(
+                "w-11 h-6 rounded-full transition-colors relative cursor-pointer",
+                showMetadataCardBelowWall ? "bg-amber-600" : "bg-muted"
+              )}
+            >
+              <span
+                className={cn(
+                  "block w-4 h-4 rounded-full bg-white transition-transform transform",
+                  showMetadataCardBelowWall ? "translate-x-6" : "translate-x-1"
+                )}
+              />
+            </button>
           </div>
         </div>
       )}
@@ -1673,7 +1739,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           const enriched = enrichItemWithArtwork({
             url: media.url,
             title: media.title,
-            alt: media.originalFileName,
+            alt: media.alt || "",
             artworkId: media.artworkId,
             slug: media.slug,
             medium: media.medium,
@@ -1701,7 +1767,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             enrichItemWithArtwork({
               url: m.url,
               title: m.title,
-              alt: m.originalFileName,
+              alt: m.alt || "",
               artworkId: m.artworkId,
               slug: m.slug,
               medium: m.medium,

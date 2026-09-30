@@ -323,9 +323,11 @@ export default function AdminLeadsPage() {
                             <span className="text-[11px] font-medium text-foreground truncate max-w-[180px]">
                               {lead.sourceEvent?.title || "Special Event"}
                             </span>
-                            {Boolean(lead.customFields?.selectedDate || lead.customFields?.selectedSlot) && (
+                            {Boolean(lead.customFields?.selectedDate || lead.customFields?.selectedDates || lead.customFields?.selectedSlot) && (
                               <span className="text-[10px] font-mono text-primary">
-                                {String(lead.customFields?.selectedDate || "")} {lead.customFields?.selectedSlot ? `(${String(lead.customFields?.selectedSlot)})` : ""}
+                                {Array.isArray(lead.customFields?.selectedDates) && (lead.customFields?.selectedDates as string[]).length > 0
+                                  ? (lead.customFields?.selectedDates as string[]).join(", ")
+                                  : String(lead.customFields?.selectedDate || "")} {lead.customFields?.selectedSlot ? `(${String(lead.customFields?.selectedSlot)})` : ""}
                               </span>
                             )}
                           </div>
@@ -522,9 +524,14 @@ export default function AdminLeadsPage() {
                     </p>
                   )}
                   <div className="flex flex-wrap gap-3 text-[11px] pt-0.5">
-                    {Boolean(selectedLead.customFields?.selectedDate) && (
+                    {Boolean(selectedLead.customFields?.selectedDate || selectedLead.customFields?.selectedDates) && (
                       <span className="text-muted-foreground">
-                        Date: <strong className="text-foreground font-mono">{String(selectedLead.customFields?.selectedDate)}</strong>
+                        Attendance Date(s):{" "}
+                        <strong className="text-foreground font-mono">
+                          {Array.isArray(selectedLead.customFields?.selectedDates) && (selectedLead.customFields?.selectedDates as string[]).length > 0
+                            ? (selectedLead.customFields?.selectedDates as string[]).join(", ")
+                            : String(selectedLead.customFields?.selectedDate || "")}
+                        </strong>
                       </span>
                     )}
                     {Boolean(selectedLead.customFields?.selectedSlot) && (

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { eventId, attendeeName, attendeeEmail, attendeePhone, ticketCount, selectedDate, selectedSlot, customAnswers } = body;
+    const { eventId, attendeeName, attendeeEmail, attendeePhone, ticketCount, selectedDate, selectedDates, selectedSlot, customAnswers } = body;
 
     if (!eventId || !attendeeName || !attendeeEmail) {
       return NextResponse.json(
@@ -62,6 +62,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Format attendance dates
+    const datesArray: string[] = Array.isArray(selectedDates) && selectedDates.length > 0
+      ? selectedDates
+      : (selectedDate ? [selectedDate] : []);
+    const dateFormatted = datesArray.length > 0 ? datesArray.join(", ") : (selectedDate || null);
+
     // Format custom answers if provided
     let customAnswersText = "";
     if (customAnswers && typeof customAnswers === "object") {
@@ -80,13 +86,13 @@ export async function POST(request: NextRequest) {
           attendeePhone: attendeePhone || null,
           ticketCount: tickets,
           paymentStatus: "CONFIRMED",
-          selectedDate: selectedDate || null,
+          selectedDate: dateFormatted,
           selectedSlot: selectedSlot || null,
         },
       });
 
       // Also record as inbound Lead
-      const dateDisplay = selectedDate || event.startDate.toLocaleDateString();
+      const dateDisplay = dateFormatted || event.startDate.toLocaleDateString();
       const slotDisplay = selectedSlot ? ` [Slot: ${selectedSlot}]` : "";
       await tx.lead.create({
         data: {
@@ -94,11 +100,12 @@ export async function POST(request: NextRequest) {
           email: attendeeEmail,
           phone: attendeePhone || null,
           subject: `RSVP: ${event.title}`,
-          message: `Registered for ${event.title} (${tickets} ticket(s)). Event date: ${dateDisplay}${slotDisplay}.${customAnswersText ? `\n\nCustom Intake Responses:${customAnswersText}` : ""}`,
+          message: `Registered for ${event.title} (${tickets} ticket(s)). Attendance Date(s): ${dateDisplay}${slotDisplay}.${customAnswersText ? `\n\nCustom Intake Responses:${customAnswersText}` : ""}`,
           source: "EVENT_RSVP",
           formTitle: "Event Attendance RSVP",
           customFields: {
-            selectedDate: selectedDate || null,
+            selectedDate: dateFormatted,
+            selectedDates: datesArray,
             selectedSlot: selectedSlot || null,
             ticketCount: tickets,
             ...(customAnswers && typeof customAnswers === "object" ? customAnswers : {}),
