@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import prisma from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 
 export interface EmailDispatchOptions {
   triggerType: string;
@@ -152,6 +153,70 @@ export function getAbsoluteAssetUrl(relativeOrAbsoluteUrl?: string | null): stri
   return resolveAbsoluteLogoUrl(relativeOrAbsoluteUrl);
 }
 
+const UNSUBSCRIBE_SECRET = process.env.BETTER_AUTH_SECRET || "savazai-atelier-unsubscribe-secret-salt-2026";
+
+/**
+ * Generates an encrypted, tamper-proof token for 1-click email unsubscribes.
+ */
+export function encryptEmailToken(email: string): string {
+  const cleanEmail = email.trim().toLowerCase();
+  const iv = crypto.randomBytes(12);
+  const key = crypto.createHash("sha256").update(UNSUBSCRIBE_SECRET).digest();
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([cipher.update(cleanEmail, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return Buffer.from(
+    `${iv.toString("base64url")}.${tag.toString("base64url")}.${encrypted.toString("base64url")}`
+  ).toString("base64url");
+}
+
+/**
+ * Decrypts and verifies an unsubscribe email token.
+ */
+export function decryptEmailToken(token: string): string | null {
+  try {
+    const raw = Buffer.from(token, "base64url").toString("utf8");
+    const [ivB64, tagB64, encB64] = raw.split(".");
+    if (!ivB64 || !tagB64 || !encB64) return null;
+    const iv = Buffer.from(ivB64, "base64url");
+    const tag = Buffer.from(tagB64, "base64url");
+    const enc = Buffer.from(encB64, "base64url");
+    const key = crypto.createHash("sha256").update(UNSUBSCRIBE_SECRET).digest();
+    const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+    decipher.setAuthTag(tag);
+    const decrypted = Buffer.concat([decipher.update(enc), decipher.final()]);
+    return decrypted.toString("utf8");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Resolves fully qualified 1-click unsubscribe URL.
+ */
+export function getUnsubscribeUrl(email: string): string {
+  const base = getBaseAppUrl();
+  const token = encryptEmailToken(email);
+  return `${base}/unsubscribe?token=${encodeURIComponent(token)}`;
+}
+
+/**
+ * Checks if an email address is listed in UnsubscribedContact table.
+ */
+export async function isEmailUnsubscribed(email?: string | null): Promise<boolean> {
+  if (!email) return false;
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    const match = await prisma.unsubscribedContact.findUnique({
+      where: { email: cleanEmail },
+    });
+    return !!match;
+  } catch (err) {
+    console.warn("[EmailService] Error checking unsubscribed contact:", err);
+    return false;
+  }
+}
+
 export interface EmailLogoAttachment {
   filename: string;
   path: string;
@@ -242,6 +307,8 @@ export function wrapBrandedEmailHtml(
     emailLogoUrl?: string | null;
     emailFooterText?: string | null;
     logoImgSrc?: string | null;
+    unsubscribeUrl?: string | null;
+    organizationName?: string | null;
   }
 ): string {
   const headerTitle = settings.emailHeaderTitle || "SavazAI Atelier";
@@ -275,7 +342,13 @@ export function wrapBrandedEmailHtml(
         ${contentHtml}
       </div>
       <div style="background: #f9fafb; padding: 16px 20px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #f3f4f6; line-height: 1.5;">
-        ${footerText}
+        <p style="margin: 0;">${footerText}</p>
+        ${settings.unsubscribeUrl ? `
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">
+            <p style="margin: 0 0 6px 0;">You received this email because you interacted with ${settings.organizationName || "the atelier"}.</p>
+            <p style="margin: 0;"><a href="${settings.unsubscribeUrl}" style="color: #6b7280; text-decoration: underline;">Unsubscribe from communications</a></p>
+          </div>
+        ` : ""}
       </div>
     </div>
   `;
@@ -457,56 +530,80 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
   // 2. Send User Confirmation Receipt if enabled and user email exists
   const targetUserEmail = (userEmail || data.email || "").toString().trim();
   if (activeTemplate.sendUserReceipt && targetUserEmail && targetUserEmail.includes("@")) {
-    const userSubjectTemplate = activeTemplate.userSubject || "Confirmation: We have received your submission";
-    const userBodyTemplate = activeTemplate.userBodyTemplate || "<p>Dear {name},</p><p>We have received your submission.</p>";
-    
-    const compiledUserSubject = interpolateTokens(userSubjectTemplate, tokens);
-    const compiledUserBody = interpolateTokens(userBodyTemplate, tokens);
-    const userHtml = wrapBrandedEmailHtml(compiledUserBody, {
-      emailHeaderTitle: settings?.emailHeaderTitle,
-      emailHeaderSubtitle: settings?.emailHeaderSubtitle,
-      logoImgSrc,
-      emailFooterText: settings?.emailFooterText,
-    });
+    const isUnsubscribed = await isEmailUnsubscribed(targetUserEmail);
 
-    if (transporter) {
-      try {
-        await transporter.sendMail({
-          from: senderString,
-          to: targetUserEmail,
-          subject: compiledUserSubject,
-          html: userHtml,
-          attachments,
-        });
-        userSent = true;
+    if (isUnsubscribed) {
+      console.log(`[EmailService] Outbound receipt suppressed: ${targetUserEmail} has unsubscribed.`);
+      userSent = false;
+      userError = "Recipient has unsubscribed from communications";
 
-        await prisma.emailDispatchLog.create({
-          data: {
-            recipient: targetUserEmail,
-            sender: fromEmail,
-            triggerType: `${triggerType}_receipt`,
-            subject: compiledUserSubject,
-            status: "SENT",
-          },
-        });
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Failed to dispatch user receipt";
-        userError = msg;
-        console.error("[EmailService] User receipt dispatch failed:", msg);
-
-        await prisma.emailDispatchLog.create({
-          data: {
-            recipient: targetUserEmail,
-            sender: fromEmail,
-            triggerType: `${triggerType}_receipt`,
-            subject: compiledUserSubject,
-            status: "FAILED",
-            errorMessage: msg,
-          },
-        });
-      }
+      await prisma.emailDispatchLog.create({
+        data: {
+          recipient: targetUserEmail,
+          sender: fromEmail,
+          triggerType: `${triggerType}_receipt`,
+          subject: interpolateTokens(activeTemplate.userSubject || "Confirmation", tokens),
+          status: "FAILED",
+          errorMessage: "Suppressed: recipient is in unsubscribed list",
+        },
+      });
     } else {
-      userError = "SMTP not configured";
+      const unsubscribeUrl = getUnsubscribeUrl(targetUserEmail);
+      tokens.unsubscribe_url = unsubscribeUrl;
+
+      const userSubjectTemplate = activeTemplate.userSubject || "Confirmation: We have received your submission";
+      const userBodyTemplate = activeTemplate.userBodyTemplate || "<p>Dear {name},</p><p>We have received your submission.</p>";
+
+      const compiledUserSubject = interpolateTokens(userSubjectTemplate, tokens);
+      const compiledUserBody = interpolateTokens(userBodyTemplate, tokens);
+      const userHtml = wrapBrandedEmailHtml(compiledUserBody, {
+        emailHeaderTitle: settings?.emailHeaderTitle,
+        emailHeaderSubtitle: settings?.emailHeaderSubtitle,
+        logoImgSrc,
+        emailFooterText: settings?.emailFooterText,
+        unsubscribeUrl,
+        organizationName: orgName,
+      });
+
+      if (transporter) {
+        try {
+          await transporter.sendMail({
+            from: senderString,
+            to: targetUserEmail,
+            subject: compiledUserSubject,
+            html: userHtml,
+            attachments,
+          });
+          userSent = true;
+
+          await prisma.emailDispatchLog.create({
+            data: {
+              recipient: targetUserEmail,
+              sender: fromEmail,
+              triggerType: `${triggerType}_receipt`,
+              subject: compiledUserSubject,
+              status: "SENT",
+            },
+          });
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : "Failed to dispatch user receipt";
+          userError = msg;
+          console.error("[EmailService] User receipt dispatch failed:", msg);
+
+          await prisma.emailDispatchLog.create({
+            data: {
+              recipient: targetUserEmail,
+              sender: fromEmail,
+              triggerType: `${triggerType}_receipt`,
+              subject: compiledUserSubject,
+              status: "FAILED",
+              errorMessage: msg,
+            },
+          });
+        }
+      } else {
+        userError = "SMTP not configured";
+      }
     }
   }
 

@@ -41,12 +41,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const userAgent = request.headers.get("user-agent") || null;
+    const isQr = Boolean(sourceArtworkId);
+
     const newLead = await prisma.lead.create({
       data: {
         name,
-        email: email || "visitor@savazar.com",
+        email: email || null,
         phone: phone || null,
+        source: isQr ? "QR_SCAN" : "CONTACT_FORM",
+        artworkId: sourceArtworkId || null,
         sourceArtworkId: sourceArtworkId || null,
+        artworkTitle: subject ? subject.replace(/^Exhibition Floor Scan:\s*/, "") : null,
+        deviceInfo: userAgent ? userAgent.slice(0, 500) : null,
         sourceEventId: sourceEventId || null,
         subject: subject || (sourceArtworkId ? "Exhibition QR Scan Visitor" : "Web Inquiry"),
         message:

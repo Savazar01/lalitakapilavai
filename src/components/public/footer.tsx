@@ -1,6 +1,7 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Sparkles, Mail, Phone, ExternalLink } from "lucide-react";
+import { PrivacyModalTrigger } from "./privacy-request-modal";
 
 interface SocialLinkItem {
   platform: string;
@@ -250,6 +251,7 @@ export async function Footer() {
                 {l.label}
               </Link>
             ))}
+            <PrivacyModalTrigger />
           </div>
         </div>
       </div>

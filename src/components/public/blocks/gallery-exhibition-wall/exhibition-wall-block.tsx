@@ -17,7 +17,7 @@ import {
   WallEnvironment,
   getWallEnvironment,
 } from "./exhibition-environments";
-import { cn } from "@/lib/utils";
+import { cn, stripHtmlTags } from "@/lib/utils";
 
 export type CameraTourStyle = "overview" | "drone" | "walkthrough" | "inspection";
 export type WallLayoutMatrix = "salon" | "linear" | "grid";
@@ -1773,7 +1773,7 @@ export function ExhibitionWallBlock({
               return mHref ? (
                 <Link
                   href={mHref}
-                  className="px-3 py-1.5 rounded-lg text-[10px] font-serif font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shrink-0 shadow-xs cursor-pointer"
+                  className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors shrink-0 cursor-pointer"
                 >
                   Details
                 </Link>
@@ -1835,7 +1835,7 @@ export function ExhibitionWallBlock({
               </div>
               {artworkHref && (
                 <Link
-                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs font-serif font-semibold tracking-wider bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white transition-all shrink-0 cursor-pointer shadow-sm border border-transparent dark:border-slate-300"
+                  className="inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors shrink-0 cursor-pointer"
                   href={artworkHref}
                 >
                   View Details
@@ -1843,8 +1843,8 @@ export function ExhibitionWallBlock({
               )}
             </div>
             {artworkDesc && (
-              <p className="text-sm text-foreground/80 mt-4 pt-4 border-t border-border/60 leading-relaxed font-sans">
-                {artworkDesc}
+              <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed font-sans mt-3 pt-3 border-t border-border/60">
+                {stripHtmlTags(artworkDesc)}
               </p>
             )}
           </div>

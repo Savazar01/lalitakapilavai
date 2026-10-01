@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { formatCurrency } from "@/lib/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PrivacyConsentCheckbox } from "@/components/ui/privacy-consent-checkbox";
 
 export interface EventRsvpCustomField {
   id: string;
@@ -116,6 +117,7 @@ export function EventRsvpForm({
   const [phone, setPhone] = React.useState("");
   const [tickets, setTickets] = React.useState("1");
   const [customAnswers, setCustomAnswers] = React.useState<Record<string, string | boolean>>({});
+  const [privacyConsent, setPrivacyConsent] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [registered, setRegistered] = React.useState(false);
 
@@ -224,10 +226,16 @@ export function EventRsvpForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!privacyConsent) {
+      toast.error("Please agree to the Privacy Policy to complete your RSVP.");
+      return;
+    }
+
     if (hasDailySchedules && requireDateSelection && selectedDates.length === 0) {
       toast.error("Please select at least one attendance date");
       return;
     }
+
 
     if (slotRequirement === "MANDATORY" && activeSlots.length > 0 && !selectedSlot) {
       toast.error("Please select an arrival time slot");
@@ -552,9 +560,17 @@ export function EventRsvpForm({
             </div>
           ))}
 
+          <PrivacyConsentCheckbox
+            id={`rsvp-privacy-${eventId}`}
+            checked={privacyConsent}
+            onChange={setPrivacyConsent}
+            required
+            className="pt-3 pb-1"
+          />
+
           <Button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !privacyConsent}
             className="w-full mt-2 h-9 text-xs font-semibold cursor-pointer"
           >
             {submitting ? "Confirming..." : buttonLabel}

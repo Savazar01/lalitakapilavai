@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PrivacyConsentCheckbox } from "@/components/ui/privacy-consent-checkbox";
 
 export interface FormFieldConfig {
   id: string;
@@ -107,6 +108,7 @@ export function DynamicFormBlock({
   className = "",
 }: DynamicFormBlockProps) {
   const [formData, setFormData] = React.useState<Record<string, string | boolean>>({});
+  const [privacyConsent, setPrivacyConsent] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
@@ -122,6 +124,12 @@ export function DynamicFormBlock({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!privacyConsent) {
+      setErrorMessage("Please agree to the Privacy Policy to submit your inquiry.");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage(null);
 
@@ -162,6 +170,12 @@ export function DynamicFormBlock({
     if (!fullName.trim() || !email.trim()) {
       setIsSubmitting(false);
       setErrorMessage("Please provide both your Name and a valid Email Address.");
+      return;
+    }
+
+    if (!privacyConsent) {
+      setIsSubmitting(false);
+      setErrorMessage("Please agree to the Privacy Policy to proceed.");
       return;
     }
 
@@ -388,11 +402,20 @@ export function DynamicFormBlock({
           })}
         </div>
 
+        {/* Universal Privacy Consent Checkbox */}
+        <PrivacyConsentCheckbox
+          id={`consent-${pageSlug}`}
+          checked={privacyConsent}
+          onChange={setPrivacyConsent}
+          required
+          className="pt-1 pb-1"
+        />
+
         {/* Action Button */}
-        <div className="pt-3">
+        <div className="pt-2">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !privacyConsent}
             className="w-full py-3 h-11 text-xs font-bold tracking-wide uppercase shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-slate-950"
             style={{
               backgroundColor: "var(--form-btn-bg)",

@@ -16,11 +16,11 @@ The **SavazAI WebApps Platform** is an enterprise-grade digital publishing, arch
 - **Visual Drag-and-Drop Page Builder & Component Studio**: Modular editorial layout engine supporting rich media blocks, interactive e-Catalogs, responsive sliders, and live contrast-aware typography.
 - **Dynamic Multi-Modal Email & Notification Studio**: Inbound alert decoupling, automatic form discovery across dynamic page blocks, and a universal Tiptap WYSIWYG editor with dual-delivery logo resolution (CID inline MIME attachments + HTTPS fallback) and full audit telemetry.
 - **Synesthetic Knowledge Graph & Semantic Vector Engine**: PostgreSQL 17 with `pgvector` powering multi-modal exploration across visual motifs, provenance tags, and audio-visual archives.
-- **Unified CRM Leads & Acquisition Funnel**: Multichannel inquiry capture linking physical placard QR scans, bespoke commission intakes, and dynamic event RSVP registrations.
-- **Dynamic Enterprise Landing Page Studio & 7 Archetypes**: Decoupled sandbox page engine with 7 deeply designed industry presets (`PROFESSIONAL`, `PORTFOLIO`, `RESTAURANT`, `HOSPITALITY`, `HEALTHCARE`, `CORPORATE`, `BLANK`), featuring interactive blocks (ROI calculator with real-time sliders, table reservation bar, suite availability bar, filterable clinical specialty selector, multi-tier pricing table, and authenticated curatorial monographs), alongside atomic homepage promotion/demotion.
-- **Sovereign Multi-Cloud Storage Engine**: Unified driver infrastructure supporting Local Disk, Cloudflare R2, AWS S3, Google Workspace (Drive OAuth uploads + Google Sheets CRM lead append), and Nextcloud Sovereign WebDAV (with recursive `MKCOL` directory provisioning and OCS Share public links).
-- **SavazAI Multi-Tenant Brand Neutrality Invariant**: Complete separation of code from tenant data, generic standard placeholders, and browser autofill credential isolation (`autoComplete="off"`, `data-1p-ignore="true"`, `data-lpignore="true"`).
-- **e-Catalog Synchronous PDF Print Driver**: Headless isolated iframe printing with eager image decoding barriers (`img.decode()`), eliminating blank image omissions across multi-page catalog PDF exports.
+- **Mobile QR Scan Onboarding & Persistent Device Identity**: Physical gallery floor QR code placard scanning with dynamic iOS safe-area insets (`pb-[calc(1.5rem+env(safe-area-inset-bottom))]`, `max-h-[92dvh]`), mandatory WhatsApp/Phone collection (`*`), sticky mobile action footer, and local storage / cookie device recognition (`savazai_visitor_identity`) enabling frictionless subsequent scans and background telemetry logging without repeating modal gates.
+- **Dedicated QR Scans CRM & Multichannel Acquisition**: Inbound CRM lead segmentation across "All Inquiries", "Contact Messages", "Event RSVPs", and "QR Artwork Scans" with dedicated artwork title, visitor phone, device user-agent telemetry, and filter-aware CSV export.
+- **Universal 1-Click Unsubscribe Pipeline & Suppression Engine**: Standardized branded email footer with authenticated AES-256-GCM encrypted tokens (`/unsubscribe?token=...`), database unsubscription persistence (`UnsubscribedContact`), and automated suppression of marketing/outbound emails.
+- **GDPR Personal Data Erasure & Universal Privacy Policy Consent**: High-visibility "Erase Data (GDPR)" administrative hard deletion across CRM leads and users, public footer data removal request modal notifying `adminAlertEmail`, and universal mandatory `PrivacyConsentCheckbox` across all contact, RSVP, QR gate, and custom forms.
+- **Exhibition Hall Placard Contrast & HTML Tag Stripping**: Semantic theme token buttons (`bg-primary text-primary-foreground`) preventing white-on-white button rendering across 3D salon walls and metadata drawers, paired with automated `stripHtmlTags(...)` sanitization eradicating raw `<p>`/`<span>` markup from displayed artwork descriptions.
 - **Brand Identity & Native Media Engine**: Full `.ico` and `.svg` bypass upload engine preserving multi-resolution favicons and scalable vector graphics, paired with zero-fallback conditional phone suppression and dynamic footer brand governance.
 
 ---
@@ -60,6 +60,8 @@ SavazAI WebApps Platform
 │   │   │   ├── blogs/                # Curatorial Essays & Blog Archive
 │   │   │   ├── blogs/[slug]/         # Rich Typography Article Viewer
 │   │   │   ├── commission/           # Bespoke Fine Art Commission Portal
+│   │   │   ├── contact/              # Direct Inquiries & Atelier Contact Desk
+│   │   │   ├── unsubscribe/          # 1-Click Secure Email Unsubscribe Handler
 │   │   │   └── [slug]/               # Dynamic Page Builder Renderer
 │   │   ├── admin/                    # Secured Multi-Tenant Admin Control Center
 │   │   │   ├── (dashboard)/
@@ -69,10 +71,10 @@ SavazAI WebApps Platform
 │   │   │   │   ├── pages/            # Page Builder Index
 │   │   │   │   ├── pages/[id]/builder# Drag-and-Drop Visual Block Studio
 │   │   │   │   ├── posts/            # Blog & Curatorial Essay Editor
-│   │   │   │   ├── leads/            # Unified CRM Inquiries & Acquisition
+│   │   │   │   ├── leads/            # Unified CRM Inquiries & Acquisition (QR Scans Tab)
 │   │   │   │   ├── categories/       # Artistic Taxonomies & Traditions
 │   │   │   │   ├── navigation/       # Header & Footer Navigation Builder
-│   │   │   │   ├── users/            # Administrative RBAC Management
+│   │   │   │   ├── users/            # Administrative RBAC & GDPR Erasure
 │   │   │   │   └── settings/         # White-Label, Theme, SMTP & Mail Config
 │   │   │   └── login/                # Better-Auth Protected Entrypoint
 │   │   └── api/                      # Protected REST & Server Action Endpoints
@@ -80,6 +82,8 @@ SavazAI WebApps Platform
 │   │       ├── auth/[...all]/        # Better-Auth Session Handlers
 │   │       ├── forms/submit/         # Decoupled Public Form Handler
 │   │       ├── events/register/      # Public RSVP Registration Engine
+│   │       ├── leads/qr-scan/        # Physical Gallery Floor QR Telemetry
+│   │       ├── privacy/              # GDPR Erasure Request Dispatcher
 │   │       └── media/[...path]/      # Watermarked Image Delivery Proxy
 │   ├── components/
 │   │   ├── admin/                    # Administration UI (Tiptap, Placard Studio)

@@ -16,6 +16,9 @@ import {
   Eye,
   Loader2,
   ExternalLink,
+  Smartphone,
+  MessageSquare,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,7 +51,7 @@ import {
 interface LeadItem {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   phone: string | null;
   subject: string | null;
   message: string;
@@ -58,12 +61,21 @@ interface LeadItem {
   formTitle?: string | null;
   pageSlug?: string | null;
   customFields?: Record<string, unknown> | null;
-  sourceArtwork: {
+  artworkId?: string | null;
+  artworkTitle?: string | null;
+  deviceInfo?: string | null;
+  isSubscribed?: boolean;
+  artwork?: {
     id: string;
     title: string;
     slug: string;
   } | null;
-  sourceEvent: {
+  sourceArtwork?: {
+    id: string;
+    title: string;
+    slug: string;
+  } | null;
+  sourceEvent?: {
     id: string;
     title: string;
     venue: string;
@@ -82,6 +94,7 @@ const statusColors: Record<string, string> = {
 export default function AdminLeadsPage() {
   const [leads, setLeads] = React.useState<LeadItem[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [sourceFilter, setSourceFilter] = React.useState<string>("ALL");
   const [statusFilter, setStatusFilter] = React.useState<string>("ALL");
   const [search, setSearch] = React.useState("");
   const [selectedLead, setSelectedLead] = React.useState<LeadItem | null>(null);
@@ -95,6 +108,9 @@ export default function AdminLeadsPage() {
     const url = new URL("/api/admin/leads", window.location.origin);
     if (statusFilter !== "ALL") {
       url.searchParams.set("status", statusFilter);
+    }
+    if (sourceFilter !== "ALL") {
+      url.searchParams.set("source", sourceFilter);
     }
     if (search.trim()) {
       url.searchParams.set("search", search.trim());
@@ -112,7 +128,7 @@ export default function AdminLeadsPage() {
         console.error("Error loading leads:", err);
         setLoading(false);
       });
-  }, [statusFilter, search]);
+  }, [statusFilter, sourceFilter, search]);
 
   React.useEffect(() => {
     fetchLeads();
@@ -185,6 +201,7 @@ export default function AdminLeadsPage() {
     const url = new URL("/api/admin/leads", window.location.origin);
     url.searchParams.set("export", "csv");
     if (statusFilter !== "ALL") url.searchParams.set("status", statusFilter);
+    if (sourceFilter !== "ALL") url.searchParams.set("source", sourceFilter);
     if (search.trim()) url.searchParams.set("search", search.trim());
     window.open(url.toString(), "_blank");
   };
@@ -207,6 +224,33 @@ export default function AdminLeadsPage() {
           Export CSV
         </Button>
       </EditablePageHeader>
+
+      {/* Primary Category / Source Filter Tabs */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-muted/40 rounded-lg border border-border">
+        {[
+          { id: "ALL", label: "All Inquiries", icon: Layers },
+          { id: "CONTACT_FORM", label: "Contact Messages", icon: MessageSquare },
+          { id: "EVENT_RSVP", label: "Event RSVPs", icon: Calendar },
+          { id: "QR_SCAN", label: "QR Artwork Scans", icon: QrCode },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = sourceFilter === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setSourceFilter(tab.id)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/60"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
@@ -233,7 +277,7 @@ export default function AdminLeadsPage() {
         <div className="relative w-full md:w-72">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search patron name, email, phone..."
+            placeholder="Search patron name, email, phone, artwork..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 text-xs"
@@ -245,7 +289,9 @@ export default function AdminLeadsPage() {
       <Card className="border border-border/80 shadow-sm overflow-hidden">
         <CardHeader className="py-3 px-4 bg-muted/20 border-b border-border flex flex-row items-center justify-between">
           <CardTitle className="text-xs font-serif uppercase tracking-wider text-muted-foreground">
-            Captured Leads &amp; Inquiries ({leads.length})
+            {sourceFilter === "QR_SCAN"
+              ? `Exhibition Floor QR Scans (${leads.length})`
+              : `Captured Leads & Inquiries (${leads.length})`}
           </CardTitle>
         </CardHeader>
 
@@ -253,178 +299,324 @@ export default function AdminLeadsPage() {
           {loading ? (
             <div className="h-64 flex flex-col items-center justify-center gap-2">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              <span className="text-xs text-muted-foreground">Retrieving CRM leads...</span>
+              <span className="text-xs text-muted-foreground">Retrieving CRM records...</span>
             </div>
           ) : leads.length === 0 ? (
             <div className="p-12 text-center">
               <Users className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-foreground">No Leads Found</p>
+              <p className="text-sm font-semibold text-foreground">No Records Found</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {statusFilter === "ALL"
+                {sourceFilter === "QR_SCAN"
+                  ? "Visitor scans from physical gallery QR placards will appear here in real time."
+                  : statusFilter === "ALL"
                   ? "QR floor scans and web inquiry forms will automatically populate here."
-                  : `No leads with status "${statusFilter}".`}
+                  : `No records matching status "${statusFilter}".`}
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-muted/40 text-muted-foreground uppercase text-[10px] tracking-wider border-b border-border">
-                  <tr>
-                    <th className="py-3 px-4">Patron Details</th>
-                    <th className="py-3 px-4">Source / Origin</th>
-                    <th className="py-3 px-4">Subject & Message</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
+                {sourceFilter === "QR_SCAN" ? (
+                  <thead className="bg-muted/40 text-muted-foreground uppercase text-[10px] tracking-wider border-b border-border">
+                    <tr>
+                      <th className="py-3 px-4">Visitor / Contact</th>
+                      <th className="py-3 px-4">Artwork Scanned</th>
+                      <th className="py-3 px-4">Device &amp; Environment</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Scanned At</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                ) : (
+                  <thead className="bg-muted/40 text-muted-foreground uppercase text-[10px] tracking-wider border-b border-border">
+                    <tr>
+                      <th className="py-3 px-4">Patron Details</th>
+                      <th className="py-3 px-4">Source / Origin</th>
+                      <th className="py-3 px-4">Subject &amp; Message</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Date</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                )}
                 <tbody className="divide-y divide-border/60">
-                  {leads.map((lead) => (
-                    <tr key={lead.id} className="hover:bg-muted/20 transition-colors">
-                      <td className="py-3 px-4">
-                        <div className="font-semibold text-foreground text-sm font-serif">
-                          {lead.name}
-                        </div>
-                        <div className="flex items-center gap-2 mt-0.5 text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Mail className="w-3 h-3 text-primary/70" /> {lead.email}
-                          </span>
-                          {lead.phone && (
-                            <span className="flex items-center gap-1">
-                              <Phone className="w-3 h-3 text-primary/70" /> {lead.phone}
-                            </span>
-                          )}
-                        </div>
-                      </td>
+                  {leads.map((lead) => {
+                    const artworkObj = lead.artwork || lead.sourceArtwork;
+                    const artworkTitle = lead.artworkTitle || artworkObj?.title || "Exhibition Floor Masterpiece";
+                    const artworkSlug = artworkObj?.slug;
 
-                      <td className="py-3 px-4">
-                        {lead.sourceArtwork ? (
-                          <div className="flex flex-col gap-1">
-                            <Badge
-                              variant="outline"
-                              className="w-fit text-[10px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 flex items-center gap-1 font-semibold"
+                    if (sourceFilter === "QR_SCAN") {
+                      return (
+                        <tr key={lead.id} className="hover:bg-muted/20 transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="font-semibold text-foreground text-sm font-serif">
+                              {lead.name}
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5 text-muted-foreground">
+                              {lead.phone ? (
+                                <span className="flex items-center gap-1 font-mono text-primary font-medium">
+                                  <Phone className="w-3 h-3 text-primary" /> {lead.phone}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground italic">No phone</span>
+                              )}
+                              {lead.email && (
+                                <span className="flex items-center gap-1">
+                                  <Mail className="w-3 h-3 text-muted-foreground" /> {lead.email}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4">
+                            <div className="flex flex-col gap-1">
+                              <Badge
+                                variant="outline"
+                                className="w-fit text-[10px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 flex items-center gap-1 font-semibold"
+                              >
+                                <QrCode className="w-3 h-3 text-primary" /> Floor QR Placard
+                              </Badge>
+                              {artworkSlug ? (
+                                <Link
+                                  href={`/artwork/${artworkSlug}`}
+                                  target="_blank"
+                                  className="text-[12px] font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
+                                >
+                                  {artworkTitle}
+                                  <ExternalLink className="w-3 h-3" />
+                                </Link>
+                              ) : (
+                                <span className="text-[12px] font-medium text-foreground">
+                                  {artworkTitle}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4 max-w-xs">
+                            <div className="flex items-center gap-1.5 text-muted-foreground font-mono text-[11px] truncate" title={lead.deviceInfo || "Web Browser"}>
+                              <Smartphone className="w-3.5 h-3.5 shrink-0 text-muted-foreground/80" />
+                              <span className="truncate">{lead.deviceInfo || "Web Browser"}</span>
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4">
+                            <Select
+                              value={lead.status}
+                              onValueChange={(val) => handleStatusChange(lead.id, val)}
                             >
-                              <QrCode className="w-3 h-3" /> Exhibition Floor QR
-                            </Badge>
-                            <Link
-                              href={`/artwork/${lead.sourceArtwork.slug}`}
-                              target="_blank"
-                              className="text-[11px] text-foreground hover:text-primary transition-colors flex items-center gap-1"
-                            >
-                              {lead.sourceArtwork.title}
-                              <ExternalLink className="w-2.5 h-2.5" />
-                            </Link>
+                              <SelectTrigger
+                                className={`h-7 w-32 text-[10px] font-semibold border rounded-full ${
+                                  statusColors[lead.status] || ""
+                                }`}
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="NEW">New</SelectItem>
+                                <SelectItem value="CONTACTED">Contacted</SelectItem>
+                                <SelectItem value="IN_DISCUSSION">In Discussion</SelectItem>
+                                <SelectItem value="QUALIFIED">Qualified</SelectItem>
+                                <SelectItem value="CLOSED">Closed</SelectItem>
+                                <SelectItem value="ARCHIVED">Archived</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </td>
+
+                          <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">
+                            <div className="flex items-center gap-1 text-[11px]">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(lead.createdAt).toLocaleString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setSelectedLead(lead)}
+                                className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
+                                title="View Full Details"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteClick(lead.id, lead.name)}
+                                className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                                title="Erase Contact & Personal Data (GDPR)"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    // Standard row for ALL, CONTACT_FORM, EVENT_RSVP
+                    return (
+                      <tr key={lead.id} className="hover:bg-muted/20 transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="font-semibold text-foreground text-sm font-serif">
+                            {lead.name}
                           </div>
-                        ) : lead.sourceEvent || lead.source === "EVENT_RSVP" ? (
-                          <div className="flex flex-col gap-0.5">
-                            <Badge variant="outline" className="w-fit text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30">
-                              Event RSVP
-                            </Badge>
-                            <span className="text-[11px] font-medium text-foreground truncate max-w-[180px]">
-                              {lead.sourceEvent?.title || "Special Event"}
-                            </span>
-                            {Boolean(lead.customFields?.selectedDate || lead.customFields?.selectedDates || lead.customFields?.selectedSlot) && (
-                              <span className="text-[10px] font-mono text-primary">
-                                {Array.isArray(lead.customFields?.selectedDates) && (lead.customFields?.selectedDates as string[]).length > 0
-                                  ? (lead.customFields?.selectedDates as string[]).join(", ")
-                                  : String(lead.customFields?.selectedDate || "")} {lead.customFields?.selectedSlot ? `(${String(lead.customFields?.selectedSlot)})` : ""}
+                          <div className="flex items-center gap-2 mt-0.5 text-muted-foreground">
+                            {lead.email && (
+                              <span className="flex items-center gap-1">
+                                <Mail className="w-3 h-3 text-primary/70" /> {lead.email}
+                              </span>
+                            )}
+                            {lead.phone && (
+                              <span className="flex items-center gap-1">
+                                <Phone className="w-3 h-3 text-primary/70" /> {lead.phone}
                               </span>
                             )}
                           </div>
-                        ) : lead.formTitle || lead.pageSlug ? (
-                          <div className="flex flex-col gap-1">
-                            <Badge
-                              variant="outline"
-                              className="w-fit text-[10px] bg-primary/10 text-primary border-primary/30"
-                            >
-                              {lead.formTitle || "Page Form"}
-                            </Badge>
-                            {lead.pageSlug && (
-                              <Link
-                                href={`/${lead.pageSlug}`}
-                                target="_blank"
-                                className="text-[11px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                        </td>
+
+                        <td className="py-3 px-4">
+                          {lead.source === "QR_SCAN" || lead.artworkId || lead.sourceArtwork ? (
+                            <div className="flex flex-col gap-1">
+                              <Badge
+                                variant="outline"
+                                className="w-fit text-[10px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 flex items-center gap-1 font-semibold"
                               >
-                                /{lead.pageSlug}
-                                <ExternalLink className="w-2.5 h-2.5" />
-                              </Link>
-                            )}
+                                <QrCode className="w-3 h-3 text-primary" /> Floor QR Placard
+                              </Badge>
+                              {artworkSlug ? (
+                                <Link
+                                  href={`/artwork/${artworkSlug}`}
+                                  target="_blank"
+                                  className="text-[11px] text-foreground hover:text-primary transition-colors flex items-center gap-1"
+                                >
+                                  {artworkTitle}
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </Link>
+                              ) : (
+                                <span className="text-[11px] text-foreground">
+                                  {artworkTitle}
+                                </span>
+                              )}
+                            </div>
+                          ) : lead.sourceEvent || lead.source === "EVENT_RSVP" ? (
+                            <div className="flex flex-col gap-0.5">
+                              <Badge variant="outline" className="w-fit text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30">
+                                Event RSVP
+                              </Badge>
+                              <span className="text-[11px] font-medium text-foreground truncate max-w-[180px]">
+                                {lead.sourceEvent?.title || "Special Event"}
+                              </span>
+                              {Boolean(lead.customFields?.selectedDate || lead.customFields?.selectedDates || lead.customFields?.selectedSlot) && (
+                                <span className="text-[10px] font-mono text-primary">
+                                  {Array.isArray(lead.customFields?.selectedDates) && (lead.customFields?.selectedDates as string[]).length > 0
+                                    ? (lead.customFields?.selectedDates as string[]).join(", ")
+                                    : String(lead.customFields?.selectedDate || "")} {lead.customFields?.selectedSlot ? `(${String(lead.customFields?.selectedSlot)})` : ""}
+                                </span>
+                              )}
+                            </div>
+                          ) : lead.formTitle || lead.pageSlug ? (
+                            <div className="flex flex-col gap-1">
+                              <Badge
+                                variant="outline"
+                                className="w-fit text-[10px] bg-primary/10 text-primary border-primary/30"
+                              >
+                                {lead.formTitle || "Page Form"}
+                              </Badge>
+                              {lead.pageSlug && (
+                                <Link
+                                  href={`/${lead.pageSlug}`}
+                                  target="_blank"
+                                  className="text-[11px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                                >
+                                  /{lead.pageSlug}
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </Link>
+                              )}
+                            </div>
+                          ) : (
+                            <Badge variant="outline" className="text-[10px]">
+                              {lead.source || "Inbound Web"}
+                            </Badge>
+                          )}
+                        </td>
+
+                        <td className="py-3 px-4 max-w-xs">
+                          <div className="font-medium text-foreground truncate">
+                            {lead.subject || "General Inquiry"}
                           </div>
-                        ) : (
-                          <Badge variant="outline" className="text-[10px]">
-                            {lead.source || "Inbound Web"}
-                          </Badge>
-                        )}
-                      </td>
+                          <p className="text-muted-foreground truncate text-[11px]">
+                            {lead.message}
+                          </p>
+                        </td>
 
-                      <td className="py-3 px-4 max-w-xs">
-                        <div className="font-medium text-foreground truncate">
-                          {lead.subject || "General Inquiry"}
-                        </div>
-                        <p className="text-muted-foreground truncate text-[11px]">
-                          {lead.message}
-                        </p>
-                      </td>
-
-                      <td className="py-3 px-4">
-                        <Select
-                          value={lead.status}
-                          onValueChange={(val) => handleStatusChange(lead.id, val)}
-                        >
-                          <SelectTrigger
-                            className={`h-7 w-32 text-[10px] font-semibold border rounded-full ${
-                              statusColors[lead.status] || ""
-                            }`}
+                        <td className="py-3 px-4">
+                          <Select
+                            value={lead.status}
+                            onValueChange={(val) => handleStatusChange(lead.id, val)}
                           >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="NEW">New</SelectItem>
-                            <SelectItem value="CONTACTED">Contacted</SelectItem>
-                            <SelectItem value="IN_DISCUSSION">In Discussion</SelectItem>
-                            <SelectItem value="QUALIFIED">Qualified</SelectItem>
-                            <SelectItem value="CLOSED">Closed</SelectItem>
-                            <SelectItem value="ARCHIVED">Archived</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </td>
+                            <SelectTrigger
+                              className={`h-7 w-32 text-[10px] font-semibold border rounded-full ${
+                                statusColors[lead.status] || ""
+                              }`}
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="NEW">New</SelectItem>
+                              <SelectItem value="CONTACTED">Contacted</SelectItem>
+                              <SelectItem value="IN_DISCUSSION">In Discussion</SelectItem>
+                              <SelectItem value="QUALIFIED">Qualified</SelectItem>
+                              <SelectItem value="CLOSED">Closed</SelectItem>
+                              <SelectItem value="ARCHIVED">Archived</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
 
-                      <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">
-                        <div className="flex items-center gap-1 text-[11px]">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(lead.createdAt).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </div>
-                      </td>
+                        <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">
+                          <div className="flex items-center gap-1 text-[11px]">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(lead.createdAt).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </div>
+                        </td>
 
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSelectedLead(lead)}
-                            className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
-                            title="View Full Details"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteClick(lead.id, lead.name)}
-                            className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
-                            title="Delete Lead"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setSelectedLead(lead)}
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
+                              title="View Full Details"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteClick(lead.id, lead.name)}
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                              title="Erase Contact & Personal Data (GDPR)"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -441,14 +633,21 @@ export default function AdminLeadsPage() {
                 <DialogTitle className="font-serif text-xl">
                   {selectedLead.name}
                 </DialogTitle>
-                <Badge
-                  variant="outline"
-                  className={`text-[10px] font-semibold border rounded-full ${
-                    statusColors[selectedLead.status]
-                  }`}
-                >
-                  {selectedLead.status.replace("_", " ")}
-                </Badge>
+                <div className="flex items-center gap-1.5">
+                  {selectedLead.isSubscribed === false && (
+                    <Badge variant="destructive" className="text-[10px] uppercase font-semibold">
+                      Unsubscribed
+                    </Badge>
+                  )}
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] font-semibold border rounded-full ${
+                      statusColors[selectedLead.status]
+                    }`}
+                  >
+                    {selectedLead.status.replace("_", " ")}
+                  </Badge>
+                </div>
               </div>
               <DialogDescription className="text-xs">
                 Captured on{" "}
@@ -467,12 +666,16 @@ export default function AdminLeadsPage() {
                   </span>
                   <div className="font-medium text-foreground flex items-center gap-1 mt-0.5">
                     <Mail className="w-3 h-3 text-primary" />
-                    <a
-                      href={`mailto:${selectedLead.email}`}
-                      className="hover:underline text-primary"
-                    >
-                      {selectedLead.email}
-                    </a>
+                    {selectedLead.email ? (
+                      <a
+                        href={`mailto:${selectedLead.email}`}
+                        className="hover:underline text-primary"
+                      >
+                        {selectedLead.email}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground italic">Not provided</span>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -484,32 +687,42 @@ export default function AdminLeadsPage() {
                     {selectedLead.phone ? (
                       <a
                         href={`tel:${selectedLead.phone}`}
-                        className="hover:underline text-foreground"
+                        className="hover:underline text-foreground font-mono"
                       >
                         {selectedLead.phone}
                       </a>
                     ) : (
-                      "Not provided"
+                      <span className="text-muted-foreground italic">Not provided</span>
                     )}
                   </div>
                 </div>
               </div>
 
-              {selectedLead.sourceArtwork && (
+              {selectedLead.deviceInfo && (
+                <div className="p-2.5 rounded-lg bg-muted/30 border border-border text-[11px] flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground font-medium">Device Environment:</span>
+                  <span className="font-mono text-foreground truncate">{selectedLead.deviceInfo}</span>
+                </div>
+              )}
+
+              {(selectedLead.artwork || selectedLead.sourceArtwork || selectedLead.artworkTitle) && (
                 <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                   <span className="text-[10px] text-slate-700 dark:text-slate-300 uppercase font-semibold flex items-center gap-1">
-                    <QrCode className="w-3 h-3 text-slate-700 dark:text-slate-300" /> Scanned Exhibition Floor QR Code
+                    <QrCode className="w-3 h-3 text-primary" /> Scanned Exhibition Floor QR Code
                   </span>
                   <p className="text-foreground font-semibold mt-1">
-                    {selectedLead.sourceArtwork.title}
+                    {selectedLead.artworkTitle || selectedLead.artwork?.title || selectedLead.sourceArtwork?.title || "Exhibition Floor Masterpiece"}
                   </p>
-                  <Link
-                    href={`/artwork/${selectedLead.sourceArtwork.slug}`}
-                    target="_blank"
-                    className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 mt-1"
-                  >
-                    View Masterwork Detail <ExternalLink className="w-2.5 h-2.5" />
-                  </Link>
+                  {(selectedLead.artwork?.slug || selectedLead.sourceArtwork?.slug) && (
+                    <Link
+                      href={`/artwork/${selectedLead.artwork?.slug || selectedLead.sourceArtwork?.slug}`}
+                      target="_blank"
+                      className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 mt-1"
+                    >
+                      View Masterwork Detail <ExternalLink className="w-2.5 h-2.5" />
+                    </Link>
+                  )}
                 </div>
               )}
 
@@ -615,24 +828,39 @@ export default function AdminLeadsPage() {
                 </div>
               )}
 
-              <div className="pt-2 flex items-center justify-between border-t border-border">
-                <span className="text-xs font-semibold text-foreground">Update Lead Status:</span>
-                <Select
-                  value={selectedLead.status}
-                  onValueChange={(val) => handleStatusChange(selectedLead.id, val)}
+              <div className="pt-3 flex items-center justify-between border-t border-border gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const target = { id: selectedLead.id, name: selectedLead.name };
+                    setSelectedLead(null);
+                    handleDeleteClick(target.id, target.name);
+                  }}
+                  className="h-8 text-xs text-destructive border-destructive/30 hover:bg-destructive/10 cursor-pointer"
                 >
-                  <SelectTrigger className="h-8 w-36 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NEW">New</SelectItem>
-                    <SelectItem value="CONTACTED">Contacted</SelectItem>
-                    <SelectItem value="IN_DISCUSSION">In Discussion</SelectItem>
-                    <SelectItem value="QUALIFIED">Qualified</SelectItem>
-                    <SelectItem value="CLOSED">Closed</SelectItem>
-                    <SelectItem value="ARCHIVED">Archived</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Erase Data (GDPR)
+                </Button>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-foreground">Status:</span>
+                  <Select
+                    value={selectedLead.status}
+                    onValueChange={(val) => handleStatusChange(selectedLead.id, val)}
+                  >
+                    <SelectTrigger className="h-8 w-36 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NEW">New</SelectItem>
+                      <SelectItem value="CONTACTED">Contacted</SelectItem>
+                      <SelectItem value="IN_DISCUSSION">In Discussion</SelectItem>
+                      <SelectItem value="QUALIFIED">Qualified</SelectItem>
+                      <SelectItem value="CLOSED">Closed</SelectItem>
+                      <SelectItem value="ARCHIVED">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </DialogContent>
@@ -643,13 +871,13 @@ export default function AdminLeadsPage() {
       <ConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title="Delete Patron Lead Record"
+        title="Erase Contact & Personal Data (GDPR Compliance)"
         description={
           targetDeleteLead
-            ? `Are you sure you want to delete the acquisition lead record for "${targetDeleteLead.name}"? This action cannot be undone.`
-            : "Are you sure you want to delete this lead record?"
+            ? `Are you sure you want to permanently erase all records and personal telemetry for "${targetDeleteLead.name}"? In accordance with GDPR data protection compliance, this action permanently deletes all associated inquiries, QR scans, and contact identifiers.`
+            : "Are you sure you want to permanently erase this contact record?"
         }
-        confirmText="Delete Lead"
+        confirmText="Erase Personal Data (GDPR)"
         isDestructive={true}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}

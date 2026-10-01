@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { LeadStatus, Prisma } from "@prisma/client";
+import { LeadSource, LeadStatus, Prisma } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const statusParam = searchParams.get("status");
+    const sourceParam = searchParams.get("source");
     const searchParam = searchParams.get("search");
     const exportCsv = searchParams.get("export") === "csv";
 
@@ -24,12 +25,25 @@ export async function GET(request: NextRequest) {
       where.status = statusParam as LeadStatus;
     }
 
+    if (sourceParam && sourceParam !== "ALL") {
+      if (sourceParam === "CONTACT_FORM") {
+        where.source = { in: ["CONTACT_FORM", "CUSTOM_FORM"] };
+      } else if (sourceParam === "QR_SCAN") {
+        where.source = "QR_SCAN";
+      } else if (sourceParam === "EVENT_RSVP") {
+        where.source = "EVENT_RSVP";
+      } else {
+        where.source = sourceParam as LeadSource;
+      }
+    }
+
     if (searchParam) {
       where.OR = [
         { name: { contains: searchParam, mode: "insensitive" } },
         { email: { contains: searchParam, mode: "insensitive" } },
         { phone: { contains: searchParam, mode: "insensitive" } },
         { subject: { contains: searchParam, mode: "insensitive" } },
+        { artworkTitle: { contains: searchParam, mode: "insensitive" } },
       ];
     }
 
@@ -37,6 +51,13 @@ export async function GET(request: NextRequest) {
       where,
       orderBy: { createdAt: "desc" },
       include: {
+        artwork: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
         sourceArtwork: {
           select: {
             id: true,
@@ -64,6 +85,9 @@ export async function GET(request: NextRequest) {
         "Status",
         "Subject",
         "Source",
+        "Artwork Scanned",
+        "Device Info",
+        "Subscribed",
         "Form Title",
         "Page Slug",
         "Source Artwork",
@@ -80,32 +104,35 @@ export async function GET(request: NextRequest) {
           ? (customFields.selectedDates as string[]).join("; ")
           : String(customFields?.selectedDate || "");
         const selectedSlotVal = String(customFields?.selectedSlot || "");
+        const artTitle = l.artworkTitle || l.artwork?.title || l.sourceArtwork?.title || "";
 
         return [
           `"${l.id}"`,
-          `"${l.name.replace(/"/g, '""')}"`,
-          `"${l.email.replace(/"/g, '""')}"`,
+          `"${(l.name || "").replace(/"/g, '""')}"`,
+          `"${(l.email || "").replace(/"/g, '""')}"`,
           `"${(l.phone || "").replace(/"/g, '""')}"`,
           `"${l.status}"`,
           `"${(l.subject || "").replace(/"/g, '""')}"`,
           `"${(l.source || "").replace(/"/g, '""')}"`,
+          `"${artTitle.replace(/"/g, '""')}"`,
+          `"${(l.deviceInfo || "").replace(/"/g, '""')}"`,
+          `"${l.isSubscribed ? "Yes" : "No"}"`,
           `"${(l.formTitle || "").replace(/"/g, '""')}"`,
           `"${(l.pageSlug || "").replace(/"/g, '""')}"`,
-          `"${(l.sourceArtwork?.title || "").replace(/"/g, '""')}"`,
+          `"${(l.sourceArtwork?.title || l.artwork?.title || "").replace(/"/g, '""')}"`,
           `"${(l.sourceEvent?.title || "").replace(/"/g, '""')}"`,
           `"${selectedDateVal.replace(/"/g, '""')}"`,
           `"${selectedSlotVal.replace(/"/g, '""')}"`,
-          `"${l.message.replace(/"/g, '""').replace(/\n/g, " ")}"`,
+          `"${(l.message || "").replace(/"/g, '""').replace(/\n/g, " ")}"`,
           `"${new Date(l.createdAt).toISOString()}"`,
         ];
       });
 
       const csvContent = [headers.join(","), ...csvRows.map((r) => r.join(","))].join("\n");
-
       return new NextResponse(csvContent, {
         headers: {
           "Content-Type": "text/csv; charset=utf-8",
-          "Content-Disposition": `attachment; filename="savazai-leads-${new Date().toISOString().slice(0, 10)}.csv"`,
+          "Content-Disposition": `attachment; filename="atelier-leads-export-${new Date().toISOString().slice(0, 10)}.csv"`,
         },
       });
     }

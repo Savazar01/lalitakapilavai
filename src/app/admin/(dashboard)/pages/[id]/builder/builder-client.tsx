@@ -2097,13 +2097,13 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
 
   const [page, setPage] = React.useState<PageData | null>(initialPage || null);
   const [loading, setLoading] = React.useState(!initialPage);
-  const [mounted, setMounted] = React.useState(false);
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const [saving, setSaving] = React.useState(false);
   const [savedSuccess, setSavedSuccess] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Viewport mode: desktop, tablet, mobile
   const [viewport, setViewport] = React.useState<ViewportMode>("desktop");

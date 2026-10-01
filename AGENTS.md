@@ -279,9 +279,50 @@ All code generation and architectural modifications must adhere to the specializ
   - Ingestion routines and "Auto-Fill from Catalog & Asset Repository" force `alt: ""` unless explicitly authored by the user.
   - Raw UUID filenames (e.g. `e09874c5-4fed-4176...`) and legacy single-artist or devotional captions are strictly stripped on catalog enrichment.
 
+### P. Exhibition Hall Placard Contrast & HTML Sanitization Invariant
+- **Theme-Driven Button Contrast**:
+  - The "Details" / "View Details" button across both floating 3D canvas overlay cards and bottom metadata drawers must strictly inherit semantic Theme Studio tokens: `bg-primary text-primary-foreground hover:bg-primary/90`.
+  - Inverted or hardcoded white-on-white text/background buttons are strictly forbidden to ensure WCAG 2.2 AA compliance across all light and dark themes.
+- **HTML Sanitization Pipeline (`stripHtmlTags`)**:
+  - All rendered artwork descriptions, curatorial notes, and placards must pass through `stripHtmlTags(...)` before display.
+  - Raw HTML markup, unescaped tags (`<p>`, `<span>`, `style="..."`), non-breaking spaces (`&nbsp;`), and HTML entities are stripped to prevent raw markup leakage into presentation placards.
 
+### Q. Mobile QR Scan Onboarding, Safe-Area & Persistent Device Identity
+- **Mobile Viewport Safe-Area Padding**:
+  - Physical QR placard scan intake modals and gates must enforce dynamic viewport heights and iOS home indicator insets: `pb-[calc(1.5rem+env(safe-area-inset-bottom))]` with `max-h-[92dvh] sm:max-h-[85dvh]` and `overflow-y-auto`.
+  - Primary action buttons ("Unlock Masterwork Details") must be placed inside sticky action footers (`sticky bottom-0 bg-card/95 backdrop-blur-sm`), ensuring full visibility above mobile browser toolbars on iPhone Safari and Android Chrome.
+- **Mandatory Phone / WhatsApp**:
+  - WhatsApp / Phone Number is marked required (`*`, `required: true`) across physical gallery floor QR scan gates to ensure valid patron outreach and acquisition telemetry.
+- **Frictionless Subsequent Scans via Device Recognition**:
+  - Visitor identity (`visitor_uuid`, name, phone, email) is persisted locally in `localStorage` under `savazai_visitor_identity` and an auxiliary 30-day cookie (`SameSite=Lax`).
+  - When a visitor scans additional artwork QR placards during the same gallery visit, `getStoredVisitorIdentity()` recognizes the device, automatically bypasses the registration barrier, and silently dispatches scan telemetry to `POST /api/leads/qr-scan`.
 
+### R. Dedicated QR Scans & CRM Lead Administration Pipeline
+- **Lead Source Classification**:
+  - Inbound inquiries are typed via `LeadSource`: `CONTACT_FORM`, `EVENT_RSVP`, `QR_SCAN`, `CUSTOM_FORM`.
+  - Scans from physical gallery QR cards persist the associated `artworkId`, `artworkTitle`, and client device user-agent string (`deviceInfo`).
+- **Segmented Admin Leads View**:
+  - `/admin/leads` provides segmented channel tab filters: "All Inquiries", "Contact Messages", "Event RSVPs", and "QR Artwork Scans".
+  - The dedicated QR view renders specialized columns: Visitor Details (Name & Phone / WhatsApp), Artwork Scanned (with direct link to masterwork), Device & Environment, Status, and Scanned At timestamp.
+  - CSV export respects the active channel filter and includes comprehensive QR scan telemetry.
 
+### S. Universal 1-Click Unsubscribe Pipeline & Promotional Suppression
+- **Authenticated Secure Tokens**:
+  - Unsubscribe tokens are generated using AES-256-GCM encryption (`encryptEmailToken(email)`) with authentication tags and IV prefixes, preventing tampering or forged unsubscriptions.
+- **Standardized Branded Email Footer**:
+  - All outbound transactional, auto-responder, RSVP confirmation, and broadcast emails append a standardized legal footer containing a 1-click unsubscribe link (`/unsubscribe?token=...`).
+- **Outbound Mailer Suppression**:
+  - Unsubscribed email addresses are recorded in the `UnsubscribedContact` table.
+  - `sendAtelierEmail(...)` verifies recipient status via `isEmailUnsubscribed(...)` and suppresses all outbound marketing/automated emails to unsubscribed addresses.
 
-
+### T. GDPR Personal Data Erasure & Universal Privacy Consent Invariant
+- **Administrative GDPR Data Erasure**:
+  - Both `/admin/leads` and `/admin/users` provide explicit "Erase Data (GDPR)" actions with high-visibility warnings.
+  - Deletion permanently removes the contact record, inquiry history, QR interaction logs, and associated telemetry in full compliance with GDPR Article 17 ("Right to Erasure").
+- **Public Footer Data Removal Trigger**:
+  - The public footer includes a "Privacy / Do Not Sell / Data Removal" action in its legal links strip.
+  - Clicking this triggers `PrivacyModalTrigger`, presenting a modal allowing users to request personal data erasure or unsubscribe immediately, automatically notifying `SystemSetting.adminAlertEmail`.
+- **Universal Privacy Policy Consent Checkbox**:
+  - All customer-facing intake forms (Contact Page, Event RSVP, Physical QR Placard Gate, Dynamic Page Builder Forms) must render `PrivacyConsentCheckbox` (`src/components/ui/privacy-consent-checkbox.tsx`).
+  - Users must explicitly check "I have read and agree to the Privacy Policy" (with a direct link to `/privacy`) before form submission is enabled. Client-side and server-side validation strictly block submissions without consent.
 

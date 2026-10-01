@@ -53,6 +53,13 @@ export async function POST(req: NextRequest) {
     const messageStr = (message || comments || "Inquiry submitted through website form.").trim();
     const subjectStr = (body.subject || `[${titleStr}] Inbound Request from ${trimmedName}`).trim();
 
+    const lowerTitle = titleStr.toLowerCase();
+    const isContact =
+      lowerTitle.includes("contact") ||
+      pageStr.toLowerCase() === "contact" ||
+      lowerTitle.includes("inquiry") ||
+      lowerTitle.includes("get in touch");
+
     // 1. Record lead in database
     const lead = await prisma.lead.create({
       data: {
@@ -63,7 +70,7 @@ export async function POST(req: NextRequest) {
         message: messageStr,
         formTitle: titleStr,
         pageSlug: pageStr,
-        source: "PAGE_FORM",
+        source: isContact ? "CONTACT_FORM" : "CUSTOM_FORM",
         customFields: customFields && typeof customFields === "object" ? customFields : {},
       },
     });

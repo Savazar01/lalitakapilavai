@@ -517,7 +517,7 @@ export default function UserManagementPage() {
                               ? "opacity-30 cursor-not-allowed"
                               : "text-destructive hover:bg-destructive/10"
                           }`}
-                          title={isCurrentUser ? "Cannot delete yourself" : "Delete User"}
+                          title={isCurrentUser ? "Cannot delete yourself" : "Delete User / Erase Data (GDPR)"}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
@@ -740,12 +740,12 @@ export default function UserManagementPage() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="font-serif text-lg text-destructive flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5" /> Confirm Account Deletion
+              <AlertTriangle className="w-5 h-5" /> Erase User &amp; Account Data (GDPR)
             </DialogTitle>
             <DialogDescription className="text-xs">
-              Are you certain you wish to delete the administrator account for{" "}
+              Are you certain you wish to delete the administrator account and permanently erase all personal telemetry for{" "}
               <strong className="text-foreground">{deleteTargetUser?.name}</strong> ({deleteTargetUser?.email})?
-              This action terminates all credentials and session tokens permanently.
+              This action terminates all credentials, audit associations, and session tokens permanently under data privacy protocols.
             </DialogDescription>
           </DialogHeader>
 
