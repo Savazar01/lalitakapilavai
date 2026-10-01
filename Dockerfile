@@ -99,6 +99,13 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy full node_modules to guarantee prisma CLI, effect, sharp, and all entrypoint lifecycle tools are available
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
+# CRITICAL FIX: Explicitly copy generated Prisma Client engine and metadata from builder stage
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma/client ./node_modules/@prisma/client
+
+# Setup directory permissions for runtime client generation
+RUN mkdir -p /app/node_modules/.prisma && chown -R nextjs:nodejs /app/node_modules/.prisma
+
 # Copy pre-bundled seeder
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/seed.js* ./prisma/
 

@@ -326,3 +326,12 @@ All code generation and architectural modifications must adhere to the specializ
   - All customer-facing intake forms (Contact Page, Event RSVP, Physical QR Placard Gate, Dynamic Page Builder Forms) must render `PrivacyConsentCheckbox` (`src/components/ui/privacy-consent-checkbox.tsx`).
   - Users must explicitly check "I have read and agree to the Privacy Policy" (with a direct link to `/privacy`) before form submission is enabled. Client-side and server-side validation strictly block submissions without consent.
 
+### U. Multi-Stage Container Prisma Client Inheritance & Fail-Fast Lifecycle Invariant
+- **Multi-Stage Prisma Client Inheritance**:
+  - In `Dockerfile`, the production `runner` stage must explicitly copy `/app/node_modules/.prisma` and `/app/node_modules/@prisma/client` from the `builder` stage immediately *after* the `deps` `node_modules` layer.
+  - This prevents `deps` (created before `prisma generate`) from overwriting the compiled query engine with uninitialized stub placeholders (`throw new Error('@prisma/client did not initialize yet')`).
+  - The runtime user (`nextjs:nodejs`) must have write permissions to `/app/node_modules/.prisma` for container self-generation.
+- **Fail-Fast Entrypoint Schema Push & Client Synchronization**:
+  - `docker-entrypoint.sh` executes a pre-migration raw SQL block via `prisma db execute --stdin` to normalize legacy `leads.source` scalar values to `'CONTACT_FORM'` before schema push.
+  - `prisma db push` strictly includes `--accept-data-loss` with fail-fast exit (`exit 1` on error) to prevent non-interactive container aborts during enum conversions.
+  - Container entrypoint executes runtime `prisma generate` immediately following the push, ensuring the schema and runtime client are synchronized before launching `exec node server.js`.
