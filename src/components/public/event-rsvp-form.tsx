@@ -9,6 +9,8 @@ import { formatCurrency } from "@/lib/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PrivacyConsentCheckbox } from "@/components/ui/privacy-consent-checkbox";
+import { FormCaptcha, FormCaptchaValue } from "@/components/ui/form-captcha";
+import { FormOtpDialog } from "@/components/ui/form-otp-dialog";
 
 export interface EventRsvpCustomField {
   id: string;
@@ -32,6 +34,8 @@ export interface EventRsvpConfig {
   timeSlotRequirement?: "MANDATORY" | "OPTIONAL" | "DISABLED"; // Default "MANDATORY"
   slotIntervalMinutes?: number; // 15, 30, 45, 60, 120, or custom
   slotCapacity?: number | null;
+  enableCaptcha?: boolean;
+  enableEmailOtp?: boolean;
   customFields?: EventRsvpCustomField[];
 }
 
@@ -183,6 +187,49 @@ export function EventRsvpForm({
     return generateTimeSlots(startH, endH, slotInterval);
   }, [slotRequirement, hasDailySchedules, dailySchedules, activeDayIdx, slotInterval, startDate, endDate]);
 
+  // Form Security & Anti-Bot States
+  const enableCaptcha = rsvpConfig?.enableCaptcha === true;
+  const enableEmailOtp = rsvpConfig?.enableEmailOtp === true;
+
+  const [captchaValue, setCaptchaValue] = React.useState<FormCaptchaValue>({ token: "", answer: "" });
+  const [otpDialogOpen, setOtpDialogOpen] = React.useState<boolean>(false);
+  const [otpSessionToken, setOtpSessionToken] = React.useState<string | null>(null);
+  const [pendingPayload, setPendingPayload] = React.useState<Record<string, unknown> | null>(null);
+
+  const executeRegistration = async (payloadToSubmit: Record<string, unknown>) => {
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/events/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadToSubmit),
+      });
+
+      if (res.ok) {
+        toast.success("Registration confirmed! We look forward to welcoming you.");
+        setRegistered(true);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to submit RSVP");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Error submitting registration");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleOtpVerified = (token: string) => {
+    setOtpSessionToken(token);
+    if (pendingPayload) {
+      executeRegistration({
+        ...pendingPayload,
+        otpSessionToken: token,
+      });
+    }
+  };
+
   const isEnabled = rsvpConfig?.enabled !== false && isRegistrationOpen;
 
   if (!isEnabled) {
@@ -236,45 +283,77 @@ export function EventRsvpForm({
       return;
     }
 
-
     if (slotRequirement === "MANDATORY" && activeSlots.length > 0 && !selectedSlot) {
       toast.error("Please select an arrival time slot");
       return;
     }
 
-    setSubmitting(true);
-
-    try {
-      const datesToSubmit = selectedDates.length > 0 ? selectedDates : (activeDate ? [activeDate] : []);
-      const res = await fetch("/api/events/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eventId,
-          attendeeName: name,
-          attendeeEmail: email,
-          attendeePhone: phone || undefined,
-          ticketCount: allowGuestCount ? (parseInt(tickets, 10) || 1) : 1,
-          selectedDate: datesToSubmit.join(", ") || undefined,
-          selectedDates: datesToSubmit,
-          selectedSlot: selectedSlot || (slotRequirement === "OPTIONAL" ? "Anytime / Flexible Arrival" : undefined),
-          customAnswers: Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
-        }),
-      });
-
-      if (res.ok) {
-        toast.success("Registration confirmed! We look forward to welcoming you.");
-        setRegistered(true);
-      } else {
-        const err = await res.json().catch(() => ({}));
-        toast.error(err.error || "Failed to submit RSVP");
-      }
-    } catch (e) {
-      console.error(e);
-      toast.error("Error submitting registration");
-    } finally {
-      setSubmitting(false);
+    if (enableCaptcha && (!captchaValue.token || !captchaValue.answer.trim())) {
+      toast.error("Please solve the bot protection math problem.");
+      return;
     }
+
+    const datesToSubmit = selectedDates.length > 0 ? selectedDates : (activeDate ? [activeDate] : []);
+    const basePayload = {
+      eventId,
+      attendeeName: name,
+      attendeeEmail: email,
+      attendeePhone: phone || undefined,
+      ticketCount: allowGuestCount ? (parseInt(tickets, 10) || 1) : 1,
+      selectedDate: datesToSubmit.join(", ") || undefined,
+      selectedDates: datesToSubmit,
+      selectedSlot: selectedSlot || (slotRequirement === "OPTIONAL" ? "Anytime / Flexible Arrival" : undefined),
+      customAnswers: Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
+      enableCaptcha,
+      captchaToken: enableCaptcha ? captchaValue.token : undefined,
+      captchaAnswer: enableCaptcha ? captchaValue.answer : undefined,
+      enableEmailOtp,
+    };
+
+    if (enableEmailOtp) {
+      if (otpSessionToken) {
+        await executeRegistration({ ...basePayload, otpSessionToken });
+        return;
+      }
+
+      setSubmitting(true);
+      try {
+        const otpRes = await fetch("/api/security/otp/request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            formType: "EVENT_RSVP",
+            targetId: eventId,
+            formTitle: eventTitle,
+          }),
+        });
+
+        const otpData = await otpRes.json();
+        if (!otpRes.ok) {
+          throw new Error(otpData.error || "Failed to initiate verification");
+        }
+
+        if (otpData.bypass && otpData.otpSessionToken) {
+          setOtpSessionToken(otpData.otpSessionToken);
+          await executeRegistration({ ...basePayload, otpSessionToken: otpData.otpSessionToken });
+          return;
+        }
+
+        setPendingPayload(basePayload);
+        setOtpDialogOpen(true);
+        setSubmitting(false);
+        return;
+      } catch (err: unknown) {
+        setSubmitting(false);
+        const msg = err instanceof Error ? err.message : "Error initiating verification";
+        toast.error(msg);
+        return;
+      }
+    }
+
+    await executeRegistration(basePayload);
   };
 
   if (registered) {
@@ -560,6 +639,17 @@ export function EventRsvpForm({
             </div>
           ))}
 
+          {/* In-House Bot Protection CAPTCHA Challenge */}
+          {enableCaptcha && (
+            <div className="pt-2">
+              <FormCaptcha
+                value={captchaValue}
+                onChange={setCaptchaValue}
+                disabled={submitting}
+              />
+            </div>
+          )}
+
           <PrivacyConsentCheckbox
             id={`rsvp-privacy-${eventId}`}
             checked={privacyConsent}
@@ -581,6 +671,18 @@ export function EventRsvpForm({
           </p>
         </form>
       </CardContent>
+
+      {/* Email OTP Verification Dialog */}
+      <FormOtpDialog
+        open={otpDialogOpen}
+        onOpenChange={setOtpDialogOpen}
+        email={email}
+        name={name}
+        formType="EVENT_RSVP"
+        targetId={eventId}
+        formTitle={eventTitle}
+        onVerified={handleOtpVerified}
+      />
     </Card>
   );
 }

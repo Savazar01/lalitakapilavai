@@ -22,6 +22,8 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PrivacyConsentCheckbox } from "@/components/ui/privacy-consent-checkbox";
+import { FormCaptcha, FormCaptchaValue } from "@/components/ui/form-captcha";
+import { FormOtpDialog } from "@/components/ui/form-otp-dialog";
 
 export interface FormFieldConfig {
   id: string;
@@ -42,6 +44,8 @@ export interface DynamicFormConfig {
   inputBorderColor?: string;// Overrides global --form-input-border
   btnBg?: string;           // Overrides global --form-btn-bg
   btnText?: string;         // Overrides global --form-btn-text
+  enableCaptcha?: boolean;  // In-house CAPTCHA challenge
+  enableEmailOtp?: boolean; // In-house email OTP verification
 }
 
 export interface DynamicFormBlockProps {
@@ -56,6 +60,8 @@ export interface DynamicFormBlockProps {
   fields?: FormFieldConfig[];
   pageSlug?: string;
   className?: string;
+  enableCaptcha?: boolean;
+  enableEmailOtp?: boolean;
 }
 
 export function DynamicFormBlock({
@@ -106,6 +112,8 @@ export function DynamicFormBlock({
   ],
   pageSlug = "general",
   className = "",
+  enableCaptcha,
+  enableEmailOtp,
 }: DynamicFormBlockProps) {
   const [formData, setFormData] = React.useState<Record<string, string | boolean>>({});
   const [privacyConsent, setPrivacyConsent] = React.useState(false);
@@ -117,9 +125,52 @@ export function DynamicFormBlock({
   const effectiveSubtitle = formConfig?.subtitle !== undefined ? formConfig.subtitle : formSubtitle;
   const effectiveFields = formConfig?.fields && formConfig.fields.length > 0 ? formConfig.fields : fields;
 
+  const effectiveEnableCaptcha = formConfig?.enableCaptcha ?? enableCaptcha ?? false;
+  const effectiveEnableEmailOtp = formConfig?.enableEmailOtp ?? enableEmailOtp ?? false;
+
+  const [captchaValue, setCaptchaValue] = React.useState<FormCaptchaValue>({ token: "", answer: "" });
+  const [otpDialogOpen, setOtpDialogOpen] = React.useState<boolean>(false);
+  const [otpSessionToken, setOtpSessionToken] = React.useState<string | null>(null);
+  const [pendingPayload, setPendingPayload] = React.useState<Record<string, unknown> | null>(null);
+
   const handleInputChange = (fieldId: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [fieldId]: value }));
     if (errorMessage) setErrorMessage(null);
+  };
+
+  const executeSubmission = async (payloadToSubmit: Record<string, unknown>) => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    try {
+      const res = await fetch("/api/forms/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadToSubmit),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send inquiry.");
+
+      setIsSuccess(true);
+      toast.success("Inquiry sent successfully!");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to submit inquiry";
+      setErrorMessage(msg);
+      toast.error(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOtpVerified = (token: string) => {
+    setOtpSessionToken(token);
+    if (pendingPayload) {
+      const finalPayload = {
+        ...pendingPayload,
+        otpSessionToken: token,
+      };
+      executeSubmission(finalPayload);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,9 +180,6 @@ export function DynamicFormBlock({
       setErrorMessage("Please agree to the Privacy Policy to submit your inquiry.");
       return;
     }
-
-    setIsSubmitting(true);
-    setErrorMessage(null);
 
     // Identify standard fields vs custom fields
     let fullName = "";
@@ -168,50 +216,86 @@ export function DynamicFormBlock({
     if (!message && typeof formData["message"] === "string") message = formData["message"];
 
     if (!fullName.trim() || !email.trim()) {
-      setIsSubmitting(false);
       setErrorMessage("Please provide both your Name and a valid Email Address.");
       return;
     }
 
-    if (!privacyConsent) {
-      setIsSubmitting(false);
-      setErrorMessage("Please agree to the Privacy Policy to proceed.");
-      return;
+    // 1. CAPTCHA verification check
+    if (effectiveEnableCaptcha) {
+      if (!captchaValue.token || !captchaValue.answer.trim()) {
+        setErrorMessage("Please solve the bot protection math problem.");
+        return;
+      }
     }
 
-    try {
-      const payload = {
-        fullName: fullName.trim(),
-        email: email.trim(),
-        phone: phone.trim() || undefined,
-        subject: subject.trim() || undefined,
-        message: message.trim() || undefined,
-        formTitle: effectiveTitle,
-        pageSlug,
-        notifyEmail,
-        recipientEmails: recipientEmails.trim() || undefined,
-        emailSubjectTemplate: emailSubjectTemplate.trim() || undefined,
-        customFields,
-      };
+    const basePayload = {
+      fullName: fullName.trim(),
+      email: email.trim(),
+      phone: phone.trim() || undefined,
+      subject: subject.trim() || undefined,
+      message: message.trim() || undefined,
+      formTitle: effectiveTitle,
+      pageSlug,
+      notifyEmail,
+      recipientEmails: recipientEmails.trim() || undefined,
+      emailSubjectTemplate: emailSubjectTemplate.trim() || undefined,
+      enableCaptcha: effectiveEnableCaptcha,
+      captchaToken: effectiveEnableCaptcha ? captchaValue.token : undefined,
+      captchaAnswer: effectiveEnableCaptcha ? captchaValue.answer : undefined,
+      enableEmailOtp: effectiveEnableEmailOtp,
+      customFields,
+    };
 
-      const res = await fetch("/api/forms/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    // 2. Email OTP Verification with Returning User Bypass
+    if (effectiveEnableEmailOtp) {
+      if (otpSessionToken) {
+        // Already verified in active session
+        await executeSubmission({ ...basePayload, otpSessionToken });
+        return;
+      }
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to send inquiry.");
+      setIsSubmitting(true);
+      setErrorMessage(null);
+      try {
+        const otpRes = await fetch("/api/security/otp/request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: fullName.trim(),
+            email: email.trim(),
+            formType: "CONTACT",
+            formTitle: effectiveTitle,
+          }),
+        });
 
-      setIsSuccess(true);
-      toast.success("Inquiry sent successfully!");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to submit inquiry";
-      setErrorMessage(msg);
-      toast.error(msg);
-    } finally {
-      setIsSubmitting(false);
+        const otpData = await otpRes.json();
+        if (!otpRes.ok) {
+          throw new Error(otpData.error || "Failed to initiate email verification");
+        }
+
+        if (otpData.bypass && otpData.otpSessionToken) {
+          // Returning verified user detected! Direct bypass permitted.
+          setOtpSessionToken(otpData.otpSessionToken);
+          await executeSubmission({ ...basePayload, otpSessionToken: otpData.otpSessionToken });
+          return;
+        }
+
+        // New or unverified user: display OTP challenge dialog
+        setPendingPayload(basePayload);
+        setOtpDialogOpen(true);
+        setIsSubmitting(false);
+        return;
+      } catch (err: unknown) {
+        setIsSubmitting(false);
+        const msg = err instanceof Error ? err.message : "Error initiating verification";
+        setErrorMessage(msg);
+        toast.error(msg);
+        return;
+      }
     }
+
+    // Direct submission if OTP is disabled
+    await executeSubmission(basePayload);
   };
 
   const containerStyle: React.CSSProperties = {
@@ -402,6 +486,17 @@ export function DynamicFormBlock({
           })}
         </div>
 
+        {/* In-House Bot Protection CAPTCHA Challenge */}
+        {effectiveEnableCaptcha && (
+          <div className="pt-1">
+            <FormCaptcha
+              value={captchaValue}
+              onChange={setCaptchaValue}
+              disabled={isSubmitting}
+            />
+          </div>
+        )}
+
         {/* Universal Privacy Consent Checkbox */}
         <PrivacyConsentCheckbox
           id={`consent-${pageSlug}`}
@@ -442,6 +537,17 @@ export function DynamicFormBlock({
           </p>
         </div>
       </form>
+
+      {/* Email OTP Verification Dialog */}
+      <FormOtpDialog
+        open={otpDialogOpen}
+        onOpenChange={setOtpDialogOpen}
+        email={pendingPayload?.email || ""}
+        name={pendingPayload?.fullName || ""}
+        formType="CONTACT"
+        formTitle={effectiveTitle}
+        onVerified={handleOtpVerified}
+      />
     </div>
   );
 }

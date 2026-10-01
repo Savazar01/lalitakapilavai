@@ -82,6 +82,8 @@ export interface EventRsvpConfig {
   timeSlotRequirement?: "MANDATORY" | "OPTIONAL" | "DISABLED"; // Default "MANDATORY"
   slotIntervalMinutes?: number; // 15, 30, 45, 60, 120, or custom
   slotCapacity?: number | null; // Max attendees per slot
+  enableCaptcha?: boolean; // In-house Bot Protection CAPTCHA
+  enableEmailOtp?: boolean; // In-house Email OTP Verification
   customFields?: EventRsvpCustomField[];
 }
 
@@ -322,6 +324,12 @@ function EventFormContent({
   );
   const [rsvpSlotCapacity, setRsvpSlotCapacity] = React.useState<string>(
     initialRsvpConfig.slotCapacity ? String(initialRsvpConfig.slotCapacity) : ""
+  );
+  const [rsvpEnableCaptcha, setRsvpEnableCaptcha] = React.useState<boolean>(
+    initialRsvpConfig.enableCaptcha === true
+  );
+  const [rsvpEnableEmailOtp, setRsvpEnableEmailOtp] = React.useState<boolean>(
+    initialRsvpConfig.enableEmailOtp === true
   );
   const [rsvpCustomFields, setRsvpCustomFields] = React.useState<EventRsvpCustomField[]>(
     initialRsvpConfig.customFields || []
@@ -620,6 +628,8 @@ function EventFormContent({
             ? parseInt(rsvpCustomSlotInterval, 10) || 30
             : rsvpSlotIntervalMinutes,
         slotCapacity: rsvpSlotCapacity ? parseInt(rsvpSlotCapacity, 10) : null,
+        enableCaptcha: rsvpEnableCaptcha,
+        enableEmailOtp: rsvpEnableEmailOtp,
         customFields: rsvpCustomFields,
       },
       dailySchedules: dailySchedules.length > 0 ? dailySchedules : null,
@@ -1527,6 +1537,35 @@ function EventFormContent({
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* Form Security & Anti-Spam Controls */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl border border-primary/20 bg-primary/5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-medium text-foreground block">Bot Protection (CAPTCHA)</span>
+                        <span className="text-[10px] text-muted-foreground">In-house stateless math challenge before RSVP</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={rsvpEnableCaptcha}
+                        onChange={(e) => setRsvpEnableCaptcha(e.target.checked)}
+                        className="w-4 h-4 accent-primary rounded cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-medium text-foreground block">Require Email OTP Verification</span>
+                        <span className="text-[10px] text-muted-foreground">6-digit email OTP (returning users bypass automatically)</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={rsvpEnableEmailOtp}
+                        onChange={(e) => setRsvpEnableEmailOtp(e.target.checked)}
+                        className="w-4 h-4 accent-primary rounded cursor-pointer"
+                      />
+                    </div>
                   </div>
 
                   {/* Custom Questions / Form Fields Builder */}

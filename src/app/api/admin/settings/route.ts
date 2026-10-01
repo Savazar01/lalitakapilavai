@@ -108,6 +108,7 @@ export async function PUT(request: NextRequest) {
       watermarkConfig: body.watermarkConfig !== undefined ? body.watermarkConfig : undefined,
       googleServicesConfig: body.googleServicesConfig !== undefined ? body.googleServicesConfig : undefined,
       nextcloudConfig: body.nextcloudConfig !== undefined ? body.nextcloudConfig : undefined,
+      formSecurityConfig: body.formSecurityConfig !== undefined ? body.formSecurityConfig : undefined,
     };
 
     let updated;

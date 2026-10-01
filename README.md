@@ -22,6 +22,8 @@ The **SavazAI WebApps Platform** is an enterprise-grade digital publishing, arch
 - **GDPR Personal Data Erasure & Universal Privacy Policy Consent**: High-visibility "Erase Data (GDPR)" administrative hard deletion across CRM leads and users, public footer data removal request modal notifying `adminAlertEmail`, and universal mandatory `PrivacyConsentCheckbox` across all contact, RSVP, QR gate, and custom forms.
 - **Exhibition Hall Placard Contrast & HTML Tag Stripping**: Semantic theme token buttons (`bg-primary text-primary-foreground`) preventing white-on-white button rendering across 3D salon walls and metadata drawers, paired with automated `stripHtmlTags(...)` sanitization eradicating raw `<p>`/`<span>` markup from displayed artwork descriptions.
 - **Multi-Stage Prisma Client Inheritance & Fail-Fast Lifecycle**: Multi-stage Docker container architecture explicitly copying `/app/node_modules/.prisma` and `@prisma/client` from `builder` into `runner`, coupled with a fail-fast `docker-entrypoint.sh` executing legacy enum normalization SQL, non-interactive schema push (`--accept-data-loss`), and runtime client regeneration.
+- **Configurable Lightweight CAPTCHA & Email OTP Verification Engine**: Per-form administrative security controls (`enableCaptcha`, `enableEmailOtp`) across all inbound intake touchpoints: Public Contact Form (`/contact`), Event Attendance RSVPs (`/events/[slug]`), Physical Artwork QR Placard Gates (`/artwork/[slug]?qr=true`), and Visual Page Builder Custom Dynamic Forms. Features a 100% accessible, tracker-free arithmetic CAPTCHA challenge signed with HMAC-SHA256 tokens and a 6-digit numeric Email OTP challenge with a 5-minute countdown timer and 3-attempt lockout.
+- **Returning User Recognition & Frictionless Bypass Invariant**: Intelligent visitor recognition matching trimmed, case-insensitive email and name against previously verified CRM leads (`Lead.isEmailVerified = true`), granting authenticated returning patrons frictionless submission with zero latency and zero repetitive OTP barriers.
 - **Brand Identity & Native Media Engine**: Full `.ico` and `.svg` bypass upload engine preserving multi-resolution favicons and scalable vector graphics, paired with zero-fallback conditional phone suppression and dynamic footer brand governance.
 
 ---
@@ -85,13 +87,14 @@ SavazAI WebApps Platform
 │   │       ├── events/register/      # Public RSVP Registration Engine
 │   │       ├── leads/qr-scan/        # Physical Gallery Floor QR Telemetry
 │   │       ├── privacy/              # GDPR Erasure Request Dispatcher
+│   │       ├── security/             # Stateless CAPTCHA & Email OTP Pipeline
 │   │       └── media/[...path]/      # Watermarked Image Delivery Proxy
 │   ├── components/
 │   │   ├── admin/                    # Administration UI (Tiptap, Placard Studio)
 │   │   ├── builder/                  # Visual Page Builder Inspector & Blocks
 │   │   ├── public/                   # Public Experience Blocks & 3D Salon Wall
-│   │   └── ui/                       # Shadcn Accessible UI Primitives
-│   ├── lib/                          # Core Drivers (Print, Email, Auth, Prisma)
+│   │   └── ui/                       # Accessible UI Primitives (CAPTCHA & OTP Dialog)
+│   ├── lib/                          # Core Drivers (Security, Print, Email, Auth, Prisma)
 │   └── types/                        # Enterprise TypeScript Specifications
 ├── prisma/
 │   ├── schema.prisma                 # Declarative Schema (PostgreSQL 17 + pgvector)

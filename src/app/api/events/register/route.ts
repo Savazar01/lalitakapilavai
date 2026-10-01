@@ -62,6 +62,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Security & Anti-Bot Verification Check
+    const rsvpConfig = (event.rsvpConfig as Record<string, unknown> | null) || {};
+    const requiresCaptcha = Boolean(rsvpConfig.enableCaptcha);
+    const requiresEmailOtp = Boolean(rsvpConfig.enableEmailOtp);
+
+    // 1. Validate CAPTCHA if enabled
+    if (requiresCaptcha) {
+      const { verifyCaptchaChallenge } = await import("@/lib/security/captcha-validator");
+      const captchaRes = verifyCaptchaChallenge(body.captchaToken, body.captchaAnswer);
+      if (!captchaRes.valid) {
+        return NextResponse.json(
+          { error: captchaRes.error || "Invalid or expired CAPTCHA challenge" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 2. Validate Email OTP if enabled (with Returning User Recognition Bypass)
+    let isVerifiedUser = false;
+    if (requiresEmailOtp) {
+      const { isReturningVerifiedUser, verifyOtpSessionToken } = await import(
+        "@/lib/security/visitor-verification"
+      );
+      const isBypass = await isReturningVerifiedUser(attendeeName, attendeeEmail);
+
+      if (isBypass) {
+        isVerifiedUser = true;
+      } else {
+        const otpCheck = verifyOtpSessionToken(body.otpSessionToken, attendeeEmail, "EVENT_RSVP");
+        if (!otpCheck.valid) {
+          return NextResponse.json(
+            { error: otpCheck.error || "Email verification required. Please verify your OTP code." },
+            { status: 400 }
+          );
+        }
+        isVerifiedUser = true;
+      }
+    }
+
+    const clientIp =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip")?.trim() ||
+      null;
+
     // Format attendance dates
     const datesArray: string[] = Array.isArray(selectedDates) && selectedDates.length > 0
       ? selectedDates
@@ -103,6 +147,9 @@ export async function POST(request: NextRequest) {
           message: `Registered for ${event.title} (${tickets} ticket(s)). Attendance Date(s): ${dateDisplay}${slotDisplay}.${customAnswersText ? `\n\nCustom Intake Responses:${customAnswersText}` : ""}`,
           source: "EVENT_RSVP",
           formTitle: "Event Attendance RSVP",
+          isEmailVerified: isVerifiedUser,
+          verifiedAt: isVerifiedUser ? new Date() : null,
+          lastVerifiedIp: isVerifiedUser ? clientIp : null,
           customFields: {
             selectedDate: dateFormatted,
             selectedDates: datesArray,

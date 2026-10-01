@@ -142,6 +142,7 @@ model SystemSetting {
   watermarkConfig   Json?   // Watermark & Foil Earmarks config: { text?: string, position?: string, opacity?: number, defaultFoilEarmarkText?: string, showFoilEarmark?: boolean }
   googleServicesConfig Json? // Google Workspace { enabled: boolean, clientId: string, clientSecret: string, refreshToken: string, driveFolderId: string, sheetId: string, defaultServices: string[] }
   nextcloudConfig      Json? // Nextcloud WebDAV { enabled: boolean, serverUrl: string, username: string, appPassword: string, baseFolder: string }
+  formSecurityConfig   Json? // Form Security & Anti-Spam { contactForm: { enableCaptcha: boolean, enableEmailOtp: boolean }, qrScanGate: { enableCaptcha: boolean, enableEmailOtp: boolean } }
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -540,6 +541,9 @@ model Lead {
   artworkTitle    String?
   deviceInfo      String?
   isSubscribed    Boolean     @default(true)
+  isEmailVerified Boolean     @default(false)
+  verifiedAt      DateTime?
+  lastVerifiedIp  String?
   customFields    Json?       // Key-value store of dynamic fields
   sourceArtworkId String?     @db.Uuid // Linked artwork for physical exhibition QR scans or direct inquiries
   sourceEventId   String?     @db.Uuid
@@ -560,6 +564,25 @@ model UnsubscribedContact {
   createdAt DateTime @default(now())
 
   @@map("unsubscribed_contacts")
+}
+
+// -----------------------------------------------------------------------------
+// Form Security & Email OTP Verification Tokens
+// -----------------------------------------------------------------------------
+
+model FormVerificationToken {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email       String
+  codeHash    String    // SHA-256 HMAC of 6-digit OTP
+  formType    String    // "CONTACT", "EVENT_RSVP", "QR_SCAN", "CUSTOM_PAGE"
+  targetId    String?   // eventId, artworkId, or customFormId
+  attempts    Int       @default(0)
+  isUsed      Boolean   @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  @@index([email, formType])
+  @@map("form_verification_tokens")
 }
 
 // -----------------------------------------------------------------------------

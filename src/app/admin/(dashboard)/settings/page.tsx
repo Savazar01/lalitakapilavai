@@ -59,6 +59,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -130,6 +131,28 @@ interface NextcloudConfig {
   appPassword: string;
   baseFolder?: string;
 }
+
+interface FormSecurityConfig {
+  contactForm: {
+    enableCaptcha: boolean;
+    enableEmailOtp: boolean;
+  };
+  qrScanGate: {
+    enableCaptcha: boolean;
+    enableEmailOtp: boolean;
+  };
+}
+
+const DEFAULT_FORM_SECURITY_CONFIG: FormSecurityConfig = {
+  contactForm: {
+    enableCaptcha: false,
+    enableEmailOtp: false,
+  },
+  qrScanGate: {
+    enableCaptcha: false,
+    enableEmailOtp: false,
+  },
+};
 
 export default function AdminSettingsPage() {
   const [loading, setLoading] = React.useState(true);
@@ -297,6 +320,8 @@ export default function AdminSettingsPage() {
     temperature: 0.7,
   });
 
+  const [formSecurityConfig, setFormSecurityConfig] = React.useState<FormSecurityConfig>(DEFAULT_FORM_SECURITY_CONFIG);
+
   const [batchWatermarking, setBatchWatermarking] = React.useState(false);
 
   const handleBatchRewatermark = async () => {
@@ -390,6 +415,12 @@ export default function AdminSettingsPage() {
           }
           if (data.nextcloudConfig) {
             setNextcloudConfig((prev) => ({ ...prev, ...data.nextcloudConfig }));
+          }
+          if (data.formSecurityConfig) {
+            setFormSecurityConfig((prev) => ({
+              contactForm: { ...prev.contactForm, ...data.formSecurityConfig.contactForm },
+              qrScanGate: { ...prev.qrScanGate, ...data.formSecurityConfig.qrScanGate },
+            }));
           }
         }
         setLoading(false);
@@ -576,6 +607,7 @@ export default function AdminSettingsPage() {
         aiConfig,
         googleServicesConfig,
         nextcloudConfig,
+        formSecurityConfig,
         watermarkConfig: {
           defaultFoilEarmarkText: form.defaultFoilEarmarkText?.trim() || "Gold Foil",
           showFoilEarmark: form.showFoilEarmark,
@@ -1024,6 +1056,105 @@ export default function AdminSettingsPage() {
                         onChange={(e) => setForm({ ...form, defaultTimezone: e.target.value })}
                         className="text-xs font-mono"
                       />
+                    </div>
+                  </div>
+
+                  {/* Form Security & Anti-Spam Verification */}
+                  <div className="p-4 rounded-lg border border-primary/30 bg-primary/5 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground flex items-center gap-1.5 text-sm">
+                        <Shield className="w-4 h-4 text-primary" />
+                        Form Security, Anti-Bot CAPTCHA &amp; Email OTP Verification
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Configure automated bot protection and visitor email authenticity verification with intelligent returning user bypass.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                      {/* Contact Form Security */}
+                      <div className="p-3.5 rounded-lg border border-border bg-card/80 space-y-3">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-border/50">
+                          <span className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                            <Mail className="w-3.5 h-3.5 text-primary" />
+                            Public Contact Form (/contact)
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="space-y-0.5">
+                            <Label className="text-xs font-medium text-foreground">Require CAPTCHA Challenge</Label>
+                            <p className="text-[10px] text-muted-foreground">Stateless arithmetic problem to prevent automated bot flood</p>
+                          </div>
+                          <Switch
+                            checked={formSecurityConfig.contactForm.enableCaptcha}
+                            onCheckedChange={(val) =>
+                              setFormSecurityConfig((prev) => ({
+                                ...prev,
+                                contactForm: { ...prev.contactForm, enableCaptcha: val },
+                              }))
+                            }
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-border/40">
+                          <div className="space-y-0.5">
+                            <Label className="text-xs font-medium text-foreground">Require Email OTP Verification</Label>
+                            <p className="text-[10px] text-muted-foreground">Dispatches 6-digit code. Verified returning users bypass automatically.</p>
+                          </div>
+                          <Switch
+                            checked={formSecurityConfig.contactForm.enableEmailOtp}
+                            onCheckedChange={(val) =>
+                              setFormSecurityConfig((prev) => ({
+                                ...prev,
+                                contactForm: { ...prev.contactForm, enableEmailOtp: val },
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      {/* Physical Artwork QR Scan Gate */}
+                      <div className="p-3.5 rounded-lg border border-border bg-card/80 space-y-3">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-border/50">
+                          <span className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                            <Shield className="w-3.5 h-3.5 text-primary" />
+                            Physical Exhibition QR Scan Gate
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="space-y-0.5">
+                            <Label className="text-xs font-medium text-foreground">Require CAPTCHA on QR Intake</Label>
+                            <p className="text-[10px] text-muted-foreground">Prevents scripted fake QR scans from skewing exhibition telemetry</p>
+                          </div>
+                          <Switch
+                            checked={formSecurityConfig.qrScanGate.enableCaptcha}
+                            onCheckedChange={(val) =>
+                              setFormSecurityConfig((prev) => ({
+                                ...prev,
+                                qrScanGate: { ...prev.qrScanGate, enableCaptcha: val },
+                              }))
+                            }
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-border/40">
+                          <div className="space-y-0.5">
+                            <Label className="text-xs font-medium text-foreground">Require Email OTP on QR Intake</Label>
+                            <p className="text-[10px] text-muted-foreground">Enforces authentic email on physical salon wall scans</p>
+                          </div>
+                          <Switch
+                            checked={formSecurityConfig.qrScanGate.enableEmailOtp}
+                            onCheckedChange={(val) =>
+                              setFormSecurityConfig((prev) => ({
+                                ...prev,
+                                qrScanGate: { ...prev.qrScanGate, enableEmailOtp: val },
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

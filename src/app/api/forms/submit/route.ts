@@ -60,7 +60,54 @@ export async function POST(req: NextRequest) {
       lowerTitle.includes("inquiry") ||
       lowerTitle.includes("get in touch");
 
-    // 1. Record lead in database
+    // Form Security & Anti-Bot Verification Check
+    const settings = await prisma.systemSetting.findFirst();
+    const formSecurity = (settings?.formSecurityConfig as Record<string, unknown> | null) || {};
+    const contactSecurity = (formSecurity.contactForm as Record<string, unknown> | undefined) || {};
+
+    const requiresCaptcha = Boolean(isContact ? contactSecurity.enableCaptcha : body.enableCaptcha);
+    const requiresEmailOtp = Boolean(isContact ? contactSecurity.enableEmailOtp : body.enableEmailOtp);
+
+    // 1. Validate CAPTCHA if enabled
+    if (requiresCaptcha) {
+      const { verifyCaptchaChallenge } = await import("@/lib/security/captcha-validator");
+      const captchaRes = verifyCaptchaChallenge(body.captchaToken, body.captchaAnswer);
+      if (!captchaRes.valid) {
+        return NextResponse.json(
+          { error: captchaRes.error || "Invalid or expired CAPTCHA challenge" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 2. Validate Email OTP if enabled (with Returning User Recognition Bypass)
+    let isVerifiedUser = false;
+    if (requiresEmailOtp) {
+      const { isReturningVerifiedUser, verifyOtpSessionToken } = await import(
+        "@/lib/security/visitor-verification"
+      );
+      const isBypass = await isReturningVerifiedUser(trimmedName, trimmedEmail);
+
+      if (isBypass) {
+        isVerifiedUser = true;
+      } else {
+        const otpCheck = verifyOtpSessionToken(body.otpSessionToken, trimmedEmail);
+        if (!otpCheck.valid) {
+          return NextResponse.json(
+            { error: otpCheck.error || "Email verification required. Please enter the 6-digit code sent to your inbox." },
+            { status: 400 }
+          );
+        }
+        isVerifiedUser = true;
+      }
+    }
+
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip")?.trim() ||
+      null;
+
+    // 3. Record lead in database
     const lead = await prisma.lead.create({
       data: {
         name: trimmedName,
@@ -71,6 +118,9 @@ export async function POST(req: NextRequest) {
         formTitle: titleStr,
         pageSlug: pageStr,
         source: isContact ? "CONTACT_FORM" : "CUSTOM_FORM",
+        isEmailVerified: isVerifiedUser,
+        verifiedAt: isVerifiedUser ? new Date() : null,
+        lastVerifiedIp: isVerifiedUser ? clientIp : null,
         customFields: customFields && typeof customFields === "object" ? customFields : {},
       },
     });

@@ -335,3 +335,24 @@ All code generation and architectural modifications must adhere to the specializ
   - `docker-entrypoint.sh` executes a pre-migration raw SQL block via `prisma db execute --stdin` to normalize legacy `leads.source` scalar values to `'CONTACT_FORM'` before schema push.
   - `prisma db push` strictly includes `--accept-data-loss` with fail-fast exit (`exit 1` on error) to prevent non-interactive container aborts during enum conversions.
   - Container entrypoint executes runtime `prisma generate` immediately following the push, ensuring the schema and runtime client are synchronized before launching `exec node server.js`.
+
+### V. Form Security, Lightweight CAPTCHA & Email OTP Verification Engine
+- **Stateless HMAC-SHA256 Arithmetic CAPTCHA Engine**:
+  - Dynamic mathematical challenges ($a + b$) signed with HMAC-SHA256 tokens (`src/lib/security/captcha-validator.ts`) utilizing `BETTER_AUTH_SECRET`, a 10-minute expiry barrier, and timing-safe equality verification (`crypto.timingSafeEqual`).
+  - Zero third-party tracker scripts or cookies required, ensuring strict WCAG 2.2 AAA accessibility and client privacy.
+- **6-Digit Numeric Email OTP Verification Pipeline**:
+  - Outbound numeric OTP tokens (`src/lib/security/visitor-verification.ts`) with a 5-minute expiry barrier, cryptographically hashed into `FormVerificationToken` (`codeHash`), enforcing a 3-attempt lockout ceiling.
+  - Dispatched via branded atelier transactional email templates with dynamic brand organization resolution.
+- **Returning User Recognition & Frictionless Bypass Invariant**:
+  - When a visitor returns to submit an inquiry, RSVP, or QR floor scan:
+  - If their trimmed, case-insensitive email AND name match an existing verified lead (`Lead.isEmailVerified = true`), the OTP challenge is automatically bypassed with zero latency and zero friction.
+- **Per-Form Configurable Administrative Toggles**:
+  - Independent toggles (`enableCaptcha: boolean`, `enableEmailOtp: boolean`) across all 4 application intake channels:
+    - **Public Contact Form** (`/contact`, `/api/forms/submit` via `SystemSetting.formSecurityConfig.contactForm`).
+    - **Event Attendance RSVPs** (`/events/[slug]`, `/api/events/register` via `Event.rsvpConfig`).
+    - **Physical Artwork QR Placard Gates** (`/artwork/[slug]?qr=true`, `/api/leads/qr-scan` via `SystemSetting.formSecurityConfig.qrScanGate`).
+    - **Visual Page Builder Custom Dynamic Forms** (`DynamicFormBlock` via `formConfig`).
+- **CRM Verification Telemetry & Verification Badges**:
+  - Inbound submissions record `isEmailVerified: boolean`, `verifiedAt: DateTime?`, and `lastVerifiedIp: string?` directly on `Lead`.
+  - Admin Leads CRM (`/admin/leads`) displays emerald "OTP Verified" status badges in table views, provides an Email Security Verification inspector card, and exports verification timestamps in CSV reports.
+

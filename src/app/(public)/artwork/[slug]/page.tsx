@@ -78,12 +78,22 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
 
   const baseUrl = await getServerBaseUrl();
   const settings = await prisma.systemSetting.findFirst({
-    select: { watermarkConfig: true, emailHeaderTitle: true, siteName: true },
+    select: {
+      watermarkConfig: true,
+      emailHeaderTitle: true,
+      siteName: true,
+      formSecurityConfig: true,
+    },
   });
   const watermarkConfig = (settings?.watermarkConfig as Record<string, unknown>) || {};
   const defaultFoilText = (watermarkConfig.defaultFoilEarmarkText as string) || "Gold Foil";
   const showFoilEarmark = watermarkConfig.showFoilEarmark !== false;
   const foilBadgeText = artwork.customFoilLabel || defaultFoilText;
+
+  const formSecurity = (settings?.formSecurityConfig as Record<string, unknown> | null) || {};
+  const qrSecurity = (formSecurity.qrScanGate as Record<string, unknown> | undefined) || {};
+  const enableCaptcha = Boolean(qrSecurity.enableCaptcha);
+  const enableEmailOtp = Boolean(qrSecurity.enableEmailOtp);
 
   const targetScanUrl = `${baseUrl}/artwork/${artwork.slug}?qr=true`;
   const qrDataUrl = await generateQRCodeDataUrl(targetScanUrl, {
@@ -101,7 +111,12 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
 
       {/* Exhibition QR Scan Interactive Lead Capture */}
       <Suspense fallback={null}>
-        <ExhibitionQrModal artworkId={artwork.id} artworkTitle={artwork.title} />
+        <ExhibitionQrModal
+          artworkId={artwork.id}
+          artworkTitle={artwork.title}
+          enableCaptcha={enableCaptcha}
+          enableEmailOtp={enableEmailOtp}
+        />
       </Suspense>
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">

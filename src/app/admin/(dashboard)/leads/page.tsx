@@ -19,6 +19,7 @@ import {
   Smartphone,
   MessageSquare,
   Layers,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +66,9 @@ interface LeadItem {
   artworkTitle?: string | null;
   deviceInfo?: string | null;
   isSubscribed?: boolean;
+  isEmailVerified?: boolean;
+  verifiedAt?: string | null;
+  lastVerifiedIp?: string | null;
   artwork?: {
     id: string;
     title: string;
@@ -363,6 +367,11 @@ export default function AdminLeadsPage() {
                               {lead.email && (
                                 <span className="flex items-center gap-1">
                                   <Mail className="w-3 h-3 text-muted-foreground" /> {lead.email}
+                                  {lead.isEmailVerified && (
+                                    <Badge variant="outline" className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 px-1 py-0 h-4">
+                                      OTP Verified
+                                    </Badge>
+                                  )}
                                 </span>
                               )}
                             </div>
@@ -473,6 +482,11 @@ export default function AdminLeadsPage() {
                             {lead.email && (
                               <span className="flex items-center gap-1">
                                 <Mail className="w-3 h-3 text-primary/70" /> {lead.email}
+                                {lead.isEmailVerified && (
+                                  <Badge variant="outline" className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 px-1 py-0 h-4">
+                                    OTP Verified
+                                  </Badge>
+                                )}
                               </span>
                             )}
                             {lead.phone && (
@@ -696,6 +710,23 @@ export default function AdminLeadsPage() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Email Security Verification Status */}
+              <div className="p-2.5 rounded-lg border text-[11px] flex items-center justify-between gap-2 bg-muted/20 border-border">
+                <span className="text-muted-foreground font-medium flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                  Email Security Verification:
+                </span>
+                {selectedLead.isEmailVerified ? (
+                  <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-medium">
+                    Verified via 6-Digit OTP {selectedLead.verifiedAt ? `(${new Date(selectedLead.verifiedAt).toLocaleDateString()})` : ""}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-[10px] bg-muted text-muted-foreground border-border">
+                    Unverified / Standard Intake
+                  </Badge>
+                )}
               </div>
 
               {selectedLead.deviceInfo && (

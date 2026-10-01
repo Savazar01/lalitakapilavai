@@ -40,6 +40,65 @@ export async function POST(request: NextRequest) {
 
     const userAgent = deviceInfo || request.headers.get("user-agent") || "Mobile Browser";
 
+    // Form Security & Anti-Bot Verification Check
+    const settings = await prisma.systemSetting.findFirst();
+    const formSecurity = (settings?.formSecurityConfig as Record<string, unknown> | null) || {};
+    const qrSecurity = (formSecurity.qrScanGate as Record<string, unknown> | undefined) || {};
+
+    const requiresCaptcha = Boolean(qrSecurity.enableCaptcha);
+    const requiresEmailOtp = Boolean(qrSecurity.enableEmailOtp);
+    const isBackground = Boolean(body.isBackgroundTelemetry);
+
+    let isVerifiedUser = false;
+
+    if (!isBackground) {
+      // 1. Validate CAPTCHA if enabled
+      if (requiresCaptcha) {
+        const { verifyCaptchaChallenge } = await import("@/lib/security/captcha-validator");
+        const captchaRes = verifyCaptchaChallenge(body.captchaToken, body.captchaAnswer);
+        if (!captchaRes.valid) {
+          return NextResponse.json(
+            { error: captchaRes.error || "Invalid or expired CAPTCHA challenge" },
+            { status: 400 }
+          );
+        }
+      }
+
+      // 2. Validate Email OTP if enabled (with Returning User Recognition Bypass)
+      if (requiresEmailOtp) {
+        const { isReturningVerifiedUser, verifyOtpSessionToken } = await import(
+          "@/lib/security/visitor-verification"
+        );
+        const isBypass = await isReturningVerifiedUser(trimmedName, trimmedEmail);
+
+        if (isBypass) {
+          isVerifiedUser = true;
+        } else {
+          const otpCheck = verifyOtpSessionToken(body.otpSessionToken, trimmedEmail, "QR_SCAN");
+          if (!otpCheck.valid) {
+            return NextResponse.json(
+              { error: otpCheck.error || "Email verification required. Please verify your OTP code." },
+              { status: 400 }
+            );
+          }
+          isVerifiedUser = true;
+        }
+      }
+    } else {
+      if (trimmedName && trimmedEmail) {
+        const { isReturningVerifiedUser } = await import("@/lib/security/visitor-verification");
+        const isBypass = await isReturningVerifiedUser(trimmedName, trimmedEmail);
+        if (isBypass) {
+          isVerifiedUser = true;
+        }
+      }
+    }
+
+    const clientIp =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip")?.trim() ||
+      null;
+
     // Lookup artwork title if artworkId is given but artworkTitle is missing
     let resolvedTitle = artworkTitle ? String(artworkTitle).trim() : "";
     if (artworkId && !resolvedTitle) {
@@ -64,10 +123,16 @@ export async function POST(request: NextRequest) {
         deviceInfo: userAgent.slice(0, 500),
         subject: `Exhibition Floor QR Scan: ${titleDisplay}`,
         message: `Visitor scanned physical gallery QR code for "${titleDisplay}" at the exhibition salon wall.`,
+        isEmailVerified: isVerifiedUser,
+        verifiedAt: isVerifiedUser ? new Date() : null,
+        lastVerifiedIp: clientIp,
         customFields: {
           scannedAt: new Date().toISOString(),
           userAgent: userAgent.slice(0, 500),
           clientTimestamp: new Date().toISOString(),
+          ...(requiresCaptcha ? { captchaVerified: true } : {}),
+          ...(requiresEmailOtp ? { emailOtpVerified: isVerifiedUser } : {}),
+          ...(isBackground ? { backgroundTelemetry: true } : {}),
         },
       },
     });

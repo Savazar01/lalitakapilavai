@@ -47,6 +47,10 @@ export default async function ContactPage() {
   const hasSections = pageData && pageData.sections && pageData.sections.length > 0;
   const contactEmail = (settings?.contactEmail || "").trim();
   const contactPhone = (settings?.contactPhone || "").trim();
+  const formSecurity = (settings?.formSecurityConfig as Record<string, unknown> | null) || {};
+  const contactSecurity = (formSecurity.contactForm as Record<string, unknown> | undefined) || {};
+  const enableCaptcha = Boolean(contactSecurity.enableCaptcha);
+  const enableEmailOtp = Boolean(contactSecurity.enableEmailOtp);
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
@@ -140,6 +144,8 @@ export default async function ContactPage() {
                   formTitle="Direct Inquiry Form"
                   formSubtitle="Please provide your contact details and message. We will respond promptly."
                   pageSlug="contact"
+                  enableCaptcha={enableCaptcha}
+                  enableEmailOtp={enableEmailOtp}
                 />
               </div>
             </div>
