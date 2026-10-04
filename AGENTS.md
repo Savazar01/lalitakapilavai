@@ -167,9 +167,11 @@ All code generation and architectural modifications must adhere to the specializ
   - Email branding uses the single source of truth: `SystemSetting.logoUrl` from the "General" settings tab.
   - Embed local disk images as inline MIME attachments (`cid:atelier-brand-logo`) to guarantee instant rendering in Gmail, Outlook, and Apple Mail without broken image icons.
   - Remote cloud storage images resolve via `getAbsoluteAssetUrl()` with fully qualified HTTPS URLs.
-- **Fail-Fast OTP Delivery & Envelope Alignment**:
+- **Fail-Fast Real OTP Delivery & Zero-Leak Invariant**:
   - Outbound OTP verification dispatch strictly fails fast on transmission failure, returning HTTP 500 with descriptive error details instead of a false HTTP 200 `challengeSent: true`.
-  - When SMTP is disabled (`isEnabled: false`) or in local environments, a high-visibility terminal banner (`🔑 [LOCAL OTP DISPATCH]`) is printed with the 6-digit code and `devCode` is returned in non-production API responses for frictionless developer testing.
+  - Zero exposure of OTP verification codes: The 6-digit numeric OTP is NEVER returned in API responses, client payloads, or network requests under any environment (`devCode` is strictly eradicated). `<FormOtpDialog />` input is initialized completely empty, enforcing real retrieval from the user's email inbox.
+  - Transporter Integrity: Outbound OTP emails strictly require an active SMTP transporter (`emailConfig.isEnabled: true` or valid SMTP credentials in database). If unconfigured or failed, the system fails fast and records `FAILED` in `EmailDispatchLog`.
+  - Post-verification submission automatically dispatches both Admin Alert Email (to `adminAlertEmail`) and Patron Confirmation Receipt (to visitor's email) via `sendAtelierEmail()`.
   - SMTP envelope sender aligns with authenticated credentials while maintaining `replyTo` for administrative routing.
 - **Audit Logging**: Persist every outbound message in `EmailDispatchLog` with delivery statuses (`SENT`, `FAILED`), error captures, and CSV export capabilities.
 

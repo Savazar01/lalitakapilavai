@@ -3122,7 +3122,7 @@
       "source_file": "src/app/api/admin/leads/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_leads_id_route_ts",
-      "community": 107,
+      "community": 81,
       "norm_label": "route.ts"
     },
     {
@@ -3131,7 +3131,7 @@
       "source_file": "src/app/api/admin/leads/[id]/route.ts",
       "source_location": "L6",
       "id": "src_app_api_admin_leads_id_route_ts_id_route_routeparams",
-      "community": 107,
+      "community": 81,
       "norm_label": "routeparams"
     },
     {
@@ -3140,7 +3140,7 @@
       "source_file": "src/app/api/admin/leads/[id]/route.ts",
       "source_location": "L10",
       "id": "src_app_api_admin_leads_id_route_ts_id_route_patch",
-      "community": 107,
+      "community": 81,
       "norm_label": "patch()"
     },
     {
@@ -3149,7 +3149,7 @@
       "source_file": "src/app/api/admin/leads/[id]/route.ts",
       "source_location": "L40",
       "id": "src_app_api_admin_leads_id_route_ts_id_route_delete",
-      "community": 107,
+      "community": 81,
       "norm_label": "delete()"
     },
     {
@@ -7431,7 +7431,7 @@
       "label": "FormOtpDialog()",
       "file_type": "code",
       "source_file": "src/components/ui/form-otp-dialog.tsx",
-      "source_location": "L28",
+      "source_location": "L27",
       "id": "ui_form_otp_dialog_formotpdialog",
       "community": 67,
       "norm_label": "formotpdialog()"
@@ -8430,7 +8430,7 @@
       "label": "sendAtelierEmail()",
       "file_type": "code",
       "source_file": "src/lib/email-service.ts",
-      "source_location": "L537",
+      "source_location": "L525",
       "id": "lib_email_service_sendatelieremail",
       "community": 57,
       "norm_label": "sendatelieremail()"
@@ -9888,7 +9888,7 @@
       "label": "D. Strict Binary Theme & Contrast Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L172",
+      "source_location": "L178",
       "id": "lalitakapilavai_agents_d_strict_binary_theme_contrast_invariant",
       "community": 9,
       "norm_label": "d. strict binary theme & contrast invariant"
@@ -9897,7 +9897,7 @@
       "label": "E. Multi-Tenant Brand Identity & Asset Engine (.ico Favicon & Conditional Phone)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L178",
+      "source_location": "L184",
       "id": "lalitakapilavai_agents_e_multi_tenant_brand_identity_asset_engine_ico_favicon_conditional_phone",
       "community": 9,
       "norm_label": "e. multi-tenant brand identity & asset engine (.ico favicon & conditional phone)"
@@ -9906,7 +9906,7 @@
       "label": "F. Dynamic Archive Subtitle & Idempotent Non-Destructive Tenant Deployment",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L183",
+      "source_location": "L189",
       "id": "lalitakapilavai_agents_f_dynamic_archive_subtitle_idempotent_non_destructive_tenant_deployment",
       "community": 9,
       "norm_label": "f. dynamic archive subtitle & idempotent non-destructive tenant deployment"
@@ -9915,7 +9915,7 @@
       "label": "G. Universal Contact Form & Generalized Multi-Tenant Email Templates",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L193",
+      "source_location": "L199",
       "id": "lalitakapilavai_agents_g_universal_contact_form_generalized_multi_tenant_email_templates",
       "community": 9,
       "norm_label": "g. universal contact form & generalized multi-tenant email templates"
@@ -9924,7 +9924,7 @@
       "label": "H. Dynamic Admin Dashboard Metric Calculation Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L198",
+      "source_location": "L204",
       "id": "lalitakapilavai_agents_h_dynamic_admin_dashboard_metric_calculation_engine",
       "community": 9,
       "norm_label": "h. dynamic admin dashboard metric calculation engine"
@@ -9933,7 +9933,7 @@
       "label": "I. Multi-Cloud Storage Architecture (Google Workspace & Nextcloud WebDAV)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L204",
+      "source_location": "L210",
       "id": "lalitakapilavai_agents_i_multi_cloud_storage_architecture_google_workspace_nextcloud_webdav",
       "community": 9,
       "norm_label": "i. multi-cloud storage architecture (google workspace & nextcloud webdav)"
@@ -9942,7 +9942,7 @@
       "label": "J. Dynamic Enterprise Landing Page Studio & Atomic Homepage Promotion",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L213",
+      "source_location": "L219",
       "id": "lalitakapilavai_agents_j_dynamic_enterprise_landing_page_studio_atomic_homepage_promotion",
       "community": 9,
       "norm_label": "j. dynamic enterprise landing page studio & atomic homepage promotion"
@@ -9951,7 +9951,7 @@
       "label": "K. SavazAI Multi-Tenant Brand Neutrality Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L229",
+      "source_location": "L235",
       "id": "lalitakapilavai_agents_k_savazai_multi_tenant_brand_neutrality_invariant",
       "community": 9,
       "norm_label": "k. savazai multi-tenant brand neutrality invariant"
@@ -9960,7 +9960,7 @@
       "label": "L. Multi-Day Event RSVP Interval Engine & Dynamic Attendance Tracking",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L238",
+      "source_location": "L244",
       "id": "lalitakapilavai_agents_l_multi_day_event_rsvp_interval_engine_dynamic_attendance_tracking",
       "community": 9,
       "norm_label": "l. multi-day event rsvp interval engine & dynamic attendance tracking"
@@ -9969,7 +9969,7 @@
       "label": "M. 3D WebGL Exhibition Salon Wall Studio & Realistic Environments",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L251",
+      "source_location": "L257",
       "id": "lalitakapilavai_agents_m_3d_webgl_exhibition_salon_wall_studio_realistic_environments",
       "community": 9,
       "norm_label": "m. 3d webgl exhibition salon wall studio & realistic environments"
@@ -9978,7 +9978,7 @@
       "label": "N. Placard Customizer Live Data Sync & Currency Overrides",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L269",
+      "source_location": "L275",
       "id": "lalitakapilavai_agents_n_placard_customizer_live_data_sync_currency_overrides",
       "community": 9,
       "norm_label": "n. placard customizer live data sync & currency overrides"
@@ -9987,7 +9987,7 @@
       "label": "O. Enterprise Page Builder Studio & Sanitized Ingestion",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L275",
+      "source_location": "L281",
       "id": "lalitakapilavai_agents_o_enterprise_page_builder_studio_sanitized_ingestion",
       "community": 9,
       "norm_label": "o. enterprise page builder studio & sanitized ingestion"
@@ -9996,7 +9996,7 @@
       "label": "P. Exhibition Hall Placard Contrast & HTML Sanitization Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L285",
+      "source_location": "L291",
       "id": "lalitakapilavai_agents_p_exhibition_hall_placard_contrast_html_sanitization_invariant",
       "community": 9,
       "norm_label": "p. exhibition hall placard contrast & html sanitization invariant"
@@ -10005,7 +10005,7 @@
       "label": "Q. Mobile QR Scan Onboarding, Safe-Area & Persistent Device Identity",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L293",
+      "source_location": "L299",
       "id": "lalitakapilavai_agents_q_mobile_qr_scan_onboarding_safe_area_persistent_device_identity",
       "community": 9,
       "norm_label": "q. mobile qr scan onboarding, safe-area & persistent device identity"
@@ -10014,7 +10014,7 @@
       "label": "R. Dedicated QR Scans & CRM Lead Administration Pipeline",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L303",
+      "source_location": "L309",
       "id": "lalitakapilavai_agents_r_dedicated_qr_scans_crm_lead_administration_pipeline",
       "community": 9,
       "norm_label": "r. dedicated qr scans & crm lead administration pipeline"
@@ -10023,7 +10023,7 @@
       "label": "S. Universal 1-Click Unsubscribe Pipeline & Promotional Suppression",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L312",
+      "source_location": "L318",
       "id": "lalitakapilavai_agents_s_universal_1_click_unsubscribe_pipeline_promotional_suppression",
       "community": 9,
       "norm_label": "s. universal 1-click unsubscribe pipeline & promotional suppression"
@@ -10032,7 +10032,7 @@
       "label": "T. GDPR Personal Data Erasure & Universal Privacy Consent Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L321",
+      "source_location": "L327",
       "id": "lalitakapilavai_agents_t_gdpr_personal_data_erasure_universal_privacy_consent_invariant",
       "community": 9,
       "norm_label": "t. gdpr personal data erasure & universal privacy consent invariant"
@@ -10041,7 +10041,7 @@
       "label": "U. Multi-Stage Container Prisma Client Inheritance & Fail-Fast Lifecycle Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L332",
+      "source_location": "L338",
       "id": "lalitakapilavai_agents_u_multi_stage_container_prisma_client_inheritance_fail_fast_lifecycle_invariant",
       "community": 9,
       "norm_label": "u. multi-stage container prisma client inheritance & fail-fast lifecycle invariant"
@@ -10050,7 +10050,7 @@
       "label": "V. Form Security, Lightweight CAPTCHA & Email OTP Verification Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L342",
+      "source_location": "L348",
       "id": "lalitakapilavai_agents_v_form_security_lightweight_captcha_email_otp_verification_engine",
       "community": 9,
       "norm_label": "v. form security, lightweight captcha & email otp verification engine"
@@ -10059,7 +10059,7 @@
       "label": "W. Public Settings API, Dynamic Form Security Propagation & Targeted Cache Revalidation",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L362",
+      "source_location": "L368",
       "id": "lalitakapilavai_agents_w_public_settings_api_dynamic_form_security_propagation_targeted_cache_revalidation",
       "community": 9,
       "norm_label": "w. public settings api, dynamic form security propagation & targeted cache revalidation"
@@ -50177,5 +50177,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6640dd2a2017b01859e9a730299be580af4623ae"
+  "built_at_commit": "677f80d9f86ebcb2062e3619729997b700d62b5c"
 }

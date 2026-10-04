@@ -167,7 +167,7 @@ export async function sendOtpVerificationEmail(
   code: string,
   name: string,
   formTitle: string = "Inquiry & Archival Portal"
-): Promise<{ success: boolean; messageId?: string; error?: string; devCode?: string }> {
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
   try {
     const { transporter, settings, envelopeFrom, replyTo } = await getTransporter();
     const branding = await getTenantBranding();
@@ -211,11 +211,21 @@ export async function sendOtpVerificationEmail(
     });
 
     if (!transporter) {
-      console.log(`\n==================================================`);
-      console.log(`🔑 [LOCAL OTP DISPATCH] Verification Code for ${email}: ${code}`);
-      console.log(`⏳ Valid for 5 minutes (Dev Mode Simulated Transmission)`);
-      console.log(`==================================================\n`);
-      return { success: true, messageId: "dev-simulated-msg", devCode: code };
+      const errorMsg = "Outbound SMTP email service is not configured or disabled in Admin Settings.";
+      console.error(`[VisitorVerification] ❌ ${errorMsg}`);
+      try {
+        await prisma.emailDispatchLog.create({
+          data: {
+            recipient: email,
+            sender: branding.fromEmail,
+            triggerType: "email_otp",
+            subject: `Verification Code Request — ${siteName}`,
+            status: "FAILED",
+            errorMessage: errorMsg,
+          },
+        });
+      } catch {}
+      return { success: false, error: errorMsg };
     }
 
     const sender = envelopeFrom || branding.fromEmail;

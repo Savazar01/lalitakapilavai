@@ -21,7 +21,6 @@ export interface FormOtpDialogProps {
   formType: "CONTACT" | "EVENT_RSVP" | "QR_SCAN" | "CUSTOM_PAGE";
   targetId?: string;
   formTitle?: string;
-  initialDevCode?: string;
   onVerified: (otpSessionToken: string) => void;
 }
 
@@ -33,7 +32,6 @@ export function FormOtpDialog({
   formType,
   targetId,
   formTitle = "Archival Portal",
-  initialDevCode,
   onVerified,
 }: FormOtpDialogProps) {
   const [code, setCode] = React.useState<string>("");
@@ -52,12 +50,10 @@ export function FormOtpDialog({
       return;
     }
 
+    setCode("");
+    setErrorMsg(null);
     setTimeLeft(300);
     setResendCooldown(60);
-    if (initialDevCode) {
-      setCode(initialDevCode);
-      toast.info(`[Dev Mode] Verification code: ${initialDevCode}`);
-    }
     /* eslint-enable react-hooks/set-state-in-effect */
 
     const interval = setInterval(() => {
@@ -66,7 +62,7 @@ export function FormOtpDialog({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [open, initialDevCode]);
+  }, [open]);
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -149,12 +145,7 @@ export function FormOtpDialog({
       toast.success("A fresh verification code has been dispatched!");
       setTimeLeft(300);
       setResendCooldown(60);
-      if (data.devCode) {
-        setCode(data.devCode);
-        toast.info(`[Dev Mode] Verification code: ${data.devCode}`);
-      } else {
-        setCode("");
-      }
+      setCode("");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to resend code";
       setErrorMsg(message);

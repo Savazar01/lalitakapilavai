@@ -399,7 +399,13 @@ export default function AdminSettingsPage() {
             setFooterConfig((prev) => ({ ...prev, ...data.footerConfig }));
           }
           if (data.emailConfig) {
-            setEmailConfig((prev) => ({ ...prev, ...data.emailConfig }));
+            setEmailConfig((prev) => ({
+              ...prev,
+              ...data.emailConfig,
+              isEnabled:
+                data.emailConfig.isEnabled ??
+                Boolean(data.emailConfig.smtpUser && data.emailConfig.smtpPassword),
+            }));
           }
           if (data.aiConfig) {
             setAiConfig((prev) => ({ ...prev, ...data.aiConfig }));
@@ -2234,6 +2240,30 @@ export default function AdminSettingsPage() {
                       </a>{" "}
                       and paste it into the password field below.
                     </p>
+                  </div>
+
+                  {/* Enable Outbound Email Services Toggle */}
+                  <div className="flex items-center justify-between p-4 rounded-lg border border-border/70 bg-card/60">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <Label className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                          <Mail className="w-3.5 h-3.5 text-primary" /> Enable Outbound Email Delivery
+                        </Label>
+                        <Badge
+                          variant={emailConfig.isEnabled ? "default" : "secondary"}
+                          className="text-[10px]"
+                        >
+                          {emailConfig.isEnabled ? "Active" : "Disabled"}
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        When enabled, all inbound inquiries, exhibition RSVPs, and 6-digit visitor verification OTP challenges will be dispatched via the configured SMTP server.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={emailConfig.isEnabled}
+                      onCheckedChange={(checked) => setEmailConfig({ ...emailConfig, isEnabled: checked })}
+                    />
                   </div>
 
                   {/* Dedicated Admin Alert Recipient Email */}

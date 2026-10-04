@@ -132,21 +132,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isNonProd = process.env.NODE_ENV !== "production";
-    const responsePayload: Record<string, unknown> = {
+    return NextResponse.json({
       success: true,
       verified: false,
       bypass: false,
       challengeSent: true,
       tokenExpiresAt: expiresAt.toISOString(),
       message: `A 6-digit verification code has been dispatched to ${trimmedEmail}.`,
-    };
-
-    if (isNonProd && emailRes.devCode) {
-      responsePayload.devCode = emailRes.devCode;
-    }
-
-    return NextResponse.json(responsePayload);
+    });
   } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : "Error requesting OTP verification";
     console.error("[OtpRequestAPI] Error:", errorMsg);

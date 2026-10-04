@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-10-04)
 
 ## Corpus Check
-- 232 files · ~258,265 words
+- 232 files · ~258,460 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1466 nodes · 3476 edges · 107 communities (89 shown, 18 thin omitted)
+- 1466 nodes · 3476 edges · 107 communities (90 shown, 17 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6640dd2a`
+- Built from commit: `677f80d9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -141,7 +141,7 @@
 - `AlternatingTimelineList()` --calls--> `cn()`  [EXTRACTED]
   src/components/public/blocks/timeline-block.tsx → src/lib/utils.ts
 
-## Communities (107 total, 18 thin omitted)
+## Communities (107 total, 17 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.20
@@ -407,6 +407,10 @@ Nodes (3): DynamicFormBlock(), metadata, DynamicPageSections()
 Cohesion: 0.22
 Nodes (10): 3. Docker Containerization & Production Build, 7. Production Environment Variables Template, code:bash (docker compose down), code:bash (# ==========================================================), code:bash (docker compose up -d --build), code:bash (docker compose ps), code:bash (curl http://localhost:3000/api/health), Full Multi-Stage Docker Build (+2 more)
 
+### Community 81 - "Community 81"
+Cohesion: 0.08
+Nodes (3): DEFAULT_EMAIL_TEMPLATES, globalForPrisma, RouteParams
+
 ### Community 82 - "Community 82"
 Cohesion: 0.12
 Nodes (19): ALLOWED_TOKENS, AllowedToken, DynamicThemeProvider(), BODY_FONT_OPTIONS, BORDER_RADIUS_OPTIONS, BORDER_WIDTH_OPTIONS, DEFAULT_DETAILED_THEME_CONFIG, DetailedThemeConfig (+11 more)
@@ -478,7 +482,7 @@ Nodes (19): CatalogMatrixConfig, SinglePlateConfigState, ECatalogCoverConfig, EC
 ## Knowledge Gaps
 - **545 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+540 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

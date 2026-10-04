@@ -458,22 +458,7 @@ export async function getTransporter() {
   const branding = await getTenantBranding();
   const emailConfig = (settings?.emailConfig as Record<string, unknown> | null) || {};
 
-  // 1. Explicit toggle: if SMTP is disabled in Admin Settings, return null transporter
-  const isEnabled = emailConfig.isEnabled === true;
-  if (!isEnabled) {
-    return {
-      transporter: null,
-      settings,
-      branding,
-      fromEmail: branding.fromAddress,
-      fromName: branding.displayName,
-      envelopeFrom: branding.fromEmail,
-      replyTo: branding.adminAlertEmail || branding.fromAddress,
-      isEnabled: false,
-    };
-  }
-
-  // 2. Resolve credentials with environment variable fallbacks
+  // 1. Resolve credentials with environment variable fallbacks
   const host =
     (emailConfig.smtpHost as string) ||
     process.env.SMTP_HOST ||
@@ -485,16 +470,19 @@ export async function getTransporter() {
   const fromEmail = (emailConfig.fromEmail as string) || branding.fromAddress || user;
   const fromName = (emailConfig.fromName as string) || branding.displayName || branding.name;
 
-  if (!user || !pass) {
+  const hasCredentials = Boolean(user && pass);
+  const isEnabled = emailConfig.isEnabled === true || (hasCredentials && emailConfig.isEnabled !== false);
+
+  if (!isEnabled || !user || !pass) {
     return {
       transporter: null,
       settings,
       branding,
-      fromEmail,
-      fromName,
+      fromEmail: branding.fromAddress,
+      fromName: branding.displayName,
       envelopeFrom: `"${fromName}" <${fromEmail || user}>`,
       replyTo: branding.adminAlertEmail || fromEmail,
-      isEnabled: true,
+      isEnabled,
     };
   }
 

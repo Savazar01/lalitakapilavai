@@ -124,7 +124,6 @@ export function EventRsvpForm({
   const [privacyConsent, setPrivacyConsent] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [registered, setRegistered] = React.useState(false);
-  const [otpDevCode, setOtpDevCode] = React.useState<string | undefined>(undefined);
 
   // Multi-Day & Slot Booking State
   const hasDailySchedules = Array.isArray(dailySchedules) && dailySchedules.length > 0;
@@ -342,9 +341,6 @@ export function EventRsvpForm({
           return;
         }
 
-        if (otpData.devCode) {
-          setOtpDevCode(otpData.devCode);
-        }
         setPendingPayload(basePayload);
         setOtpDialogOpen(true);
         setSubmitting(false);
@@ -685,7 +681,6 @@ export function EventRsvpForm({
         formType="EVENT_RSVP"
         targetId={eventId}
         formTitle={eventTitle}
-        initialDevCode={otpDevCode}
         onVerified={handleOtpVerified}
       />
     </Card>
