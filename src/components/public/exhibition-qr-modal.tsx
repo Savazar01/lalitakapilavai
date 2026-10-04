@@ -98,6 +98,7 @@ export function ExhibitionQrModal({
   const [captchaValue, setCaptchaValue] = React.useState<FormCaptchaValue>({ token: "", answer: "" });
   const [otpDialogOpen, setOtpDialogOpen] = React.useState<boolean>(false);
   const [otpSessionToken, setOtpSessionToken] = React.useState<string | null>(null);
+  const [otpDevCode, setOtpDevCode] = React.useState<string | undefined>(undefined);
   const [pendingPayload, setPendingPayload] = React.useState<{ payload: Record<string, unknown>; visitorData: VisitorIdentity } | null>(null);
 
   React.useEffect(() => {
@@ -269,6 +270,9 @@ export function ExhibitionQrModal({
           return;
         }
 
+        if (otpData.devCode) {
+          setOtpDevCode(otpData.devCode);
+        }
         setPendingPayload({ payload: basePayload, visitorData });
         setOtpDialogOpen(true);
         setSubmitting(false);
@@ -425,6 +429,7 @@ export function ExhibitionQrModal({
           name={name}
           formType="QR_SCAN"
           targetId={artworkId}
+          initialDevCode={otpDevCode}
           onVerified={handleOtpVerified}
         />
       )}

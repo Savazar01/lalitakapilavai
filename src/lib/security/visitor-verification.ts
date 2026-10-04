@@ -167,9 +167,9 @@ export async function sendOtpVerificationEmail(
   code: string,
   name: string,
   formTitle: string = "Inquiry & Archival Portal"
-): Promise<{ success: boolean; messageId?: string; error?: string }> {
+): Promise<{ success: boolean; messageId?: string; error?: string; devCode?: string }> {
   try {
-    const { transporter, settings } = await getTransporter();
+    const { transporter, settings, envelopeFrom, replyTo } = await getTransporter();
     const branding = await getTenantBranding();
     const siteName = branding.name;
     const { logoImgSrc, attachments } = resolveEmailLogoAndAttachments(branding.logoUrl);
@@ -211,24 +211,61 @@ export async function sendOtpVerificationEmail(
     });
 
     if (!transporter) {
-      console.log(`[VisitorVerification] (Simulated Dev Mode) OTP Code for ${email}: ${code}`);
-      return { success: true, messageId: "dev-simulated-msg" };
+      console.log(`\n==================================================`);
+      console.log(`🔑 [LOCAL OTP DISPATCH] Verification Code for ${email}: ${code}`);
+      console.log(`⏳ Valid for 5 minutes (Dev Mode Simulated Transmission)`);
+      console.log(`==================================================\n`);
+      return { success: true, messageId: "dev-simulated-msg", devCode: code };
     }
 
+    const sender = envelopeFrom || branding.fromEmail;
     const info = await transporter.sendMail({
-      from: branding.fromEmail,
+      from: sender,
       to: email,
+      replyTo: replyTo || branding.adminAlertEmail || branding.fromAddress,
       subject: `Your Verification Code: ${code} — ${siteName}`,
       html,
       attachments,
     });
 
+    console.log(`[VisitorVerification] ✅ OTP email dispatched to ${email} (Message ID: ${info.messageId})`);
+
+    // Log successful dispatch
+    await prisma.emailDispatchLog.create({
+      data: {
+        recipient: email,
+        sender,
+        triggerType: "email_otp",
+        subject: `Your Verification Code: ${code} — ${siteName}`,
+        status: "SENT",
+      },
+    }).catch(() => {});
+
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("[VisitorVerification] Failed to dispatch OTP email:", error);
+    const errorMsg = error instanceof Error ? error.message : "Failed to send verification email";
+    console.error("[VisitorVerification] ❌ Failed to dispatch OTP email:", errorMsg);
+
+    // Log failed dispatch
+    try {
+      const branding = await getTenantBranding();
+      await prisma.emailDispatchLog.create({
+        data: {
+          recipient: email,
+          sender: branding.fromEmail,
+          triggerType: "email_otp",
+          subject: `Verification Code Request — ${branding.name}`,
+          status: "FAILED",
+          errorMessage: errorMsg,
+        },
+      });
+    } catch {
+      // Ignore database logging error during failure handling
+    }
+
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to send verification email",
+      error: errorMsg,
     };
   }
 }

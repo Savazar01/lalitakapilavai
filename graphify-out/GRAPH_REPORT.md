@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-10-04)
 
 ## Corpus Check
-- 232 files · ~257,774 words
+- 232 files · ~258,265 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1466 nodes · 3476 edges · 108 communities (91 shown, 17 thin omitted)
+- 1466 nodes · 3476 edges · 107 communities (89 shown, 18 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `76cab5e0`
+- Built from commit: `6640dd2a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -107,7 +107,6 @@
 - [[_COMMUNITY_Community 94|Community 94]]
 - [[_COMMUNITY_Community 95|Community 95]]
 - [[_COMMUNITY_Community 96|Community 96]]
-- [[_COMMUNITY_Community 97|Community 97]]
 - [[_COMMUNITY_Community 98|Community 98]]
 - [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
@@ -139,14 +138,14 @@
   src/app/(public)/gallery/[categorySlug]/page.tsx → src/lib/utils.ts
 - `KenBurnsCanvasProps` --references--> `MediaGalleryItem`  [EXTRACTED]
   src/components/public/blocks/gallery-3d/ken-burns-canvas.tsx → src/components/public/blocks/media-gallery-block.tsx
-- `InteractiveDepthCardProps` --references--> `MediaGalleryItem`  [EXTRACTED]
-  src/components/public/blocks/gallery-3d/interactive-depth-card.tsx → src/components/public/blocks/media-gallery-block.tsx
+- `AlternatingTimelineList()` --calls--> `cn()`  [EXTRACTED]
+  src/components/public/blocks/timeline-block.tsx → src/lib/utils.ts
 
-## Communities (108 total, 17 thin omitted)
+## Communities (107 total, 18 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.26
-Nodes (10): formatLocalizedDateTime(), getOrdinalSuffix(), SupportedCurrency, formatEventSchedule(), EventRsvpForm(), EventDetailPage(), GalleryPhoto, getEventBySlug (+2 more)
+Cohesion: 0.20
+Nodes (12): formatLocalizedDateTime(), getOrdinalSuffix(), SupportedCurrency, formatEventSchedule(), EventRsvpForm(), ProtectedImage(), ProtectedImageProps, EventDetailPage() (+4 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.16
@@ -408,10 +407,6 @@ Nodes (3): DynamicFormBlock(), metadata, DynamicPageSections()
 Cohesion: 0.22
 Nodes (10): 3. Docker Containerization & Production Build, 7. Production Environment Variables Template, code:bash (docker compose down), code:bash (# ==========================================================), code:bash (docker compose up -d --build), code:bash (docker compose ps), code:bash (curl http://localhost:3000/api/health), Full Multi-Stage Docker Build (+2 more)
 
-### Community 81 - "Community 81"
-Cohesion: 0.08
-Nodes (3): DEFAULT_EMAIL_TEMPLATES, globalForPrisma, RouteParams
-
 ### Community 82 - "Community 82"
 Cohesion: 0.12
 Nodes (19): ALLOWED_TOKENS, AllowedToken, DynamicThemeProvider(), BODY_FONT_OPTIONS, BORDER_RADIUS_OPTIONS, BORDER_WIDTH_OPTIONS, DEFAULT_DETAILED_THEME_CONFIG, DetailedThemeConfig (+11 more)
@@ -453,16 +448,12 @@ Cohesion: 0.10
 Nodes (35): AiAssistantModal(), AiAssistantModalProps, CatalogBackgroundConfig, CatalogBackgroundControl(), CatalogBackgroundControlProps, HERITAGE_COLOR_PRESETS, CatalogMatrixStudio(), CatalogTemplateItem (+27 more)
 
 ### Community 95 - "Community 95"
-Cohesion: 0.22
-Nodes (9): MediaGalleryDisplayMode, MediaGalleryItem, MediaGalleryBlockData, ThreeCylinderCarousel(), ThreeCylinderCarouselProps, ThreeLiquidWarp(), ThreeLiquidWarpProps, ArtworkPlacement (+1 more)
+Cohesion: 0.18
+Nodes (11): MediaGalleryDisplayMode, MediaGalleryItem, MediaGalleryBlockData, InteractiveDepthCard(), InteractiveDepthCardProps, ThreeCylinderCarousel(), ThreeCylinderCarouselProps, ThreeLiquidWarp() (+3 more)
 
 ### Community 96 - "Community 96"
 Cohesion: 0.16
 Nodes (9): EnvironmentCategory, getWallEnvironment(), WALL_ENVIRONMENTS, WallEnvironment, CameraTourStyle, ExhibitionWallBlock(), TourStep, WallLayoutMatrix (+1 more)
-
-### Community 97 - "Community 97"
-Cohesion: 0.40
-Nodes (4): InteractiveDepthCard(), InteractiveDepthCardProps, ProtectedImage(), ProtectedImageProps
 
 ### Community 98 - "Community 98"
 Cohesion: 0.25
@@ -487,12 +478,12 @@ Nodes (19): CatalogMatrixConfig, SinglePlateConfigState, ECatalogCoverConfig, EC
 ## Knowledge Gaps
 - **545 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+540 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `Community 53` to `Community 0`, `Community 4`, `Community 7`, `Community 21`, `Community 32`, `Community 33`, `Community 36`, `Community 39`, `Community 43`, `Community 44`, `Community 45`, `Community 48`, `Community 50`, `Community 51`, `Community 56`, `Community 59`, `Community 67`, `Community 79`, `Community 87`, `Community 88`, `Community 90`, `Community 94`, `Community 95`, `Community 96`, `Community 97`, `Community 98`, `Community 100`?**
+- **Why does `cn()` connect `Community 53` to `Community 0`, `Community 4`, `Community 7`, `Community 21`, `Community 32`, `Community 33`, `Community 36`, `Community 39`, `Community 43`, `Community 44`, `Community 45`, `Community 48`, `Community 50`, `Community 51`, `Community 56`, `Community 59`, `Community 67`, `Community 79`, `Community 87`, `Community 88`, `Community 90`, `Community 94`, `Community 95`, `Community 96`, `Community 98`, `Community 100`?**
   _High betweenness centrality (0.062) - this node is a cross-community bridge._
 - **Why does `Button` connect `Community 32` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `Community 21`, `Community 31`, `Community 33`, `Community 36`, `Community 39`, `Community 44`, `Community 45`, `Community 48`, `Community 50`, `Community 51`, `Community 56`, `Community 66`, `Community 67`, `Community 86`, `Community 87`, `Community 88`, `Community 90`, `Community 94`, `Community 98`, `Community 101`, `Community 104`?**
   _High betweenness centrality (0.034) - this node is a cross-community bridge._

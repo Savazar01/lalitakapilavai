@@ -120,6 +120,7 @@ export function DynamicFormBlock({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [otpDevCode, setOtpDevCode] = React.useState<string | undefined>(undefined);
 
   const effectiveTitle = formConfig?.title || formTitle;
   const effectiveSubtitle = formConfig?.subtitle !== undefined ? formConfig.subtitle : formSubtitle;
@@ -341,6 +342,9 @@ export function DynamicFormBlock({
         }
 
         // New or unverified user: display OTP challenge dialog
+        if (otpData.devCode) {
+          setOtpDevCode(otpData.devCode);
+        }
         setPendingPayload(basePayload);
         setOtpDialogOpen(true);
         setIsSubmitting(false);
@@ -606,6 +610,7 @@ export function DynamicFormBlock({
         name={typeof pendingPayload?.fullName === "string" ? pendingPayload.fullName : ""}
         formType="CONTACT"
         formTitle={effectiveTitle}
+        initialDevCode={otpDevCode}
         onVerified={handleOtpVerified}
       />
     </div>

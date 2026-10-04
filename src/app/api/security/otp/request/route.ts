@@ -122,17 +122,31 @@ export async function POST(request: NextRequest) {
     );
 
     if (!emailRes.success) {
-      console.warn("[OtpRequestAPI] Email dispatch reported error:", emailRes.error);
+      console.error("❌ Fatal: OTP verification email delivery failed:", emailRes.error);
+      return NextResponse.json(
+        {
+          error: `Unable to dispatch verification code via email: ${emailRes.error || "SMTP transmission error"}. Please check mail configuration in Admin Settings or contact support.`,
+          details: emailRes.error,
+        },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({
+    const isNonProd = process.env.NODE_ENV !== "production";
+    const responsePayload: Record<string, unknown> = {
       success: true,
       verified: false,
       bypass: false,
       challengeSent: true,
       tokenExpiresAt: expiresAt.toISOString(),
       message: `A 6-digit verification code has been dispatched to ${trimmedEmail}.`,
-    });
+    };
+
+    if (isNonProd && emailRes.devCode) {
+      responsePayload.devCode = emailRes.devCode;
+    }
+
+    return NextResponse.json(responsePayload);
   } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : "Error requesting OTP verification";
     console.error("[OtpRequestAPI] Error:", errorMsg);

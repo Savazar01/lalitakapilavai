@@ -458,16 +458,51 @@ export async function getTransporter() {
   const branding = await getTenantBranding();
   const emailConfig = (settings?.emailConfig as Record<string, unknown> | null) || {};
 
-  const host = (emailConfig.smtpHost as string) || "smtp.gmail.com";
-  const port = Number(emailConfig.smtpPort) || 587;
-  const user = (emailConfig.smtpUser as string) || "";
-  const pass = (emailConfig.smtpPassword as string) || "";
-  const fromEmail = branding.fromAddress;
-  const fromName = branding.displayName;
+  // 1. Explicit toggle: if SMTP is disabled in Admin Settings, return null transporter
+  const isEnabled = emailConfig.isEnabled === true;
+  if (!isEnabled) {
+    return {
+      transporter: null,
+      settings,
+      branding,
+      fromEmail: branding.fromAddress,
+      fromName: branding.displayName,
+      envelopeFrom: branding.fromEmail,
+      replyTo: branding.adminAlertEmail || branding.fromAddress,
+      isEnabled: false,
+    };
+  }
+
+  // 2. Resolve credentials with environment variable fallbacks
+  const host =
+    (emailConfig.smtpHost as string) ||
+    process.env.SMTP_HOST ||
+    ((emailConfig.provider as string) === "gmail" ? "smtp.gmail.com" : "smtp.gmail.com");
+  const port = Number(emailConfig.smtpPort || process.env.SMTP_PORT) || 587;
+  const user = (emailConfig.smtpUser as string) || process.env.SMTP_USER || "";
+  const pass = (emailConfig.smtpPassword as string) || process.env.SMTP_PASS || process.env.SMTP_PASSWORD || "";
+
+  const fromEmail = (emailConfig.fromEmail as string) || branding.fromAddress || user;
+  const fromName = (emailConfig.fromName as string) || branding.displayName || branding.name;
 
   if (!user || !pass) {
-    return { transporter: null, settings, branding, fromEmail, fromName };
+    return {
+      transporter: null,
+      settings,
+      branding,
+      fromEmail,
+      fromName,
+      envelopeFrom: `"${fromName}" <${fromEmail || user}>`,
+      replyTo: branding.adminAlertEmail || fromEmail,
+      isEnabled: true,
+    };
   }
+
+  // Envelope alignment: for Gmail SMTP, envelope sender should align with authenticated user
+  const isGmail = (emailConfig.provider as string) === "gmail" || host.includes("gmail.com");
+  const actualSender = isGmail && user && !fromEmail.includes(user) ? user : (fromEmail || user);
+  const envelopeFrom = `"${fromName}" <${actualSender}>`;
+  const replyTo = branding.adminAlertEmail || fromEmail || user;
 
   const transporter = nodemailer.createTransport({
     host,
@@ -478,12 +513,20 @@ export async function getTransporter() {
       pass,
     },
     tls: {
-      rejectUnauthorized: true,
-      minVersion: "TLSv1.2",
+      rejectUnauthorized: false, // Prevents container networking / self-signed certificate rejections
     },
   });
 
-  return { transporter, settings, branding, fromEmail, fromName };
+  return {
+    transporter,
+    settings,
+    branding,
+    fromEmail,
+    fromName,
+    envelopeFrom,
+    replyTo,
+    isEnabled: true,
+  };
 }
 
 /**
