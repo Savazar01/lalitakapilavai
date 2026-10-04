@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
-import { wrapBrandedEmailHtml, resolveEmailLogoAndAttachments } from "@/lib/email-service";
+import { wrapBrandedEmailHtml, resolveEmailLogoAndAttachments, getTenantBranding } from "@/lib/email-service";
 
 export const dynamic = "force-dynamic";
 
@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
     // Verify SMTP connection
     await transporter.verify();
 
-    // Send test email with dynamic branding from settings
-    const sender = fromName ? `"${fromName}" <${fromEmail || user}>` : fromEmail || user;
-    const testSubject = `✨ [${systemSettings?.emailHeaderTitle || "SavazAI WebApps Platform"}] SMTP / Gmail Connectivity Test`;
+    const branding = await getTenantBranding();
+    const sender = fromName ? `"${fromName}" <${fromEmail || user}>` : branding.fromEmail;
+    const testSubject = `✨ [${branding.name}] SMTP / Gmail Connectivity Test`;
 
     const bodyHtml = `
       <p style="font-size: 15px; line-height: 1.6; margin-top: 0;">
@@ -72,15 +72,15 @@ export async function POST(request: NextRequest) {
         <p style="margin: 4px 0;"><strong>Provider:</strong> ${provider || "SMTP"}</p>
         <p style="margin: 4px 0;"><strong>Server Host:</strong> ${host}:${port}</p>
         <p style="margin: 4px 0;"><strong>Sender Account:</strong> ${user}</p>
-        <p style="margin: 4px 0;"><strong>Admin Alert Recipient:</strong> ${systemSettings?.adminAlertEmail || recipient}</p>
+        <p style="margin: 4px 0;"><strong>Admin Alert Recipient:</strong> ${branding.adminAlertEmail || recipient}</p>
         <p style="margin: 4px 0;"><strong>Timestamp:</strong> ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</p>
       </div>
       <p style="font-size: 13px; color: #6b7280; margin-bottom: 0;">
-        Inbound gallery inquiries, concert RSVPs, and commissioning notifications will be routed cleanly through this outbound gateway.
+        Inbound inquiries, RSVPs, and notifications will be routed cleanly through this outbound gateway.
       </p>
     `;
 
-    const rawLogo = systemSettings?.logoUrl || systemSettings?.emailLogoUrl;
+    const rawLogo = branding.logoUrl || systemSettings?.logoUrl;
     const { logoImgSrc, attachments } = resolveEmailLogoAndAttachments(rawLogo);
 
     const finalHtml = wrapBrandedEmailHtml(bodyHtml, {
@@ -88,13 +88,16 @@ export async function POST(request: NextRequest) {
       emailHeaderSubtitle: systemSettings?.emailHeaderSubtitle,
       logoImgSrc,
       emailFooterText: systemSettings?.emailFooterText,
+      brandName: branding.name,
+      brandSubtitle: branding.subtitle,
+      organizationName: branding.name,
     });
 
     const info = await transporter.sendMail({
       from: sender,
       to: recipient,
       subject: testSubject,
-      text: `Greetings from ${systemSettings?.emailHeaderTitle || "SavazAI Atelier"}.\n\nYour outbound email delivery system is functioning perfectly.\n\nProvider: ${provider || "SMTP"}\nHost: ${host}:${port}\nUser: ${user}\nTimestamp: ${new Date().toISOString()}`,
+      text: `Greetings from ${branding.name}.\n\nYour outbound email delivery system is functioning perfectly.\n\nProvider: ${provider || "SMTP"}\nHost: ${host}:${port}\nUser: ${user}\nTimestamp: ${new Date().toISOString()}`,
       html: finalHtml,
       attachments,
     });

@@ -50,10 +50,6 @@ const nextConfig: NextConfig = {
         hostname: "**.savazar.com",
       },
       {
-        protocol: "https",
-        hostname: "**.lalitakapilavai.com",
-      },
-      {
         protocol: "http",
         hostname: "localhost",
       },

@@ -62,10 +62,20 @@ export async function PUT(request: NextRequest) {
       archiveSubtitle: body.archiveSubtitle !== undefined ? (body.archiveSubtitle ? String(body.archiveSubtitle).trim() : null) : undefined,
       siteDescription: body.siteDescription,
       adminAlertEmail: body.adminAlertEmail,
-      emailHeaderTitle: body.emailHeaderTitle,
-      emailHeaderSubtitle: body.emailHeaderSubtitle,
-      emailLogoUrl: body.emailLogoUrl,
-      emailFooterText: body.emailFooterText,
+      emailHeaderTitle:
+        body.emailHeaderTitle !== undefined
+          ? (body.emailHeaderTitle && String(body.emailHeaderTitle).trim() !== ""
+              ? String(body.emailHeaderTitle).trim()
+              : (body.siteName ? String(body.siteName).trim() : null))
+          : undefined,
+      emailHeaderSubtitle:
+        body.emailHeaderSubtitle !== undefined
+          ? (body.emailHeaderSubtitle && String(body.emailHeaderSubtitle).trim() !== ""
+              ? String(body.emailHeaderSubtitle).trim()
+              : (body.archiveSubtitle ? String(body.archiveSubtitle).trim() : null))
+          : undefined,
+      emailLogoUrl: body.emailLogoUrl !== undefined ? (body.emailLogoUrl ? String(body.emailLogoUrl).trim() : null) : undefined,
+      emailFooterText: body.emailFooterText !== undefined ? (body.emailFooterText ? String(body.emailFooterText).trim() : null) : undefined,
       contactEmail: body.contactEmail !== undefined ? (body.contactEmail ? String(body.contactEmail).trim() : null) : undefined,
       contactPhone: body.contactPhone !== undefined ? (body.contactPhone ? String(body.contactPhone).trim() : null) : undefined,
       watermarkText: body.watermarkText,
@@ -101,7 +111,11 @@ export async function PUT(request: NextRequest) {
         contactEmail: body.footerConfig?.contactEmail !== undefined ? String(body.footerConfig.contactEmail).trim() : undefined,
         contactPhone: body.footerConfig?.contactPhone !== undefined ? String(body.footerConfig.contactPhone).trim() : undefined,
       } : undefined,
-      emailConfig: body.emailConfig !== undefined ? body.emailConfig : undefined,
+      emailConfig: body.emailConfig !== undefined ? {
+        ...body.emailConfig,
+        fromName: body.emailConfig?.fromName ? String(body.emailConfig.fromName).trim() : (body.siteName?.trim() || existing?.siteName?.trim() || "SavazAI Platform"),
+        fromEmail: body.emailConfig?.fromEmail ? String(body.emailConfig.fromEmail).trim() : (body.adminAlertEmail?.trim() || existing?.adminAlertEmail?.trim() || "info@savazar.com"),
+      } : undefined,
       aiConfig: body.aiConfig !== undefined ? body.aiConfig : undefined,
       adminConfig: body.adminConfig !== undefined ? body.adminConfig : undefined,
       themeConfig: body.themeConfig !== undefined ? body.themeConfig : undefined,

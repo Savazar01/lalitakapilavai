@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     prisma.systemSetting.findFirst(),
   ]);
   const siteName = settings?.siteName || "SavazAI WebApps";
-  const artistName = settings?.emailHeaderTitle || "the Atelier";
+  const artistName = settings?.siteName || "the Atelier";
 
   if (!category) {
     return { title: `Category Not Found — ${siteName}` };

@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await prisma.systemSetting.findFirst();
   const siteName = settings?.siteName || "SavazAI WebApps";
-  const artistName = settings?.emailHeaderTitle || "the Atelier";
+  const artistName = settings?.siteName || "the Atelier";
 
   return {
     title: `Cultural Chronicle & Curatorial Essays — ${siteName}`,

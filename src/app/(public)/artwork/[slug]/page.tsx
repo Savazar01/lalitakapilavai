@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     prisma.systemSetting.findFirst(),
   ]);
   const siteName = settings?.siteName || "SavazAI WebApps";
-  const artistName = settings?.emailHeaderTitle || "Master Artist";
+  const artistName = settings?.siteName || "Master Artist";
 
   if (!artwork) {
     return { title: `Artwork Not Found — ${siteName}` };
@@ -80,7 +80,6 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
   const settings = await prisma.systemSetting.findFirst({
     select: {
       watermarkConfig: true,
-      emailHeaderTitle: true,
       siteName: true,
       formSecurityConfig: true,
     },
@@ -156,7 +155,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               customFoilLabel={artwork.customFoilLabel || undefined}
               defaultFoilText={defaultFoilText}
               yearCreated={artwork.yearCreated}
-              artistName={settings?.emailHeaderTitle || "Master Artist"}
+              artistName={settings?.siteName || "Master Artist"}
             />
 
             {/* Copyright & Provenance Notice */}
@@ -166,7 +165,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
                 <span className="font-serif font-bold text-foreground block mb-0.5">
                   Archival Provenance &amp; Copyright Notice
                 </span>
-                Original hand-crafted masterwork by {settings?.emailHeaderTitle || "the master artist"}. Layered on unblemished teakwood planks, gilded with certified {artwork.customFoilLabel || artwork.goldPurity || defaultFoilText || "authentic gold foil"}, and finished with semi-precious gemstones. Unauthorized reproduction or digital harvesting is prohibited.
+                Original hand-crafted masterwork by {settings?.siteName || "the master artist"}. Layered on unblemished teakwood planks, gilded with certified {artwork.customFoilLabel || artwork.goldPurity || defaultFoilText || "authentic gold foil"}, and finished with semi-precious gemstones. Unauthorized reproduction or digital harvesting is prohibited.
               </div>
             </div>
           </div>

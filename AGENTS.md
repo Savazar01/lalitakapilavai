@@ -160,10 +160,13 @@ All code generation and architectural modifications must adhere to the specializ
 ### C. Universal Email Notification & Form Dispatch Engine
 - **Decoupled Alert Routing**: Inbound form submissions route to `systemSetting.adminAlertEmail`, never to console super-admin credentials.
 - **Dynamic Form Discovery**: `/api/admin/forms/discover` dynamically aggregates core triggers (`contact`, `event_rsvp`, `custom_form`), Page Builder form blocks, and active Event registration forms.
+- **Universal Tenant Brand Resolver (`getTenantBranding()`)**:
+  - Outbound email dispatch across all transports (inquiry auto-responders, admin alerts, test pings, and OTP verifications) dynamically resolves `name`, `subtitle`, `logoUrl`, `fromEmail`, and `displayName` from `prisma.systemSetting`.
+  - Zero hardcoded client names, emails, or artist titles are permitted in email templates, transporters, or fallbacks.
 - **Dual Delivery Logo Engine (CID + HTTPS)**:
   - Email branding uses the single source of truth: `SystemSetting.logoUrl` from the "General" settings tab.
   - Embed local disk images as inline MIME attachments (`cid:atelier-brand-logo`) to guarantee instant rendering in Gmail, Outlook, and Apple Mail without broken image icons.
-  - Use `getAbsoluteAssetUrl()` to resolve remote storage assets with fully qualified HTTPS URLs.
+  - Remote cloud storage images resolve via `getAbsoluteAssetUrl()` with fully qualified HTTPS URLs.
 - **Audit Logging**: Persist every outbound message in `EmailDispatchLog` with delivery statuses (`SENT`, `FAILED`), error captures, and CSV export capabilities.
 
 ### D. Strict Binary Theme & Contrast Invariant

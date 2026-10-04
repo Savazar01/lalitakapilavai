@@ -245,10 +245,10 @@ export default function AdminSettingsPage() {
     archiveSubtitle: "",
     siteDescription: "",
     adminAlertEmail: "alerts@savazar.com",
-    emailHeaderTitle: "SavazAI Atelier",
-    emailHeaderSubtitle: "Sacred & Traditional Indian Art",
+    emailHeaderTitle: "",
+    emailHeaderSubtitle: "",
     emailLogoUrl: "",
-    emailFooterText: "Inbound atelier inquiry and archival correspondence.",
+    emailFooterText: "",
     contactEmail: "",
     contactPhone: "",
     logoUrl: "",
@@ -363,10 +363,10 @@ export default function AdminSettingsPage() {
             archiveSubtitle: data.archiveSubtitle || "",
             siteDescription: data.siteDescription || "",
             adminAlertEmail: data.adminAlertEmail || "alerts@savazar.com",
-            emailHeaderTitle: data.emailHeaderTitle || "SavazAI Atelier",
-            emailHeaderSubtitle: data.emailHeaderSubtitle || "Sacred & Traditional Indian Art",
+            emailHeaderTitle: data.emailHeaderTitle || "",
+            emailHeaderSubtitle: data.emailHeaderSubtitle || "",
             emailLogoUrl: data.emailLogoUrl || "",
-            emailFooterText: data.emailFooterText || "Inbound atelier inquiry and archival correspondence.",
+            emailFooterText: data.emailFooterText || "",
             contactEmail: data.contactEmail || "",
             contactPhone: data.contactPhone || "",
             defaultCurrency: data.defaultCurrency || "INR",
@@ -2368,7 +2368,7 @@ export default function AdminSettingsPage() {
                         <Input
                           value={form.emailHeaderTitle}
                           onChange={(e) => setForm({ ...form, emailHeaderTitle: e.target.value })}
-                          placeholder="SavazAI Atelier"
+                          placeholder={form.siteName || "SavazAI Platform"}
                           className="text-xs"
                         />
                       </div>
@@ -2377,7 +2377,7 @@ export default function AdminSettingsPage() {
                         <Input
                           value={form.emailHeaderSubtitle}
                           onChange={(e) => setForm({ ...form, emailHeaderSubtitle: e.target.value })}
-                          placeholder="Sacred & Traditional Indian Art"
+                          placeholder={form.archiveSubtitle || "Digital Atelier & Cultural Archive"}
                           className="text-xs"
                         />
                       </div>

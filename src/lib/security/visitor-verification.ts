@@ -1,6 +1,11 @@
 import crypto from "crypto";
 import prisma from "@/lib/prisma";
-import { getTransporter, wrapBrandedEmailHtml } from "@/lib/email-service";
+import {
+  getTransporter,
+  wrapBrandedEmailHtml,
+  getTenantBranding,
+  resolveEmailLogoAndAttachments,
+} from "@/lib/email-service";
 
 const VERIFICATION_SECRET =
   process.env.BETTER_AUTH_SECRET ||
@@ -164,8 +169,10 @@ export async function sendOtpVerificationEmail(
   formTitle: string = "Inquiry & Archival Portal"
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   try {
-    const { transporter, settings, fromEmail, fromName } = await getTransporter();
-    const siteName = settings?.siteName || "SavazAI Atelier";
+    const { transporter, settings } = await getTransporter();
+    const branding = await getTenantBranding();
+    const siteName = branding.name;
+    const { logoImgSrc, attachments } = resolveEmailLogoAndAttachments(branding.logoUrl);
 
     const contentHtml = `
       <p style="margin-top: 0;">Dear <strong>${name || "Patron"}</strong>,</p>
@@ -189,17 +196,18 @@ export async function sendOtpVerificationEmail(
 
       <p style="margin-top: 28px; font-size: 13px; color: #374151;">
         Warm regards,<br/>
-        <strong>${siteName} Archival Desk</strong>
+        <strong>${siteName} Correspondence Desk</strong>
       </p>
     `;
 
     const html = wrapBrandedEmailHtml(contentHtml, {
-      emailHeaderTitle: settings?.emailHeaderTitle || siteName,
-      emailHeaderSubtitle: "Identity & Verification Desk",
-      logoUrl: settings?.logoUrl,
-      emailLogoUrl: settings?.emailLogoUrl,
-      emailFooterText: settings?.emailFooterText || "Secured verification and visitor correspondence.",
-      organizationName: siteName,
+      emailHeaderTitle: branding.name,
+      emailHeaderSubtitle: branding.subtitle || "Identity & Verification Desk",
+      logoImgSrc,
+      emailFooterText: settings?.emailFooterText || `Inbound correspondence and secure notification dispatch • ${branding.name}`,
+      organizationName: branding.name,
+      brandName: branding.name,
+      brandSubtitle: branding.subtitle,
     });
 
     if (!transporter) {
@@ -208,10 +216,11 @@ export async function sendOtpVerificationEmail(
     }
 
     const info = await transporter.sendMail({
-      from: `"${fromName}" <${fromEmail}>`,
+      from: branding.fromEmail,
       to: email,
       subject: `Your Verification Code: ${code} — ${siteName}`,
       html,
+      attachments,
     });
 
     return { success: true, messageId: info.messageId };

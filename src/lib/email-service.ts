@@ -295,6 +295,81 @@ export function resolveEmailLogoAndAttachments(logoUrl?: string | null): Resolve
   };
 }
 
+export interface TenantBranding {
+  name: string;
+  subtitle: string;
+  logoUrl: string | null;
+  fromEmail: string;
+  fromAddress: string;
+  displayName: string;
+  adminAlertEmail: string;
+}
+
+/**
+ * Centrally resolves active multi-tenant branding from SystemSetting in PostgreSQL.
+ * Eradicates any legacy hardcoded client strings and ensures white-label neutrality.
+ */
+export async function getTenantBranding(): Promise<TenantBranding> {
+  const settings = await prisma.systemSetting.findFirst({
+    select: {
+      siteName: true,
+      archiveSubtitle: true,
+      logoUrl: true,
+      adminAlertEmail: true,
+      emailConfig: true,
+      emailHeaderTitle: true,
+      emailHeaderSubtitle: true,
+      emailFooterText: true,
+    },
+  });
+
+  const emailConfig = (settings?.emailConfig as Record<string, unknown> | null) || {};
+
+  // Clean brand name: prefer siteName, then emailHeaderTitle (if not legacy), then platform fallback
+  let rawName = (settings?.siteName || "").trim();
+  if (!rawName || rawName === "SavazAI WebApps") {
+    if (settings?.emailHeaderTitle && !settings.emailHeaderTitle.toLowerCase().includes("lalita")) {
+      rawName = settings.emailHeaderTitle.trim();
+    }
+  }
+  const name = rawName || "SavazAI Platform";
+
+  // Clean subtitle: prefer archiveSubtitle, then emailHeaderSubtitle (if not legacy)
+  let rawSubtitle = (settings?.archiveSubtitle || "").trim();
+  if (!rawSubtitle && settings?.emailHeaderSubtitle && !settings.emailHeaderSubtitle.toLowerCase().includes("sacred")) {
+    rawSubtitle = settings.emailHeaderSubtitle.trim();
+  }
+  const subtitle = rawSubtitle;
+
+  // Clean logo: logoUrl is the single source of truth
+  const logoUrl = settings?.logoUrl || null;
+
+  // Clean sender address:
+  let fromAddress = (emailConfig.fromEmail as string || "").trim();
+  if (!fromAddress || fromAddress.includes("lalitakapilavai.com")) {
+    fromAddress = (settings?.adminAlertEmail || process.env.SMTP_FROM || "info@savazar.com").trim();
+  }
+
+  // Clean display name:
+  let displayName = (emailConfig.fromName as string || "").trim();
+  if (!displayName || displayName.toLowerCase().includes("lalita") || displayName === "SavazAI Atelier") {
+    displayName = name;
+  }
+
+  const fromEmail = `"${displayName}" <${fromAddress}>`;
+  const adminAlertEmail = (settings?.adminAlertEmail || emailConfig.adminAlertEmail as string || fromAddress).trim();
+
+  return {
+    name,
+    subtitle,
+    logoUrl,
+    fromEmail,
+    fromAddress,
+    displayName,
+    adminAlertEmail,
+  };
+}
+
 /**
  * Wraps compiled email body with dynamic branded header, logo, and footer.
  */
@@ -309,14 +384,31 @@ export function wrapBrandedEmailHtml(
     logoImgSrc?: string | null;
     unsubscribeUrl?: string | null;
     organizationName?: string | null;
+    brandName?: string | null;
+    brandSubtitle?: string | null;
   }
 ): string {
-  const headerTitle = settings.emailHeaderTitle || "SavazAI Atelier";
-  const headerSubtitle = settings.emailHeaderSubtitle || "Digital Atelier & Cultural Archive";
-  const footerText = settings.emailFooterText || "Inbound atelier inquiry and archival correspondence.";
+  // Dynamic header resolution - eradicate hardcoded client strings
+  const rawTitle = settings.emailHeaderTitle?.trim();
+  const isLegacyTitle = !rawTitle || rawTitle.toLowerCase().includes("lalita");
+  const headerTitle = isLegacyTitle
+    ? (settings.brandName || settings.organizationName || "SavazAI Platform")
+    : rawTitle;
+
+  const rawSubtitle = settings.emailHeaderSubtitle?.trim();
+  const isLegacySubtitle = !rawSubtitle || rawSubtitle.toLowerCase().includes("sacred & traditional");
+  const headerSubtitle = isLegacySubtitle
+    ? (settings.brandSubtitle || "")
+    : rawSubtitle;
+
+  const rawFooter = settings.emailFooterText?.trim();
+  const isLegacyFooter = !rawFooter || rawFooter.toLowerCase().includes("art inquiry");
+  const footerText = isLegacyFooter
+    ? `Inbound correspondence and secure notification dispatch • ${headerTitle}`
+    : rawFooter;
 
   // Prefer explicitly resolved logoImgSrc (which may be cid:atelier-brand-logo)
-  const rawLogo = settings.logoUrl || settings.emailLogoUrl;
+  const rawLogo = settings.logoUrl || (settings.emailLogoUrl && !settings.emailLogoUrl.includes("7cda5006") ? settings.emailLogoUrl : null);
   const logoSrc = settings.logoImgSrc !== undefined
     ? settings.logoImgSrc
     : (rawLogo ? resolveEmailLogoAndAttachments(rawLogo).logoImgSrc : null);
@@ -331,12 +423,16 @@ export function wrapBrandedEmailHtml(
       </div>`
     : "";
 
+  const subtitleHtml = headerSubtitle
+    ? `<p style="margin: 6px 0 0 0; color: #854d0e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;">${headerSubtitle}</p>`
+    : "";
+
   return `
     <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
       <div style="background: #faf7f2; padding: 24px; text-align: center; border-bottom: 2px solid #d4af37;">
         ${logoHtml}
         <h2 style="margin: 0; color: #111827; font-size: 20px; font-weight: bold; letter-spacing: 0.02em;">${headerTitle}</h2>
-        <p style="margin: 6px 0 0 0; color: #854d0e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;">${headerSubtitle}</p>
+        ${subtitleHtml}
       </div>
       <div style="padding: 28px 24px; color: #374151; font-size: 14px; line-height: 1.65;">
         ${contentHtml}
@@ -345,7 +441,7 @@ export function wrapBrandedEmailHtml(
         <p style="margin: 0;">${footerText}</p>
         ${settings.unsubscribeUrl ? `
           <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">
-            <p style="margin: 0 0 6px 0;">You received this email because you interacted with ${settings.organizationName || "the atelier"}.</p>
+            <p style="margin: 0 0 6px 0;">You received this email because you interacted with ${settings.organizationName || headerTitle}.</p>
             <p style="margin: 0;"><a href="${settings.unsubscribeUrl}" style="color: #6b7280; text-decoration: underline;">Unsubscribe from communications</a></p>
           </div>
         ` : ""}
@@ -355,21 +451,22 @@ export function wrapBrandedEmailHtml(
 }
 
 /**
- * Creates nodemailer transporter from SystemSetting emailConfig
+ * Creates nodemailer transporter from SystemSetting emailConfig using dynamic tenant branding.
  */
 export async function getTransporter() {
   const settings = await prisma.systemSetting.findFirst();
+  const branding = await getTenantBranding();
   const emailConfig = (settings?.emailConfig as Record<string, unknown> | null) || {};
 
   const host = (emailConfig.smtpHost as string) || "smtp.gmail.com";
   const port = Number(emailConfig.smtpPort) || 587;
   const user = (emailConfig.smtpUser as string) || "";
   const pass = (emailConfig.smtpPassword as string) || "";
-  const fromEmail = (emailConfig.fromEmail as string) || user || "contact@savazar.com";
-  const fromName = (emailConfig.fromName as string) || "SavazAI Atelier";
+  const fromEmail = branding.fromAddress;
+  const fromName = branding.displayName;
 
   if (!user || !pass) {
-    return { transporter: null, settings, fromEmail, fromName };
+    return { transporter: null, settings, branding, fromEmail, fromName };
   }
 
   const transporter = nodemailer.createTransport({
@@ -386,7 +483,7 @@ export async function getTransporter() {
     },
   });
 
-  return { transporter, settings, fromEmail, fromName };
+  return { transporter, settings, branding, fromEmail, fromName };
 }
 
 /**
@@ -424,15 +521,10 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
 
   const activeTemplate = dbTemplate || defaultTemplate;
 
-  const { transporter, settings, fromEmail, fromName } = await getTransporter();
+  const { transporter, settings, branding, fromEmail } = await getTransporter();
 
   // Resolve tenant organization name
-  const orgName =
-    settings?.siteName
-      ? settings.siteName.includes("—")
-        ? settings.siteName.split("—")[0].trim()
-        : settings.siteName
-      : "SavazAI Platform";
+  const orgName = branding.name;
 
   // Tokens dictionary
   const now = new Date();
@@ -449,11 +541,13 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
     guest_count: data.guest_count || 1,
     date: now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
     organization_name: orgName,
+    archive_name: orgName,
+    site_name: orgName,
     ...data,
   };
 
-  const senderString = `"${fromName}" <${fromEmail}>`;
-  const adminRecipient = recipientOverride || settings?.adminAlertEmail || "alerts@savazar.com";
+  const senderString = branding.fromEmail;
+  const adminRecipient = recipientOverride || branding.adminAlertEmail;
 
   let adminSent = false;
   let adminError: string | undefined;
@@ -461,7 +555,7 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
   let userError: string | undefined;
 
   // Resolve brand logo and local CID attachments
-  const rawLogo = settings?.logoUrl || settings?.emailLogoUrl;
+  const rawLogo = branding.logoUrl || settings?.logoUrl;
   const { logoImgSrc, attachments } = resolveEmailLogoAndAttachments(rawLogo);
 
   // 1. Send Admin Notification Email
@@ -472,6 +566,9 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
     emailHeaderSubtitle: settings?.emailHeaderSubtitle,
     logoImgSrc,
     emailFooterText: settings?.emailFooterText,
+    brandName: branding.name,
+    brandSubtitle: branding.subtitle,
+    organizationName: orgName,
   });
 
   if (transporter) {
@@ -563,6 +660,8 @@ export async function sendAtelierEmail(options: EmailDispatchOptions): Promise<{
         emailFooterText: settings?.emailFooterText,
         unsubscribeUrl,
         organizationName: orgName,
+        brandName: branding.name,
+        brandSubtitle: branding.subtitle,
       });
 
       if (transporter) {
