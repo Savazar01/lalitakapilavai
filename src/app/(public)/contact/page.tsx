@@ -58,7 +58,11 @@ export default async function ContactPage() {
 
       <main className="flex-1 w-full py-8 sm:py-14">
         {hasSections ? (
-          <DynamicPageSections sections={pageData.sections} />
+          <DynamicPageSections
+            sections={pageData.sections}
+            enableCaptcha={enableCaptcha}
+            enableEmailOtp={enableEmailOtp}
+          />
         ) : (
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
             {/* Header */}

@@ -356,3 +356,13 @@ All code generation and architectural modifications must adhere to the specializ
   - Inbound submissions record `isEmailVerified: boolean`, `verifiedAt: DateTime?`, and `lastVerifiedIp: string?` directly on `Lead`.
   - Admin Leads CRM (`/admin/leads`) displays emerald "OTP Verified" status badges in table views, provides an Email Security Verification inspector card, and exports verification timestamps in CSV reports.
 
+### W. Public Settings API, Dynamic Form Security Propagation & Targeted Cache Revalidation
+- **Public Settings Endpoint (`src/app/api/settings/public/route.ts`)**:
+  - Unauthenticated, sanitized endpoint returning public brand identity metadata (`siteName`, `archiveSubtitle`, `contactEmail`, `contactPhone`, `logoUrl`, `faviconUrl`) and active `formSecurityConfig` (`contactForm`, `qrScanGate`).
+  - Employs cache headers (`s-maxage=10, stale-while-revalidate=59`) ensuring rapid client updates without exposing private storage credentials or database configurations.
+- **Universal Form Block Security Propagation**:
+  - `ContactPage` (`src/app/(public)/contact/page.tsx`), `DynamicPageSections` (`src/components/public/dynamic-page-sections.tsx`), and `TiptapRenderer` (`src/components/public/tiptap-renderer.tsx`) pass active `enableCaptcha` and `enableEmailOtp` flags directly into `<DynamicFormBlock>`.
+  - In `DynamicFormBlock` (`src/components/public/blocks/dynamic-form-block.tsx`), if security flags are not supplied via props or block JSON, a dynamic client fallback automatically fetches `/api/settings/public` on mount, ensuring that Page Builder blocks and custom embeds dynamically align with admin security toggles.
+- **Targeted Cache Revalidation**:
+  - `PUT /api/admin/settings` explicitly invalidates cache for `/contact`, `/(public)/contact`, `/api/settings/public`, `/artwork/[slug]`, and `/events/[slug]`, guaranteeing instant propagation of configuration mutations across all public intake portals.
+

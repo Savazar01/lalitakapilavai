@@ -73,6 +73,8 @@ export interface TiptapRendererProps {
   contrast?: ContrastMode | DynamicContrastScope;
   catalogPageSize?: CatalogPageSize;
   catalogOrientation?: CatalogOrientation;
+  enableCaptcha?: boolean;
+  enableEmailOtp?: boolean;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -771,6 +773,8 @@ export interface ColumnBlock {
   fields?: FormFieldConfig[];
   formConfig?: DynamicFormConfig;
   pageSlug?: string;
+  enableCaptcha?: boolean;
+  enableEmailOtp?: boolean;
   // Media Gallery Block Properties
   galleryDisplayMode?: MediaGalleryDisplayMode;
   galleryAutoplayTimer?: number;
@@ -814,7 +818,8 @@ export interface ColumnBlock {
 export function renderColumnBlock(
   block: ColumnBlock,
   contrast: ContrastMode = "auto",
-  geometry?: CatalogGeometry
+  geometry?: CatalogGeometry,
+  securityOverrides?: { enableCaptcha?: boolean; enableEmailOtp?: boolean }
 ): React.ReactNode {
   if (block.type === "IMAGE") {
     return (
@@ -937,6 +942,8 @@ export function renderColumnBlock(
           emailSubjectTemplate={block.emailSubjectTemplate}
           fields={block.fields}
           pageSlug={block.pageSlug}
+          enableCaptcha={block.enableCaptcha ?? securityOverrides?.enableCaptcha}
+          enableEmailOtp={block.enableEmailOtp ?? securityOverrides?.enableEmailOtp}
         />
       </div>
     );
@@ -1016,6 +1023,8 @@ export function TiptapRenderer({
   contrast = "auto",
   catalogPageSize,
   catalogOrientation,
+  enableCaptcha,
+  enableEmailOtp,
 }: TiptapRendererProps) {
   if (!content) return null;
   const legacyContrast: ContrastMode =
@@ -1100,7 +1109,9 @@ export function TiptapRenderer({
   if (Array.isArray(rawObj.blocks) && rawObj.blocks.length > 0) {
     return (
       <div className={cn(contrastClasses, "space-y-4", className)}>
-        {rawObj.blocks.map((block: ColumnBlock) => renderColumnBlock(block, legacyContrast, geometry))}
+        {rawObj.blocks.map((block: ColumnBlock) =>
+          renderColumnBlock(block, legacyContrast, geometry, { enableCaptcha, enableEmailOtp })
+        )}
       </div>
     );
   }

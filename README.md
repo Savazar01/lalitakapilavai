@@ -224,6 +224,12 @@ SavazAI WebApps Platform
 - **Full Field Customization**: Every tile field (Title, Sub-label, Description, Icon, Target URL, Metric Source, and Manual Value) is interactively editable with live preview and reordering controls.
 - **SSR Pre-Computation**: Server-rendered SSR aggregation ensures immediate, zero-flicker metric integer hydration upon page load.
 
+#### 12. Form Security, Anti-Bot CAPTCHA & Email OTP Verification Engine
+- **Per-Form Configurable Security Controls**: Administrative toggles for arithmetic CAPTCHA and 6-digit Email OTP challenges across the Public Contact Form, Event RSVPs, QR Placard Gates, and Page Builder custom forms.
+- **Dedicated Public Settings API (`/api/settings/public`)**: Sanitized endpoint exposing brand metadata and `formSecurityConfig` with cache-control headers, enabling dynamic security alignment across dynamic client components and static page renders.
+- **Frictionless Returning User Recognition**: Returning verified visitors are recognized via email and name matching against verified CRM leads, granting instant bypass with zero verification latency.
+- **Universal Privacy Consent Enforcement**: Mandatory `PrivacyConsentCheckbox` across all inbound inquiry portals ensuring GDPR and privacy compliance before form dispatch.
+
 ---
 
 ## 5. Quickstart & Local Development

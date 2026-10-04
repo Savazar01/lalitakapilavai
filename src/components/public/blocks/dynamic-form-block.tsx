@@ -125,8 +125,68 @@ export function DynamicFormBlock({
   const effectiveSubtitle = formConfig?.subtitle !== undefined ? formConfig.subtitle : formSubtitle;
   const effectiveFields = formConfig?.fields && formConfig.fields.length > 0 ? formConfig.fields : fields;
 
-  const effectiveEnableCaptcha = formConfig?.enableCaptcha ?? enableCaptcha ?? false;
-  const effectiveEnableEmailOtp = formConfig?.enableEmailOtp ?? enableEmailOtp ?? false;
+  // Dynamic client fallback for security config if not explicitly passed as props or in formConfig
+  const [dynamicSecurity, setDynamicSecurity] = React.useState<{
+    enableCaptcha?: boolean;
+    enableEmailOtp?: boolean;
+  }>({});
+
+  React.useEffect(() => {
+    const hasExplicitCaptcha = formConfig?.enableCaptcha !== undefined || enableCaptcha !== undefined;
+    const hasExplicitOtp = formConfig?.enableEmailOtp !== undefined || enableEmailOtp !== undefined;
+    if (hasExplicitCaptcha && hasExplicitOtp) {
+      return;
+    }
+
+    let isMounted = true;
+    fetch("/api/settings/public")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!isMounted || !data?.formSecurityConfig) return;
+        const config = data.formSecurityConfig;
+        const lowerPage = (pageSlug || "").toLowerCase();
+        const lowerTitle = (effectiveTitle || "").toLowerCase();
+        const isContactForm =
+          lowerPage === "contact" ||
+          lowerTitle.includes("contact") ||
+          lowerTitle.includes("inquiry") ||
+          lowerTitle.includes("get in touch");
+
+        const target = isContactForm ? config.contactForm : (config.contactForm || {});
+        if (target) {
+          setDynamicSecurity({
+            enableCaptcha: Boolean(target.enableCaptcha),
+            enableEmailOtp: Boolean(target.enableEmailOtp),
+          });
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not fetch public form security settings:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    enableCaptcha,
+    enableEmailOtp,
+    formConfig?.enableCaptcha,
+    formConfig?.enableEmailOtp,
+    pageSlug,
+    effectiveTitle,
+  ]);
+
+  const effectiveEnableCaptcha =
+    formConfig?.enableCaptcha ??
+    enableCaptcha ??
+    dynamicSecurity.enableCaptcha ??
+    false;
+
+  const effectiveEnableEmailOtp =
+    formConfig?.enableEmailOtp ??
+    enableEmailOtp ??
+    dynamicSecurity.enableEmailOtp ??
+    false;
 
   const [captchaValue, setCaptchaValue] = React.useState<FormCaptchaValue>({ token: "", answer: "" });
   const [otpDialogOpen, setOtpDialogOpen] = React.useState<boolean>(false);
@@ -542,8 +602,8 @@ export function DynamicFormBlock({
       <FormOtpDialog
         open={otpDialogOpen}
         onOpenChange={setOtpDialogOpen}
-        email={pendingPayload?.email || ""}
-        name={pendingPayload?.fullName || ""}
+        email={typeof pendingPayload?.email === "string" ? pendingPayload.email : ""}
+        name={typeof pendingPayload?.fullName === "string" ? pendingPayload.fullName : ""}
         formType="CONTACT"
         formTitle={effectiveTitle}
         onVerified={handleOtpVerified}

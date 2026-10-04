@@ -41,12 +41,16 @@ interface DynamicPageSectionsProps {
   sections?: DynamicSectionItem[] | null;
   className?: string;
   scrollTransition?: ScrollTransitionMode;
+  enableCaptcha?: boolean;
+  enableEmailOtp?: boolean;
 }
 
 export function DynamicPageSections({
   sections,
   className = "",
   scrollTransition = "parallax-float",
+  enableCaptcha,
+  enableEmailOtp,
 }: DynamicPageSectionsProps) {
   if (!sections || sections.length === 0) return null;
 
@@ -413,7 +417,12 @@ export function DynamicPageSections({
                         {colObj?.type && typeof colObj.type === "string" && colObj.type.startsWith("landing_") ? (
                           <ArchetypeShowcaseBlock content={colObj} contrast={colScope.contrastMode} />
                         ) : (
-                          <TiptapRenderer content={col.content as Record<string, unknown>} contrast={colScope.contrastMode} />
+                          <TiptapRenderer
+                            content={col.content as Record<string, unknown>}
+                            contrast={colScope.contrastMode}
+                            enableCaptcha={enableCaptcha}
+                            enableEmailOtp={enableEmailOtp}
+                          />
                         )}
                       </div>
                     );
