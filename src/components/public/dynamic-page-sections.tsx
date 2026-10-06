@@ -25,6 +25,7 @@ export interface DynamicSectionItem {
   subtitle?: string | null;
   description?: string | null;
   titleAlignment?: "left" | "center" | "right" | string | null;
+  slug?: string | null;
   gridSpan?: number;
   layoutType?: string | null;
   matrixConfig?: PageMatrixConfig | unknown | null;
@@ -110,6 +111,7 @@ export function DynamicPageSections({
             className="w-full"
           >
             <AnimatedSection
+              id={section.slug || undefined}
               className={cn("w-full relative overflow-hidden", sectionScope.wrapperClass, sectionTypographyClasses, section.customCssClass)}
               style={sectionStyle}
             >
@@ -135,54 +137,34 @@ export function DynamicPageSections({
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               {/* Dynamic Section Header Block */}
-              {(() => {
-                const hasCustomTitle = !!(
-                  section.title &&
-                  section.title.trim().length > 0 &&
-                  !/^Section \d+$/i.test(section.title.trim())
-                );
-                const hasHeader = !!(
-                  section.subtitle?.trim() ||
-                  section.description?.trim() ||
-                  hasCustomTitle
-                );
-
-                if (!hasHeader) return null;
-
-                const alignment = section.titleAlignment || "center";
-                const alignContainerClass =
-                  alignment === "left"
-                    ? "text-left items-start"
-                    : alignment === "right"
-                    ? "text-right items-end ml-auto"
-                    : "text-center items-center mx-auto";
-                const alignDescClass =
-                  alignment === "left"
-                    ? "text-left mr-auto"
-                    : alignment === "right"
-                    ? "text-right ml-auto"
-                    : "text-center mx-auto";
-
-                return (
-                  <header className={cn("w-full mb-8 sm:mb-10 flex flex-col gap-2", alignContainerClass)}>
-                    {section.subtitle && section.subtitle.trim().length > 0 && (
-                      <span className="text-xs font-mono uppercase tracking-widest text-primary font-semibold">
-                        {section.subtitle}
-                      </span>
-                    )}
-                    {section.title && section.title.trim().length > 0 && (
-                      <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold tracking-tight text-foreground">
-                        {section.title}
-                      </h2>
-                    )}
-                    {section.description && section.description.trim().length > 0 && (
-                      <p className={cn("text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl", alignDescClass)}>
-                        {section.description}
-                      </p>
-                    )}
-                  </header>
-                );
-              })()}
+              {(section.title || section.subtitle || section.description) && (
+                <header
+                  className={cn(
+                    "mb-10 max-w-3xl",
+                    section.titleAlignment === "center"
+                      ? "mx-auto text-center"
+                      : section.titleAlignment === "right"
+                      ? "ml-auto text-right"
+                      : "text-left"
+                  )}
+                >
+                  {section.subtitle && (
+                    <span className="text-xs font-mono font-semibold uppercase tracking-widest text-primary mb-2 inline-block">
+                      {section.subtitle}
+                    </span>
+                  )}
+                  {section.title && (
+                    <h2 className="text-3xl sm:text-4xl font-serif font-bold text-foreground tracking-tight">
+                      {section.title}
+                    </h2>
+                  )}
+                  {section.description && (
+                    <p className="mt-3 text-base text-muted-foreground leading-relaxed">
+                      {section.description}
+                    </p>
+                  )}
+                </header>
+              )}
               {section.layoutType === "MATRIX" && section.matrixConfig ? (
                 (() => {
                   const matrix = section.matrixConfig as PageMatrixConfig;

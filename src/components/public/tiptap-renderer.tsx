@@ -21,6 +21,13 @@ import { DynamicFormBlock, FormFieldConfig, DynamicFormConfig } from "@/componen
 import { MediaGalleryBlock, MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
 import { HeroShowcaseBlock, type HeroArchetype, type HotspotPin } from "@/components/public/blocks/hero-showcase-block";
 import { ArchetypeShowcaseBlock } from "@/components/public/blocks/landing/archetype-showcase-blocks";
+import {
+  HeroBlock,
+  MetricGridBlock,
+  TabbedFeatureBlock,
+  FeatureGridBlock,
+  AccordionBlock,
+} from "@/components/public/blocks/product-showcase-blocks";
 import { cn } from "@/lib/utils";
 import { getShapeDefinition } from "@/components/builder/shapes/shape-definitions";
 import {
@@ -726,7 +733,13 @@ export interface ColumnBlock {
     | "ARTIST_TIMELINE"
     | "FORM_BLOCK"
     | "MEDIA_GALLERY"
-    | "HERO_SHOWCASE";
+    | "HERO_SHOWCASE"
+    | "HERO_BLOCK"
+    | "METRIC_GRID"
+    | "TABBED_FEATURE_BLOCK"
+    | "FEATURE_GRID"
+    | "ACCORDION_BLOCK";
+  data?: Record<string, unknown>;
   content?: Record<string, unknown>;
   mediaUrl?: string;
   mediaAlt?: string;
@@ -1004,6 +1017,46 @@ export function renderColumnBlock(
     );
   }
 
+  if (block.type === "HERO_BLOCK") {
+    return (
+      <div key={block.id} className="w-full">
+        <HeroBlock block={block as unknown as Record<string, unknown>} />
+      </div>
+    );
+  }
+
+  if (block.type === "METRIC_GRID") {
+    return (
+      <div key={block.id} className="w-full">
+        <MetricGridBlock block={block as unknown as Record<string, unknown>} />
+      </div>
+    );
+  }
+
+  if (block.type === "TABBED_FEATURE_BLOCK") {
+    return (
+      <div key={block.id} className="w-full">
+        <TabbedFeatureBlock block={block as unknown as Record<string, unknown>} />
+      </div>
+    );
+  }
+
+  if (block.type === "FEATURE_GRID") {
+    return (
+      <div key={block.id} className="w-full">
+        <FeatureGridBlock block={block as unknown as Record<string, unknown>} />
+      </div>
+    );
+  }
+
+  if (block.type === "ACCORDION_BLOCK") {
+    return (
+      <div key={block.id} className="w-full">
+        <AccordionBlock block={block as unknown as Record<string, unknown>} />
+      </div>
+    );
+  }
+
   if (block.type === "TEXT" && block.content) {
     const doc = block.content as unknown as TiptapNode;
     const typographyClasses = getContrastTypographyClasses(contrast);
@@ -1101,8 +1154,16 @@ export function TiptapRenderer({
   const rawObj = content as Record<string, unknown>;
 
   // Check if content is a landing page showcase block
-  if (typeof rawObj?.type === "string" && rawObj.type.startsWith("landing_")) {
-    return <ArchetypeShowcaseBlock content={rawObj} contrast={legacyContrast} className={className} />;
+  if (typeof rawObj?.type === "string") {
+    if (rawObj.type.startsWith("landing_")) {
+      return <ArchetypeShowcaseBlock content={rawObj} contrast={legacyContrast} className={className} />;
+    }
+    const upperType = rawObj.type.toUpperCase();
+    if (upperType === "HERO_BLOCK") return <HeroBlock block={rawObj} className={className} />;
+    if (upperType === "METRIC_GRID") return <MetricGridBlock block={rawObj} className={className} />;
+    if (upperType === "TABBED_FEATURE_BLOCK") return <TabbedFeatureBlock block={rawObj} className={className} />;
+    if (upperType === "FEATURE_GRID") return <FeatureGridBlock block={rawObj} className={className} />;
+    if (upperType === "ACCORDION_BLOCK") return <AccordionBlock block={rawObj} className={className} />;
   }
 
   // Check if content has nested multi-row blocks

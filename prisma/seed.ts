@@ -1,5 +1,6 @@
 import { PrismaClient, Role, MenuPosition } from "@prisma/client";
 import { hashPassword } from "better-auth/crypto";
+import { seedProductPage } from "../src/lib/seeds/seed-product-page";
 
 const prisma = new PrismaClient();
 
@@ -937,6 +938,9 @@ async function main() {
       console.log(`✅ Provisioned default email template: ${t.triggerType}`);
     }
   }
+
+  // 10. Seed Flagship SavazAI WebApps Product Tour Page (/product)
+  await seedProductPage(prisma);
 
   console.log("🌿 Database seed completed successfully!");
 }

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "prisma db push --accept-data-loss && tsx prisma/seed.ts && next dev --port 3060",
+    "db:seed": "tsx prisma/seed.ts",
     "build": "next build",
     "start": "next start --port 3060",
     "lint": "eslint",

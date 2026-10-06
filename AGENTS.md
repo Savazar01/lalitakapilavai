@@ -375,3 +375,27 @@ All code generation and architectural modifications must adhere to the specializ
 - **Targeted Cache Revalidation**:
   - `PUT /api/admin/settings` explicitly invalidates cache for `/contact`, `/(public)/contact`, `/api/settings/public`, `/artwork/[slug]`, and `/events/[slug]`, guaranteeing instant propagation of configuration mutations across all public intake portals.
 
+### X. Flagship Platform Product Tour Page (/product) & Zero-Hardcoded Showcase Blocks
+- **Absolute Zero-Hardcoding Invariant**:
+  - The rendering components (`HeroBlock`, `MetricGridBlock`, `TabbedFeatureBlock`, `FeatureGridBlock`, `AccordionBlock`) in `src/components/public/blocks/product-showcase-blocks.tsx` contain zero hardcoded strings, labels, or static copy fallbacks.
+  - Every single headline, eyebrow tag, subheadline, metric card, persona tab, feature bullet, and accordion specification is dynamically retrieved from PostgreSQL via `Page`, `PageSection`, and `SubSection` models.
+- **12 Dynamic Architectural Sections**:
+  1. Hero & Strategic Value Proposition (`HERO_BLOCK`, `METRIC_GRID`).
+  2. Persona-Driven Solutions Hub (`TABBED_FEATURE_BLOCK` with 4 configurable persona views: Master Artists, Exhibition Directors, Art Academies, Commercial Galleries).
+  3. Visual Page Builder & Layout Engine (`FEATURE_GRID`, slug `modules`).
+  4. Flexible Menu Navigation Architecture (`FEATURE_GRID`).
+  5. Administrative Command Center & Telemetry (`FEATURE_GRID`).
+  6. SEO & AI-Optimized Publishing Engine (`FEATURE_GRID`).
+  7. Multi-Tier Art Categories & Taxonomy (`FEATURE_GRID`).
+  8. Artwork Master Catalog & Vault Management (`FEATURE_GRID`).
+  9. Curatorial e-Catalogs & Museum Placard Engine (`FEATURE_GRID`).
+  10. Exhibitions, Multi-Day RSVPs & 3D WebGL Salon (`FEATURE_GRID`).
+  11. Inbound CRM Leads & Visitor Intelligence (`FEATURE_GRID`).
+  12. Enterprise System Configuration Hub (`ACCORDION_BLOCK` with 7 comprehensive system specifications).
+- **Universal Page Builder & Inspector Integration**:
+  - Full live canvas rendering inside `src/app/admin/(dashboard)/pages/[id]/builder/builder-client.tsx` with live Section Header preview and reactive `StyleInspector` bindings.
+  - Subsections support both direct block data (`{ type: "FEATURE_GRID", data: ... }`) and multi-row layout structures (`{ blocks: [...] }`).
+- **Idempotent Database Seeding**:
+  - `src/lib/seeds/seed-product-page.ts` automatically checks for existing `/product` pages and preserves user modifications unless force update is specified.
+  - Automatically provisions the "Product" menu item in the main navigation menu (`position: TOP_CENTER`, `orderIndex: 2`).
+

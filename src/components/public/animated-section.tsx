@@ -4,18 +4,21 @@ import * as React from "react";
 import { motion } from "framer-motion";
 
 export interface AnimatedSectionProps {
+  id?: string;
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
 }
 
 export function AnimatedSection({
+  id,
   children,
   className = "",
   style,
 }: AnimatedSectionProps) {
   return (
     <motion.section
+      id={id}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}

@@ -64,6 +64,14 @@ import { MediaGalleryBlock, MediaGalleryItem, MediaGalleryDisplayMode } from "@/
 import { HeroBlockInspector, HeroBlockData } from "@/components/builder/hero-block-inspector";
 import { HeroShowcaseBlock } from "@/components/public/blocks/hero-showcase-block";
 import {
+  HeroBlock,
+  MetricGridBlock,
+  TabbedFeatureBlock,
+  FeatureGridBlock,
+  AccordionBlock,
+} from "@/components/public/blocks/product-showcase-blocks";
+import { cn } from "@/lib/utils";
+import {
   PageMatrixStudio,
   type PageMatrixConfig,
   reconcilePageMatrixCells,
@@ -729,6 +737,36 @@ function SortableSection({
           </Button>
         </div>
       </div>
+
+      {/* Dynamic Section Header Canvas Preview */}
+      {(section.title || section.subtitle || section.description) && (
+        <header
+          className={cn(
+            "mb-6 px-4 sm:px-6 relative z-10 max-w-3xl",
+            section.titleAlignment === "left"
+              ? "text-left mr-auto"
+              : section.titleAlignment === "right"
+              ? "text-right ml-auto"
+              : "text-center mx-auto"
+          )}
+        >
+          {section.subtitle && (
+            <span className="text-xs font-mono font-semibold uppercase tracking-widest text-primary mb-1.5 inline-block">
+              {section.subtitle}
+            </span>
+          )}
+          {section.title && (
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground tracking-tight">
+              {section.title}
+            </h2>
+          )}
+          {section.description && (
+            <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              {section.description}
+            </p>
+          )}
+        </header>
+      )}
 
       {/* Matrix Canvas or 12-Column Responsive Grid Row */}
       {section.layoutType === "MATRIX" ? (
@@ -1558,6 +1596,36 @@ function SortableSection({
                           </div>
                         </div>
                       )}
+
+                      {block.type === "HERO_BLOCK" && (
+                        <div className="p-3 rounded-xl border border-primary/30 bg-card overflow-hidden">
+                          <HeroBlock block={block as unknown as Record<string, unknown>} />
+                        </div>
+                      )}
+
+                      {block.type === "METRIC_GRID" && (
+                        <div className="p-3 rounded-xl border border-primary/30 bg-card overflow-hidden">
+                          <MetricGridBlock block={block as unknown as Record<string, unknown>} />
+                        </div>
+                      )}
+
+                      {block.type === "TABBED_FEATURE_BLOCK" && (
+                        <div className="p-3 rounded-xl border border-primary/30 bg-card overflow-hidden">
+                          <TabbedFeatureBlock block={block as unknown as Record<string, unknown>} />
+                        </div>
+                      )}
+
+                      {block.type === "FEATURE_GRID" && (
+                        <div className="p-3 rounded-xl border border-primary/30 bg-card overflow-hidden">
+                          <FeatureGridBlock block={block as unknown as Record<string, unknown>} />
+                        </div>
+                      )}
+
+                      {block.type === "ACCORDION_BLOCK" && (
+                        <div className="p-3 rounded-xl border border-primary/30 bg-card overflow-hidden">
+                          <AccordionBlock block={block as unknown as Record<string, unknown>} />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1608,13 +1676,26 @@ function SortableSection({
                     return null;
                   })()}
 
+                  {/* Single Custom Showcase Block Preview */}
+                  {(() => {
+                    const bType = typeof colObj?.type === "string" ? colObj.type.toUpperCase() : "";
+                    if (bType === "HERO_BLOCK") return <div className="p-2 rounded-xl bg-card border border-border"><HeroBlock block={colObj} /></div>;
+                    if (bType === "METRIC_GRID") return <div className="p-2 rounded-xl bg-card border border-border"><MetricGridBlock block={colObj} /></div>;
+                    if (bType === "TABBED_FEATURE_BLOCK") return <div className="p-2 rounded-xl bg-card border border-border"><TabbedFeatureBlock block={colObj} /></div>;
+                    if (bType === "FEATURE_GRID") return <div className="p-2 rounded-xl bg-card border border-border"><FeatureGridBlock block={colObj} /></div>;
+                    if (bType === "ACCORDION_BLOCK") return <div className="p-2 rounded-xl bg-card border border-border"><AccordionBlock block={colObj} /></div>;
+                    return null;
+                  })()}
+
                   {/* Inline Tiptap Rich-Text Editor */}
-                  <TiptapEditor
-                    contrast={sectionContrast}
-                    isLight={isSectionLight}
-                    content={col.content}
-                    onChange={(json) => onUpdateSubSectionContent(colIdx, json)}
-                  />
+                  {(!colObj?.type || colObj.type === "doc") && (
+                    <TiptapEditor
+                      contrast={sectionContrast}
+                      isLight={isSectionLight}
+                      content={col.content}
+                      onChange={(json) => onUpdateSubSectionContent(colIdx, json)}
+                    />
+                  )}
                 </div>
               )}
 
@@ -2712,10 +2793,10 @@ export default function VisualPageBuilder({ initialPage, id: propId }: VisualPag
                     }
                     return {
                       ...sec,
-                      title: updated.title || sec.title,
-                      subtitle: updated.subtitle || null,
-                      description: updated.description || null,
-                      titleAlignment: updated.titleAlignment || null,
+                      title: updated.title !== undefined ? updated.title : sec.title,
+                      subtitle: updated.subtitle !== undefined ? updated.subtitle : null,
+                      description: updated.description !== undefined ? updated.description : null,
+                      titleAlignment: updated.titleAlignment || "center",
                       backgroundColor: updated.backgroundColor,
                       backgroundType: updated.backgroundType || "COLOR",
                       backgroundPattern: updated.backgroundPattern || null,
