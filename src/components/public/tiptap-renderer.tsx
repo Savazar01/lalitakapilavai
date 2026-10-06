@@ -1168,11 +1168,51 @@ export function TiptapRenderer({
 
   // Check if content has nested multi-row blocks
   if (Array.isArray(rawObj.blocks) && rawObj.blocks.length > 0) {
+    const renderedNodes: React.ReactNode[] = [];
+    let buttonGroup: ColumnBlock[] = [];
+
+    const flushButtons = (key: string) => {
+      if (buttonGroup.length === 0) return;
+      renderedNodes.push(
+        <div key={`btn-group-${key}`} className="pt-2 flex flex-wrap items-center gap-3">
+          {buttonGroup.map((btn) => (
+            <Link
+              key={btn.id}
+              href={btn.buttonUrl || "#"}
+              className={cn(
+                "inline-flex items-center justify-center px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-semibold transition-all cursor-pointer shadow-xs",
+                btn.buttonVariant === "outline"
+                  ? "border border-primary text-primary hover:bg-primary/10"
+                  : btn.buttonVariant === "temple"
+                  ? "bg-[#A3281E] text-white hover:bg-[#8A2219] shadow-md"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+              )}
+            >
+              {btn.buttonText || "Explore Masterwork"}
+            </Link>
+          ))}
+        </div>
+      );
+      buttonGroup = [];
+    };
+
+    rawObj.blocks.forEach((block: ColumnBlock, idx: number) => {
+      if (block.type === "BUTTON") {
+        buttonGroup.push(block);
+      } else {
+        flushButtons(`flush-${idx}`);
+        renderedNodes.push(
+          <div key={block.id || `blk-${idx}`}>
+            {renderColumnBlock(block, legacyContrast, geometry, { enableCaptcha, enableEmailOtp })}
+          </div>
+        );
+      }
+    });
+    flushButtons("final");
+
     return (
       <div className={cn(contrastClasses, "space-y-4", className)}>
-        {rawObj.blocks.map((block: ColumnBlock) =>
-          renderColumnBlock(block, legacyContrast, geometry, { enableCaptcha, enableEmailOtp })
-        )}
+        {renderedNodes}
       </div>
     );
   }

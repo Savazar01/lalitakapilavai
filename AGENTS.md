@@ -375,27 +375,25 @@ All code generation and architectural modifications must adhere to the specializ
 - **Targeted Cache Revalidation**:
   - `PUT /api/admin/settings` explicitly invalidates cache for `/contact`, `/(public)/contact`, `/api/settings/public`, `/artwork/[slug]`, and `/events/[slug]`, guaranteeing instant propagation of configuration mutations across all public intake portals.
 
-### X. Flagship Platform Product Tour Page (/product) & Zero-Hardcoded Showcase Blocks
-- **Absolute Zero-Hardcoding Invariant**:
-  - The rendering components (`HeroBlock`, `MetricGridBlock`, `TabbedFeatureBlock`, `FeatureGridBlock`, `AccordionBlock`) in `src/components/public/blocks/product-showcase-blocks.tsx` contain zero hardcoded strings, labels, or static copy fallbacks.
-  - Every single headline, eyebrow tag, subheadline, metric card, persona tab, feature bullet, and accordion specification is dynamically retrieved from PostgreSQL via `Page`, `PageSection`, and `SubSection` models.
-- **12 Dynamic Architectural Sections**:
-  1. Hero & Strategic Value Proposition (`HERO_BLOCK`, `METRIC_GRID`).
-  2. Persona-Driven Solutions Hub (`TABBED_FEATURE_BLOCK` with 4 configurable persona views: Master Artists, Exhibition Directors, Art Academies, Commercial Galleries).
-  3. Visual Page Builder & Layout Engine (`FEATURE_GRID`, slug `modules`).
-  4. Flexible Menu Navigation Architecture (`FEATURE_GRID`).
-  5. Administrative Command Center & Telemetry (`FEATURE_GRID`).
-  6. SEO & AI-Optimized Publishing Engine (`FEATURE_GRID`).
-  7. Multi-Tier Art Categories & Taxonomy (`FEATURE_GRID`).
-  8. Artwork Master Catalog & Vault Management (`FEATURE_GRID`).
-  9. Curatorial e-Catalogs & Museum Placard Engine (`FEATURE_GRID`).
-  10. Exhibitions, Multi-Day RSVPs & 3D WebGL Salon (`FEATURE_GRID`).
-  11. Inbound CRM Leads & Visitor Intelligence (`FEATURE_GRID`).
-  12. Enterprise System Configuration Hub (`ACCORDION_BLOCK` with 7 comprehensive system specifications).
-- **Universal Page Builder & Inspector Integration**:
-  - Full live canvas rendering inside `src/app/admin/(dashboard)/pages/[id]/builder/builder-client.tsx` with live Section Header preview and reactive `StyleInspector` bindings.
-  - Subsections support both direct block data (`{ type: "FEATURE_GRID", data: ... }`) and multi-row layout structures (`{ blocks: [...] }`).
-- **Idempotent Database Seeding**:
-  - `src/lib/seeds/seed-product-page.ts` automatically checks for existing `/product` pages and preserves user modifications unless force update is specified.
-  - Automatically provisions the "Product" menu item in the main navigation menu (`position: TOP_CENTER`, `orderIndex: 2`).
+### X. Flagship Platform Product Tour Page (/product) & 100% WYSIWYG Editorial Engine
+- **100% Inline WYSIWYG Editing Architecture**:
+  - Eliminated monolithic, non-editable block components in favor of standard Page Builder column structures populated with native Tiptap ProseMirror AST nodes (`heading`, `paragraph`, `bulletList`, `textStyle`, `marks`).
+  - Curators and administrators can click directly on any eyebrow, title, description, or bullet point on the Page Builder canvas (`/admin/pages/[id]/builder`) to edit text live with Tiptap formatting tools.
+- **7 Human-Centric Editorial Rhythmic Acts**:
+  1. **Act 1: Split Hero**: 7-column left panel featuring bold editorial title, outcomes-driven subheadline, and consecutive grouped action buttons (`[Start Platform Tour]` linking to `#personas` & `[Request Atelier Access]` linking to `#inquiry`); 5-column right panel displaying an atelier glass teaser card with live metric statistics. Section title is set to null, eliminating duplicate/double header rendering.
+  2. **Act 2: 4 Persona Pillars**: 3-column balanced cards with gold eyebrow badges, warm borders, and clear outcome-focused benefits tailored to: Independent Masters, Fine Art Galleries, Biennale & Festival Directors, and Art Academies & Students.
+  3. **Act 3: 3 Alternating 6/6 Editorial Plates**:
+     - Plate 1: Physical Print & Publishing Placards & Catalogs (1-click print-ready visiting cards and museum placards).
+     - Plate 2: 3D Spatial Salon Walkthroughs (True-to-life gallery lighting, spatial corridors, natural aspect ratios).
+     - Plate 3: Exhibition RSVPs & Visitor Operations (Multi-day bookings, dynamic intervals, instant QR floor check-in).
+  4. **Act 4: 2-Column Capabilities Matrix**: Curatorial Freedom (visual page builder, taxonomies, navigation) and Enterprise Infrastructure (sovereign storage, AEO/Schema.org, zero-spam bot protection, binary themes).
+  5. **Act 5: Dedicated In-Page Platform Inquiry Form**: Center-aligned dynamic form block (`FORM_BLOCK`) embedded directly at the bottom with recipient routing set to `info@savazar.com`, collecting inquiries without redirecting to client contact forms.
+- **Navigation Isolation Invariant**:
+  - `/product` is permanently decoupled from the public Main Navigation Menu tree. It operates as an independent, shareable tour portal accessible via direct link (`/product`) or optional footer links.
+- **Grouped Button Rendering**:
+  - `src/components/public/tiptap-renderer.tsx` automatically aggregates consecutive `BUTTON` blocks in a column into a flex wrap button group (`pt-2 flex flex-wrap items-center gap-3`), rendering dual action buttons cleanly side-by-side.
+- **Decoupled Inbound Dispatch Recipient Override**:
+  - `/api/forms/submit` accepts `recipientEmails` and `recipientOverride` parameters from dynamic form blocks, dispatching leads to targeted administrative addresses (e.g. `info@savazar.com`) while preserving fallback to `SystemSetting.adminAlertEmail`.
+- **Idempotent Non-Destructive Seeding**:
+  - `src/lib/seeds/seed-product-page.ts` cleanly recreates the 7 sections for `slug: "product"` while maintaining non-destructive database safety for all other site pages.
 

@@ -1,9 +1,103 @@
-import { PrismaClient, MenuPosition } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 
-export async function seedProductPage(prisma: PrismaClient, options: { forceUpdate?: boolean } = {}) {
-  console.log("🚀 Initializing Product Tour Page (/product) seeder...");
+// ============================================================================
+// ProseMirror / Tiptap AST Generation Helpers (100% Native Inline WYSIWYG)
+// ============================================================================
+function tiptapText(text: string, marks?: { type: string; attrs?: Record<string, unknown> }[]) {
+  return {
+    type: "text",
+    text,
+    ...(marks && marks.length > 0 ? { marks } : {}),
+  };
+}
 
-  // 1. Check for existing page with slug: "product"
+function tiptapEyebrow(text: string) {
+  return {
+    type: "paragraph",
+    content: [
+      tiptapText(text, [
+        { type: "bold" },
+        {
+          type: "textStyle",
+          attrs: { color: "#D4AF37", fontSize: "11px" },
+        },
+      ]),
+    ],
+  };
+}
+
+function tiptapHeading(text: string, level = 2) {
+  return {
+    type: "heading",
+    attrs: { level },
+    content: [tiptapText(text)],
+  };
+}
+
+function tiptapParagraph(text: string, marks?: { type: string; attrs?: Record<string, unknown> }[]) {
+  return {
+    type: "paragraph",
+    content: [tiptapText(text, marks)],
+  };
+}
+
+function tiptapBulletList(items: string[]) {
+  return {
+    type: "bulletList",
+    content: items.map((item) => {
+      const colonIdx = item.indexOf(":");
+      if (colonIdx > 0) {
+        const title = item.slice(0, colonIdx + 1);
+        const rest = item.slice(colonIdx + 1);
+        return {
+          type: "listItem",
+          content: [
+            {
+              type: "paragraph",
+              content: [
+                tiptapText(title, [{ type: "bold" }]),
+                tiptapText(rest),
+              ],
+            },
+          ],
+        };
+      }
+      return {
+        type: "listItem",
+        content: [
+          {
+            type: "paragraph",
+            content: [tiptapText(item)],
+          },
+        ],
+      };
+    }),
+  };
+}
+
+function tiptapDoc(...nodes: unknown[]) {
+  return {
+    type: "doc",
+    content: nodes.flat(),
+  };
+}
+
+export async function seedProductPage(prisma: PrismaClient, options: { forceUpdate?: boolean } = { forceUpdate: true }) {
+  console.log("🚀 Initializing Redesigned Product Tour Page (/product) seeder...");
+
+  // 1. Navigation Cleanup: Decouple /product from Main Navigation Menu
+  await prisma.menuItem.deleteMany({
+    where: {
+      OR: [
+        { path: "/product" },
+        { path: "/product/" },
+        { label: { equals: "Product", mode: "insensitive" } },
+      ],
+    },
+  });
+  console.log("🧹 Ensured /product is decoupled from public navigation menus.");
+
+  // 2. Check for existing page with slug: "product"
   const existingPage = await prisma.page.findUnique({
     where: { slug: "product" },
     include: {
@@ -14,8 +108,6 @@ export async function seedProductPage(prisma: PrismaClient, options: { forceUpda
       },
     },
   });
-
-  const shouldSeedSections = !existingPage || existingPage.sections.length === 0 || options.forceUpdate;
 
   let pageId = existingPage?.id;
 
@@ -30,7 +122,7 @@ export async function seedProductPage(prisma: PrismaClient, options: { forceUpda
         isActive: true,
         isHomepage: false,
         metaDescription:
-          "Explore the complete digital platform for artists, galleries, and exhibition directors: 3D WebGL salon walkthroughs, sovereign multi-cloud storage, museum placards, and e-catalog publishing.",
+          "The complete digital platform for independent artists, gallery curators, biennales, and art academies: 3D virtual exhibitions, high-res placards, and sovereign archives.",
       },
     });
     pageId = created.id;
@@ -39,9 +131,11 @@ export async function seedProductPage(prisma: PrismaClient, options: { forceUpda
     console.log(`ℹ️ Existing /product page detected (ID: ${existingPage.id}, Sections: ${existingPage.sections.length}).`);
   }
 
+  const shouldSeedSections = !existingPage || existingPage.sections.length === 0 || options.forceUpdate;
+
   if (shouldSeedSections && pageId) {
-    if (existingPage && existingPage.sections.length > 0 && options.forceUpdate) {
-      console.log("🔄 Force update requested: replacing existing /product sections...");
+    if (existingPage && existingPage.sections.length > 0) {
+      console.log("🔄 Replacing existing /product sections with redesigned editorial layout...");
       await prisma.subSection.deleteMany({
         where: { section: { pageId } },
       });
@@ -50,52 +144,107 @@ export async function seedProductPage(prisma: PrismaClient, options: { forceUpda
       });
     }
 
-    console.log("📦 Seeding 12 dynamic sections for /product...");
+    console.log("📦 Seeding 7 editorial, 100% WYSIWYG-native sections for /product...");
 
     const sectionsData = [
-      // Section 1: Hero & Strategic Value Proposition
+      // ======================================================================
+      // Act 1: The Atelier & Exhibition Operating System (Split Hero)
+      // Zero double header: section title is null, heading is inside Left Column
+      // ======================================================================
       {
         orderIndex: 1,
-        title: "The Complete Digital Platform for Artists, Galleries, and Exhibition Directors",
-        subtitle: "ENTERPRISE CULTURAL PLATFORM • GLOBAL EDITION",
-        description:
-          "Curate physical masterworks, architect 3D WebGL salon walkthroughs, manage multi-day exhibition RSVPs, publish editorial print-ready e-catalogs, and safeguard sovereign art archives with enterprise privacy.",
-        titleAlignment: "center",
-        gridSpan: 12,
         slug: "hero",
-        customCssClass: "py-12 sm:py-16 border-b border-border/60",
+        title: null,
+        subtitle: null,
+        description: null,
+        titleAlignment: "left",
+        gridSpan: 12,
+        backgroundColor: "rgba(13, 14, 18, 0.4)",
+        backgroundType: "COLOR",
         subSections: [
+          // Left Column (7 cols): Native Tiptap Text + Dual Action Buttons
           {
-            title: "Hero Showcase & Metrics",
             orderIndex: 1,
-            gridSpan: 12,
+            gridSpan: 7,
+            title: "Platform Hero & Mission",
             content: {
               blocks: [
                 {
-                  id: "prod-hero-blk",
-                  type: "HERO_BLOCK",
-                  data: {
-                    badge: "ENTERPRISE CULTURAL PLATFORM • GLOBAL EDITION",
-                    headline: "The Complete Digital Platform for Artists, Galleries, and Exhibition Directors",
-                    subtext:
-                      "Curate physical masterworks, architect 3D WebGL salon walkthroughs, manage multi-day exhibition RSVPs, publish editorial print-ready e-catalogs, and safeguard sovereign art archives with enterprise privacy.",
-                    primaryCtaText: "Explore Interactive Modules",
-                    primaryCtaUrl: "#modules",
-                    secondaryCtaText: "Schedule Platform Walkthrough",
-                    secondaryCtaUrl: "/contact",
-                  },
+                  id: "hero-text-node",
+                  type: "TEXT",
+                  content: tiptapDoc(
+                    tiptapEyebrow("FINE ART • EXHIBITION MANAGEMENT • DIGITAL CATALOGS"),
+                    tiptapHeading("The All-In-One Platform to Showcase, Exhibit, and Sell Your Art", 1),
+                    tiptapParagraph(
+                      "Built specifically for independent artists, gallery curators, biennales, and art academies. Everything you need to manage your masterworks, host physical and 3D virtual exhibitions, print exhibition placards, and connect directly with collectors."
+                    )
+                  ),
                 },
                 {
-                  id: "prod-metrics-blk",
-                  type: "METRIC_GRID",
-                  data: {
-                    metrics: [
-                      { value: "100%", label: "Sovereign Storage" },
-                      { value: "3D WebGL", label: "Zero-Latency Virtual Salon" },
-                      { value: "300 DPI", label: "Print-Ready Placards & Catalogs" },
-                      { value: "Sub-Second", label: "Ingestion & Provenance Sync" },
-                    ],
-                  },
+                  id: "hero-btn-tour",
+                  type: "BUTTON",
+                  buttonText: "Start Platform Tour",
+                  buttonUrl: "#features",
+                  buttonVariant: "gold",
+                },
+                {
+                  id: "hero-btn-inquiry",
+                  type: "BUTTON",
+                  buttonText: "Request Atelier Access",
+                  buttonUrl: "#inquiry",
+                  buttonVariant: "outline",
+                },
+              ],
+            },
+          },
+          // Right Column (5 cols): Visual Teaser Card (Image + Placard + 3D CTA)
+          {
+            orderIndex: 2,
+            gridSpan: 5,
+            title: "Exhibition Card Preview",
+            content: {
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.03)",
+                borderColor: "rgba(212, 175, 55, 0.3)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "gold-glow",
+                ornamentalFrame: true,
+              },
+              blocks: [
+                {
+                  id: "hero-preview-img",
+                  type: "IMAGE",
+                  mediaUrl:
+                    "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=800",
+                  mediaAlt: "Classical Masterwork Exhibition Plate",
+                  mediaAspectRatio: "4:3",
+                  mediaBorderRadius: "rounded-lg",
+                  hasBorder: true,
+                  borderWidth: 1,
+                },
+                {
+                  id: "hero-preview-placard-text",
+                  type: "TEXT",
+                  content: tiptapDoc(
+                    tiptapEyebrow("300 DPI MUSEUM PLACARD PREVIEW"),
+                    tiptapHeading("Masterwork in Gold Leaf & Mineral Pigments", 3),
+                    tiptapParagraph("48 × 36 in • 24K Gold Foil • Provenance Verified", [
+                      { type: "textStyle", attrs: { color: "#94a3b8" } },
+                    ]),
+                    tiptapParagraph("● Virtual 3D Salon Walkthrough Live", [
+                      { type: "bold" },
+                      { type: "textStyle", attrs: { color: "#10b981" } },
+                    ])
+                  ),
+                },
+                {
+                  id: "hero-preview-btn",
+                  type: "BUTTON",
+                  buttonText: "Preview 3D Exhibition Salon",
+                  buttonUrl: "/exhibition-simulator",
+                  buttonVariant: "outline",
                 },
               ],
             },
@@ -103,467 +252,542 @@ export async function seedProductPage(prisma: PrismaClient, options: { forceUpda
         ],
       },
 
-      // Section 2: Persona-Driven Solutions Hub
+      // ======================================================================
+      // Act 2: Built for Every Creative Journey (4 Focused Persona Pillars)
+      // Single Section Header + 4 distinct, inline-editable cards
+      // ======================================================================
       {
         orderIndex: 2,
-        title: "Built for the Global Fine Arts Ecosystem",
+        slug: "personas",
+        title: "Built for Every Creative Journey",
         subtitle: "TAILORED WORKFLOWS",
         description:
-          "Whether you are a solo master artist, an international biennale curator, or an emerging academy student, the platform adapts to your curatorial lifecycle.",
+          "Whether you are an independent master artist, an international gallery, an art academy, or an advisory, the platform adapts to your curatorial lifecycle.",
         titleAlignment: "center",
         gridSpan: 12,
-        slug: "solutions",
-        customCssClass: "py-16 sm:py-20 bg-muted/20 border-b border-border/60",
+        backgroundColor: "rgba(10, 11, 15, 0.6)",
+        backgroundType: "COLOR",
         subSections: [
+          // Pillar 1: Independent Artists & Ateliers (3 cols)
           {
-            title: "Persona Solutions Matrix",
             orderIndex: 1,
-            gridSpan: 12,
+            gridSpan: 3,
+            title: "Independent Artists Pillar",
             content: {
-              type: "TABBED_FEATURE_BLOCK",
-              data: {
-                tabs: [
-                  {
-                    id: "tab-artists",
-                    label: "Master Artists & Independent Ateliers",
-                    title: "Authentic Archival & High-Fidelity Provenance",
-                    copy: "High-resolution media vaults, dynamic client-side watermarking, multi-currency valuation pricing, and private acquisition inquiries.",
-                  },
-                  {
-                    id: "tab-directors",
-                    label: "Exhibition Directors & Biennale Organizers",
-                    title: "Turnkey Exhibition & Visitor Operations",
-                    copy: "International timezone-protected scheduling, multi-day calendar engines with 15/30/60-min RSVP intervals, live floor QR codes, and automated visitor check-ins.",
-                  },
-                  {
-                    id: "tab-students",
-                    label: "Fine Art Students & Graduating Academies",
-                    title: "Rapid Onboarding & Retrospective Showcases",
-                    copy: "Publish thesis collections, generate digital monograph e-catalogs, and launch professional portfolio exhibitions without code.",
-                  },
-                  {
-                    id: "tab-galleries",
-                    label: "Commercial Galleries & Art Foundations",
-                    title: "Client Acquisition & Sovereign Privacy",
-                    copy: "Inbound CRM lead capture, verified email OTP gates, one-click GDPR/DPDP data erasure, and multi-cloud storage synchronization.",
-                  },
-                ],
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.3)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "soft",
               },
+              ...tiptapDoc(
+                tiptapEyebrow("🎨 INDEPENDENT ATELIERS"),
+                tiptapHeading("Your Lifelong Masterwork Archive", 3),
+                tiptapParagraph(
+                  "High-resolution portfolio protection with automated watermarks, multi-currency price tags, and direct private collector inquiries without gallery commissions."
+                )
+              ),
+            },
+          },
+          // Pillar 2: Galleries & Exhibition Organizers (3 cols)
+          {
+            orderIndex: 2,
+            gridSpan: 3,
+            title: "Galleries & Organizers Pillar",
+            content: {
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.3)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "soft",
+              },
+              ...tiptapDoc(
+                tiptapEyebrow("🏛️ GALLERIES & CURATORS"),
+                tiptapHeading("Turnkey Exhibition Operations", 3),
+                tiptapParagraph(
+                  "Multi-day event scheduling with 30-minute guest arrival slots, live smartphone QR codes for every painting on the wall, and automated attendee tracking."
+                )
+              ),
+            },
+          },
+          // Pillar 3: Art Academies & Students (3 cols)
+          {
+            orderIndex: 3,
+            gridSpan: 3,
+            title: "Art Academies Pillar",
+            content: {
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.3)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "soft",
+              },
+              ...tiptapDoc(
+                tiptapEyebrow("🎓 ACADEMIES & STUDENTS"),
+                tiptapHeading("Launch Your Graduating Showcase", 3),
+                tiptapParagraph(
+                  "Rapid setup for thesis exhibitions, student retrospectives, and digital monographs ready for university review boards without writing code."
+                )
+              ),
+            },
+          },
+          // Pillar 4: Curators & Art Advisories (3 cols)
+          {
+            orderIndex: 4,
+            gridSpan: 3,
+            title: "Curators & Advisories Pillar",
+            content: {
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.3)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "soft",
+              },
+              ...tiptapDoc(
+                tiptapEyebrow("📜 CURATORS & ADVISORIES"),
+                tiptapHeading("Museum-Standard Digital Monograms", 3),
+                tiptapParagraph(
+                  "Archival e-catalogs ready for digital flipbooks and high-res printing, plus verified email security to protect private acquisitions."
+                )
+              ),
             },
           },
         ],
       },
 
-      // Section 3: Visual Page Builder & Layout Engine (Target of #modules CTA)
+      // ======================================================================
+      // Act 3 - Feature A: Museum Placards & e-Catalogs (Split 6/6)
+      // Zero double header
+      // ======================================================================
       {
         orderIndex: 3,
-        title: "Dynamic 12-Column Visual Page Studio",
-        subtitle: "CONTENT ARCHITECTURE",
-        description: "Create bespoke public experiences with responsive column splitting and visual editing.",
-        titleAlignment: "center",
+        slug: "features",
+        title: null,
+        subtitle: null,
+        description: null,
+        titleAlignment: "left",
         gridSpan: 12,
-        slug: "modules",
-        customCssClass: "py-16 sm:py-20 border-b border-border/60",
+        backgroundColor: "rgba(13, 14, 18, 0.4)",
+        backgroundType: "COLOR",
         subSections: [
+          // Left Column (6 cols): Text + CTA
           {
-            title: "Page Studio Engine",
             orderIndex: 1,
-            gridSpan: 12,
+            gridSpan: 6,
+            title: "Placard Publishing Narrative",
             content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 4,
-                features: [
-                  {
-                    title: "Drag-and-Drop Layout Grid",
-                    description: "Flexible multi-column containers (1/1, 1/2, 1/3, 1/4) with dynamic margins.",
-                  },
-                  {
-                    title: "Inline Tiptap WYSIWYG",
-                    description: "Real-time editorial formatting, quotes, token chips, and styled callouts.",
-                  },
-                  {
-                    title: "Modular Block Ecosystem",
-                    description: "Timelines, accordions, dynamic forms, metric counters, and media players.",
-                  },
-                  {
-                    title: "Decoupled Sandbox & Homepage Promotion",
-                    description: "Build and test landing pages in a sandbox, then atomically promote to homepage in one click.",
-                  },
-                ],
+              blocks: [
+                {
+                  id: "feat-a-text",
+                  type: "TEXT",
+                  content: tiptapDoc(
+                    tiptapEyebrow("PUBLISHING & PRINT"),
+                    tiptapHeading("Museum-Ready Wall Placards & Print Catalogs in One Click", 2),
+                    tiptapParagraph(
+                      "Generate 300 DPI high-resolution printable cards with artwork dimensions, pricing, and provenance QR codes formatted specifically for physical gallery display stands."
+                    ),
+                    tiptapParagraph(
+                      "Export publication-grade digital monographs with full-bleed layouts, high-res plates, and curatorial essays—zero desktop publishing software required."
+                    )
+                  ),
+                },
+                {
+                  id: "feat-a-btn",
+                  type: "BUTTON",
+                  buttonText: "Explore Digital Catalogs",
+                  buttonUrl: "/catalogs",
+                  buttonVariant: "gold",
+                },
+              ],
+            },
+          },
+          // Right Column (6 cols): Visual Mockup Card
+          {
+            orderIndex: 2,
+            gridSpan: 6,
+            title: "Placard Visual Card",
+            content: {
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.25)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "soft",
               },
+              blocks: [
+                {
+                  id: "feat-a-img",
+                  type: "IMAGE",
+                  mediaUrl:
+                    "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800",
+                  mediaAlt: "Exhibition Monograph Placard",
+                  mediaAspectRatio: "16:9",
+                  mediaBorderRadius: "rounded-lg",
+                  hasBorder: true,
+                  borderWidth: 1,
+                },
+                {
+                  id: "feat-a-caption",
+                  type: "TEXT",
+                  content: tiptapDoc(
+                    tiptapParagraph(
+                      "Visiting-card (3.5 × 2 in) and museum-wall (4 × 2.5 in) formats with 18mm clamp safety margins and instant QR provenance verification.",
+                      [{ type: "textStyle", attrs: { color: "#94a3b8", fontSize: "13px" } }]
+                    )
+                  ),
+                },
+              ],
             },
           },
         ],
       },
 
-      // Section 4: Flexible Menu Navigation Architecture
+      // ======================================================================
+      // Act 3 - Feature B: Virtual 3D Spatial Walkthroughs (Alternating Split 6/6)
+      // Visual on Left, Text on Right
+      // ======================================================================
       {
         orderIndex: 4,
-        title: "Multi-Zone Navigation Hierarchy",
-        subtitle: "INFORMATION DESIGN",
-        description: "Deliver fluid visitor journeys across desktop, tablet, and mobile displays.",
-        titleAlignment: "center",
+        slug: "spatial-3d",
+        title: null,
+        subtitle: null,
+        description: null,
+        titleAlignment: "left",
         gridSpan: 12,
-        slug: "navigation",
-        customCssClass: "py-16 sm:py-20 bg-muted/20 border-b border-border/60",
+        backgroundColor: "rgba(10, 11, 15, 0.6)",
+        backgroundType: "COLOR",
         subSections: [
+          // Left Column (6 cols): Visual Salon Teaser Card
           {
-            title: "Navigation Architecture",
             orderIndex: 1,
-            gridSpan: 12,
+            gridSpan: 6,
+            title: "3D Salon Visual Card",
             content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 3,
-                features: [
-                  {
-                    title: "3-Tier Hierarchical Menus",
-                    description: "Root links, dropdown menus, and nested collections.",
-                  },
-                  {
-                    title: "Multi-Zone Layout Engine",
-                    description: "Independent headers for Top-Center, Top-Left, Top-Right CTA, and Sidebar Left.",
-                  },
-                  {
-                    title: "Mobile Slide-Out Drawer",
-                    description: "Safe-area compliant responsive touch navigation.",
-                  },
-                ],
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.25)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "gold-glow",
               },
+              blocks: [
+                {
+                  id: "feat-b-img",
+                  type: "IMAGE",
+                  mediaUrl:
+                    "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&q=80&w=800",
+                  mediaAlt: "3D Virtual Gallery Corridor",
+                  mediaAspectRatio: "16:9",
+                  mediaBorderRadius: "rounded-lg",
+                  hasBorder: true,
+                  borderWidth: 1,
+                },
+                {
+                  id: "feat-b-caption",
+                  type: "TEXT",
+                  content: tiptapDoc(
+                    tiptapParagraph(
+                      "7 procedural gallery environments including imperial palaces, minimalist white cubes, and heritage villas.",
+                      [{ type: "textStyle", attrs: { color: "#94a3b8", fontSize: "13px" } }]
+                    )
+                  ),
+                },
+              ],
+            },
+          },
+          // Right Column (6 cols): Text + CTA
+          {
+            orderIndex: 2,
+            gridSpan: 6,
+            title: "3D Salon Narrative",
+            content: {
+              blocks: [
+                {
+                  id: "feat-b-text",
+                  type: "TEXT",
+                  content: tiptapDoc(
+                    tiptapEyebrow("SPATIAL EXHIBITIONS"),
+                    tiptapHeading("Virtual 3D Walkthroughs with True Architectural Lighting", 2),
+                    tiptapParagraph(
+                      "Transport global collectors into 7 architectural salon environments—from minimalist white-cube galleries to heritage palaces—with genuine museum eye-level hanging and cinematic camera tours."
+                    ),
+                    tiptapParagraph(
+                      "Preserves the true aspect ratio of every canvas without squishing or cropping. Smooth interactive walkthroughs that work instantly on mobile and desktop without app downloads."
+                    )
+                  ),
+                },
+                {
+                  id: "feat-b-btn",
+                  type: "BUTTON",
+                  buttonText: "Tour Virtual Salon",
+                  buttonUrl: "/exhibition-simulator",
+                  buttonVariant: "gold",
+                },
+              ],
             },
           },
         ],
       },
 
-      // Section 5: Administrative Command Center & Telemetry
+      // ======================================================================
+      // Act 3 - Feature C: Event RSVPs & Visitor Tracking (Split 6/6)
+      // Text on Left, Visual on Right
+      // ======================================================================
       {
         orderIndex: 5,
-        title: "Executive Platform Dashboard",
-        subtitle: "OPERATIONAL CONTROL",
-        description: "Unified visibility into assets, inquiries, events, and infrastructure health.",
-        titleAlignment: "center",
+        slug: "visitor-rsvps",
+        title: null,
+        subtitle: null,
+        description: null,
+        titleAlignment: "left",
         gridSpan: 12,
-        slug: "dashboard",
-        customCssClass: "py-16 sm:py-20 border-b border-border/60",
+        backgroundColor: "rgba(13, 14, 18, 0.4)",
+        backgroundType: "COLOR",
         subSections: [
+          // Left Column (6 cols): Text + CTA
           {
-            title: "Dashboard & Control",
             orderIndex: 1,
-            gridSpan: 12,
+            gridSpan: 6,
+            title: "RSVP & CRM Narrative",
             content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 3,
-                features: [
-                  {
-                    title: "Live KPI Metrics",
-                    description: "Real-time tallies of artworks, active categories, published catalogs, and visitor leads.",
-                  },
-                  {
-                    title: "Infrastructure Monitoring",
-                    description: "Direct indicators for PostgreSQL connection status, Coolify container uptime, and storage health.",
-                  },
-                  {
-                    title: "Quick Actions",
-                    description: "Fast-access shortcuts to curate events, print placards, and review inquiries.",
-                  },
-                ],
+              blocks: [
+                {
+                  id: "feat-c-text",
+                  type: "TEXT",
+                  content: tiptapDoc(
+                    tiptapEyebrow("VISITOR OPERATIONS & CRM"),
+                    tiptapHeading("Effortless Event RSVPs & Live Visitor Tracking", 2),
+                    tiptapParagraph(
+                      "Manage guest capacities, eliminate paper sign-in sheets, and let visitors scan wall QR codes with their phone to explore artwork stories and register their interest."
+                    ),
+                    tiptapParagraph(
+                      "Configurable 15, 30, and 60-minute arrival windows keep foot traffic organized. Inbound patron details sync directly into your private CRM with zero-leak email verification."
+                    )
+                  ),
+                },
+                {
+                  id: "feat-c-btn",
+                  type: "BUTTON",
+                  buttonText: "View Scheduled Exhibitions",
+                  buttonUrl: "/events",
+                  buttonVariant: "gold",
+                },
+              ],
+            },
+          },
+          // Right Column (6 cols): Visual Mockup Card
+          {
+            orderIndex: 2,
+            gridSpan: 6,
+            title: "RSVP Visual Card",
+            content: {
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.25)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "soft",
               },
+              blocks: [
+                {
+                  id: "feat-c-img",
+                  type: "IMAGE",
+                  mediaUrl:
+                    "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&q=80&w=800",
+                  mediaAlt: "Gallery Exhibition Reception",
+                  mediaAspectRatio: "16:9",
+                  mediaBorderRadius: "rounded-lg",
+                  hasBorder: true,
+                  borderWidth: 1,
+                },
+                {
+                  id: "feat-c-caption",
+                  type: "TEXT",
+                  content: tiptapDoc(
+                    tiptapParagraph(
+                      "Automated RSVP receipts, attendance lists, and floor QR scan acquisition with phone & WhatsApp collection.",
+                      [{ type: "textStyle", attrs: { color: "#94a3b8", fontSize: "13px" } }]
+                    )
+                  ),
+                },
+              ],
             },
           },
         ],
       },
 
-      // Section 6: SEO & AI-Optimized Publishing Engine
+      // ======================================================================
+      // Act 4: Complete Platform Capabilities (Clean 2-Column Matrix)
+      // Replaces 8 identical dark boxes with 2 unified editorial columns
+      // ======================================================================
       {
         orderIndex: 6,
-        title: "Schema.org AEO & Editorial Journal",
-        subtitle: "DISCOVERABILITY",
-        description: "Maximize reach across traditional search engines and conversational AI models.",
+        slug: "capabilities",
+        title: "Complete Platform Capabilities at Your Command",
+        subtitle: "ENTERPRISE ARCHITECTURE",
+        description:
+          "Designed for total curatorial sovereignty, high performance, and effortless administration.",
         titleAlignment: "center",
         gridSpan: 12,
-        slug: "seo-publishing",
-        customCssClass: "py-16 sm:py-20 bg-muted/20 border-b border-border/60",
+        backgroundColor: "rgba(10, 11, 15, 0.6)",
+        backgroundType: "COLOR",
         subSections: [
+          // Left Column (6 cols): Curatorial Freedom
           {
-            title: "Discoverability Features",
             orderIndex: 1,
-            gridSpan: 12,
+            gridSpan: 6,
+            title: "Curatorial Freedom Capabilities",
             content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 3,
-                features: [
-                  {
-                    title: "Answer Engine Optimization (AEO)",
-                    description: "Automatic JSON-LD structured data embedding for AI knowledge extraction.",
-                  },
-                  {
-                    title: "Rich Editorial Tools",
-                    description: "Summary abstracts, tag taxonomy, author profiles, and media embeds.",
-                  },
-                  {
-                    title: "Search Engine Optimization",
-                    description: "Granular control over meta titles, canonical links, and Open Graph previews.",
-                  },
-                ],
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.3)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "soft",
               },
+              ...tiptapDoc(
+                tiptapEyebrow("CURATORIAL FREEDOM"),
+                tiptapHeading("Total Freedom to Customize Every Detail", 3),
+                tiptapBulletList([
+                  "Visual Page Builder: Drag-and-drop layout studio with responsive 12-column grids and live Tiptap editing.",
+                  "Multi-Tier Art Categories: Unbounded relational taxonomies across eras, mediums, schools, and cultural disciplines.",
+                  "Flexible Navigation Architecture: Multi-zone headers, mobile slide-out drawers, and nested dropdown links.",
+                  "Bulk Spreadsheet Operations: Fast onboarding and collection updates via Excel import and export.",
+                ])
+              ),
+            },
+          },
+          // Right Column (6 cols): Enterprise Performance & Privacy
+          {
+            orderIndex: 2,
+            gridSpan: 6,
+            title: "Performance & Privacy Capabilities",
+            content: {
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                borderColor: "rgba(212, 175, 55, 0.3)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "soft",
+              },
+              ...tiptapDoc(
+                tiptapEyebrow("ENTERPRISE INFRASTRUCTURE"),
+                tiptapHeading("Enterprise Performance & Sovereign Privacy", 3),
+                tiptapBulletList([
+                  "Sovereign Storage: Keep originals on your private server, Google Drive, Nextcloud, AWS S3, or Cloudflare R2.",
+                  "Search & AI Discoverability: Automatic Schema.org JSON-LD structured data for Answer Engine Optimization (AEO).",
+                  "Bot Defense & Zero-Spam Inquiries: Stateless arithmetic CAPTCHA and verified email passcodes eliminate spam.",
+                  "Binary Light & Dark Themes: Impeccable contrast with classical typography and accessible WCAG 2.2 AAA tokens.",
+                ])
+              ),
             },
           },
         ],
       },
 
-      // Section 7: Multi-Tier Art Categories & Taxonomy
+      // ======================================================================
+      // Act 5: Dedicated Platform Inquiry Form (Direct Intake to info@savazar.com)
+      // ======================================================================
       {
         orderIndex: 7,
-        title: "Hierarchical Collection Taxonomy",
-        subtitle: "CURATORIAL CLASSIFICATION",
-        description: "Organize masterworks across schools, mediums, eras, and custom disciplines.",
+        slug: "inquiry",
+        title: "Ready to Launch Your Platform?",
+        subtitle: "DIRECT PLATFORM INQUIRY",
+        description:
+          "Connect with the SavazAI team for a personalized demo, custom onboarding, or academic institutional licensing.",
         titleAlignment: "center",
         gridSpan: 12,
-        slug: "taxonomy",
-        customCssClass: "py-16 sm:py-20 border-b border-border/60",
+        backgroundColor: "rgba(13, 14, 18, 0.5)",
+        backgroundType: "COLOR",
         subSections: [
           {
-            title: "Taxonomy Engine",
             orderIndex: 1,
             gridSpan: 12,
+            title: "Platform Inquiry Form Card",
             content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 3,
-                features: [
-                  {
-                    title: "Parent & Sub-Category Tree",
-                    description: "Unbounded relational hierarchy with inheritances.",
-                  },
-                  {
-                    title: "Dynamic Permalinks",
-                    description: "Clean, SEO-optimized URL slugs for specialized collections.",
-                  },
-                  {
-                    title: "Curatorial Introductions",
-                    description: "Rich descriptions, hero imagery, and custom category badges.",
-                  },
-                ],
+              _style: {
+                backgroundColor: "rgba(255, 255, 255, 0.03)",
+                borderColor: "rgba(212, 175, 55, 0.4)",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "rounded-2xl",
+                boxShadow: "gold-glow",
+                ornamentalFrame: true,
               },
-            },
-          },
-        ],
-      },
-
-      // Section 8: Artwork Master Catalog & Vault Management
-      {
-        orderIndex: 8,
-        title: "Comprehensive Masterwork Archive",
-        subtitle: "COLLECTION REPOSITORY",
-        description: "Detailed cataloging with high-resolution imagery and intellectual property protection.",
-        titleAlignment: "center",
-        gridSpan: 12,
-        slug: "master-catalog",
-        customCssClass: "py-16 sm:py-20 bg-muted/20 border-b border-border/60",
-        subSections: [
-          {
-            title: "Vault Management",
-            orderIndex: 1,
-            gridSpan: 12,
-            content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 3,
-                features: [
-                  {
-                    title: "Granular Artwork Ledger",
-                    description:
-                      "Title, artist, medium, dimensions, year of creation, provenance, and multi-currency pricing (USD, EUR, GBP, INR, AED, SGD).",
-                  },
-                  {
-                    title: "Bulk Spreadsheet Operations",
-                    description: "Fast onboarding and collection updates via Excel import/export.",
-                  },
-                  {
-                    title: "Dynamic Watermark Guard",
-                    description: "Automatic overlay protection on public previews while preserving raw originals in the private vault.",
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
-
-      // Section 9: Curatorial e-Catalogs & Museum Placard Engine
-      {
-        orderIndex: 9,
-        title: "Digital Monographs & Exhibition Placards",
-        subtitle: "PUBLISHING & PRINT",
-        description: "Generate publication-grade catalogs and gallery wall labels instantly.",
-        titleAlignment: "center",
-        gridSpan: 12,
-        slug: "publishing-placards",
-        customCssClass: "py-16 sm:py-20 border-b border-border/60",
-        subSections: [
-          {
-            title: "Publishing Suite",
-            orderIndex: 1,
-            gridSpan: 12,
-            content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 3,
-                features: [
-                  {
-                    title: "Digital e-Catalog Monographs",
-                    description: "Curatorial essays, magazine layouts, colophon leaves, and ornamental gold borders.",
-                  },
-                  {
-                    title: "Headless Print Isolation Driver",
-                    description: "Flawless PDF downloads with zero missing images via synchronous preloader barriers.",
-                  },
-                  {
-                    title: "Museum Wall Placards",
-                    description: "300 DPI exhibition display cards with QR codes, dimensions, price overrides, and 18mm clamp margins.",
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
-
-      // Section 10: Exhibitions, Multi-Day RSVPs & 3D WebGL Salon
-      {
-        orderIndex: 10,
-        title: "Event Management & 3D Virtual Gallery",
-        subtitle: "EXPERIENCE ARCHITECTURE",
-        description: "Engage global audiences through interactive physical events and virtual salon spaces.",
-        titleAlignment: "center",
-        gridSpan: 12,
-        slug: "exhibitions-3d",
-        customCssClass: "py-16 sm:py-20 bg-muted/20 border-b border-border/60",
-        subSections: [
-          {
-            title: "Spatial Experience Suite",
-            orderIndex: 1,
-            gridSpan: 12,
-            content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 3,
-                features: [
-                  {
-                    title: "Timezone-Protected Scheduling",
-                    description: "Multi-day schedules with independent daily hours and 15/30/45/60-minute RSVP booking intervals.",
-                  },
-                  {
-                    title: "3D WebGL Exhibition Salon Studio",
-                    description:
-                      "Interactive Three.js/R3F virtual gallery with 7 architectural environments, museum eye-level hanging (1.55m), and cinematic camera tours.",
-                  },
-                  {
-                    title: "Physical QR Integration",
-                    description: "Floor scan codes providing instant artwork provenance to mobile visitors.",
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
-
-      // Section 11: Inbound CRM Leads & Visitor Intelligence
-      {
-        orderIndex: 11,
-        title: "Unified CRM & Lead Management",
-        subtitle: "AUDIENCE INTELLIGENCE",
-        description: "Track visitor interactions, acquisition inquiries, and exhibition registrations.",
-        titleAlignment: "center",
-        gridSpan: 12,
-        slug: "crm-leads",
-        customCssClass: "py-16 sm:py-20 border-b border-border/60",
-        subSections: [
-          {
-            title: "Audience Pipeline",
-            orderIndex: 1,
-            gridSpan: 12,
-            content: {
-              type: "FEATURE_GRID",
-              data: {
-                columns: 3,
-                features: [
-                  {
-                    title: "Multi-Source Capture",
-                    description: "Unified tracking from contact forms, event RSVPs, custom forms, and in-gallery QR scans.",
-                  },
-                  {
-                    title: "Persistent Device Identity",
-                    description: "Frictionless multi-scan experience for mobile patrons without repetitive forms.",
-                  },
-                  {
-                    title: "Lead Pipeline & Export",
-                    description: "Lead status tracking, detailed inquiry notes, and one-click CSV export.",
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
-
-      // Section 12: Enterprise System Configuration Hub
-      {
-        orderIndex: 12,
-        title: "Comprehensive System Settings",
-        subtitle: "PLATFORM ADMINISTRATION",
-        description: "Full control over branding, storage, security, communications, and intelligence.",
-        titleAlignment: "center",
-        gridSpan: 12,
-        slug: "system-config",
-        customCssClass: "py-16 sm:py-20 bg-muted/20",
-        subSections: [
-          {
-            title: "Administration Engine",
-            orderIndex: 1,
-            gridSpan: 12,
-            content: {
-              type: "ACCORDION_BLOCK",
-              data: {
-                items: [
-                  {
-                    title: "White-Label & General Branding",
-                    description: "Custom logos, favicons, site titles, and strict multi-tenant brand neutrality.",
-                  },
-                  {
-                    title: "Sovereign & Multi-Cloud Storage",
-                    description:
-                      "Local private media vault by default, with native Cloudflare R2, AWS S3, Google Drive v3, and Nextcloud WebDAV REST drivers.",
-                  },
-                  {
-                    title: "Email & SMTP Communications",
-                    description:
-                      "SMTP server setup, transactional auto-responders, 1-click unsubscribe links, and dynamic token interpolation.",
-                  },
-                  {
-                    title: "Form Bot Defense & Security",
-                    description:
-                      "Per-form configurable Math CAPTCHA challenges and 6-digit Email OTP verification with verified returning-user bypass.",
-                  },
-                  {
-                    title: "Multi-Model AI Engine Integration",
-                    description:
-                      "Native support for OpenAI, Google Gemini, Anthropic Claude, and local private LLMs (Ollama / LM Studio) powering writing assistants.",
-                  },
-                  {
-                    title: "Real-Time Theme Studio",
-                    description: "Fine-grained palette controls for instant Dark and Light mode switching.",
-                  },
-                  {
-                    title: "GDPR & Privacy Compliance",
-                    description: "One-click personal data erasure workflows and universal privacy policy consent checkboxes.",
-                  },
-                ],
-              },
+              blocks: [
+                {
+                  id: "platform-inquiry-form-block",
+                  type: "FORM_BLOCK",
+                  formTitle: "Get Started with SavazAI Platform",
+                  formSubtitle:
+                    "Tell us about your atelier, gallery, or institution. Our platform engineering team will schedule your personalized demo.",
+                  submitButtonText: "Connect with Our Team",
+                  successMessage:
+                    "Thank you for contacting SavazAI. Our platform team has received your inquiry and will reach out shortly.",
+                  notifyEmail: true,
+                  recipientEmails: "info@savazar.com",
+                  emailSubjectTemplate: "SavazAI Platform Inquiry from {name}",
+                  pageSlug: "product",
+                  fields: [
+                    {
+                      id: "name",
+                      label: "Full Name",
+                      type: "text",
+                      required: true,
+                      placeholder: "e.g. Elena Rostova",
+                    },
+                    {
+                      id: "email",
+                      label: "Email Address",
+                      type: "email",
+                      required: true,
+                      placeholder: "elena@atelier.org",
+                    },
+                    {
+                      id: "role",
+                      label: "Your Role / Creative Focus",
+                      type: "select",
+                      required: true,
+                      options: [
+                        "Independent Master Artist",
+                        "Gallery Curator / Director",
+                        "Biennale / Event Organizer",
+                        "Fine Art Academic / Student",
+                        "Collector / Advisory",
+                        "Other Creative Discipline",
+                      ],
+                    },
+                    {
+                      id: "portfolio_url",
+                      label: "Website / Portfolio URL",
+                      type: "text",
+                      required: false,
+                      placeholder: "https://yourportfolio.com",
+                    },
+                    {
+                      id: "message",
+                      label: "Message / Requirements",
+                      type: "textarea",
+                      required: true,
+                      placeholder:
+                        "Tell us about your upcoming exhibitions, collection size, or custom platform needs...",
+                    },
+                  ],
+                },
+              ],
             },
           },
         ],
@@ -571,72 +795,35 @@ export async function seedProductPage(prisma: PrismaClient, options: { forceUpda
     ];
 
     for (const sec of sectionsData) {
-      await prisma.pageSection.create({
+      const createdSec = await prisma.pageSection.create({
         data: {
           pageId,
           orderIndex: sec.orderIndex,
+          slug: sec.slug,
           title: sec.title,
           subtitle: sec.subtitle,
           description: sec.description,
           titleAlignment: sec.titleAlignment,
           gridSpan: sec.gridSpan,
-          slug: sec.slug,
-          customCssClass: sec.customCssClass,
-          subSections: {
-            create: sec.subSections.map((sub) => ({
-              orderIndex: sub.orderIndex,
-              title: sub.title,
-              gridSpan: sub.gridSpan,
-              content: sub.content,
-            })),
+          backgroundColor: sec.backgroundColor,
+          backgroundType: sec.backgroundType,
+          customCssClass: "py-16",
+        },
+      });
+
+      for (const sub of sec.subSections) {
+        await prisma.subSection.create({
+          data: {
+            sectionId: createdSec.id,
+            orderIndex: sub.orderIndex,
+            gridSpan: sub.gridSpan,
+            title: sub.title,
+            content: sub.content as Prisma.InputJsonValue,
           },
-        },
-      });
+        });
+      }
     }
 
-    console.log("✅ Successfully seeded all 12 dynamic sections for /product.");
-  } else {
-    console.log("🛡️ Preserved existing user modifications for /product sections.");
-  }
-
-  // 2. Navigation Seeding: Add /product to main menu if not present
-  const existingProductMenu = await prisma.menuItem.findFirst({
-    where: {
-      OR: [{ path: "/product" }, { label: { equals: "Product", mode: "insensitive" } }],
-    },
-  });
-
-  if (!existingProductMenu) {
-    // Check if another item occupies orderIndex 2 at TOP_CENTER
-    const conflictItem = await prisma.menuItem.findFirst({
-      where: { position: MenuPosition.TOP_CENTER, orderIndex: 2, parentId: null },
-    });
-
-    if (conflictItem) {
-      // Shift existing items >= 2 up by 1 to make room cleanly
-      await prisma.menuItem.updateMany({
-        where: {
-          position: MenuPosition.TOP_CENTER,
-          parentId: null,
-          orderIndex: { gte: 2 },
-        },
-        data: {
-          orderIndex: { increment: 1 },
-        },
-      });
-    }
-
-    await prisma.menuItem.create({
-      data: {
-        label: "Product",
-        path: "/product",
-        position: MenuPosition.TOP_CENTER,
-        orderIndex: 2,
-        isActive: true,
-      },
-    });
-    console.log("✅ Added 'Product' (/product) to TOP_CENTER navigation menu at order 2.");
-  } else {
-    console.log(`ℹ️ Navigation item for /product already exists (ID: ${existingProductMenu.id}).`);
+    console.log("✅ Successfully seeded all 7 redesigned editorial sections for /product.");
   }
 }

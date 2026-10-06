@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       formTitle,
       pageSlug,
       notifyEmail,
+      recipientEmails,
       customFields,
     } = body;
 
@@ -178,6 +179,7 @@ export async function POST(req: NextRequest) {
         await sendAtelierEmail({
           triggerType,
           userEmail: trimmedEmail,
+          recipientOverride: (recipientEmails || body.recipientOverride) ? String(recipientEmails || body.recipientOverride).trim() : undefined,
           data: {
             name: trimmedName,
             email: trimmedEmail,
