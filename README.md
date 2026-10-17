@@ -233,6 +233,12 @@ SavazAI WebApps Platform
 - **Frictionless Returning User Recognition**: Returning verified visitors are recognized via email and name matching against verified CRM leads, granting instant bypass with zero verification latency.
 - **Universal Privacy Consent Enforcement**: Mandatory `PrivacyConsentCheckbox` across all inbound inquiry portals ensuring GDPR and privacy compliance before form dispatch.
 
+#### 13. Resilient Session Guard, 401 Interception & Anti-Loop Architecture
+- **Centralized Session Interception (`src/lib/admin-fetch.ts`)**: Automatic HTTP 401/403 session expiration capture with in-flight redirect locking (`isRedirectingToLogin`) and single login navigation.
+- **Defensive Unwrapping (`unwrapRecords`)**: Multi-key defensive payload deserialization protecting admin listing views against API schema variations and accidental blank states.
+- **Edge Anti-Bounce Protocol (`src/proxy.ts`)**: Eradicated blind edge redirects from `/admin/login` to `/admin`. Edge middleware unconditionally wipes stale session cookies on unauthenticated requests and 401 responses, preventing CPU-pegging redirect loops.
+- **Mount-Only Dashboard Life Cycle**: Strict empty dependency arrays on administrative layout effects, preventing cascading fetch storms.
+
 ---
 
 ## 5. Quickstart & Local Development

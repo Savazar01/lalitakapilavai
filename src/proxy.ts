@@ -41,12 +41,10 @@ export function proxy(request: NextRequest) {
         { error: "Unauthorized administrative access. Valid session required." },
         { status: 401 }
       );
-      if (isSessionExpired) {
-        res.cookies.delete("better-auth.session_token");
-        res.cookies.delete("__Secure-better-auth.session_token");
-        res.cookies.delete("better-auth.session_data");
-        res.cookies.delete("__Secure-better-auth.session_data");
-      }
+      res.cookies.delete("better-auth.session_token");
+      res.cookies.delete("__Secure-better-auth.session_token");
+      res.cookies.delete("better-auth.session_data");
+      res.cookies.delete("__Secure-better-auth.session_data");
       return res;
     }
   }
@@ -60,18 +58,24 @@ export function proxy(request: NextRequest) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       const res = NextResponse.redirect(loginUrl);
-      if (isSessionExpired) {
+      res.cookies.delete("better-auth.session_token");
+      res.cookies.delete("__Secure-better-auth.session_token");
+      res.cookies.delete("better-auth.session_data");
+      res.cookies.delete("__Secure-better-auth.session_data");
+      return res;
+    }
+
+    // On login page: if user arrived via redirect query parameter or has stale session, explicitly clear cookies and render login form
+    if (isLoginPage) {
+      if (request.nextUrl.searchParams.has("redirect") || !hasActiveSession) {
+        const res = NextResponse.next();
         res.cookies.delete("better-auth.session_token");
         res.cookies.delete("__Secure-better-auth.session_token");
         res.cookies.delete("better-auth.session_data");
         res.cookies.delete("__Secure-better-auth.session_data");
+        return res;
       }
-      return res;
-    }
-
-    // Authenticated user attempting to visit login page -> redirect to dashboard
-    if (hasActiveSession && isLoginPage) {
-      return NextResponse.redirect(new URL("/admin", request.url));
+      return NextResponse.next();
     }
   }
 

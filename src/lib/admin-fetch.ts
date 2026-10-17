@@ -20,9 +20,11 @@ export class AdminApiError extends Error {
   }
 }
 
+let isRedirectingToLogin = false;
+
 /**
  * Resilient fetch wrapper for administrative client components.
- * Automatically catches 401/403, evicts stale state, and redirects to login.
+ * Automatically catches 401/403, evicts stale state, and redirects to login once.
  */
 export async function adminFetch<T = unknown>(
   url: string,
@@ -32,10 +34,22 @@ export async function adminFetch<T = unknown>(
 
   if (res.status === 401 || res.status === 403) {
     if (typeof window !== "undefined") {
-      const currentPath = window.location.pathname + window.location.search;
-      const redirectUrl = `/admin/login?redirect=${encodeURIComponent(currentPath)}`;
-      // Clear any potential stale client-cached states
-      window.location.href = redirectUrl;
+      // Clear non-HttpOnly cached cookies if present
+      try {
+        document.cookie = "better-auth.session_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+        document.cookie = "__Secure-better-auth.session_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+        document.cookie = "better-auth.session_data=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+        document.cookie = "__Secure-better-auth.session_data=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+      } catch {
+        // Non-blocking
+      }
+
+      // Guard against redirect loops and multiple concurrent redirects
+      if (!window.location.pathname.startsWith("/admin/login") && !isRedirectingToLogin) {
+        isRedirectingToLogin = true;
+        const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/admin/login?redirect=${currentPath}`;
+      }
     }
     throw new AdminSessionExpiredError();
   }

@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-10-17)
 
 ## Corpus Check
-- 235 files · ~264,815 words
+- 235 files · ~265,203 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1497 nodes · 3564 edges · 109 communities (91 shown, 18 thin omitted)
+- 1499 nodes · 3566 edges · 104 communities (90 shown, 14 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1f28fae3`
+- Built from commit: `f609640b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -78,7 +78,6 @@
 - [[_COMMUNITY_Community 64|Community 64]]
 - [[_COMMUNITY_Community 65|Community 65]]
 - [[_COMMUNITY_Community 66|Community 66]]
-- [[_COMMUNITY_Community 67|Community 67]]
 - [[_COMMUNITY_Community 68|Community 68]]
 - [[_COMMUNITY_Community 69|Community 69]]
 - [[_COMMUNITY_Community 70|Community 70]]
@@ -113,9 +112,6 @@
 - [[_COMMUNITY_Community 100|Community 100]]
 - [[_COMMUNITY_Community 101|Community 101]]
 - [[_COMMUNITY_Community 102|Community 102]]
-- [[_COMMUNITY_Community 104|Community 104]]
-- [[_COMMUNITY_Community 105|Community 105]]
-- [[_COMMUNITY_Community 107|Community 107]]
 - [[_COMMUNITY_Community 109|Community 109]]
 
 ## God Nodes (most connected - your core abstractions)
@@ -128,7 +124,7 @@
 7. `DialogHeader()` - 32 edges
 8. `DialogTitle` - 31 edges
 9. `DialogDescription` - 30 edges
-10. `DialogFooter()` - 27 edges
+10. `6. Architectural Invariants & Specialized Core Engines` - 28 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `main()` --calls--> `seedProductPage()`  [EXTRACTED]
@@ -139,18 +135,18 @@
   src/app/(public)/catalogs/[slug]/page.tsx → src/lib/utils.ts
 - `CategoryGalleryPage()` --calls--> `cn()`  [EXTRACTED]
   src/app/(public)/gallery/[categorySlug]/page.tsx → src/lib/utils.ts
-- `InteractiveDepthCardProps` --references--> `MediaGalleryItem`  [EXTRACTED]
-  src/components/public/blocks/gallery-3d/interactive-depth-card.tsx → src/components/public/blocks/media-gallery-block.tsx
+- `POST()` --calls--> `sendAtelierEmail()`  [INFERRED]
+  src/app/api/events/register/route.ts → src/lib/email-service.ts
 
-## Communities (109 total, 18 thin omitted)
+## Communities (104 total, 14 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.83
-Nodes (3): GET(), POST(), mergeAdminConfig()
+Cohesion: 0.22
+Nodes (13): AiAssistantModal(), CatalogTemplateItem, UniversalMediaDialogProps, UniversalMediaItem, VaultItem, COLOR_PRESETS, FONT_FAMILIES, FONT_SIZES (+5 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.15
-Nodes (15): ModernDateTimePicker(), ModernDateTimePickerProps, MONTH_NAMES, SHORT_DAYS, COUNTRY_CURRENCIES, CountryInfo, DIAL_CODES, findCountry() (+7 more)
+Cohesion: 0.16
+Nodes (14): ModernDateTimePicker(), ModernDateTimePickerProps, MONTH_NAMES, SHORT_DAYS, COUNTRY_CURRENCIES, CountryInfo, DIAL_CODES, findCountry() (+6 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.04
@@ -162,7 +158,7 @@ Nodes (19): 2. Quickstart & Local Development, 3. High-Level Modular Architectur
 
 ### Community 4 - "Community 4"
 Cohesion: 0.12
-Nodes (20): CatalogMatrixStudioProps, AlternatingTimelineList(), categoryBadges, categoryIcons, MilestoneCard(), TimelineBlock(), TimelineBlockProps, TimelineMilestone (+12 more)
+Nodes (21): CatalogMatrixStudioProps, AlternatingTimelineList(), categoryBadges, categoryIcons, MilestoneCard(), TimelineBlock(), TimelineBlockProps, TimelineMilestone (+13 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.13
@@ -173,16 +169,16 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.25
-Nodes (7): SheetContent, SheetContentProps, SheetDescription, SheetHeader(), SheetOverlay, SheetTitle, sheetVariants
+Cohesion: 0.21
+Nodes (9): NavItem, navItems, SheetContent, SheetContentProps, SheetDescription, SheetHeader(), SheetOverlay, SheetTitle (+1 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.12
-Nodes (19): ECatalogThemeConfig, CatalogEditorContext, CATALOG_PAGE_DIMENSIONS, CatalogGeometry, CatalogOrientation, CatalogPageSize, PAGE_SIZE_OPTIONS, PageDimension (+11 more)
+Cohesion: 0.09
+Nodes (24): ECatalogThemeConfig, CatalogEditorContext, CATALOG_PAGE_DIMENSIONS, CatalogGeometry, CatalogOrientation, CatalogPageSize, PAGE_SIZE_OPTIONS, PageDimension (+16 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.07
-Nodes (27): 6. Architectural Invariants & Specialized Core Engines, A. Physical Placard Print Engine (Isolated Iframe Driver), B. 3D WebGL Exhibition Salon Wall Engine, C. Universal Email Notification & Form Dispatch Engine, D. Strict Binary Theme & Contrast Invariant, E. Multi-Tenant Brand Identity & Asset Engine (.ico Favicon & Conditional Phone), F. Dynamic Archive Subtitle & Idempotent Non-Destructive Tenant Deployment, G. Universal Contact Form & Generalized Multi-Tenant Email Templates (+19 more)
+Nodes (28): 6. Architectural Invariants & Specialized Core Engines, A. Physical Placard Print Engine (Isolated Iframe Driver), B. 3D WebGL Exhibition Salon Wall Engine, C. Universal Email Notification & Form Dispatch Engine, D. Strict Binary Theme & Contrast Invariant, E. Multi-Tenant Brand Identity & Asset Engine (.ico Favicon & Conditional Phone), F. Dynamic Archive Subtitle & Idempotent Non-Destructive Tenant Deployment, G. Universal Contact Form & Generalized Multi-Tenant Email Templates (+20 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.16
@@ -217,8 +213,8 @@ Cohesion: 0.25
 Nodes (7): 1. React Server Component (RSC) Boundaries, 2. Server-Side Data Fetching & Deduplication, 3. Zero-FOUC Theming & Hydration Safeguards, 4. Performance & Re-render Prevention, code:typescript (export async function getDashboardData() {), code:tsx (<ThemeProvider), Skill: Vercel React & Next.js 16 Best Practices
 
 ### Community 18 - "Community 18"
-Cohesion: 0.25
-Nodes (3): metadata, Navbar(), PageProps
+Cohesion: 0.24
+Nodes (8): MediaGalleryItem, MediaGalleryBlockData, ThreeCylinderCarousel(), ThreeCylinderCarouselProps, ThreeLiquidWarp(), ThreeLiquidWarpProps, ArtworkPlacement, ExhibitionWallBlockProps
 
 ### Community 19 - "Community 19"
 Cohesion: 0.36
@@ -226,23 +222,23 @@ Nodes (9): main(), prisma, seedProductPage(), tiptapBulletList(), tiptapDoc(), t
 
 ### Community 21 - "Community 21"
 Cohesion: 0.11
-Nodes (28): DashboardLayoutManager(), DashboardWidgetData, iconRegistry, MetricsPayload, EditablePageHeader(), TiptapEditor(), ECatalogListItem, ArtCategoryItem (+20 more)
+Nodes (25): EditablePageHeader(), EditablePageHeaderProps, ECatalogListItem, ArtCategoryItem, LeadItem, statusColors, AdminApiError, adminFetch() (+17 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.08
-Nodes (4): { GET, POST }, auth, AuthSession, MediaVaultItem
+Cohesion: 0.06
+Nodes (8): { GET, POST }, fetchThumbnailBuffer(), GET(), auth, AuthSession, MediaVaultItem, RouteParams, RouteParams
 
 ### Community 31 - "Community 31"
 Cohesion: 0.07
-Nodes (35): MediaVaultDialog(), CustomDividerNode, DIVIDER_COLORS, DividerNodeAttributes, STYLES, THICKNESSES, WIDTHS, CustomImageNode (+27 more)
+Nodes (36): MediaVaultDialog(), CustomDividerNode, DIVIDER_COLORS, DividerNodeAttributes, STYLES, THICKNESSES, WIDTHS, CustomImageNode (+28 more)
 
 ### Community 32 - "Community 32"
-Cohesion: 0.14
-Nodes (24): AiAssistantModalProps, ArtworkBulkImportModalProps, ImportAuditItem, ImportAuditResult, EmailTiptapEditorProps, MediaVaultDialogProps, MediaVaultItem, CATEGORY_OPTIONS (+16 more)
+Cohesion: 0.15
+Nodes (18): ArtworkBulkImportModal(), ArtworkBulkImportModalProps, ImportAuditItem, ImportAuditResult, MediaVaultDialogProps, MediaVaultItem, HeroArchetype, HeroShowcaseBlockProps (+10 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.12
-Nodes (28): PageMatrixStudio(), SortableSection(), getCatalogDimensions(), BackgroundStyleConfig, computeRelativeLuminance(), ContainerThemeScope, getColorSaturation(), getContrastTypographyClasses() (+20 more)
+Cohesion: 0.16
+Nodes (22): SortableSection(), isLightColor, reconcilePageMatrixCells(), SortableSection(), BackgroundStyleConfig, computeRelativeLuminance(), ContainerThemeScope, getColorSaturation() (+14 more)
 
 ### Community 34 - "Community 34"
 Cohesion: 0.17
@@ -254,15 +250,15 @@ Nodes (6): POST(), AiConfig, CULTURAL_SYSTEM_PROMPT, generateAiContent(), Genera
 
 ### Community 36 - "Community 36"
 Cohesion: 0.09
-Nodes (31): ArtworkPlacardSheetProps, CARD_BG_SWATCHES, DEFAULT_PLACARD_STYLING, EditablePlacardItem, HEADER_COLOR_SWATCHES, PlacardArtwork, TEXT_COLOR_SWATCHES, TITLE_COLOR_SWATCHES (+23 more)
+Nodes (32): AiAssistantModalProps, iconRegistry, MetricsPayload, DynamicFormBlockProps, FIELD_TYPE_LABELS, FormBlockInspectorProps, MediaGalleryInspectorProps, CATEGORY_OPTIONS (+24 more)
 
 ### Community 37 - "Community 37"
 Cohesion: 0.18
 Nodes (19): clearStorageCache(), generatePresignedDownloadUrl(), generatePresignedUploadUrl(), getMediaStream(), getStorageClient(), getStorageConfig(), StorageConfig, uploadBuffer() (+11 more)
 
 ### Community 39 - "Community 39"
-Cohesion: 0.11
-Nodes (22): MailConfigStudio(), ADMIN_NAV_ITEMS, BODY_FONT_OPTIONS, BORDER_RADIUS_OPTIONS, BORDER_WIDTH_OPTIONS, DEFAULT_DETAILED_THEME_CONFIG, FONT_SIZE_OPTIONS, FormThemeTokens (+14 more)
+Cohesion: 0.12
+Nodes (14): BORDER_WIDTH_OPTIONS, DEFAULT_DETAILED_THEME_CONFIG, FONT_SIZE_OPTIONS, HEADING_FONT_OPTIONS, AiConfig, DEFAULT_FORM_SECURITY_CONFIG, EmailConfig, FooterConfig (+6 more)
 
 ### Community 40 - "Community 40"
 Cohesion: 0.15
@@ -273,40 +269,40 @@ Cohesion: 0.16
 Nodes (9): EnvironmentCategory, getWallEnvironment(), WALL_ENVIRONMENTS, WallEnvironment, CameraTourStyle, ExhibitionWallBlock(), TourStep, WallLayoutMatrix (+1 more)
 
 ### Community 44 - "Community 44"
-Cohesion: 0.08
-Nodes (34): columnPresets, PageData, SortableSection(), SubSectionData, VisualPageBuilderProps, FormBlockInspector(), FormFieldConfig, HeroBlockInspector() (+26 more)
+Cohesion: 0.10
+Nodes (31): DynamicFormBlock(), HeroShowcaseBlock(), MediaGalleryBlock(), PdfViewerBlock(), PdfViewerBlockProps, columnPresets, PageData, SectionData (+23 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.08
-Nodes (29): DynamicFormConfig, FormFieldConfig, HeroArchetype, HeroShowcaseBlock(), HeroShowcaseBlockProps, HotspotPin, AccordionBlock(), AccordionBlockItem (+21 more)
+Cohesion: 0.09
+Nodes (27): DynamicFormConfig, FormFieldConfig, MediaGalleryDisplayMode, AccordionBlock(), AccordionBlockItem, FeatureGridBlock(), FeatureGridItem, HeroBlock() (+19 more)
 
 ### Community 47 - "Community 47"
-Cohesion: 0.19
-Nodes (9): NavItemDef, Sidebar(), SidebarProps, NavItem, navItems, AdminPortalConfig, DEFAULT_ADMIN_CONFIG, PageHeadingConfig (+1 more)
+Cohesion: 0.22
+Nodes (10): ADMIN_NAV_ITEMS, NavItemDef, Sidebar(), SidebarProps, GET(), POST(), AdminPortalConfig, DEFAULT_ADMIN_CONFIG (+2 more)
 
 ### Community 48 - "Community 48"
-Cohesion: 0.23
-Nodes (10): PdfViewerBlock(), PdfViewerBlockProps, formatLocalizedDateTime(), getOrdinalSuffix(), SupportedCurrency, EventDetailPage(), GalleryPhoto, getEventBySlug (+2 more)
+Cohesion: 0.29
+Nodes (9): formatLocalizedDateTime(), getOrdinalSuffix(), SupportedCurrency, formatEventSchedule(), EventDetailPage(), GalleryPhoto, getEventBySlug, generateMetadata() (+1 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.13
-Nodes (15): 10. Security, Better-Auth RBAC & User Administration (`/admin/users`), 11. Dynamic Admin Overview & Metric Engine (`/admin` and `src/components/admin/dashboard-layout-manager.tsx`), 12. Form Security, Anti-Bot CAPTCHA & Email OTP Verification Engine, 1. Artwork Vault & Catalog Manager (`/admin/artworks`), 2. Museum Placard & e-Catalog Print Engine (`src/lib/print-isolated-html.ts`), 2. Museum Placard Print Studio (`src/lib/print-isolated-html.ts`), 3. Visual Drag-and-Drop Page Builder (`/admin/pages/[id]/builder`), 3. Visual Page Builder & Enterprise Landing Page Studio (`/admin/pages`) (+7 more)
+Cohesion: 0.12
+Nodes (16): 10. Security, Better-Auth RBAC & User Administration (`/admin/users`), 11. Dynamic Admin Overview & Metric Engine (`/admin` and `src/components/admin/dashboard-layout-manager.tsx`), 12. Form Security, Anti-Bot CAPTCHA & Email OTP Verification Engine, 13. Resilient Session Guard, 401 Interception & Anti-Loop Architecture, 1. Artwork Vault & Catalog Manager (`/admin/artworks`), 2. Museum Placard & e-Catalog Print Engine (`src/lib/print-isolated-html.ts`), 2. Museum Placard Print Studio (`src/lib/print-isolated-html.ts`), 3. Visual Drag-and-Drop Page Builder (`/admin/pages/[id]/builder`) (+8 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.23
-Nodes (12): ArtworkBulkImportModal(), Artwork, Category, Table, TableBody, TableCaption, TableCell, TableFooter (+4 more)
+Cohesion: 0.25
+Nodes (11): Artwork, Category, Table, TableBody, TableCaption, TableCell, TableFooter, TableHead (+3 more)
 
 ### Community 51 - "Community 51"
-Cohesion: 0.07
-Nodes (40): geistMono, geistSans, generateMetadata(), metadata, POST(), ThemeProvider(), getCellValue(), parseBoolean() (+32 more)
+Cohesion: 0.06
+Nodes (49): geistMono, geistSans, generateMetadata(), metadata, POST(), ThemeProvider(), getCellValue(), parseBoolean() (+41 more)
 
 ### Community 52 - "Community 52"
 Cohesion: 0.70
 Nodes (4): checkAdminAuth(), DELETE(), GET(), PUT()
 
 ### Community 53 - "Community 53"
-Cohesion: 0.11
-Nodes (23): ArtworkMetadata, ArtworkPlacard(), ExhibitionWallBlock, getItemHref(), InteractiveDepthCard, ItemLinkWrapper(), KenBurnsCanvas, MediaGalleryBlock() (+15 more)
+Cohesion: 0.16
+Nodes (13): ArtworkMetadata, ArtworkPlacard(), ExhibitionWallBlock, getItemHref(), InteractiveDepthCard, ItemLinkWrapper(), KenBurnsCanvas, MediaGalleryBlockProps (+5 more)
 
 ### Community 54 - "Community 54"
 Cohesion: 0.15
@@ -317,20 +313,20 @@ Cohesion: 0.17
 Nodes (11): cloudflare-security-audit-skill, code:javascript (// validate-findings.cjs usage), code:bash (node validate-findings.cjs path/to/findings.json), code:json ({), findings.json structure, License, Output files, Related skills (+3 more)
 
 ### Community 56 - "Community 56"
-Cohesion: 0.18
-Nodes (7): CategoryGalleryPage(), PageProps, metadata, Artwork, Category, GalleryGrid(), GalleryGridProps
+Cohesion: 0.22
+Nodes (4): CategoryGalleryPage(), PageProps, metadata, GalleryGrid()
 
 ### Community 57 - "Community 57"
-Cohesion: 0.08
-Nodes (44): POST(), GET(), EmailDispatchOptions, EmailLogoAttachment, encryptEmailToken(), getAbsoluteAssetUrl(), getBaseAppUrl(), getTenantBranding() (+36 more)
+Cohesion: 0.13
+Nodes (26): getTenantBranding(), getTransporter(), checkRateLimit(), cleanupExpired(), getClientIp(), lastCleanup, rateLimitMap, RateLimitOptions (+18 more)
 
 ### Community 58 - "Community 58"
 Cohesion: 0.20
 Nodes (9): audit_metadata, audit_date, run_number, skill_version, target_repository, confirmed_findings, coverage_notes, prior_runs_reviewed (+1 more)
 
 ### Community 59 - "Community 59"
-Cohesion: 0.23
-Nodes (10): SectionData, PageMatrixConfig, SectionData, ArchetypeShowcaseBlock(), CatalogScrollEngine(), CatalogScrollEngineProps, ScrollTransitionMode, DynamicPageSectionsProps (+2 more)
+Cohesion: 0.22
+Nodes (10): ArchetypeShowcaseBlock(), BackgroundPattern, getPatternById(), getPatternStyle(), CatalogScrollEngine(), CatalogScrollEngineProps, ScrollTransitionMode, DynamicPageSectionsProps (+2 more)
 
 ### Community 60 - "Community 60"
 Cohesion: 0.22
@@ -357,12 +353,8 @@ Cohesion: 0.22
 Nodes (9): scripts, build, db:seed, dev, docker:dev, docker:dev:down, docker:dev:logs, lint (+1 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.22
-Nodes (5): metadata, FooterConfig, LegalLinkItem, SocialLinkItem, PrivacyModalTrigger()
-
-### Community 67 - "Community 67"
-Cohesion: 0.14
-Nodes (19): formatCurrency(), EventDailySchedule, EventRsvpConfig, EventRsvpCustomField, EventRsvpForm(), EventRsvpFormProps, formatTime12h(), generateTimeSlots() (+11 more)
+Cohesion: 0.10
+Nodes (12): metadata, metadata, metadata, ExhibitionWallViewer(), Footer(), FooterConfig, LegalLinkItem, SocialLinkItem (+4 more)
 
 ### Community 68 - "Community 68"
 Cohesion: 0.25
@@ -417,12 +409,12 @@ Cohesion: 0.22
 Nodes (10): 3. Docker Containerization & Production Build, 7. Production Environment Variables Template, code:bash (docker compose down), code:bash (# ==========================================================), code:bash (docker compose up -d --build), code:bash (docker compose ps), code:bash (curl http://localhost:3000/api/health), Full Multi-Stage Docker Build (+2 more)
 
 ### Community 81 - "Community 81"
-Cohesion: 0.10
-Nodes (3): fetchThumbnailBuffer(), GET(), globalForPrisma
+Cohesion: 0.08
+Nodes (4): checkAdminAuth(), GET(), POST(), globalForPrisma
 
 ### Community 82 - "Community 82"
-Cohesion: 0.23
-Nodes (9): ALLOWED_TOKENS, AllowedToken, DynamicThemeProvider(), DetailedThemeConfig, generateUnifiedThemeCSS(), sanitizeDetailedThemeConfig(), ALLOWED_TOKENS, PUT() (+1 more)
+Cohesion: 0.15
+Nodes (15): ALLOWED_TOKENS, AllowedToken, DynamicThemeProvider(), BODY_FONT_OPTIONS, BORDER_RADIUS_OPTIONS, DetailedThemeConfig, FormThemeTokens, generateUnifiedThemeCSS() (+7 more)
 
 ### Community 85 - "Community 85"
 Cohesion: 0.21
@@ -433,32 +425,28 @@ Cohesion: 0.20
 Nodes (8): AnimatedSection(), AnimatedSectionProps, DynamicPublicPage(), generateMetadata(), getPageBySlug, PageProps, generateMetadata(), PageProps
 
 ### Community 87 - "Community 87"
-Cohesion: 0.15
-Nodes (15): AiAssistantModal(), ArtworkSummary, EventDailySchedule, EventFormData, EventFormModal(), EventFormModalProps, EventRsvpConfig, EventRsvpCustomField (+7 more)
+Cohesion: 0.10
+Nodes (23): ArtworkPlacardSheetProps, CARD_BG_SWATCHES, DEFAULT_PLACARD_STYLING, EditablePlacardItem, HEADER_COLOR_SWATCHES, PlacardArtwork, TEXT_COLOR_SWATCHES, TITLE_COLOR_SWATCHES (+15 more)
 
 ### Community 88 - "Community 88"
 Cohesion: 0.40
 Nodes (4): Commands, TextOrientationExtension, TextOrientationOptions, TextOrientationType
 
 ### Community 90 - "Community 90"
-Cohesion: 0.29
-Nodes (8): DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSubContent, DropdownMenuSubTrigger
-
-### Community 91 - "Community 91"
-Cohesion: 0.17
-Nodes (4): DynamicFormBlock(), metadata, metadata, DynamicPageSections()
+Cohesion: 0.22
+Nodes (9): DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSubContent, DropdownMenuSubTrigger (+1 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.14
 Nodes (14): 1. Artist Profile & Domain Context, 2. Technology Stack & Modern Architectural Standards, 4. Single-Folder Local 'DevPlans' Archiving Rule, 6. Content Integrity, Dynamic CMS & Non-Destructive Operations Standards, 7. Theme-Adaptive Typography & Container Contrast Invariant, 8. Admin Portal Dual-Theme Contrast Invariant, 8. Admin Portal Semantic Neutral Architecture (Zero Low-Contrast Yellows), 8. Unified Application & Admin Theme System (+6 more)
 
 ### Community 93 - "Community 93"
-Cohesion: 0.40
-Nodes (4): InteractiveDepthCard(), InteractiveDepthCardProps, ProtectedImage(), ProtectedImageProps
+Cohesion: 0.24
+Nodes (7): InteractiveDepthCard(), InteractiveDepthCardProps, Artwork, Category, GalleryGridProps, ProtectedImage(), ProtectedImageProps
 
-### Community 95 - "Community 95"
-Cohesion: 0.83
-Nodes (3): checkAdminAuth(), GET(), POST()
+### Community 96 - "Community 96"
+Cohesion: 0.22
+Nodes (8): EmailTiptapEditor(), AVAILABLE_TOKENS, EmailLog, EmailTemplate, MailConfigStudio(), Pagination, DiscoveredFormCategory, DiscoveredFormItem
 
 ### Community 97 - "Community 97"
 Cohesion: 0.39
@@ -466,7 +454,7 @@ Nodes (9): CatalogMatrixConfig, SinglePlateConfigState, ECatalogCoverConfig, ECa
 
 ### Community 98 - "Community 98"
 Cohesion: 0.09
-Nodes (37): CatalogBackgroundConfig, CatalogBackgroundControl(), CatalogBackgroundControlProps, HERITAGE_COLOR_PRESETS, CatalogMatrixStudio(), CatalogTemplateItem, MatrixCellSegment, reconcileMatrixCells() (+29 more)
+Nodes (31): CatalogBackgroundConfig, CatalogBackgroundControl(), CatalogBackgroundControlProps, HERITAGE_COLOR_PRESETS, CatalogMatrixStudio(), MatrixCellSegment, reconcileMatrixCells(), CatalogSinglePlateEditor() (+23 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.29
@@ -477,28 +465,36 @@ Cohesion: 0.27
 Nodes (9): ArtworkPlacardSheet(), getFontFamilyCss(), getPhysicalDimensions(), PhysicalDimensions, PlacardPrintOptions, PlacardStylingConfig, printIsolatedElement(), printIsolatedHtml() (+1 more)
 
 ### Community 101 - "Community 101"
-Cohesion: 0.22
-Nodes (6): metadata, decryptEmailToken(), ExhibitionWallViewer(), Footer(), UnsubscribePage(), UnsubscribePageProps
+Cohesion: 0.50
+Nodes (3): decryptEmailToken(), UnsubscribePage(), UnsubscribePageProps
+
+### Community 102 - "Community 102"
+Cohesion: 0.16
+Nodes (10): DashboardLayoutManager(), DashboardWidgetData, metadata, metadata, authClient, CardContent, CardDescription, CardFooter (+2 more)
+
+### Community 109 - "Community 109"
+Cohesion: 0.16
+Nodes (17): POST(), DEFAULT_EMAIL_TEMPLATES, EmailDispatchOptions, EmailLogoAttachment, encryptEmailToken(), getAbsoluteAssetUrl(), getBaseAppUrl(), getUnsubscribeUrl() (+9 more)
 
 ## Knowledge Gaps
-- **555 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+550 more)
+- **557 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+552 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `Community 34` to `Community 4`, `Community 7`, `Community 21`, `Community 31`, `Community 32`, `Community 33`, `Community 36`, `Community 39`, `Community 43`, `Community 44`, `Community 45`, `Community 48`, `Community 50`, `Community 51`, `Community 53`, `Community 56`, `Community 59`, `Community 67`, `Community 90`, `Community 91`, `Community 93`, `Community 98`, `Community 100`, `Community 101`?**
-  _High betweenness centrality (0.069) - this node is a cross-community bridge._
-- **Why does `Button` connect `Community 32` to `Community 1`, `Community 18`, `Community 21`, `Community 31`, `Community 33`, `Community 36`, `Community 39`, `Community 44`, `Community 45`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 56`, `Community 67`, `Community 86`, `Community 87`, `Community 90`, `Community 98`, `Community 101`, `Community 104`?**
-  _High betweenness centrality (0.032) - this node is a cross-community bridge._
-- **Why does `Badge()` connect `Community 21` to `Community 1`, `Community 4`, `Community 18`, `Community 32`, `Community 34`, `Community 36`, `Community 39`, `Community 44`, `Community 45`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 56`, `Community 66`, `Community 87`, `Community 91`, `Community 98`, `Community 102`, `Community 104`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `cn()` connect `Community 34` to `Community 0`, `Community 4`, `Community 7`, `Community 8`, `Community 18`, `Community 21`, `Community 31`, `Community 32`, `Community 33`, `Community 36`, `Community 39`, `Community 43`, `Community 44`, `Community 45`, `Community 50`, `Community 51`, `Community 53`, `Community 56`, `Community 59`, `Community 66`, `Community 87`, `Community 90`, `Community 93`, `Community 96`, `Community 98`, `Community 100`, `Community 102`?**
+  _High betweenness centrality (0.065) - this node is a cross-community bridge._
+- **Why does `Button` connect `Community 32` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `Community 21`, `Community 31`, `Community 36`, `Community 39`, `Community 44`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 66`, `Community 86`, `Community 87`, `Community 90`, `Community 93`, `Community 96`, `Community 98`, `Community 101`, `Community 102`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+- **Why does `Badge()` connect `Community 32` to `Community 0`, `Community 1`, `Community 4`, `Community 7`, `Community 21`, `Community 34`, `Community 36`, `Community 39`, `Community 44`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 66`, `Community 87`, `Community 93`, `Community 96`, `Community 98`, `Community 102`?**
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
 - **What connects `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig` to the rest of the system?**
-  _555 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _557 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.044444444444444446 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
-  _Cohesion score 0.12307692307692308 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11965811965811966 - nodes in this community are weakly interconnected._
 - **Should `Community 5` be split into smaller, more focused modules?**
   _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._

@@ -411,4 +411,17 @@ All code generation and architectural modifications must adhere to the specializ
 - **Intelligent Schedule Tab Segmentation**:
   - In `/admin/events`, if `upcomingEvents.length === 0` but curated retrospectives exist, the view automatically defaults to `"all"` so active past events are immediately visible on screen with accurate count badges.
 
+### Z. Anti-Loop Invariant, Session Edge Guard & CPU Protection Protocol
+- **Strict Anti-Bounce Invariant on `/admin/login`**:
+  - In `src/proxy.ts`, the edge middleware must NEVER automatically bounce or redirect incoming requests to `/admin/login` back to `/admin` based solely on client cookie existence. Because Better-Auth cookies may expire in the database while lingering in the browser, blind edge redirects create an infinite ping-pong redirect loop between `/admin/login` and `/admin` consuming 100%+ CPU.
+  - Whenever an incoming request to `/admin/login` includes `?redirect=...` or lacks an active session, `proxy.ts` must explicitly clear all session cookies (`Set-Cookie: better-auth.session_token=; Max-Age=0`) and allow the login form to render with HTTP 200.
+- **Client-Side In-Flight Redirect Lock (`isRedirectingToLogin`)**:
+  - In `src/lib/admin-fetch.ts`, the redirect trigger on HTTP 401/403 must enforce an in-flight guard (`!isRedirectingToLogin`) and verify `!window.location.pathname.startsWith("/admin/login")` before setting `window.location.href`. Multiple parallel requests must never fire competing redirect events.
+- **Rigid Mount-Only Dependency Arrays in Dashboard Layouts**:
+  - In `src/app/admin/(dashboard)/layout.tsx`, all data fetching effects must use rigid, empty dependency arrays `[]` (mount-only) or strictly memoized primitives.
+  - Catch blocks handling `AdminSessionExpiredError` must return immediately without attempting re-renders or background retries.
+- **Server-Driven Stale Cookie Eviction**:
+  - When administrative route handlers (`/api/admin/*`) return HTTP 401 Unauthorized, they must explicitly delete `better-auth.session_token`, `__Secure-better-auth.session_token`, and `better-auth.session_data` in the response headers, breaking browser cookie persistence.
+
+
 

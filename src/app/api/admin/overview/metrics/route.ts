@@ -12,7 +12,12 @@ export async function GET(_request: NextRequest) {
     });
 
     if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const res = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      res.cookies.delete("better-auth.session_token");
+      res.cookies.delete("__Secure-better-auth.session_token");
+      res.cookies.delete("better-auth.session_data");
+      res.cookies.delete("__Secure-better-auth.session_data");
+      return res;
     }
 
     const [

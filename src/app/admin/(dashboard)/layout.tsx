@@ -24,39 +24,29 @@ export default function AdminDashboardLayout({
   const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
   const [adminConfig, setAdminConfig] = React.useState<AdminPortalConfig>(DEFAULT_ADMIN_CONFIG);
 
-  const loadConfig = React.useCallback(async () => {
-    try {
-      const [settingsData, copyData] = await Promise.all([
-        adminFetch<{ logoUrl?: string | null }>("/api/admin/settings"),
-        adminFetch<AdminPortalConfig>("/api/admin/settings/copy"),
-      ]);
-      if (settingsData?.logoUrl) setLogoUrl(settingsData.logoUrl);
-      if (copyData) setAdminConfig(copyData);
-    } catch (err) {
-      if (err instanceof AdminSessionExpiredError) return;
-      // Non-blocking
-    }
-  }, []);
-
   React.useEffect(() => {
     let ignore = false;
-    Promise.all([
-      adminFetch<{ logoUrl?: string | null }>("/api/admin/settings"),
-      adminFetch<AdminPortalConfig>("/api/admin/settings/copy"),
-    ])
-      .then(([settingsData, copyData]) => {
+
+    const fetchPortalSettings = async () => {
+      try {
+        const [settingsData, copyData] = await Promise.all([
+          adminFetch<{ logoUrl?: string | null }>("/api/admin/settings"),
+          adminFetch<AdminPortalConfig>("/api/admin/settings/copy"),
+        ]);
         if (!ignore) {
           if (settingsData?.logoUrl) setLogoUrl(settingsData.logoUrl);
           if (copyData) setAdminConfig(copyData);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         if (err instanceof AdminSessionExpiredError) return;
         // Non-blocking
-      });
+      }
+    };
+
+    fetchPortalSettings();
 
     const handleConfigUpdate = () => {
-      loadConfig();
+      fetchPortalSettings();
     };
 
     window.addEventListener("adminConfigUpdated", handleConfigUpdate);
@@ -64,7 +54,7 @@ export default function AdminDashboardLayout({
       ignore = true;
       window.removeEventListener("adminConfigUpdated", handleConfigUpdate);
     };
-  }, [loadConfig]);
+  }, []);
 
   const brandTitle = adminConfig.sidebarBrandTitle || DEFAULT_ADMIN_CONFIG.sidebarBrandTitle;
 
