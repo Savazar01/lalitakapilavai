@@ -40,6 +40,7 @@ import {
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
+import { adminFetch, unwrapRecords, AdminSessionExpiredError } from "@/lib/admin-fetch";
 
 import {
   Select,
@@ -108,7 +109,8 @@ export default function AdminLeadsPage() {
   const [targetDeleteLead, setTargetDeleteLead] = React.useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = React.useState(false);
 
-  const fetchLeads = React.useCallback(() => {
+  React.useEffect(() => {
+    let ignore = false;
     const url = new URL("/api/admin/leads", window.location.origin);
     if (statusFilter !== "ALL") {
       url.searchParams.set("status", statusFilter);
@@ -120,23 +122,48 @@ export default function AdminLeadsPage() {
       url.searchParams.set("search", search.trim());
     }
 
-    fetch(url.toString())
-      .then((res) => res.json())
+    adminFetch<LeadItem[]>(url.toString())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setLeads(data);
+        if (!ignore) {
+          setLeads(unwrapRecords<LeadItem>(data, ["leads", "items"]));
+          setLoading(false);
         }
-        setLoading(false);
       })
       .catch((err) => {
-        console.error("Error loading leads:", err);
-        setLoading(false);
+        if (!ignore) {
+          if (err instanceof AdminSessionExpiredError) return;
+          console.error("Error loading leads:", err);
+          toast.error(err instanceof Error ? err.message : "Failed to load leads");
+          setLoading(false);
+        }
       });
+
+    return () => {
+      ignore = true;
+    };
   }, [statusFilter, sourceFilter, search]);
 
-  React.useEffect(() => {
-    fetchLeads();
-  }, [fetchLeads]);
+  const fetchLeads = React.useCallback(async () => {
+    const url = new URL("/api/admin/leads", window.location.origin);
+    if (statusFilter !== "ALL") {
+      url.searchParams.set("status", statusFilter);
+    }
+    if (sourceFilter !== "ALL") {
+      url.searchParams.set("source", sourceFilter);
+    }
+    if (search.trim()) {
+      url.searchParams.set("search", search.trim());
+    }
+
+    try {
+      const data = await adminFetch<LeadItem[]>(url.toString());
+      setLeads(unwrapRecords<LeadItem>(data, ["leads", "items"]));
+    } catch (err) {
+      if (err instanceof AdminSessionExpiredError) return;
+      console.error("Error reloading leads:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to reload leads");
+    }
+  }, [statusFilter, sourceFilter, search]);
 
   const handleStatusChange = async (leadId: string, newStatus: string) => {
     try {

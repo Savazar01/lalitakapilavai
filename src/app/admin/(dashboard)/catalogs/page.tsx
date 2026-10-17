@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { MediaUploader } from "@/components/admin/media-uploader";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
+import { adminFetch, unwrapRecords, AdminSessionExpiredError } from "@/lib/admin-fetch";
 
 interface ECatalogListItem {
   id: string;
@@ -85,22 +86,21 @@ export default function AdminCatalogsPage() {
 
   React.useEffect(() => {
     let ignore = false;
-    async function init() {
-      try {
-        const res = await fetch("/api/admin/catalogs");
-        const data = await res.json();
-        if (!ignore && Array.isArray(data)) {
-          setCatalogs(data);
-        }
-      } catch (err) {
-        console.error("Failed to load catalogs:", err);
-      } finally {
+    adminFetch<ECatalogListItem[]>("/api/admin/catalogs")
+      .then((data) => {
         if (!ignore) {
+          setCatalogs(unwrapRecords<ECatalogListItem>(data, ["catalogs", "items"]));
           setLoading(false);
         }
-      }
-    }
-    init();
+      })
+      .catch((err) => {
+        if (!ignore) {
+          if (err instanceof AdminSessionExpiredError) return;
+          console.error("Failed to load catalogs:", err);
+          toast.error(err instanceof Error ? err.message : "Failed to load catalogs");
+          setLoading(false);
+        }
+      });
     return () => {
       ignore = true;
     };
@@ -108,13 +108,12 @@ export default function AdminCatalogsPage() {
 
   const fetchCatalogs = React.useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/catalogs");
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setCatalogs(data);
-      }
+      const data = await adminFetch<ECatalogListItem[]>("/api/admin/catalogs");
+      setCatalogs(unwrapRecords<ECatalogListItem>(data, ["catalogs", "items"]));
     } catch (err) {
+      if (err instanceof AdminSessionExpiredError) return;
       console.error("Failed to refresh catalogs:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to refresh catalogs");
     }
   }, []);
 

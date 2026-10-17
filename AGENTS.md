@@ -397,3 +397,18 @@ All code generation and architectural modifications must adhere to the specializ
 - **Idempotent Non-Destructive Seeding**:
   - `src/lib/seeds/seed-product-page.ts` cleanly recreates the 7 sections for `slug: "product"` while maintaining non-destructive database safety for all other site pages.
 
+### Y. Administrative 401/403 Interception, Safe Deserialization & Zero-Data-Loss Architecture
+- **Automatic Session Expiration & 401 Interception (`adminFetch`)**:
+  - All administrative dashboard pages (`/admin/pages`, `/admin/categories`, `/admin/artworks`, `/admin/catalogs`, `/admin/events`, `/admin/leads`, `/admin/layout`) must invoke API endpoints using `adminFetch<T>()` from `src/lib/admin-fetch.ts`.
+  - When an HTTP 401 or 403 occurs (due to expired session cookie or unauthenticated request), `adminFetch` immediately captures `window.location.pathname + window.location.search` and redirects to `/admin/login?redirect=<path>`, preventing silent client-side error swallowing into empty arrays `[]`.
+  - Stale state is evicted, throwing `AdminSessionExpiredError` to prevent misleading "No records found" empty state cards.
+- **Defensive Payload Deserialization (`unwrapRecords`)**:
+  - API responses must be deserialized via `unwrapRecords<T>(data, fallbackKeys)`.
+  - Supports direct arrays as well as envelope wrappers (`items`, `pages`, `artworks`, `categories`, `catalogs`, `events`, `leads`, `posts`), preventing non-array payloads or API envelope changes from causing blank screens.
+- **Zero-Data-Loss Invariant**:
+  - Under no circumstances shall database reset scripts, destructive prisma migrations (`db push --force-reset`), or mock seed resets be executed on production or staging databases.
+  - Seeder scripts must verify existing database records before writing, preserving user modifications.
+- **Intelligent Schedule Tab Segmentation**:
+  - In `/admin/events`, if `upcomingEvents.length === 0` but curated retrospectives exist, the view automatically defaults to `"all"` so active past events are immediately visible on screen with accurate count badges.
+
+

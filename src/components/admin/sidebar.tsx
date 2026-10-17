@@ -151,25 +151,43 @@ export function Sidebar({
 
       {/* User Card & Logout */}
       <div className="p-4 border-t border-border mt-auto flex flex-col gap-2 bg-card/80">
-        <Link
-          href="/admin/profile"
-          className="flex items-center justify-between p-1.5 -m-1.5 rounded-md hover:bg-muted/50 transition-colors group"
-          title="Manage Profile & Security"
-        >
-          <div className="flex flex-col truncate">
-            <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
-              {mounted && session?.user?.name ? session.user.name : "Administrator"}
-            </span>
-            <span className="text-[11px] text-muted-foreground truncate">
-              {mounted && session?.user?.email ? session.user.email : "admin@savazar.com"}
-            </span>
-          </div>
-          <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-semibold">
-            {mounted && (session?.user as { role?: string } | undefined)?.role
-              ? (session?.user as { role?: string } | undefined)?.role
-              : "SUPER_ADMIN"}
-          </Badge>
-        </Link>
+        {mounted && session?.user ? (
+          <Link
+            href="/admin/profile"
+            className="flex items-center justify-between p-1.5 -m-1.5 rounded-md hover:bg-muted/50 transition-colors group"
+            title="Manage Profile & Security"
+          >
+            <div className="flex flex-col truncate">
+              <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                {session.user.name || "Administrator"}
+              </span>
+              <span className="text-[11px] text-muted-foreground truncate">
+                {session.user.email}
+              </span>
+            </div>
+            <Badge variant="outline" className="text-[10px] uppercase font-mono bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700 font-semibold">
+              {(session.user as { role?: string }).role || "ADMIN"}
+            </Badge>
+          </Link>
+        ) : (
+          <Link
+            href="/admin/login"
+            className="flex items-center justify-between p-1.5 -m-1.5 rounded-md hover:bg-amber-500/10 transition-colors group"
+            title="Click to authenticate"
+          >
+            <div className="flex flex-col truncate">
+              <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 group-hover:underline truncate">
+                Session Expired
+              </span>
+              <span className="text-[11px] text-muted-foreground truncate">
+                Click to log in again
+              </span>
+            </div>
+            <Badge variant="outline" className="text-[10px] uppercase font-mono bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/60 dark:text-amber-200 font-semibold">
+              RE-LOGIN
+            </Badge>
+          </Link>
+        )}
 
         <div className="flex items-center justify-between pt-2 border-t border-border/40">
           <Link
@@ -181,15 +199,27 @@ export function Sidebar({
             Live Site
           </Link>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSignOut}
-            className="h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5 mr-1" />
-            Sign Out
-          </Button>
+          {mounted && session?.user ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              className="h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5 mr-1" />
+              Sign Out
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/admin/login")}
+              className="h-8 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-500/10 cursor-pointer"
+            >
+              <Shield className="w-3.5 h-3.5 mr-1" />
+              Sign In
+            </Button>
+          )}
         </div>
       </div>
     </aside>

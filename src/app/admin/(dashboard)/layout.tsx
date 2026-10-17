@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Menu as MenuIcon, Shield } from "lucide-react";
 import { Sidebar } from "@/components/admin/sidebar";
 import { AdminPortalConfig, DEFAULT_ADMIN_CONFIG } from "@/lib/admin-config";
+import { adminFetch, AdminSessionExpiredError } from "@/lib/admin-fetch";
 
 export default function AdminDashboardLayout({
   children,
@@ -23,20 +24,36 @@ export default function AdminDashboardLayout({
   const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
   const [adminConfig, setAdminConfig] = React.useState<AdminPortalConfig>(DEFAULT_ADMIN_CONFIG);
 
-  const loadConfig = React.useCallback(() => {
-    Promise.all([
-      fetch("/api/admin/settings").then((res) => (res.ok ? res.json() : null)),
-      fetch("/api/admin/settings/copy").then((res) => (res.ok ? res.json() : null)),
-    ])
-      .then(([settingsData, copyData]) => {
-        if (settingsData?.logoUrl) setLogoUrl(settingsData.logoUrl);
-        if (copyData) setAdminConfig(copyData);
-      })
-      .catch(() => {});
+  const loadConfig = React.useCallback(async () => {
+    try {
+      const [settingsData, copyData] = await Promise.all([
+        adminFetch<{ logoUrl?: string | null }>("/api/admin/settings"),
+        adminFetch<AdminPortalConfig>("/api/admin/settings/copy"),
+      ]);
+      if (settingsData?.logoUrl) setLogoUrl(settingsData.logoUrl);
+      if (copyData) setAdminConfig(copyData);
+    } catch (err) {
+      if (err instanceof AdminSessionExpiredError) return;
+      // Non-blocking
+    }
   }, []);
 
   React.useEffect(() => {
-    loadConfig();
+    let ignore = false;
+    Promise.all([
+      adminFetch<{ logoUrl?: string | null }>("/api/admin/settings"),
+      adminFetch<AdminPortalConfig>("/api/admin/settings/copy"),
+    ])
+      .then(([settingsData, copyData]) => {
+        if (!ignore) {
+          if (settingsData?.logoUrl) setLogoUrl(settingsData.logoUrl);
+          if (copyData) setAdminConfig(copyData);
+        }
+      })
+      .catch((err) => {
+        if (err instanceof AdminSessionExpiredError) return;
+        // Non-blocking
+      });
 
     const handleConfigUpdate = () => {
       loadConfig();
@@ -44,6 +61,7 @@ export default function AdminDashboardLayout({
 
     window.addEventListener("adminConfigUpdated", handleConfigUpdate);
     return () => {
+      ignore = true;
       window.removeEventListener("adminConfigUpdated", handleConfigUpdate);
     };
   }, [loadConfig]);

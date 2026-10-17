@@ -68,6 +68,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency, SUPPORTED_CURRENCIES } from "@/lib/formatters";
+import { adminFetch, unwrapRecords, AdminSessionExpiredError } from "@/lib/admin-fetch";
 
 interface Category {
   id: string;
@@ -243,44 +244,26 @@ export default function ArtworksAdminPage() {
     }
   };
 
-  const reloadData = React.useCallback(() => {
-    Promise.all([
-      fetch("/api/admin/artworks").then((res) => (res.ok ? res.json() : [])),
-      fetch("/api/admin/categories").then((res) => (res.ok ? res.json() : [])),
-    ])
-      .then(([artworksData, categoriesData]) => {
-        setArtworks(artworksData);
-        setCategories(categoriesData);
-        setLoading(false);
-      })
-      .catch((e) => {
-        console.error("Error loading artworks data:", e);
-        setLoading(false);
-      });
+  const reloadData = React.useCallback(async () => {
+    try {
+      const [artworksData, categoriesData] = await Promise.all([
+        adminFetch<Artwork[]>("/api/admin/artworks"),
+        adminFetch<Category[]>("/api/admin/categories"),
+      ]);
+      setArtworks(unwrapRecords<Artwork>(artworksData, ["artworks", "items"]));
+      setCategories(unwrapRecords<Category>(categoriesData, ["categories", "items"]));
+    } catch (e) {
+      if (e instanceof AdminSessionExpiredError) return;
+      console.error("Error loading artworks data:", e);
+      toast.error(e instanceof Error ? e.message : "Error loading artworks data");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   React.useEffect(() => {
-    let isMounted = true;
-    Promise.all([
-      fetch("/api/admin/artworks").then((res) => (res.ok ? res.json() : [])),
-      fetch("/api/admin/categories").then((res) => (res.ok ? res.json() : [])),
-    ])
-      .then(([artworksData, categoriesData]) => {
-        if (isMounted) {
-          setArtworks(artworksData);
-          setCategories(categoriesData);
-          setLoading(false);
-        }
-      })
-      .catch((e) => {
-        console.error("Error loading artworks data:", e);
-        if (isMounted) setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    reloadData();
+  }, [reloadData]);
 
   // Open Create Modal
   const handleOpenCreate = () => {

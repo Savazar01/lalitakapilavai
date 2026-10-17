@@ -46,6 +46,7 @@ import {
   type LandingPageArchetypeKey,
 } from "@/lib/landing-page-archetypes";
 import { cn } from "@/lib/utils";
+import { adminFetch, unwrapRecords, AdminSessionExpiredError } from "@/lib/admin-fetch";
 
 interface PageConfig {
   upcomingBadge?: string;
@@ -134,23 +135,36 @@ export default function PagesAdminPage() {
   const [promotingId, setPromotingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    let isMounted = true;
-    fetch("/api/admin/pages")
-      .then((res) => (res.ok ? res.json() : []))
+    let ignore = false;
+    adminFetch<PageItem[]>("/api/admin/pages")
       .then((data) => {
-        if (isMounted) {
-          setPages(data);
+        if (!ignore) {
+          setPages(unwrapRecords<PageItem>(data, ["pages", "items"]));
           setLoading(false);
         }
       })
       .catch((e) => {
-        console.error(e);
-        if (isMounted) setLoading(false);
+        if (!ignore) {
+          if (e instanceof AdminSessionExpiredError) return;
+          console.error("Failed to load pages:", e);
+          toast.error(e instanceof Error ? e.message : "Failed to load pages");
+          setLoading(false);
+        }
       });
-
     return () => {
-      isMounted = false;
+      ignore = true;
     };
+  }, []);
+
+  const loadPages = React.useCallback(async () => {
+    try {
+      const data = await adminFetch<PageItem[]>("/api/admin/pages");
+      setPages(unwrapRecords<PageItem>(data, ["pages", "items"]));
+    } catch (e) {
+      if (e instanceof AdminSessionExpiredError) return;
+      console.error("Failed to reload pages:", e);
+      toast.error(e instanceof Error ? e.message : "Failed to reload pages");
+    }
   }, []);
 
   // Auto-slug from title
@@ -224,8 +238,8 @@ export default function PagesAdminPage() {
         const newPage = await res.json();
         toast.success(`Landing page created with ${selectedArchetype} archetype! Launching visual builder...`);
         setLandingModalOpen(false);
-        const refreshed = await fetch("/api/admin/pages").then((r) => (r.ok ? r.json() : []));
-        setPages(refreshed);
+        const refreshed = await adminFetch<PageItem[]>("/api/admin/pages");
+        setPages(unwrapRecords<PageItem>(refreshed, ["pages", "items"]));
         router.push(`/admin/pages/${newPage.id}/builder`);
       } else {
         const err = await res.json().catch(() => ({}));

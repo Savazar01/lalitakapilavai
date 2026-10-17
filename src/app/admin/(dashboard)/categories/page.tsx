@@ -48,6 +48,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
+import { adminFetch, unwrapRecords, AdminSessionExpiredError } from "@/lib/admin-fetch";
 
 
 interface ArtCategoryItem {
@@ -118,24 +119,38 @@ export default function AdminCategoriesPage() {
     borderStyle: "gold-fillet",
   });
 
-  const fetchCategories = React.useCallback(() => {
-    fetch("/api/admin/categories")
-      .then((res) => res.json())
+  React.useEffect(() => {
+    let ignore = false;
+    adminFetch<ArtCategoryItem[]>("/api/admin/categories")
       .then((data) => {
-        if (Array.isArray(data)) {
-          setCategories(data);
+        if (!ignore) {
+          setCategories(unwrapRecords<ArtCategoryItem>(data, ["categories", "items"]));
+          setLoading(false);
         }
-        setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to load categories:", err);
-        setLoading(false);
+        if (!ignore) {
+          if (err instanceof AdminSessionExpiredError) return;
+          console.error("Failed to load categories:", err);
+          toast.error(err instanceof Error ? err.message : "Failed to load categories");
+          setLoading(false);
+        }
       });
+    return () => {
+      ignore = true;
+    };
   }, []);
 
-  React.useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  const fetchCategories = React.useCallback(async () => {
+    try {
+      const data = await adminFetch<ArtCategoryItem[]>("/api/admin/categories");
+      setCategories(unwrapRecords<ArtCategoryItem>(data, ["categories", "items"]));
+    } catch (err) {
+      if (err instanceof AdminSessionExpiredError) return;
+      console.error("Failed to reload categories:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to reload categories");
+    }
+  }, []);
 
   const handleOpenCreate = () => {
     setEditingCategory(null);

@@ -43,6 +43,7 @@ import { EventFormModal, EventFormData, type EventDailySchedule, type EventRsvpC
 import { EditablePageHeader } from "@/components/admin/editable-page-header";
 import { formatEventSchedule } from "@/lib/geo-timezone";
 import { formatCurrency } from "@/lib/formatters";
+import { adminFetch, unwrapRecords, AdminSessionExpiredError } from "@/lib/admin-fetch";
 
 interface ArtworkSummary {
   id: string;
@@ -144,25 +145,65 @@ export default function EventsAdminPage() {
   const [eventPlacardArtworks, setEventPlacardArtworks] = React.useState<PlacardArtwork[]>([]);
   const [loadingEventPlacards, setLoadingEventPlacards] = React.useState<string | null>(null);
 
-  const reloadEvents = React.useCallback(() => {
+  React.useEffect(() => {
+    let ignore = false;
     Promise.all([
-      fetch("/api/admin/events").then((res) => (res.ok ? res.json() : [])),
-      fetch("/api/admin/artworks").then((res) => (res.ok ? res.json() : [])),
+      adminFetch<EventItem[]>("/api/admin/events"),
+      adminFetch<ArtworkSummary[]>("/api/admin/artworks"),
     ])
       .then(([eventsData, artworksData]) => {
-        setEvents(eventsData);
-        setArtworksCatalog(artworksData);
-        setLoading(false);
+        if (!ignore) {
+          const records = unwrapRecords<EventItem>(eventsData, ["events", "items"]);
+          const artworksRecords = unwrapRecords<ArtworkSummary>(artworksData, ["artworks", "items"]);
+          setEvents(records);
+          setArtworksCatalog(artworksRecords);
+          setLoading(false);
+
+          // Intelligent tab segmentation:
+          // If there are no upcoming events but past events exist, default to "all"
+          // so the curator immediately sees the scheduled/curated events instead of an empty state.
+          const now = new Date();
+          const hasUpcoming = records.some((ev) => {
+            if (ev.statusOverride === "FORCE_UPCOMING") return true;
+            if (ev.statusOverride === "FORCE_PAST") return false;
+            const compareDate = ev.endDate ? new Date(ev.endDate) : new Date(ev.startDate);
+            return compareDate >= now;
+          });
+          if (!hasUpcoming && records.length > 0) {
+            setActiveSegment("all");
+          }
+        }
       })
       .catch((e) => {
-        console.error(e);
-        setLoading(false);
+        if (!ignore) {
+          if (e instanceof AdminSessionExpiredError) return;
+          console.error("Error loading events:", e);
+          toast.error(e instanceof Error ? e.message : "Error loading events");
+          setLoading(false);
+        }
       });
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
-  React.useEffect(() => {
-    reloadEvents();
-  }, [reloadEvents]);
+  const reloadEvents = React.useCallback(async () => {
+    try {
+      const [eventsData, artworksData] = await Promise.all([
+        adminFetch<EventItem[]>("/api/admin/events"),
+        adminFetch<ArtworkSummary[]>("/api/admin/artworks"),
+      ]);
+      const records = unwrapRecords<EventItem>(eventsData, ["events", "items"]);
+      const artworksRecords = unwrapRecords<ArtworkSummary>(artworksData, ["artworks", "items"]);
+      setEvents(records);
+      setArtworksCatalog(artworksRecords);
+    } catch (e) {
+      if (e instanceof AdminSessionExpiredError) return;
+      console.error("Error reloading events:", e);
+      toast.error(e instanceof Error ? e.message : "Error reloading events");
+    }
+  }, []);
 
   // Open Create Modal
   const handleOpenCreate = () => {

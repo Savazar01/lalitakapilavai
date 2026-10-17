@@ -10,13 +10,44 @@ export function proxy(request: NextRequest) {
     request.cookies.get("better-auth.session_token")?.value ||
     request.cookies.get("__Secure-better-auth.session_token")?.value;
 
+  const sessionDataCookie =
+    request.cookies.get("better-auth.session_data")?.value ||
+    request.cookies.get("__Secure-better-auth.session_data")?.value;
+
+  let isSessionExpired = false;
+  if (sessionDataCookie) {
+    try {
+      const decoded = JSON.parse(Buffer.from(sessionDataCookie, "base64").toString("utf-8"));
+      if (decoded && decoded.expiresAt) {
+        const expiresMs =
+          typeof decoded.expiresAt === "number" && decoded.expiresAt < 10000000000
+            ? decoded.expiresAt * 1000
+            : new Date(decoded.expiresAt).getTime();
+        if (Number.isFinite(expiresMs) && Date.now() > expiresMs) {
+          isSessionExpired = true;
+        }
+      }
+    } catch {
+      // Non-blocking parse fallback
+    }
+  }
+
+  const hasActiveSession = Boolean(sessionToken && !isSessionExpired);
+
   // 2. Defense-in-depth edge guard for /api/admin/:path*
   if (pathname.startsWith("/api/admin")) {
-    if (!sessionToken) {
-      return NextResponse.json(
-        { error: "Unauthorized administrative access. Valid session cookie required." },
+    if (!hasActiveSession) {
+      const res = NextResponse.json(
+        { error: "Unauthorized administrative access. Valid session required." },
         { status: 401 }
       );
+      if (isSessionExpired) {
+        res.cookies.delete("better-auth.session_token");
+        res.cookies.delete("__Secure-better-auth.session_token");
+        res.cookies.delete("better-auth.session_data");
+        res.cookies.delete("__Secure-better-auth.session_data");
+      }
+      return res;
     }
   }
 
@@ -24,15 +55,22 @@ export function proxy(request: NextRequest) {
   if (pathname.startsWith("/admin")) {
     const isLoginPage = pathname === "/admin/login";
 
-    // Unauthenticated user attempting to access protected admin page
-    if (!sessionToken && !isLoginPage) {
+    // Unauthenticated or expired session attempting to access protected admin page
+    if (!hasActiveSession && !isLoginPage) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
+      const res = NextResponse.redirect(loginUrl);
+      if (isSessionExpired) {
+        res.cookies.delete("better-auth.session_token");
+        res.cookies.delete("__Secure-better-auth.session_token");
+        res.cookies.delete("better-auth.session_data");
+        res.cookies.delete("__Secure-better-auth.session_data");
+      }
+      return res;
     }
 
     // Authenticated user attempting to visit login page -> redirect to dashboard
-    if (sessionToken && isLoginPage) {
+    if (hasActiveSession && isLoginPage) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
   }

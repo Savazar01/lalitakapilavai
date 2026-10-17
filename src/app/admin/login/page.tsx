@@ -96,7 +96,7 @@ function LoginForm() {
               id="email"
               name="email"
               type="email"
-              placeholder="admin@savazar.com"
+              placeholder="admin@yourdomain.com"
               autoComplete="email"
               required
               value={email}
