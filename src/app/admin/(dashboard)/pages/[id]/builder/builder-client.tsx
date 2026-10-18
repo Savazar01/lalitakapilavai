@@ -573,6 +573,11 @@ function SortableSection({
     overlayTitleColor?: string;
     overlayTextColor?: string;
     canvasBgColor?: string;
+    canvasBgImageUrl?: string;
+    canvasBgMode?: "cover" | "contain" | "tile" | "blur";
+    canvasBgOpacity?: number;
+    wallBackgroundMode?: "uniform" | "per-wall";
+    wallCustomBackgrounds?: string[];
     borderFilletColor?: string;
     borderWidth?: number;
     framePadding?: number;
@@ -1491,6 +1496,11 @@ function SortableSection({
                                   showCaptionRibbon: block.galleryShowCaptionRibbon,
                                   environmentId: block.galleryEnvironmentId,
                                   customWallUrl: block.galleryCustomWallUrl,
+                                  wallBackgroundMode: block.galleryWallBackgroundMode,
+                                  wallCustomBackgrounds: block.galleryWallCustomBackgrounds,
+                                  canvasBgImageUrl: block.galleryCanvasBgImageUrl,
+                                  canvasBgMode: block.galleryCanvasBgMode,
+                                  canvasBgOpacity: block.galleryCanvasBgOpacity,
                                   cameraTourStyle: block.galleryCameraTourStyle,
                                   wallLayout: block.galleryWallLayout,
                                   autoplayTour: block.galleryAutoplayTour,
@@ -1527,6 +1537,11 @@ function SortableSection({
                               showCaptionRibbon={block.galleryShowCaptionRibbon}
                               environmentId={block.galleryEnvironmentId}
                               customWallUrl={block.galleryCustomWallUrl}
+                              wallBackgroundMode={block.galleryWallBackgroundMode}
+                              wallCustomBackgrounds={block.galleryWallCustomBackgrounds}
+                              canvasBgImageUrl={block.galleryCanvasBgImageUrl}
+                              canvasBgMode={block.galleryCanvasBgMode}
+                              canvasBgOpacity={block.galleryCanvasBgOpacity}
                               cameraTourStyle={block.galleryCameraTourStyle}
                               wallLayout={block.galleryWallLayout}
                               autoplayTour={block.galleryAutoplayTour}
@@ -2028,12 +2043,17 @@ function SortableSection({
                 overlayTitleColor: activeGalleryModal.overlayTitleColor,
                 overlayTextColor: activeGalleryModal.overlayTextColor,
                 canvasBgColor: activeGalleryModal.canvasBgColor,
+                canvasBgImageUrl: activeGalleryModal.canvasBgImageUrl,
+                canvasBgMode: activeGalleryModal.canvasBgMode,
+                canvasBgOpacity: activeGalleryModal.canvasBgOpacity,
                 borderFilletColor: activeGalleryModal.borderFilletColor,
                 borderWidth: activeGalleryModal.borderWidth,
                 framePadding: activeGalleryModal.framePadding,
                 showCaptionRibbon: activeGalleryModal.showCaptionRibbon,
                 environmentId: activeGalleryModal.environmentId,
                 customWallUrl: activeGalleryModal.customWallUrl,
+                wallBackgroundMode: activeGalleryModal.wallBackgroundMode,
+                wallCustomBackgrounds: activeGalleryModal.wallCustomBackgrounds,
                 cameraTourStyle: activeGalleryModal.cameraTourStyle,
                 wallLayout: activeGalleryModal.wallLayout,
                 autoplayTour: activeGalleryModal.autoplayTour,
@@ -2060,12 +2080,17 @@ function SortableSection({
                   galleryOverlayTitleColor: updated.overlayTitleColor,
                   galleryOverlayTextColor: updated.overlayTextColor,
                   galleryCanvasBgColor: updated.canvasBgColor,
+                  galleryCanvasBgImageUrl: updated.canvasBgImageUrl,
+                  galleryCanvasBgMode: updated.canvasBgMode,
+                  galleryCanvasBgOpacity: updated.canvasBgOpacity,
                   galleryBorderFilletColor: updated.borderFilletColor,
                   galleryBorderWidth: updated.borderWidth,
                   galleryFramePadding: updated.framePadding,
                   galleryShowCaptionRibbon: updated.showCaptionRibbon,
                   galleryEnvironmentId: updated.environmentId,
                   galleryCustomWallUrl: updated.customWallUrl,
+                  galleryWallBackgroundMode: updated.wallBackgroundMode,
+                  galleryWallCustomBackgrounds: updated.wallCustomBackgrounds,
                   galleryCameraTourStyle: updated.cameraTourStyle,
                   galleryWallLayout: updated.wallLayout,
                   galleryAutoplayTour: updated.autoplayTour,
@@ -2089,12 +2114,17 @@ function SortableSection({
                         overlayTitleColor: updated.overlayTitleColor,
                         overlayTextColor: updated.overlayTextColor,
                         canvasBgColor: updated.canvasBgColor,
+                        canvasBgImageUrl: updated.canvasBgImageUrl,
+                        canvasBgMode: updated.canvasBgMode,
+                        canvasBgOpacity: updated.canvasBgOpacity,
                         borderFilletColor: updated.borderFilletColor,
                         borderWidth: updated.borderWidth,
                         framePadding: updated.framePadding,
                         showCaptionRibbon: updated.showCaptionRibbon,
                         environmentId: updated.environmentId,
                         customWallUrl: updated.customWallUrl,
+                        wallBackgroundMode: updated.wallBackgroundMode,
+                        wallCustomBackgrounds: updated.wallCustomBackgrounds,
                         cameraTourStyle: updated.cameraTourStyle,
                         wallLayout: updated.wallLayout,
                         autoplayTour: updated.autoplayTour,

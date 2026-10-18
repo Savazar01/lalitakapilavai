@@ -803,10 +803,16 @@ export interface ColumnBlock {
   galleryShowCaptionRibbon?: boolean;
   galleryEnvironmentId?: string;
   galleryCustomWallUrl?: string;
+  galleryWallBackgroundMode?: "uniform" | "per-wall";
+  galleryWallCustomBackgrounds?: string[];
+  galleryCanvasBgImageUrl?: string;
+  galleryCanvasBgMode?: "cover" | "contain" | "tile" | "blur";
+  galleryCanvasBgOpacity?: number;
   galleryCameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   galleryWallLayout?: "salon" | "linear" | "grid";
   galleryAutoplayTour?: boolean;
   galleryShowFrameHeader?: boolean;
+  frameHeaderBg?: string;
   galleryFrameHeaderBg?: string;
   galleryFrameHeaderTextColor?: string;
   galleryItems?: MediaGalleryItem[];
@@ -981,6 +987,11 @@ export function renderColumnBlock(
           showCaptionRibbon={block.galleryShowCaptionRibbon}
           environmentId={block.galleryEnvironmentId}
           customWallUrl={block.galleryCustomWallUrl}
+          wallBackgroundMode={block.galleryWallBackgroundMode}
+          wallCustomBackgrounds={block.galleryWallCustomBackgrounds}
+          canvasBgImageUrl={block.galleryCanvasBgImageUrl}
+          canvasBgMode={block.galleryCanvasBgMode}
+          canvasBgOpacity={block.galleryCanvasBgOpacity}
           cameraTourStyle={block.galleryCameraTourStyle}
           wallLayout={block.galleryWallLayout}
           autoplayTour={block.galleryAutoplayTour}

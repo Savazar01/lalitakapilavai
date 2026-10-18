@@ -152,11 +152,16 @@ All code generation and architectural modifications must adhere to the specializ
 - **Multi-Wall Automatic Partitioning**:
   - Use `maxArtworksPerWall` (default: 4, range: 2–8).
   - When hung artworks exceed this threshold, the engine automatically partitions the collection into sequential corridor walls (Wall 1, Wall 2, etc.), preventing visual crowding.
-- **Multi-Wall Custom Image Backdrops & Uniform Fallback**:
+- **Multi-Wall Custom Image Backdrops & Pure Backdrop Mode**:
   - In `ExhibitionWallBlock`, the back wall geometry is partitioned into modular bay meshes (`w = 0` to `numWalls - 1`) aligned with architectural divider pilasters.
-  - Supports `wallBackgroundMode: "uniform" | "per_wall"`:
-    - `"uniform"`: All salon corridor bays share a single texture (`wallCustomBackgroundUrl`), with optional bump mapping and tone coordination.
-    - `"per_wall"`: Each bay (`wallCustomBackgrounds[w]`) receives an independent high-resolution texture map with independent sRGB color space rendering and bump dynamics.
+  - Supports `wallBackgroundMode: "uniform" | "per-wall"`:
+    - `"uniform"`: All salon corridor bays share a single texture (`wallCustomBackgroundUrl`), mapped via dynamic aspect-ratio cover UVs.
+    - `"per_wall"`: Each bay (`wallCustomBackgrounds[w]`) receives an independent high-resolution texture map with independent sRGB color space rendering and dedicated upload input pipeline.
+  - **Pure Backdrop Mode (Procedural Element Suppression)**:
+    - When `isCustomBackdrop` is active (custom wall URL, per-wall configuration, or custom cultural environment), the engine suppresses all procedural 3D elements (`floorMesh.visible = false`, `crownMesh.visible = false`, `skirtingMesh.visible = false`, `pilasters.visible = false`, `decorGroup.visible = false`).
+    - Eliminates duplicate CSS `backgroundImage` on the container, rendering the image cleanly through Three.js WebGL with `roughness: 0.35`, `metalness: 0.0`, `color: 0xffffff`, and `bumpMap: null`.
+    - Switches ambient and spotlight illumination to clean, neutral white (`0xffffff`, ambient $1.0$, spotlight $7.0$), eliminating unwanted color tinting or dimming from cultural environment presets.
+    - Artworks maintain museum-standard eye-level centerline hanging ($1.55\text{ m}$) with balanced, proportional horizontal spacing centered at `wallCenterX`.
   - Wall bays seamlessly fallback to procedurally illuminated plaster walls when no custom texture is specified.
 - **Universal Media Gallery Canvas Background Engine**:
   - All Media Gallery presentation options (Carousel, Snap Scroll, Curated Bento, Ken Burns, Soft Crossfade, Filmstrip Reel) support custom backdrop images via `canvasBgImageUrl`, `canvasBgMode` (`"cover" | "contain" | "tile" | "blur"`), and `canvasBgOpacity` (0–100%).

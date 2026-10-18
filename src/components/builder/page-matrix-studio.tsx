@@ -1408,12 +1408,20 @@ export function PageMatrixStudio({
                             showCaptionRibbon={block.galleryShowCaptionRibbon}
                             environmentId={block.galleryEnvironmentId}
                             customWallUrl={block.galleryCustomWallUrl}
+                            wallBackgroundMode={block.galleryWallBackgroundMode}
+                            wallCustomBackgrounds={block.galleryWallCustomBackgrounds}
+                            canvasBgImageUrl={block.galleryCanvasBgImageUrl}
+                            canvasBgMode={block.galleryCanvasBgMode}
+                            canvasBgOpacity={block.galleryCanvasBgOpacity}
                             cameraTourStyle={block.galleryCameraTourStyle}
                             wallLayout={block.galleryWallLayout}
                             autoplayTour={block.galleryAutoplayTour}
                             showFrameHeader={block.galleryShowFrameHeader}
                             frameHeaderBg={block.galleryFrameHeaderBg}
                             frameHeaderTextColor={block.galleryFrameHeaderTextColor}
+                            maxArtworksPerWall={block.galleryMaxArtworksPerWall}
+                            overviewDwellSeconds={block.galleryOverviewWallDwell}
+                            showMetadataCardBelowWall={block.galleryShowMetadataCardBelowWall}
                           />
                         </div>
                       )}
@@ -1947,6 +1955,11 @@ export function PageMatrixStudio({
                 showCaptionRibbon: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryShowCaptionRibbon,
                 environmentId: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryEnvironmentId,
                 customWallUrl: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCustomWallUrl,
+                wallBackgroundMode: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryWallBackgroundMode,
+                wallCustomBackgrounds: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryWallCustomBackgrounds,
+                canvasBgImageUrl: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCanvasBgImageUrl,
+                canvasBgMode: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCanvasBgMode,
+                canvasBgOpacity: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCanvasBgOpacity,
                 cameraTourStyle: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCameraTourStyle,
                 wallLayout: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryWallLayout,
                 autoplayTour: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryAutoplayTour,
@@ -1954,6 +1967,10 @@ export function PageMatrixStudio({
                 frameHeaderBg: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryFrameHeaderBg,
                 frameHeaderTextColor: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryFrameHeaderTextColor,
                 items: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryItems,
+                maxArtworksPerWall: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryMaxArtworksPerWall,
+                overviewWallDwell: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryOverviewWallDwell,
+                overviewDwellSeconds: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryOverviewWallDwell,
+                showMetadataCardBelowWall: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryShowMetadataCardBelowWall,
               }}
               onChange={(updated) => {
                 updateBlockInCell(
@@ -1970,18 +1987,26 @@ export function PageMatrixStudio({
                     galleryOverlayTitleColor: updated.overlayTitleColor,
                     galleryOverlayTextColor: updated.overlayTextColor,
                     galleryCanvasBgColor: updated.canvasBgColor,
+                    galleryCanvasBgImageUrl: updated.canvasBgImageUrl,
+                    galleryCanvasBgMode: updated.canvasBgMode,
+                    galleryCanvasBgOpacity: updated.canvasBgOpacity,
                     galleryBorderFilletColor: updated.borderFilletColor,
                     galleryBorderWidth: updated.borderWidth,
                     galleryFramePadding: updated.framePadding,
                     galleryShowCaptionRibbon: updated.showCaptionRibbon,
                     galleryEnvironmentId: updated.environmentId,
                     galleryCustomWallUrl: updated.customWallUrl,
+                    galleryWallBackgroundMode: updated.wallBackgroundMode,
+                    galleryWallCustomBackgrounds: updated.wallCustomBackgrounds,
                     galleryCameraTourStyle: updated.cameraTourStyle,
                     galleryWallLayout: updated.wallLayout,
                     galleryAutoplayTour: updated.autoplayTour,
                     galleryShowFrameHeader: updated.showFrameHeader,
                     galleryFrameHeaderBg: updated.frameHeaderBg,
                     galleryFrameHeaderTextColor: updated.frameHeaderTextColor,
+                    galleryMaxArtworksPerWall: updated.maxArtworksPerWall,
+                    galleryOverviewWallDwell: updated.overviewWallDwell ?? updated.overviewDwellSeconds,
+                    galleryShowMetadataCardBelowWall: updated.showMetadataCardBelowWall,
                   }
                 );
               }}

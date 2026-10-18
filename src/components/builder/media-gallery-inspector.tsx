@@ -134,6 +134,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const [uploading, setUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const wallFileInputRef = React.useRef<HTMLInputElement>(null);
+  const perWallFileInputRef = React.useRef<HTMLInputElement>(null);
   const canvasBgFileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Universal Media Dialog state
@@ -302,6 +303,8 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       ...data,
       customWallUrl: url,
       customWallBackdropUrl: url,
+      environmentId: url ? "custom" : data.environmentId,
+      culturalEnvironment: url ? "custom" : data.culturalEnvironment,
     });
   };
 
@@ -321,6 +324,8 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     onChange({
       ...data,
       wallCustomBackgrounds: copy,
+      environmentId: url ? "custom" : data.environmentId,
+      culturalEnvironment: url ? "custom" : data.culturalEnvironment,
     });
   };
 
@@ -336,6 +341,8 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       customWallUrl: sourceUrl,
       customWallBackdropUrl: sourceUrl,
       wallCustomBackgrounds: updated,
+      environmentId: "custom",
+      culturalEnvironment: "custom",
     });
     toast.success(`Applied Wall #${sourceIndex + 1} background to all walls!`);
   };
@@ -1007,12 +1014,23 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                           onChange={(e) => handlePerWallUrlChange(selectedWallTab, e.target.value)}
                           className="h-8 text-xs font-mono"
                         />
+                        <input
+                          ref={perWallFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadFile(f, "perWall", selectedWallTab);
+                            if (perWallFileInputRef.current) perWallFileInputRef.current.value = "";
+                          }}
+                        />
                         <Button
                           type="button"
                           variant="default"
                           size="sm"
                           disabled={uploading}
-                          onClick={() => wallFileInputRef.current?.click()}
+                          onClick={() => perWallFileInputRef.current?.click()}
                           className="h-8 text-xs shrink-0 cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
                         >
                           <UploadCloud className="w-3.5 h-3.5 mr-1" /> Upload Image

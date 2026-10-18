@@ -144,8 +144,8 @@ function computePlacements(
         const xPos = currentLeft + width / 2;
         currentLeft += width + calculatedGap;
 
-        // Eye-level center line at 1.55m, guaranteed minimum floor clearance of 0.98m
-        const yPos = Math.max(1.55, 0.98 + height / 2);
+        // Eye-level center line at 1.55m
+        const yPos = 1.55;
 
         placements.push({
           item,
@@ -194,15 +194,8 @@ function computePlacements(
         const row = Math.floor(localIdx / cols);
         const { width, height } = frameSizes[localIdx];
 
-        let yPos = 1.55;
-        if (totalRows === 1) {
-          yPos = Math.max(1.55, 0.98 + height / 2);
-        } else {
-          // 2 rows: row 0 (top row) at ~2.15m, row 1 (bottom row) at ~1.28m
-          const bottomRowY = Math.max(1.28, 0.98 + height / 2);
-          const topRowY = Math.max(2.15, bottomRowY + height / 2 + 0.32 + height / 2);
-          yPos = row === 0 ? topRowY : bottomRowY;
-        }
+        // 1 row: 1.55m eye level; 2 rows: 1.95m and 1.15m (average is 1.55m)
+        const yPos = totalRows === 1 ? 1.55 : row === 0 ? 1.95 : 1.15;
 
         placements.push({
           item,
@@ -236,24 +229,23 @@ function computePlacements(
       }[] = [];
 
       if (count === 1) {
-        localSlots = [{ x: 0, y: Math.max(1.55, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" }];
+        localSlots = [{ x: 0, y: 1.55, frame: "gold-teak" }];
       } else if (count === 2) {
         const w0 = frameSizes[0].width;
         const w1 = frameSizes[1].width;
         const totalSpan = w0 + minGap + w1;
         localSlots = [
-          { x: -totalSpan / 2 + w0 / 2, y: Math.max(1.55, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" },
-          { x: totalSpan / 2 - w1 / 2, y: Math.max(1.55, 0.98 + frameSizes[1].height / 2), frame: "rosewood-ivory" },
+          { x: -totalSpan / 2 + w0 / 2, y: 1.55, frame: "gold-teak" },
+          { x: totalSpan / 2 - w1 / 2, y: 1.55, frame: "rosewood-ivory" },
         ];
       } else if (count === 3) {
         const w0 = frameSizes[0].width;
         const w1 = frameSizes[1].width;
         const w2 = frameSizes[2].width;
-        const totalSpan = w1 + minGap + w0 + minGap + w2;
         localSlots = [
-          { x: 0, y: Math.max(1.60, 0.98 + frameSizes[0].height / 2), frame: "gold-teak" },
-          { x: -totalSpan / 2 + w1 / 2, y: Math.max(1.52, 0.98 + frameSizes[1].height / 2), frame: "rosewood-ivory" },
-          { x: totalSpan / 2 - w2 / 2, y: Math.max(1.52, 0.98 + frameSizes[2].height / 2), frame: "light-oak" },
+          { x: -(w1 / 2 + minGap + w0 / 2), y: 1.55, frame: "rosewood-ivory" },
+          { x: 0, y: 1.58, frame: "gold-teak" },
+          { x: +(w1 / 2 + minGap + w2 / 2), y: 1.55, frame: "light-oak" },
         ];
       } else if (count === 4) {
         const leftColW = Math.max(frameSizes[0].width, frameSizes[1].width);
@@ -262,17 +254,11 @@ function computePlacements(
         const leftColX = -totalSpan / 2 + leftColW / 2;
         const rightColX = totalSpan / 2 - rightColW / 2;
 
-        const bY0 = Math.max(1.28, 0.98 + frameSizes[1].height / 2);
-        const tY0 = Math.max(2.15, bY0 + frameSizes[1].height / 2 + 0.32 + frameSizes[0].height / 2);
-
-        const bY1 = Math.max(1.28, 0.98 + frameSizes[3].height / 2);
-        const tY1 = Math.max(2.15, bY1 + frameSizes[3].height / 2 + 0.32 + frameSizes[2].height / 2);
-
         localSlots = [
-          { x: leftColX, y: tY0, frame: "light-oak" },
-          { x: leftColX, y: bY0, frame: "rosewood-ivory" },
-          { x: rightColX, y: tY1, frame: "gold-teak" },
-          { x: rightColX, y: bY1, frame: "white-float" },
+          { x: leftColX, y: 1.95, frame: "light-oak" },
+          { x: leftColX, y: 1.15, frame: "rosewood-ivory" },
+          { x: rightColX, y: 1.95, frame: "gold-teak" },
+          { x: rightColX, y: 1.15, frame: "white-float" },
         ];
       } else if (count === 5) {
         const centerW = frameSizes[0].width;
@@ -282,20 +268,12 @@ function computePlacements(
         const leftColX = -totalSpan / 2 + leftColW / 2;
         const rightColX = totalSpan / 2 - rightColW / 2;
 
-        const centerY = Math.max(1.55, 0.98 + frameSizes[0].height / 2);
-
-        const bYL = Math.max(1.28, 0.98 + frameSizes[2].height / 2);
-        const tYL = Math.max(2.15, bYL + frameSizes[2].height / 2 + 0.32 + frameSizes[1].height / 2);
-
-        const bYR = Math.max(1.28, 0.98 + frameSizes[4].height / 2);
-        const tYR = Math.max(2.15, bYR + frameSizes[4].height / 2 + 0.32 + frameSizes[3].height / 2);
-
         localSlots = [
-          { x: 0, y: centerY, frame: "gold-teak" },
-          { x: leftColX, y: tYL, frame: "light-oak" },
-          { x: leftColX, y: bYL, frame: "rosewood-ivory" },
-          { x: rightColX, y: tYR, frame: "light-oak" },
-          { x: rightColX, y: bYR, frame: "rosewood-ivory" },
+          { x: 0, y: 1.55, frame: "gold-teak" },
+          { x: leftColX, y: 1.95, frame: "light-oak" },
+          { x: leftColX, y: 1.15, frame: "rosewood-ivory" },
+          { x: rightColX, y: 1.95, frame: "light-oak" },
+          { x: rightColX, y: 1.15, frame: "rosewood-ivory" },
         ];
       } else if (count === 6) {
         const col0W = Math.max(frameSizes[0].width, frameSizes[1].width);
@@ -306,22 +284,13 @@ function computePlacements(
         const col1X = -totalSpan / 2 + col0W + minGap + col1W / 2;
         const col2X = totalSpan / 2 - col2W / 2;
 
-        const bY0 = Math.max(1.28, 0.98 + frameSizes[1].height / 2);
-        const tY0 = Math.max(2.15, bY0 + frameSizes[1].height / 2 + 0.32 + frameSizes[0].height / 2);
-
-        const bY1 = Math.max(1.28, 0.98 + frameSizes[3].height / 2);
-        const tY1 = Math.max(2.15, bY1 + frameSizes[3].height / 2 + 0.32 + frameSizes[2].height / 2);
-
-        const bY2 = Math.max(1.28, 0.98 + frameSizes[5].height / 2);
-        const tY2 = Math.max(2.15, bY2 + frameSizes[5].height / 2 + 0.32 + frameSizes[4].height / 2);
-
         localSlots = [
-          { x: col0X, y: tY0, frame: "rosewood-ivory" },
-          { x: col0X, y: bY0, frame: "light-oak" },
-          { x: col1X, y: tY1, frame: "gold-teak" },
-          { x: col1X, y: bY1, frame: "rosewood-ivory" },
-          { x: col2X, y: tY2, frame: "light-oak" },
-          { x: col2X, y: bY2, frame: "gold-teak" },
+          { x: col0X, y: 1.95, frame: "rosewood-ivory" },
+          { x: col0X, y: 1.15, frame: "light-oak" },
+          { x: col1X, y: 1.95, frame: "gold-teak" },
+          { x: col1X, y: 1.15, frame: "rosewood-ivory" },
+          { x: col2X, y: 1.95, frame: "light-oak" },
+          { x: col2X, y: 1.15, frame: "gold-teak" },
         ];
       } else {
         const colWidths = [
@@ -344,16 +313,10 @@ function computePlacements(
           btmItemIdx: number,
           fTop: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float",
           fBtm: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float"
-        ) => {
-          const bH = frameSizes[btmItemIdx]?.height || 1.2;
-          const tH = frameSizes[topItemIdx]?.height || 1.2;
-          const bY = Math.max(1.28, 0.98 + bH / 2);
-          const tY = Math.max(2.15, bY + bH / 2 + 0.32 + tH / 2);
-          return [
-            { x: centers[colIdx], y: tY, frame: fTop },
-            { x: centers[colIdx], y: bY, frame: fBtm },
-          ];
-        };
+        ) => [
+          { x: centers[colIdx], y: 1.95, frame: fTop },
+          { x: centers[colIdx], y: 1.15, frame: fBtm },
+        ];
 
         localSlots = [
           ...getColSlots(0, 0, 1, "gold-teak", "rosewood-ivory"),
@@ -416,8 +379,10 @@ export function ExhibitionWallBlock({
   const activeCustomWallUrl = customWallBackdropUrl || customWallUrl;
   const isPerWall = wallBackgroundMode === "per-wall" && wallCustomBackgrounds.some((u) => u && u.trim() !== "");
   const isCustomBackdrop =
-    ((activeEnvId === "custom" || activeEnvId.toLowerCase().includes("custom")) && !!activeCustomWallUrl) ||
-    isPerWall;
+    Boolean(activeCustomWallUrl && activeCustomWallUrl.trim() !== "") ||
+    isPerWall ||
+    activeEnvId === "custom" ||
+    activeEnvId.toLowerCase().includes("custom");
 
   const isMounted = React.useSyncExternalStore(
     () => () => {},
@@ -598,6 +563,11 @@ export function ExhibitionWallBlock({
     wallMesh?: THREE.Mesh;
     wallMeshes?: THREE.Mesh[];
     decorGroup?: THREE.Group;
+    floorMesh?: THREE.Mesh;
+    crownMesh?: THREE.Mesh;
+    skirtingMesh?: THREE.Mesh;
+    pilasterMeshes?: THREE.Mesh[];
+    capMeshes?: THREE.Mesh[];
     animationId: number;
     clock: THREE.Clock;
     raycaster: THREE.Raycaster;
@@ -657,16 +627,17 @@ export function ExhibitionWallBlock({
     texLoader.crossOrigin = "anonymous";
 
     // Ambient Lighting
+    const lightColor = isCustomBackdrop ? new THREE.Color(0xffffff) : new THREE.Color(env.lightingColor);
     const ambientLight = new THREE.AmbientLight(
-      new THREE.Color(env.lightingColor),
-      0.85
+      lightColor,
+      isCustomBackdrop ? 1.0 : 0.85
     );
     scene.add(ambientLight);
 
     // Directional Ceiling Main Tracking Spotlight
     const spotlight = new THREE.SpotLight(
-      new THREE.Color(env.lightingColor),
-      env.spotlightIntensity * 12,
+      lightColor,
+      isCustomBackdrop ? 7.0 : env.spotlightIntensity * 12,
       36,
       Math.PI / 4,
       0.55,
@@ -687,26 +658,29 @@ export function ExhibitionWallBlock({
     // Side Fill Lights per wall bay for rich chiaroscuro depth
     for (let w = 0; w < numWalls; w++) {
       const bayX = w * wallSpacing;
-      const leftFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 6, 16);
+      const fillColor = isCustomBackdrop ? new THREE.Color(0xffffff) : new THREE.Color(env.lightingColor);
+      const leftFill = new THREE.PointLight(fillColor, isCustomBackdrop ? 2.5 : 6, 16);
       leftFill.position.set(bayX - 5.0, 4.2, 4.0);
       scene.add(leftFill);
 
-      const rightFill = new THREE.PointLight(new THREE.Color(env.lightingColor), 6, 16);
+      const rightFill = new THREE.PointLight(fillColor, isCustomBackdrop ? 2.5 : 6, 16);
       rightFill.position.set(bayX + 5.0, 4.2, 4.0);
       scene.add(rightFill);
 
-      // Subtle warm visitor gallery floor/bench fill light to illuminate foreground decor
-      const visitorFill = new THREE.PointLight(0xffeedd, 1.2, 10);
-      visitorFill.position.set(bayX, 2.0, 7.5);
-      scene.add(visitorFill);
+      if (!isCustomBackdrop) {
+        // Subtle warm visitor gallery floor/bench fill light to illuminate foreground decor
+        const visitorFill = new THREE.PointLight(0xffeedd, 1.2, 10);
+        visitorFill.position.set(bayX, 2.0, 7.5);
+        scene.add(visitorFill);
+      }
     }
 
     // Per-Artwork Radial Falloff Spotlights (Focused Light Pools)
     const artSpotlights: THREE.SpotLight[] = [];
     placements.forEach((placement) => {
       const artSpot = new THREE.SpotLight(
-        new THREE.Color(env.lightingColor),
-        env.spotlightIntensity * 6,
+        lightColor,
+        isCustomBackdrop ? 3.5 : env.spotlightIntensity * 6,
         14,
         Math.PI / 5.5,
         0.8,
@@ -782,13 +756,14 @@ export function ExhibitionWallBlock({
 
     if (numWalls <= 1) {
       const wallMat = new THREE.MeshStandardMaterial({
-        map: wallTex,
-        bumpMap: bumpTex,
-        bumpScale: 0.04,
-        roughness: 0.92,
-        metalness: 0.02,
-        transparent: isCustomBackdrop,
-        opacity: isCustomBackdrop ? 0.88 : 1.0,
+        map: isCustomBackdrop ? null : wallTex,
+        bumpMap: isCustomBackdrop ? null : bumpTex,
+        bumpScale: isCustomBackdrop ? 0 : 0.04,
+        roughness: isCustomBackdrop ? 0.35 : 0.92,
+        metalness: 0.0,
+        color: new THREE.Color(0xffffff),
+        transparent: false,
+        opacity: 1.0,
       });
 
       const singleCustomUrl =
@@ -801,9 +776,24 @@ export function ExhibitionWallBlock({
           singleCustomUrl,
           (loadedTex) => {
             loadedTex.colorSpace = THREE.SRGBColorSpace;
-            loadedTex.wrapS = THREE.RepeatWrapping;
-            loadedTex.wrapT = THREE.ClampToEdgeWrapping;
+            const img = loadedTex.image;
+            if (img && img.naturalWidth && img.naturalHeight) {
+              const texAspect = img.naturalWidth / img.naturalHeight;
+              const planeAspect = corridorLength / 12;
+              if (planeAspect > texAspect) {
+                loadedTex.repeat.set(1, texAspect / planeAspect);
+                loadedTex.offset.set(0, (1 - texAspect / planeAspect) / 2);
+              } else {
+                loadedTex.repeat.set(planeAspect / texAspect, 1);
+                loadedTex.offset.set((1 - planeAspect / texAspect) / 2, 0);
+              }
+            }
             wallMat.map = loadedTex;
+            wallMat.bumpMap = null;
+            wallMat.roughness = 0.35;
+            wallMat.metalness = 0.0;
+            wallMat.transparent = false;
+            wallMat.opacity = 1.0;
             wallMat.needsUpdate = true;
           },
           undefined,
@@ -834,15 +824,15 @@ export function ExhibitionWallBlock({
           ? (wallCustomBackgrounds?.[w] || activeCustomWallUrl || env.wallTextureUrl)
           : (activeCustomWallUrl || wallCustomBackgrounds?.[w] || env.wallTextureUrl);
 
-        const bayHasCustom = !!bayCustomUrl;
         const bayMat = new THREE.MeshStandardMaterial({
-          map: wallTex,
-          bumpMap: bumpTex,
-          bumpScale: 0.04,
-          roughness: 0.92,
-          metalness: 0.02,
-          transparent: bayHasCustom && isCustomBackdrop,
-          opacity: bayHasCustom && isCustomBackdrop ? 0.88 : 1.0,
+          map: isCustomBackdrop ? null : wallTex,
+          bumpMap: isCustomBackdrop ? null : bumpTex,
+          bumpScale: isCustomBackdrop ? 0 : 0.04,
+          roughness: isCustomBackdrop ? 0.35 : 0.92,
+          metalness: 0.0,
+          color: new THREE.Color(0xffffff),
+          transparent: false,
+          opacity: 1.0,
         });
 
         if (bayCustomUrl) {
@@ -850,9 +840,24 @@ export function ExhibitionWallBlock({
             bayCustomUrl,
             (loadedTex) => {
               loadedTex.colorSpace = THREE.SRGBColorSpace;
-              loadedTex.wrapS = THREE.ClampToEdgeWrapping;
-              loadedTex.wrapT = THREE.ClampToEdgeWrapping;
+              const img = loadedTex.image;
+              if (img && img.naturalWidth && img.naturalHeight) {
+                const texAspect = img.naturalWidth / img.naturalHeight;
+                const planeAspect = bayWidth / 12;
+                if (planeAspect > texAspect) {
+                  loadedTex.repeat.set(1, texAspect / planeAspect);
+                  loadedTex.offset.set(0, (1 - texAspect / planeAspect) / 2);
+                } else {
+                  loadedTex.repeat.set(planeAspect / texAspect, 1);
+                  loadedTex.offset.set((1 - planeAspect / texAspect) / 2, 0);
+                }
+              }
               bayMat.map = loadedTex;
+              bayMat.bumpMap = null;
+              bayMat.roughness = 0.35;
+              bayMat.metalness = 0.0;
+              bayMat.transparent = false;
+              bayMat.opacity = 1.0;
               bayMat.needsUpdate = true;
             },
             undefined,
@@ -881,6 +886,7 @@ export function ExhibitionWallBlock({
     crownMesh.position.set(corridorCenterX, 5.8, 0.1);
     crownMesh.castShadow = true;
     crownMesh.receiveShadow = true;
+    crownMesh.visible = !isCustomBackdrop;
     scene.add(crownMesh);
 
     // 3D Architectural Baseboard / Skirting along Floor Line
@@ -894,6 +900,7 @@ export function ExhibitionWallBlock({
     skirtingMesh.position.set(corridorCenterX, 0.17, 0.06);
     skirtingMesh.castShadow = true;
     skirtingMesh.receiveShadow = true;
+    skirtingMesh.visible = !isCustomBackdrop;
     scene.add(skirtingMesh);
 
     // Architectural Divider Pilasters framing every Wall Bay symmetrically
@@ -913,19 +920,26 @@ export function ExhibitionWallBlock({
       pilasterPositions.push(w * wallSpacing - wallSpacing / 2);
     }
 
+    const pilasterMeshes: THREE.Mesh[] = [];
+    const capMeshes: THREE.Mesh[] = [];
+
     pilasterPositions.forEach((dividerX) => {
       const pilasterGeo = new THREE.BoxGeometry(0.38, 5.8, 0.18);
       const pilasterMesh = new THREE.Mesh(pilasterGeo, pilasterMat);
       pilasterMesh.position.set(dividerX, 2.9, 0.09);
       pilasterMesh.castShadow = true;
       pilasterMesh.receiveShadow = true;
+      pilasterMesh.visible = !isCustomBackdrop;
       scene.add(pilasterMesh);
+      pilasterMeshes.push(pilasterMesh);
 
       // Gilded accent fillet capital
       const capGeo = new THREE.BoxGeometry(0.5, 0.12, 0.22);
       const capMesh = new THREE.Mesh(capGeo, capMat);
       capMesh.position.set(dividerX, 5.75, 0.11);
+      capMesh.visible = !isCustomBackdrop;
       scene.add(capMesh);
+      capMeshes.push(capMesh);
     });
 
     // Hardwood / Stone Floor Plane spanning corridor
@@ -961,10 +975,12 @@ export function ExhibitionWallBlock({
     floorMesh.rotation.x = -Math.PI / 2;
     floorMesh.position.set(corridorCenterX, 0, 10);
     floorMesh.receiveShadow = true;
+    floorMesh.visible = !isCustomBackdrop;
     scene.add(floorMesh);
 
     // Procedural Architectural 3D Decor Objects per Environment (Positioned strictly in visitor foreground z=6.2m or outer flanks)
     const decorGroup = new THREE.Group();
+    decorGroup.visible = !isCustomBackdrop;
     if (env.decorType === "minimalist-bench") {
       // Modern Minimalist gallery benches (low visitor seat height 0.32m, pushed to foreground z = 6.2)
       for (let w = 0; w < numWalls; w++) {
@@ -1353,6 +1369,11 @@ export function ExhibitionWallBlock({
       wallMesh: wallMeshes[0],
       wallMeshes,
       decorGroup,
+      floorMesh,
+      crownMesh,
+      skirtingMesh,
+      pilasterMeshes,
+      capMeshes,
       animationId: 0,
       clock,
       raycaster,
@@ -1395,7 +1416,7 @@ export function ExhibitionWallBlock({
 
       // Keep foreground room decor visible during overview wall shots; hide during focus so it never occludes artworks
       if (state.decorGroup) {
-        state.decorGroup.visible = isStepOverview;
+        state.decorGroup.visible = !isCustomBackdrop && isStepOverview;
       }
 
       state.artworkMeshes.forEach((art) => {
@@ -1457,21 +1478,38 @@ export function ExhibitionWallBlock({
   React.useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
+
+    if (state.floorMesh) state.floorMesh.visible = !isCustomBackdrop;
+    if (state.crownMesh) state.crownMesh.visible = !isCustomBackdrop;
+    if (state.skirtingMesh) state.skirtingMesh.visible = !isCustomBackdrop;
+    state.pilasterMeshes?.forEach((p) => (p.visible = !isCustomBackdrop));
+    state.capMeshes?.forEach((c) => (c.visible = !isCustomBackdrop));
+    if (state.decorGroup && isCustomBackdrop) state.decorGroup.visible = false;
+
     if (isCustomBackdrop) {
       state.scene.background = null;
+      state.scene.fog = null;
       state.renderer.setClearColor(0x000000, 0);
+      state.ambientLight.color.set(0xffffff);
+      state.ambientLight.intensity = 1.0;
+      state.spotlight.color.set(0xffffff);
+      state.spotlight.intensity = 7.0;
+      state.artSpotlights.forEach((s) => {
+        s.color.set(0xffffff);
+        s.intensity = 3.5;
+      });
     } else {
       state.scene.background = new THREE.Color(env.wallBgColor);
       state.scene.fog = new THREE.FogExp2(new THREE.Color(env.wallBgColor), 0.032);
+      state.ambientLight.color.set(env.lightingColor);
+      state.ambientLight.intensity = 0.85;
+      state.spotlight.color.set(env.lightingColor);
+      state.spotlight.intensity = env.spotlightIntensity * 12;
+      state.artSpotlights.forEach((s) => {
+        s.color.set(env.lightingColor);
+        s.intensity = env.spotlightIntensity * 6;
+      });
     }
-    state.ambientLight.color.set(env.lightingColor);
-    state.ambientLight.intensity = 0.85;
-    state.spotlight.color.set(env.lightingColor);
-    state.spotlight.intensity = env.spotlightIntensity * 12;
-    state.artSpotlights.forEach((s) => {
-      s.color.set(env.lightingColor);
-      s.intensity = env.spotlightIntensity * 6;
-    });
   }, [env, isCustomBackdrop]);
 
   // Camera Target Position Calculator based on Tour Mode and Selected Artwork/Wall
@@ -1628,20 +1666,6 @@ export function ExhibitionWallBlock({
     <div className={cn("w-full flex flex-col", className)}>
       <div
         ref={containerRef}
-        style={(() => {
-          const currentWallCustomUrl = isPerWall
-            ? (wallCustomBackgrounds?.[activeWallIndex] || activeCustomWallUrl)
-            : (activeCustomWallUrl || wallCustomBackgrounds?.[0]);
-          if (currentWallCustomUrl && isCustomBackdrop) {
-            return {
-              backgroundImage: `url("${currentWallCustomUrl}")`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            };
-          }
-          return undefined;
-        })()}
         className={cn(
           "relative w-full rounded-2xl overflow-hidden border border-border/60 bg-stone-950 select-none shadow-2xl transition-all duration-300",
           isFullscreen ? "fixed inset-0 z-50 rounded-none border-none h-screen w-screen" : "h-[540px] sm:h-[640px]"

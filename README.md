@@ -125,7 +125,7 @@ SavazAI WebApps Platform
    - Cinematic damped camera transitions using `THREE.MathUtils.damp` for position and target `lookAt`, establishing an initial wide salon shot at `(0, 1.85, 9.4)` looking at `(0, 1.55, 0)` and executing smooth panoramic sweeps across adjacent gallery walls.
    - 7 Procedural architectural environments (Modern Minimalist, Imperial Palace, Indian Atelier, Residential Salon, Heritage Villa, Corporate Gallery, Custom).
    - Multi-wall corridor partitioning (`maxArtworksPerWall`) automatically dividing collections across navigable gallery walls.
-   - **Multi-Wall Custom Image Backdrops**: Upload and assign custom backdrop images either uniformly across the entire salon corridor or uniquely per wall bay (`Wall 1`, `Wall 2`, ... `Wall N`) with high-resolution texture mapping, sRGB color fidelity, and coordinated lighting.
+   - **Multi-Wall Custom Image Backdrops & Pure Backdrop Mode**: Upload and assign custom backdrop images either uniformly across the entire salon corridor or uniquely per wall bay (`Wall 1`, `Wall 2`, ... `Wall N`) with high-resolution texture mapping, sRGB color fidelity, and pure backdrop rendering that suppresses procedural 3D floors, mouldings, pilasters, and decor while engaging neutral white lighting for 100% true-color presentation.
    - **Universal Media Gallery Canvas Backgrounds**: Custom image backgrounds for all display modes (Carousel, Snap Scroll, Curated Bento, Ken Burns, Soft Crossfade, Filmstrip Reel) with configurable scaling (`cover`, `contain`, `tile`, `blur`) and opacity controls.
    - Mobile-responsive layout cleanly hiding on-wall placards on mobile (`< 768px`) with floating provenance drawer rendered beneath the canvas.
 3. **Archival Fine Art Gallery & High-Res Inspection**:

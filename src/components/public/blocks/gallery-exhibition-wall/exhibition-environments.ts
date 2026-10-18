@@ -139,7 +139,7 @@ export const WALL_ENVIRONMENTS: WallEnvironment[] = [
     wallGradient: "radial-gradient(ellipse 65% 50% at 50% 20%, rgba(255, 248, 230, 0.14) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 85%)",
     floorBgColor: "#110E0C",
     floorGradient: "linear-gradient(180deg, #1C1814 0%, #0A0807 100%)",
-    lightingColor: "#FFE7B8",
+    lightingColor: "#FFFFFF",
     spotlightIntensity: 1.0,
     frameStyleDefault: "white-cube",
     mouldingColor: "#2A2420",
