@@ -22,6 +22,50 @@ import { cn, stripHtmlTags } from "@/lib/utils";
 export type CameraTourStyle = "overview" | "drone" | "walkthrough" | "inspection";
 export type WallLayoutMatrix = "salon" | "linear" | "grid";
 
+export type WallArtworkLayoutType =
+  | "auto"
+  | "auto-balanced"
+  | "single"
+  | "single-centered"
+  | "single-left"
+  | "single-right"
+  | "horizontal-2"
+  | "vertical-2"
+  | "horizontal-3"
+  | "vertical-3"
+  | "pyramid-1-2"
+  | "pyramid-2-1"
+  | "inverted-pyramid-2-1"
+  | "grid-2x2"
+  | "horizontal-4"
+  | "stack-1-3"
+  | "stack-3-1"
+  | "pyramid-1-3"
+  | "pyramid-3-1"
+  | "salon-4"
+  | "centerpiece-flanked"
+  | "centerpiece-flanked-5"
+  | "grid-2-3"
+  | "grid-3-2"
+  | "staggered-2-3"
+  | "staggered-3-2"
+  | "horizontal-5"
+  | "grid-3x2"
+  | "grid-2x3"
+  | "horizontal-6";
+
+export interface ExhibitionWallConfig {
+  id?: string;
+  wallIndex?: number;
+  name?: string;
+  layoutType?: WallArtworkLayoutType;
+  artworkIds?: string[];
+  offsetX?: number;
+  offsetY?: number;
+  spacingMultiplier?: number;
+  customBackgroundUrl?: string;
+}
+
 export interface ExhibitionWallBlockProps {
   items: MediaGalleryItem[];
   environmentId?: string;
@@ -40,6 +84,7 @@ export interface ExhibitionWallBlockProps {
   showExhibitionBadge?: boolean;
   maxArtworksPerWall?: number;
   showMetadataCardBelowWall?: boolean;
+  wallConfigs?: ExhibitionWallConfig[];
   className?: string;
 }
 
@@ -99,312 +144,462 @@ function calculateFrameSize(aspectRatio: number, maxDim = 1.7): { width: number;
   }
 }
 
+export const WALL_SPACING = 20.0;
+
 /**
  * Computes architectural multi-wall corridor coordinates replicating the
  * Classical Fine Art / Salon Wall Architecture.
- * Partitions items across sequential walls (wallSpacing = 14.0).
+ * Supports custom per-wall layouts, offsets, and spacing multipliers.
  */
 function computePlacements(
   items: MediaGalleryItem[],
   layout: WallLayoutMatrix = "salon",
-  maxPerWall = 4
+  maxPerWall = 4,
+  wallConfigs?: ExhibitionWallConfig[],
+  wallSpacing = WALL_SPACING
 ): ArtworkPlacement[] {
   if (items.length === 0) return [];
 
-  const wallSpacing = 14.0;
-  const safeMax = Math.max(1, Math.min(8, maxPerWall));
-  const numWalls = Math.ceil(items.length / safeMax);
   const placements: ArtworkPlacement[] = [];
+  const safeMax = Math.max(1, Math.min(8, maxPerWall));
+  const hasConfigs = Boolean(wallConfigs && wallConfigs.length > 0);
+  const numWalls = hasConfigs ? wallConfigs!.length : Math.ceil(items.length / safeMax);
 
   for (let w = 0; w < numWalls; w++) {
-    const wallItems = items.slice(w * safeMax, (w + 1) * safeMax);
-    const wallCenterX = w * wallSpacing;
-    const count = wallItems.length;
-    const minGap = 0.85; // Guaranteed minimum clearance between outer frame edges (0.85m)
+    const cfg = hasConfigs ? wallConfigs![w] : undefined;
+    let wallItems: MediaGalleryItem[] = [];
 
-    if (layout === "linear") {
-      const frameSizes = wallItems.map((item) => {
-        const ar = parseArtworkAspectRatio(item);
-        const maxDim = count === 1 ? 2.0 : count <= 3 ? 1.6 : 1.35;
-        return calculateFrameSize(ar, maxDim);
-      });
-
-      const sumWidths = frameSizes.reduce((acc, s) => acc + s.width, 0);
-      const idealWallSpan = 11.0;
-      const calculatedGap =
-        count > 1
-          ? Math.max(minGap, Math.min(1.4, (idealWallSpan - sumWidths) / (count - 1)))
-          : 0;
-      const totalWallWidth = sumWidths + (count - 1) * calculatedGap;
-      let currentLeft = wallCenterX - totalWallWidth / 2;
-
-      wallItems.forEach((item, localIdx) => {
-        const globalIdx = w * safeMax + localIdx;
-        const { width, height } = frameSizes[localIdx];
-        const xPos = currentLeft + width / 2;
-        currentLeft += width + calculatedGap;
-
-        // Eye-level center line at 1.55m
-        const yPos = 1.55;
-
-        placements.push({
-          item,
-          x: xPos,
-          y: yPos,
-          width,
-          height,
-          wallIndex: w,
-          wallCenterX,
-          frameType: globalIdx % 2 === 0 ? "gold-teak" : "light-oak",
-          index: globalIdx,
-        });
-      });
-    } else if (layout === "grid") {
-      const cols = Math.min(count, count > 4 ? 3 : 2);
-      const minColGap = cols === 2 ? 1.50 : 1.10;
-      const VERTICAL_GAP = 0.28;
-      const EYE_LEVEL_Y = 1.55;
-
-      const frameSizes = wallItems.map((item) => {
-        const ar = parseArtworkAspectRatio(item);
-        const maxDim = count <= 2 ? 1.6 : 1.15;
-        return calculateFrameSize(ar, maxDim);
-      });
-
-      // Compute max width per column
-      const colWidths: number[] = Array(cols).fill(0);
-      frameSizes.forEach((size, idx) => {
-        const col = idx % cols;
-        colWidths[col] = Math.max(colWidths[col], size.width);
-      });
-
-      const sumColWidths = colWidths.reduce((a, b) => a + b, 0);
-      const totalGridWidth = sumColWidths + (cols - 1) * minColGap;
-
-      // Calculate column centers
-      const colCenters: number[] = [];
-      let currentX = wallCenterX - totalGridWidth / 2;
-      for (let c = 0; c < cols; c++) {
-        colCenters.push(currentX + colWidths[c] / 2);
-        currentX += colWidths[c] + minColGap;
-      }
-
-      const totalRows = Math.ceil(count / cols);
-
-      // Pre-calculate dynamic Y position per column to guarantee no vertical overlap
-      const colYPositions: { [col: number]: { [row: number]: number } } = {};
-      for (let c = 0; c < cols; c++) {
-        colYPositions[c] = {};
-        const topIdx = c;
-        const btmIdx = c + cols;
-        if (totalRows === 1 || btmIdx >= count) {
-          colYPositions[c][0] = EYE_LEVEL_Y;
-        } else {
-          const hTop = frameSizes[topIdx].height;
-          const hBtm = frameSizes[btmIdx].height;
-          const centerDist = hTop / 2 + VERTICAL_GAP + hBtm / 2;
-          colYPositions[c][0] = EYE_LEVEL_Y + centerDist / 2;
-          colYPositions[c][1] = EYE_LEVEL_Y - centerDist / 2;
-        }
-      }
-
-      wallItems.forEach((item, localIdx) => {
-        const globalIdx = w * safeMax + localIdx;
-        const col = localIdx % cols;
-        const row = Math.floor(localIdx / cols);
-        const { width, height } = frameSizes[localIdx];
-        const yPos = colYPositions[col]?.[row] ?? EYE_LEVEL_Y;
-
-        placements.push({
-          item,
-          x: colCenters[col],
-          y: yPos,
-          width,
-          height,
-          wallIndex: w,
-          wallCenterX,
-          frameType:
-            globalIdx % 3 === 0
-              ? "gold-teak"
-              : globalIdx % 3 === 1
-              ? "rosewood-ivory"
-              : "light-oak",
-          index: globalIdx,
-        });
-      });
-    } else {
-      // "salon" layout per wall with dynamic vertical clearance & generous horizontal separation
-      const VERTICAL_GAP = 0.28;
-      const EYE_LEVEL_Y = 1.55;
-
-      const frameSizes = wallItems.map((item) => {
-        const ar = parseArtworkAspectRatio(item);
-        // Multi-row layouts (count >= 4) use maxDim 1.15m so stacked artworks fit cleanly within wall height
-        const maxDim = count === 1 ? 2.0 : count <= 3 ? 1.65 : 1.15;
-        return calculateFrameSize(ar, maxDim);
-      });
-
-      // Helper for calculating non-overlapping vertical positions for a stacked column pair
-      const getStackedY = (topIdx: number, btmIdx: number) => {
-        const hTop = frameSizes[topIdx]?.height || 1.15;
-        const hBtm = frameSizes[btmIdx]?.height || 1.15;
-        const centerDist = hTop / 2 + VERTICAL_GAP + hBtm / 2;
-        return {
-          yTop: EYE_LEVEL_Y + centerDist / 2,
-          yBtm: EYE_LEVEL_Y - centerDist / 2,
-        };
-      };
-
-      let localSlots: {
-        x: number;
-        y: number;
-        frame: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
-      }[] = [];
-
-      if (count === 1) {
-        localSlots = [{ x: 0, y: EYE_LEVEL_Y, frame: "gold-teak" }];
-      } else if (count === 2) {
-        const w0 = frameSizes[0].width;
-        const w1 = frameSizes[1].width;
-        const colGap = 1.40;
-        const totalSpan = w0 + colGap + w1;
-        localSlots = [
-          { x: -totalSpan / 2 + w0 / 2, y: EYE_LEVEL_Y, frame: "gold-teak" },
-          { x: totalSpan / 2 - w1 / 2, y: EYE_LEVEL_Y, frame: "rosewood-ivory" },
-        ];
-      } else if (count === 3) {
-        const w0 = frameSizes[0].width;
-        const w1 = frameSizes[1].width;
-        const w2 = frameSizes[2].width;
-        const colGap = 1.20;
-        localSlots = [
-          { x: -(w1 / 2 + colGap + w0 / 2), y: EYE_LEVEL_Y, frame: "rosewood-ivory" },
-          { x: 0, y: EYE_LEVEL_Y + 0.03, frame: "gold-teak" },
-          { x: +(w1 / 2 + colGap + w2 / 2), y: EYE_LEVEL_Y, frame: "light-oak" },
-        ];
-      } else if (count === 4) {
-        // 2 columns, 2 rows each: (0 top, 1 bottom) and (2 top, 3 bottom)
-        const leftColW = Math.max(frameSizes[0].width, frameSizes[1].width);
-        const rightColW = Math.max(frameSizes[2].width, frameSizes[3].width);
-        const colGap = 1.50; // Generous 1.5m horizontal separation across 14m wall bay
-        const totalSpan = leftColW + colGap + rightColW;
-        const leftColX = -totalSpan / 2 + leftColW / 2;
-        const rightColX = totalSpan / 2 - rightColW / 2;
-
-        const leftY = getStackedY(0, 1);
-        const rightY = getStackedY(2, 3);
-
-        localSlots = [
-          { x: leftColX, y: leftY.yTop, frame: "light-oak" },
-          { x: leftColX, y: leftY.yBtm, frame: "rosewood-ivory" },
-          { x: rightColX, y: rightY.yTop, frame: "gold-teak" },
-          { x: rightColX, y: rightY.yBtm, frame: "white-float" },
-        ];
-      } else if (count === 5) {
-        // Centerpiece at eye-level flanked by 2 stacked columns (1 top, 2 btm) and (3 top, 4 btm)
-        const centerW = frameSizes[0].width;
-        const leftColW = Math.max(frameSizes[1].width, frameSizes[2].width);
-        const rightColW = Math.max(frameSizes[3].width, frameSizes[4].width);
-        const sideGap = 1.35;
-        const leftColX = -(centerW / 2 + sideGap + leftColW / 2);
-        const rightColX = +(centerW / 2 + sideGap + rightColW / 2);
-
-        const leftY = getStackedY(1, 2);
-        const rightY = getStackedY(3, 4);
-
-        localSlots = [
-          { x: 0, y: EYE_LEVEL_Y, frame: "gold-teak" },
-          { x: leftColX, y: leftY.yTop, frame: "light-oak" },
-          { x: leftColX, y: leftY.yBtm, frame: "rosewood-ivory" },
-          { x: rightColX, y: rightY.yTop, frame: "light-oak" },
-          { x: rightColX, y: rightY.yBtm, frame: "rosewood-ivory" },
-        ];
-      } else if (count === 6) {
-        // 3 columns of 2 rows each: (0, 1), (2, 3), (4, 5)
-        const col0W = Math.max(frameSizes[0].width, frameSizes[1].width);
-        const col1W = Math.max(frameSizes[2].width, frameSizes[3].width);
-        const col2W = Math.max(frameSizes[4].width, frameSizes[5].width);
-        const colGap = 1.20;
-        const totalSpan = col0W + colGap + col1W + colGap + col2W;
-        const col0X = -totalSpan / 2 + col0W / 2;
-        const col1X = 0;
-        const col2X = totalSpan / 2 - col2W / 2;
-
-        const yCol0 = getStackedY(0, 1);
-        const yCol1 = getStackedY(2, 3);
-        const yCol2 = getStackedY(4, 5);
-
-        localSlots = [
-          { x: col0X, y: yCol0.yTop, frame: "rosewood-ivory" },
-          { x: col0X, y: yCol0.yBtm, frame: "light-oak" },
-          { x: col1X, y: yCol1.yTop, frame: "gold-teak" },
-          { x: col1X, y: yCol1.yBtm, frame: "rosewood-ivory" },
-          { x: col2X, y: yCol2.yTop, frame: "light-oak" },
-          { x: col2X, y: yCol2.yBtm, frame: "gold-teak" },
-        ];
-      } else {
-        // 4 columns of up to 2 rows each (count = 7 or 8)
-        const colWidths = [
-          Math.max(frameSizes[0].width, frameSizes[1]?.width || 1.15),
-          Math.max(frameSizes[2]?.width || 1.15, frameSizes[3]?.width || 1.15),
-          Math.max(frameSizes[4]?.width || 1.15, frameSizes[5]?.width || 1.15),
-          Math.max(frameSizes[6]?.width || 1.15, frameSizes[7]?.width || 1.15),
-        ];
-        const colGap = 0.95;
-        const totalSpan = colWidths.reduce((a, b) => a + b, 0) + 3 * colGap;
-        let cur = -totalSpan / 2;
-        const centers = colWidths.map((cw) => {
-          const c = cur + cw / 2;
-          cur += cw + colGap;
-          return c;
-        });
-
-        const getColSlots = (
-          colIdx: number,
-          topItemIdx: number,
-          btmItemIdx: number,
-          fTop: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float",
-          fBtm: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float"
-        ) => {
-          if (btmItemIdx >= count) {
-            return [{ x: centers[colIdx], y: EYE_LEVEL_Y, frame: fTop }];
-          }
-          const y = getStackedY(topItemIdx, btmItemIdx);
-          return [
-            { x: centers[colIdx], y: y.yTop, frame: fTop },
-            { x: centers[colIdx], y: y.yBtm, frame: fBtm },
-          ];
-        };
-
-        localSlots = [
-          ...getColSlots(0, 0, 1, "gold-teak", "rosewood-ivory"),
-          ...getColSlots(1, 2, 3, "light-oak", "gold-teak"),
-          ...getColSlots(2, 4, 5, "rosewood-ivory", "light-oak"),
-          ...getColSlots(3, 6, 7, "white-float", "gold-teak"),
-        ];
-      }
-
-      wallItems.forEach((item, localIdx) => {
-        const slot = localSlots[localIdx] || {
-          x: -3.0 + localIdx * 1.5,
-          y: 1.55,
-          frame: "gold-teak" as const,
-        };
-        const globalIdx = w * safeMax + localIdx;
-        const { width, height } = frameSizes[localIdx];
-        placements.push({
-          item,
-          x: wallCenterX + slot.x,
-          y: slot.y,
-          width,
-          height,
-          wallIndex: w,
-          wallCenterX,
-          frameType: slot.frame,
-          index: globalIdx,
-        });
+    if (cfg?.artworkIds && cfg.artworkIds.length > 0) {
+      cfg.artworkIds.forEach((targetId) => {
+        const found = items.find(
+          (it) =>
+            it.id === targetId ||
+            it.artworkId === targetId ||
+            it.artwork?.id === targetId ||
+            it.artwork?.slug === targetId ||
+            it.url === targetId
+        );
+        if (found) wallItems.push(found);
       });
     }
+
+    // Fallback to sequential slicing if no custom artwork IDs matched
+    if (wallItems.length === 0) {
+      wallItems = items.slice(w * safeMax, (w + 1) * safeMax);
+    }
+
+    const wallCenterX = w * wallSpacing;
+    const count = wallItems.length;
+    if (count === 0) continue;
+
+    const offsetX = cfg?.offsetX ?? 0;
+    const offsetY = cfg?.offsetY ?? 0;
+    const spacingMult = Math.max(0.4, Math.min(2.5, cfg?.spacingMultiplier ?? 1.0));
+    const rawLayout = cfg?.layoutType || "auto";
+
+    // Resolve layout type
+    let resolvedLayout: WallArtworkLayoutType = rawLayout;
+    if (resolvedLayout === "auto") {
+      if (layout === "linear") {
+        if (count <= 1) resolvedLayout = "single";
+        else if (count === 2) resolvedLayout = "horizontal-2";
+        else if (count === 3) resolvedLayout = "horizontal-3";
+        else if (count === 4) resolvedLayout = "horizontal-4";
+        else if (count === 5) resolvedLayout = "horizontal-5";
+        else resolvedLayout = "horizontal-6";
+      } else if (layout === "grid") {
+        if (count <= 1) resolvedLayout = "single";
+        else if (count === 2) resolvedLayout = "horizontal-2";
+        else if (count === 3) resolvedLayout = "pyramid-1-2";
+        else if (count === 4) resolvedLayout = "grid-2x2";
+        else if (count === 5) resolvedLayout = "grid-2-3";
+        else resolvedLayout = "grid-3x2";
+      } else {
+        // "salon"
+        if (count <= 1) resolvedLayout = "single";
+        else if (count === 2) resolvedLayout = "horizontal-2";
+        else if (count === 3) resolvedLayout = "pyramid-1-2";
+        else if (count === 4) resolvedLayout = "grid-2x2";
+        else if (count === 5) resolvedLayout = "centerpiece-flanked";
+        else resolvedLayout = "grid-3x2";
+      }
+    }
+
+    const VERTICAL_GAP = 0.28 * spacingMult;
+    const EYE_LEVEL_Y = 1.55;
+
+    // Tailor max dimension to layout
+    let maxDim = 1.35;
+    if (resolvedLayout === "single" || count === 1) maxDim = 2.0;
+    else if (resolvedLayout === "vertical-3") maxDim = 0.95;
+    else if (
+      resolvedLayout === "horizontal-4" ||
+      resolvedLayout === "stack-1-3" ||
+      resolvedLayout === "stack-3-1" ||
+      resolvedLayout === "grid-2x2" ||
+      resolvedLayout === "salon-4"
+    )
+      maxDim = 1.15;
+    else if (
+      resolvedLayout === "horizontal-5" ||
+      resolvedLayout === "grid-2-3" ||
+      resolvedLayout === "grid-3-2" ||
+      resolvedLayout === "centerpiece-flanked"
+    )
+      maxDim = 1.10;
+    else if (
+      resolvedLayout === "horizontal-6" ||
+      resolvedLayout === "grid-3x2" ||
+      resolvedLayout === "grid-2x3"
+    )
+      maxDim = 0.95;
+    else if (count <= 3) maxDim = 1.55;
+    else maxDim = 1.15;
+
+    const frameSizes = wallItems.map((item) => {
+      const ar = parseArtworkAspectRatio(item);
+      return calculateFrameSize(ar, maxDim);
+    });
+
+    // Helper for 2 stacked artworks with guaranteed vertical clearance
+    const getStackedY = (topIdx: number, btmIdx: number) => {
+      const hTop = frameSizes[topIdx]?.height || 1.15;
+      const hBtm = frameSizes[btmIdx]?.height || 1.15;
+      const centerDist = hTop / 2 + VERTICAL_GAP + hBtm / 2;
+      return {
+        yTop: EYE_LEVEL_Y + centerDist / 2,
+        yBtm: EYE_LEVEL_Y - centerDist / 2,
+      };
+    };
+
+    let localSlots: {
+      x: number;
+      y: number;
+      frame: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
+    }[] = [];
+
+    if (resolvedLayout === "single" || count === 1) {
+      localSlots = [{ x: 0, y: EYE_LEVEL_Y, frame: "gold-teak" }];
+    } else if (resolvedLayout === "horizontal-2") {
+      const w0 = frameSizes[0].width;
+      const w1 = frameSizes[1]?.width || 1.2;
+      const colGap = 1.50 * spacingMult;
+      const totalSpan = w0 + colGap + w1;
+      localSlots = [
+        { x: -totalSpan / 2 + w0 / 2, y: EYE_LEVEL_Y, frame: "gold-teak" },
+        { x: totalSpan / 2 - w1 / 2, y: EYE_LEVEL_Y, frame: "rosewood-ivory" },
+      ];
+    } else if (resolvedLayout === "vertical-2") {
+      const y = getStackedY(0, 1);
+      localSlots = [
+        { x: 0, y: y.yTop, frame: "gold-teak" },
+        { x: 0, y: y.yBtm, frame: "rosewood-ivory" },
+      ];
+    } else if (resolvedLayout === "horizontal-3") {
+      const w0 = frameSizes[0].width;
+      const w1 = frameSizes[1]?.width || 1.2;
+      const w2 = frameSizes[2]?.width || 1.2;
+      const colGap = 1.25 * spacingMult;
+      const totalSpan = w0 + w1 + w2 + 2 * colGap;
+      localSlots = [
+        { x: -totalSpan / 2 + w0 / 2, y: EYE_LEVEL_Y, frame: "rosewood-ivory" },
+        { x: 0, y: EYE_LEVEL_Y + 0.03, frame: "gold-teak" },
+        { x: totalSpan / 2 - w2 / 2, y: EYE_LEVEL_Y, frame: "light-oak" },
+      ];
+    } else if (resolvedLayout === "vertical-3") {
+      const h0 = frameSizes[0].height;
+      const h1 = frameSizes[1]?.height || 1.0;
+      const h2 = frameSizes[2]?.height || 1.0;
+      const vGap = 0.20 * spacingMult;
+      localSlots = [
+        { x: 0, y: EYE_LEVEL_Y + h1 / 2 + vGap + h0 / 2, frame: "gold-teak" },
+        { x: 0, y: EYE_LEVEL_Y, frame: "rosewood-ivory" },
+        { x: 0, y: EYE_LEVEL_Y - (h1 / 2 + vGap + h2 / 2), frame: "light-oak" },
+      ];
+    } else if (resolvedLayout === "pyramid-1-2") {
+      const w1 = frameSizes[1]?.width || 1.1;
+      const w2 = frameSizes[2]?.width || 1.1;
+      const colGap = 1.40 * spacingMult;
+      const btmSpan = w1 + colGap + w2;
+      const hBtmMax = Math.max(frameSizes[1]?.height || 1.1, frameSizes[2]?.height || 1.1);
+      const h0 = frameSizes[0].height;
+      const centerDist = h0 / 2 + VERTICAL_GAP + hBtmMax / 2;
+      localSlots = [
+        { x: 0, y: EYE_LEVEL_Y + centerDist / 2, frame: "gold-teak" },
+        { x: -btmSpan / 2 + w1 / 2, y: EYE_LEVEL_Y - centerDist / 2, frame: "rosewood-ivory" },
+        { x: btmSpan / 2 - w2 / 2, y: EYE_LEVEL_Y - centerDist / 2, frame: "light-oak" },
+      ];
+    } else if (resolvedLayout === "pyramid-2-1") {
+      const w0 = frameSizes[0]?.width || 1.1;
+      const w1 = frameSizes[1]?.width || 1.1;
+      const colGap = 1.40 * spacingMult;
+      const topSpan = w0 + colGap + w1;
+      const hTopMax = Math.max(frameSizes[0]?.height || 1.1, frameSizes[1]?.height || 1.1);
+      const h2 = frameSizes[2]?.height || 1.1;
+      const centerDist = hTopMax / 2 + VERTICAL_GAP + h2 / 2;
+      localSlots = [
+        { x: -topSpan / 2 + w0 / 2, y: EYE_LEVEL_Y + centerDist / 2, frame: "rosewood-ivory" },
+        { x: topSpan / 2 - w1 / 2, y: EYE_LEVEL_Y + centerDist / 2, frame: "light-oak" },
+        { x: 0, y: EYE_LEVEL_Y - centerDist / 2, frame: "gold-teak" },
+      ];
+    } else if (resolvedLayout === "grid-2x2" || resolvedLayout === "salon-4") {
+      const leftColW = Math.max(frameSizes[0].width, frameSizes[1]?.width || 1.1);
+      const rightColW = Math.max(frameSizes[2]?.width || 1.1, frameSizes[3]?.width || 1.1);
+      const colGap = 1.50 * spacingMult;
+      const totalSpan = leftColW + colGap + rightColW;
+      const leftColX = -totalSpan / 2 + leftColW / 2;
+      const rightColX = totalSpan / 2 - rightColW / 2;
+      const leftY = getStackedY(0, 1);
+      const rightY = getStackedY(2, 3);
+      localSlots = [
+        { x: leftColX, y: leftY.yTop, frame: "light-oak" },
+        { x: leftColX, y: leftY.yBtm, frame: "rosewood-ivory" },
+        { x: rightColX, y: rightY.yTop, frame: "gold-teak" },
+        { x: rightColX, y: rightY.yBtm, frame: "white-float" },
+      ];
+    } else if (resolvedLayout === "horizontal-4") {
+      const colGap = 0.95 * spacingMult;
+      const totalSpan = frameSizes.slice(0, 4).reduce((sum, s) => sum + s.width, 0) + 3 * colGap;
+      let cur = -totalSpan / 2;
+      localSlots = frameSizes.slice(0, 4).map((s, idx) => {
+        const x = cur + s.width / 2;
+        cur += s.width + colGap;
+        return {
+          x,
+          y: EYE_LEVEL_Y,
+          frame: idx % 2 === 0 ? ("gold-teak" as const) : ("light-oak" as const),
+        };
+      });
+    } else if (resolvedLayout === "stack-1-3") {
+      const btmSizes = frameSizes.slice(1, 4);
+      const colGap = 1.05 * spacingMult;
+      const btmSpan = btmSizes.reduce((sum, s) => sum + s.width, 0) + (btmSizes.length - 1) * colGap;
+      const hBtmMax = Math.max(...btmSizes.map((s) => s.height));
+      const h0 = frameSizes[0].height;
+      const centerDist = h0 / 2 + VERTICAL_GAP + hBtmMax / 2;
+      let cur = -btmSpan / 2;
+      const btmSlots = btmSizes.map((s, idx) => {
+        const x = cur + s.width / 2;
+        cur += s.width + colGap;
+        return {
+          x,
+          y: EYE_LEVEL_Y - centerDist / 2,
+          frame: idx === 1 ? ("gold-teak" as const) : ("rosewood-ivory" as const),
+        };
+      });
+      localSlots = [
+        { x: 0, y: EYE_LEVEL_Y + centerDist / 2, frame: "gold-teak" },
+        ...btmSlots,
+      ];
+    } else if (resolvedLayout === "stack-3-1") {
+      const topSizes = frameSizes.slice(0, 3);
+      const colGap = 1.05 * spacingMult;
+      const topSpan = topSizes.reduce((sum, s) => sum + s.width, 0) + (topSizes.length - 1) * colGap;
+      const hTopMax = Math.max(...topSizes.map((s) => s.height));
+      const h3 = frameSizes[3]?.height || 1.1;
+      const centerDist = hTopMax / 2 + VERTICAL_GAP + h3 / 2;
+      let cur = -topSpan / 2;
+      const topSlots = topSizes.map((s, idx) => {
+        const x = cur + s.width / 2;
+        cur += s.width + colGap;
+        return {
+          x,
+          y: EYE_LEVEL_Y + centerDist / 2,
+          frame: idx === 1 ? ("gold-teak" as const) : ("rosewood-ivory" as const),
+        };
+      });
+      localSlots = [
+        ...topSlots,
+        { x: 0, y: EYE_LEVEL_Y - centerDist / 2, frame: "light-oak" },
+      ];
+    } else if (resolvedLayout === "centerpiece-flanked") {
+      const centerW = frameSizes[0].width;
+      const leftColW = Math.max(frameSizes[1]?.width || 1.0, frameSizes[2]?.width || 1.0);
+      const rightColW = Math.max(frameSizes[3]?.width || 1.0, frameSizes[4]?.width || 1.0);
+      const sideGap = 1.35 * spacingMult;
+      const leftColX = -(centerW / 2 + sideGap + leftColW / 2);
+      const rightColX = +(centerW / 2 + sideGap + rightColW / 2);
+      const leftY = getStackedY(1, 2);
+      const rightY = getStackedY(3, 4);
+      localSlots = [
+        { x: 0, y: EYE_LEVEL_Y, frame: "gold-teak" },
+        { x: leftColX, y: leftY.yTop, frame: "light-oak" },
+        { x: leftColX, y: leftY.yBtm, frame: "rosewood-ivory" },
+        { x: rightColX, y: rightY.yTop, frame: "light-oak" },
+        { x: rightColX, y: rightY.yBtm, frame: "rosewood-ivory" },
+      ];
+    } else if (resolvedLayout === "grid-2-3") {
+      const topSizes = frameSizes.slice(0, 2);
+      const btmSizes = frameSizes.slice(2, 5);
+      const colGap = 1.10 * spacingMult;
+      const topSpan = topSizes.reduce((sum, s) => sum + s.width, 0) + colGap;
+      const btmSpan = btmSizes.reduce((sum, s) => sum + s.width, 0) + 2 * colGap;
+      const hTopMax = Math.max(...topSizes.map((s) => s.height));
+      const hBtmMax = Math.max(...btmSizes.map((s) => s.height));
+      const centerDist = hTopMax / 2 + VERTICAL_GAP + hBtmMax / 2;
+      let curT = -topSpan / 2;
+      const topSlots = topSizes.map((s) => {
+        const x = curT + s.width / 2;
+        curT += s.width + colGap;
+        return { x, y: EYE_LEVEL_Y + centerDist / 2, frame: "light-oak" as const };
+      });
+      let curB = -btmSpan / 2;
+      const btmSlots = btmSizes.map((s) => {
+        const x = curB + s.width / 2;
+        curB += s.width + colGap;
+        return { x, y: EYE_LEVEL_Y - centerDist / 2, frame: "rosewood-ivory" as const };
+      });
+      localSlots = [...topSlots, ...btmSlots];
+    } else if (resolvedLayout === "grid-3-2") {
+      const topSizes = frameSizes.slice(0, 3);
+      const btmSizes = frameSizes.slice(3, 5);
+      const colGap = 1.10 * spacingMult;
+      const topSpan = topSizes.reduce((sum, s) => sum + s.width, 0) + 2 * colGap;
+      const btmSpan = btmSizes.reduce((sum, s) => sum + s.width, 0) + colGap;
+      const hTopMax = Math.max(...topSizes.map((s) => s.height));
+      const hBtmMax = Math.max(...btmSizes.map((s) => s.height));
+      const centerDist = hTopMax / 2 + VERTICAL_GAP + hBtmMax / 2;
+      let curT = -topSpan / 2;
+      const topSlots = topSizes.map((s) => {
+        const x = curT + s.width / 2;
+        curT += s.width + colGap;
+        return { x, y: EYE_LEVEL_Y + centerDist / 2, frame: "rosewood-ivory" as const };
+      });
+      let curB = -btmSpan / 2;
+      const btmSlots = btmSizes.map((s) => {
+        const x = curB + s.width / 2;
+        curB += s.width + colGap;
+        return { x, y: EYE_LEVEL_Y - centerDist / 2, frame: "light-oak" as const };
+      });
+      localSlots = [...topSlots, ...btmSlots];
+    } else if (resolvedLayout === "horizontal-5") {
+      const colGap = 0.85 * spacingMult;
+      const totalSpan = frameSizes.slice(0, 5).reduce((sum, s) => sum + s.width, 0) + 4 * colGap;
+      let cur = -totalSpan / 2;
+      localSlots = frameSizes.slice(0, 5).map((s, idx) => {
+        const x = cur + s.width / 2;
+        cur += s.width + colGap;
+        return { x, y: EYE_LEVEL_Y, frame: idx % 2 === 0 ? ("gold-teak" as const) : ("light-oak" as const) };
+      });
+    } else if (resolvedLayout === "grid-3x2") {
+      const col0W = Math.max(frameSizes[0]?.width || 1.0, frameSizes[1]?.width || 1.0);
+      const col1W = Math.max(frameSizes[2]?.width || 1.0, frameSizes[3]?.width || 1.0);
+      const col2W = Math.max(frameSizes[4]?.width || 1.0, frameSizes[5]?.width || 1.0);
+      const colGap = 1.20 * spacingMult;
+      const totalSpan = col0W + colGap + col1W + colGap + col2W;
+      const col0X = -totalSpan / 2 + col0W / 2;
+      const col1X = 0;
+      const col2X = totalSpan / 2 - col2W / 2;
+      const yCol0 = getStackedY(0, 1);
+      const yCol1 = getStackedY(2, 3);
+      const yCol2 = getStackedY(4, 5);
+      localSlots = [
+        { x: col0X, y: yCol0.yTop, frame: "rosewood-ivory" },
+        { x: col0X, y: yCol0.yBtm, frame: "light-oak" },
+        { x: col1X, y: yCol1.yTop, frame: "gold-teak" },
+        { x: col1X, y: yCol1.yBtm, frame: "rosewood-ivory" },
+        { x: col2X, y: yCol2.yTop, frame: "light-oak" },
+        { x: col2X, y: yCol2.yBtm, frame: "gold-teak" },
+      ];
+    } else if (resolvedLayout === "grid-2x3") {
+      const col0W = Math.max(frameSizes[0]?.width || 1.0, frameSizes[1]?.width || 1.0, frameSizes[2]?.width || 1.0);
+      const col1W = Math.max(frameSizes[3]?.width || 1.0, frameSizes[4]?.width || 1.0, frameSizes[5]?.width || 1.0);
+      const colGap = 1.60 * spacingMult;
+      const totalSpan = col0W + colGap + col1W;
+      const col0X = -totalSpan / 2 + col0W / 2;
+      const col1X = totalSpan / 2 - col1W / 2;
+      const vGap = 0.18 * spacingMult;
+      const getY3 = (i0: number, i1: number, i2: number) => {
+        const h0 = frameSizes[i0]?.height || 1.0;
+        const h1 = frameSizes[i1]?.height || 1.0;
+        const h2 = frameSizes[i2]?.height || 1.0;
+        return {
+          top: EYE_LEVEL_Y + h1 / 2 + vGap + h0 / 2,
+          mid: EYE_LEVEL_Y,
+          btm: EYE_LEVEL_Y - (h1 / 2 + vGap + h2 / 2),
+        };
+      };
+      const yL = getY3(0, 1, 2);
+      const yR = getY3(3, 4, 5);
+      localSlots = [
+        { x: col0X, y: yL.top, frame: "gold-teak" },
+        { x: col0X, y: yL.mid, frame: "rosewood-ivory" },
+        { x: col0X, y: yL.btm, frame: "light-oak" },
+        { x: col1X, y: yR.top, frame: "light-oak" },
+        { x: col1X, y: yR.mid, frame: "gold-teak" },
+        { x: col1X, y: yR.btm, frame: "rosewood-ivory" },
+      ];
+    } else if (resolvedLayout === "horizontal-6") {
+      const colGap = 0.80 * spacingMult;
+      const totalSpan = frameSizes.slice(0, 6).reduce((sum, s) => sum + s.width, 0) + 5 * colGap;
+      let cur = -totalSpan / 2;
+      localSlots = frameSizes.slice(0, 6).map((s, idx) => {
+        const x = cur + s.width / 2;
+        cur += s.width + colGap;
+        return { x, y: EYE_LEVEL_Y, frame: idx % 2 === 0 ? ("gold-teak" as const) : ("light-oak" as const) };
+      });
+    } else {
+      // 4-column multi-row grid (7+ artworks)
+      const colWidths = [
+        Math.max(frameSizes[0]?.width || 1.15, frameSizes[1]?.width || 1.15),
+        Math.max(frameSizes[2]?.width || 1.15, frameSizes[3]?.width || 1.15),
+        Math.max(frameSizes[4]?.width || 1.15, frameSizes[5]?.width || 1.15),
+        Math.max(frameSizes[6]?.width || 1.15, frameSizes[7]?.width || 1.15),
+      ];
+      const colGap = 0.95 * spacingMult;
+      const totalSpan = colWidths.reduce((a, b) => a + b, 0) + 3 * colGap;
+      let cur = -totalSpan / 2;
+      const centers = colWidths.map((cw) => {
+        const c = cur + cw / 2;
+        cur += cw + colGap;
+        return c;
+      });
+
+      const getColSlots = (
+        colIdx: number,
+        topItemIdx: number,
+        btmItemIdx: number,
+        fTop: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float",
+        fBtm: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float"
+      ) => {
+        if (btmItemIdx >= count) {
+          return [{ x: centers[colIdx], y: EYE_LEVEL_Y, frame: fTop }];
+        }
+        const y = getStackedY(topItemIdx, btmItemIdx);
+        return [
+          { x: centers[colIdx], y: y.yTop, frame: fTop },
+          { x: centers[colIdx], y: y.yBtm, frame: fBtm },
+        ];
+      };
+
+      localSlots = [
+        ...getColSlots(0, 0, 1, "gold-teak", "rosewood-ivory"),
+        ...getColSlots(1, 2, 3, "light-oak", "gold-teak"),
+        ...getColSlots(2, 4, 5, "rosewood-ivory", "light-oak"),
+        ...getColSlots(3, 6, 7, "white-float", "gold-teak"),
+      ];
+    }
+
+    wallItems.forEach((item, localIdx) => {
+      const slot = localSlots[localIdx] || {
+        x: -3.0 + localIdx * 1.5,
+        y: EYE_LEVEL_Y,
+        frame: "gold-teak" as const,
+      };
+      const globalIdx = placements.length;
+      const { width, height } = frameSizes[localIdx] || { width: 1.2, height: 1.2 };
+      placements.push({
+        item,
+        x: wallCenterX + slot.x + offsetX,
+        y: slot.y + offsetY,
+        width,
+        height,
+        wallIndex: w,
+        wallCenterX,
+        frameType: slot.frame,
+        index: globalIdx,
+      });
+    });
   }
 
   return placements;
@@ -428,6 +623,7 @@ export function ExhibitionWallBlock({
   wallEnvironments = [],
   maxArtworksPerWall = 4,
   showMetadataCardBelowWall = true,
+  wallConfigs = [],
   className = "",
 }: ExhibitionWallBlockProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -436,9 +632,11 @@ export function ExhibitionWallBlock({
   const activeEnvId = culturalEnvironment || environmentId || "modern-minimalist";
   const activeCustomWallUrl = customWallBackdropUrl || customWallUrl;
   const isPerWall = wallBackgroundMode === "per-wall" && wallCustomBackgrounds.some((u) => u && u.trim() !== "");
+  const hasWallConfigBackdrops = Boolean(wallConfigs?.some((c) => c.customBackgroundUrl && c.customBackgroundUrl.trim() !== ""));
   const isCustomBackdrop =
     Boolean(activeCustomWallUrl && activeCustomWallUrl.trim() !== "") ||
     isPerWall ||
+    hasWallConfigBackdrops ||
     activeEnvId === "custom" ||
     activeEnvId.toLowerCase().includes("custom");
 
@@ -525,11 +723,12 @@ export function ExhibitionWallBlock({
   }, [liveItems]);
 
   const placements = React.useMemo(() => {
-    return computePlacements(validItems, wallLayout, maxArtworksPerWall);
-  }, [validItems, wallLayout, maxArtworksPerWall]);
+    return computePlacements(validItems, wallLayout, maxArtworksPerWall, wallConfigs, WALL_SPACING);
+  }, [validItems, wallLayout, maxArtworksPerWall, wallConfigs]);
 
-  const safeMax = Math.max(2, Math.min(8, maxArtworksPerWall));
-  const numWalls = Math.max(1, Math.ceil(validItems.length / safeMax));
+  const safeMax = Math.max(1, Math.min(8, maxArtworksPerWall));
+  const hasConfigs = Boolean(wallConfigs && wallConfigs.length > 0);
+  const numWalls = hasConfigs ? wallConfigs!.length : Math.max(1, Math.ceil(validItems.length / safeMax));
 
   // Build sequential tour path:
   // Wall 0 Overview -> Wall 0 Artworks -> Wall 1 Overview -> Wall 1 Artworks -> ...
@@ -662,8 +861,11 @@ export function ExhibitionWallBlock({
     }
 
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    // Museum eye-level camera baseline at 1.85m height, 9.4m distance for wide salon establishing shot
-    camera.position.set(0, 1.85, 9.4);
+    const initVFovRad = (50 * Math.PI) / 180;
+    const initAspect = width / height;
+    const initialOverviewZ = Math.min(13.6 / (2 * Math.tan(initVFovRad / 2) * initAspect), 8.2);
+    // Museum eye-level camera baseline at 1.85m height, framed with zero adjacent wall bleed
+    camera.position.set(0, 1.85, initialOverviewZ);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -709,7 +911,7 @@ export function ExhibitionWallBlock({
     scene.add(spotlight.target);
 
     // Dynamic corridor dimensions based on wall partitions
-    const wallSpacing = 14.0;
+    const wallSpacing = WALL_SPACING;
     const corridorLength = Math.max(34, (numWalls - 1) * wallSpacing + 34);
     const corridorCenterX = ((numWalls - 1) * wallSpacing) / 2;
 
@@ -872,15 +1074,15 @@ export function ExhibitionWallBlock({
         const bayCenterX = w * wallSpacing;
         const isFirst = w === 0;
         const isLast = w === numWalls - 1;
-        const leftExtension = isFirst ? 14.0 : 0.0;
-        const rightExtension = isLast ? 14.0 : 0.0;
+        const leftExtension = isFirst ? wallSpacing : 0.0;
+        const rightExtension = isLast ? wallSpacing : 0.0;
         const bayWidth = wallSpacing + leftExtension + rightExtension;
         const adjustedCenterX = bayCenterX - leftExtension / 2 + rightExtension / 2;
 
         const bayGeo = new THREE.PlaneGeometry(bayWidth, 12);
-        const bayCustomUrl = isPerWall
+        const bayCustomUrl = wallConfigs?.[w]?.customBackgroundUrl || (isPerWall
           ? (wallCustomBackgrounds?.[w] || activeCustomWallUrl || env.wallTextureUrl)
-          : (activeCustomWallUrl || wallCustomBackgrounds?.[w] || env.wallTextureUrl);
+          : (activeCustomWallUrl || wallCustomBackgrounds?.[w] || env.wallTextureUrl));
 
         const bayMat = new THREE.MeshStandardMaterial({
           map: isCustomBackdrop ? null : wallTex,
@@ -889,7 +1091,7 @@ export function ExhibitionWallBlock({
           roughness: isCustomBackdrop ? 0.35 : 0.92,
           metalness: 0.0,
           color: new THREE.Color(0xffffff),
-          transparent: false,
+          transparent: isCustomBackdrop,
           opacity: 1.0,
         });
 
@@ -1495,6 +1697,21 @@ export function ExhibitionWallBlock({
         });
       });
 
+      // Modular Backdrop Mesh Dissolve: active wall bay stays solid; distant bays fade out to guarantee zero bleed
+      if (state.wallMeshes && state.wallMeshes.length > 1) {
+        state.wallMeshes.forEach((mesh, w) => {
+          const bayCenter = w * wallSpacing;
+          const distToCam = Math.abs(state.camera.position.x - bayCenter);
+          // When camera is near this wall (within 10m), bay is fully visible; beyond 14m it fades completely
+          const bayTargetOpacity = THREE.MathUtils.clamp(1 - (distToCam - 4) / 10, 0, 1);
+          if (mesh.material && !Array.isArray(mesh.material) && "opacity" in mesh.material) {
+            mesh.material.transparent = true;
+            mesh.material.opacity = THREE.MathUtils.lerp(mesh.material.opacity, bayTargetOpacity, Math.min(1, delta * 8));
+            mesh.visible = mesh.material.opacity > 0.01;
+          }
+        });
+      }
+
       state.renderer.render(state.scene, state.camera);
       state.animationId = requestAnimationFrame(animate);
     };
@@ -1530,6 +1747,7 @@ export function ExhibitionWallBlock({
     wallCustomBackgrounds,
     activeCustomWallUrl,
     isPerWall,
+    wallConfigs,
   ]);
 
   // Update Environment Lighting dynamically
@@ -1576,8 +1794,12 @@ export function ExhibitionWallBlock({
     if (!state) return;
 
     if (isOverview) {
-      const wallCenterX = activeWallIndex * 14.0;
-      state.targetCamPos.set(wallCenterX, 1.85, 9.4);
+      const wallCenterX = activeWallIndex * WALL_SPACING;
+      const vFovRad = ((state.camera.fov || 50) * Math.PI) / 180;
+      const aspect = state.camera.aspect || 1.6;
+      // Bay width is WALL_SPACING (20.0m). Bound visible width <= 13.6m to ensure 0 bleed from adjacent bays
+      const dynamicOverviewZ = Math.min(13.6 / (2 * Math.tan(vFovRad / 2) * aspect), 8.2);
+      state.targetCamPos.set(wallCenterX, 1.85, dynamicOverviewZ);
       state.targetLookAt.set(wallCenterX, 1.55, 0);
     } else if (activePlacement) {
       const frameH = activePlacement.height + 0.16;

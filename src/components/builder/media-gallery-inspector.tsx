@@ -17,6 +17,19 @@ import {
   Film,
   Palette,
   Landmark,
+  Sliders,
+  MoveHorizontal,
+  MoveVertical,
+  Maximize2,
+  LayoutGrid,
+  Columns,
+  Rows,
+  Split,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  GripVertical,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -35,6 +48,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
+import type {
+  ExhibitionWallConfig,
+  WallArtworkLayoutType,
+} from "@/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block";
 import { WALL_ENVIRONMENTS } from "@/components/public/blocks/gallery-exhibition-wall/exhibition-environments";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +68,153 @@ export function isRawFilenameOrUuid(str?: string | null): boolean {
 export function stripHtmlTags(str?: string | null): string {
   if (!str) return "";
   return str.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+}
+
+export interface LayoutPresetOption {
+  id: WallArtworkLayoutType;
+  label: string;
+  badge: string;
+  desc: string;
+}
+
+export function getLayoutPresetsForCount(count: number): LayoutPresetOption[] {
+  if (count <= 1) {
+    return [
+      { id: "single-centered", label: "Centerpiece", badge: "Center", desc: "Centered at 1.55m eye-level" },
+      { id: "single-left", label: "Flank Left", badge: "Left", desc: "Shifted 1.8m left for room furniture" },
+      { id: "single-right", label: "Flank Right", badge: "Right", desc: "Shifted 1.8m right for room decor" },
+    ];
+  }
+  if (count === 2) {
+    return [
+      { id: "horizontal-2", label: "Horizontal Line", badge: "Side by Side", desc: "2 artworks at 1.55m centerline" },
+      { id: "vertical-2", label: "Vertical Column", badge: "Stacked", desc: "2 artworks vertically stacked (0.28m clearance)" },
+    ];
+  }
+  if (count === 3) {
+    return [
+      { id: "horizontal-3", label: "Horizontal Line", badge: "1×3 Line", desc: "3 artworks in horizontal promenade" },
+      { id: "vertical-3", label: "Vertical Column", badge: "3×1 Stack", desc: "3 artworks vertically stacked centered" },
+      { id: "pyramid-1-2", label: "Pyramid", badge: "1 Top / 2 Bottom", desc: "1 crown centerpiece above 2 flanking pieces" },
+      { id: "inverted-pyramid-2-1", label: "Inverted Pyramid", badge: "2 Top / 1 Bottom", desc: "2 upper pieces above 1 centered grounding piece" },
+    ];
+  }
+  if (count === 4) {
+    return [
+      { id: "grid-2x2", label: "Balanced 2×2 Grid", badge: "Quad Grid", desc: "Balanced quad with guaranteed vertical clearance" },
+      { id: "horizontal-4", label: "Horizontal Line", badge: "1×4 Line", desc: "4 artworks across eye-level promenade" },
+      { id: "pyramid-1-3", label: "Crown + 3 Under", badge: "1 Top / 3 Bottom", desc: "1 centerpiece above 3 lower works" },
+      { id: "pyramid-3-1", label: "3 Over + Center", badge: "3 Top / 1 Bottom", desc: "3 upper works above 1 centered work" },
+      { id: "salon-4", label: "Classical Salon Quad", badge: "Salon", desc: "Asymmetric classical heights (1.85m / 1.25m)" },
+    ];
+  }
+  if (count === 5) {
+    return [
+      { id: "centerpiece-flanked-5", label: "Centerpiece + 2 Flanking", badge: "1 Center / 4 Flank", desc: "1 dominant center flanked by 2 stacked pairs" },
+      { id: "staggered-2-3", label: "2 Over, 3 Under", badge: "2 Top / 3 Bottom", desc: "2 upper artworks over 3 lower artworks" },
+      { id: "staggered-3-2", label: "3 Over, 2 Under", badge: "3 Top / 2 Bottom", desc: "3 upper artworks over 2 lower artworks" },
+      { id: "horizontal-5", label: "Horizontal Line", badge: "1×5 Line", desc: "5 artworks in panoramic alignment" },
+    ];
+  }
+  if (count === 6) {
+    return [
+      { id: "grid-3x2", label: "Wide Grid (3 Col × 2 Row)", badge: "3×2 Matrix", desc: "Wide gallery 6-artwork salon" },
+      { id: "grid-2x3", label: "Vertical Grid (2 Col × 3 Row)", badge: "2×3 Matrix", desc: "High-ceiling archival 6-artwork salon" },
+      { id: "horizontal-6", label: "Horizontal Line", badge: "1×6 Line", desc: "6 artworks in panoramic promenade" },
+    ];
+  }
+  return [
+    { id: "auto-balanced", label: "Automatic Curatorial Multi-Row", badge: "Multi-Row", desc: "Auto-balances artworks evenly into non-overlapping rows" },
+  ];
+}
+
+export function getSchematicArtworkPositions(
+  count: number,
+  layout: WallArtworkLayoutType,
+  spacingMult: number,
+  offX: number,
+  offY: number
+): { leftPct: number; bottomPct: number }[] {
+  const coords: { x: number; y: number }[] = [];
+
+  if (count <= 1) {
+    if (layout === "single-left") coords.push({ x: -1.8, y: 1.55 });
+    else if (layout === "single-right") coords.push({ x: 1.8, y: 1.55 });
+    else coords.push({ x: 0, y: 1.55 });
+  } else if (count === 2) {
+    if (layout === "vertical-2") {
+      coords.push({ x: 0, y: 2.25 }, { x: 0, y: 0.85 });
+    } else {
+      coords.push({ x: -1.4, y: 1.55 }, { x: 1.4, y: 1.55 });
+    }
+  } else if (count === 3) {
+    if (layout === "vertical-3") {
+      coords.push({ x: 0, y: 2.5 }, { x: 0, y: 1.55 }, { x: 0, y: 0.6 });
+    } else if (layout === "pyramid-1-2") {
+      coords.push({ x: 0, y: 2.35 }, { x: -1.4, y: 0.85 }, { x: 1.4, y: 0.85 });
+    } else if (layout === "inverted-pyramid-2-1") {
+      coords.push({ x: -1.4, y: 2.25 }, { x: 1.4, y: 2.25 }, { x: 0, y: 0.85 });
+    } else {
+      coords.push({ x: -2.4, y: 1.55 }, { x: 0, y: 1.55 }, { x: 2.4, y: 1.55 });
+    }
+  } else if (count === 4) {
+    if (layout === "horizontal-4") {
+      coords.push({ x: -3.6, y: 1.55 }, { x: -1.2, y: 1.55 }, { x: 1.2, y: 1.55 }, { x: 3.6, y: 1.55 });
+    } else if (layout === "pyramid-1-3") {
+      coords.push({ x: 0, y: 2.4 }, { x: -2.4, y: 0.85 }, { x: 0, y: 0.85 }, { x: 2.4, y: 0.85 });
+    } else if (layout === "pyramid-3-1") {
+      coords.push({ x: -2.4, y: 2.25 }, { x: 0, y: 2.25 }, { x: 2.4, y: 2.25 }, { x: 0, y: 0.75 });
+    } else if (layout === "salon-4") {
+      coords.push({ x: -1.6, y: 2.1 }, { x: 1.6, y: 1.8 }, { x: -1.3, y: 0.85 }, { x: 1.7, y: 0.95 });
+    } else {
+      coords.push({ x: -1.4, y: 2.25 }, { x: 1.4, y: 2.25 }, { x: -1.4, y: 0.85 }, { x: 1.4, y: 0.85 });
+    }
+  } else if (count === 5) {
+    if (layout === "centerpiece-flanked-5") {
+      coords.push({ x: 0, y: 1.55 }, { x: -2.2, y: 2.25 }, { x: -2.2, y: 0.85 }, { x: 2.2, y: 2.25 }, { x: 2.2, y: 0.85 });
+    } else if (layout === "staggered-2-3") {
+      coords.push({ x: -1.3, y: 2.25 }, { x: 1.3, y: 2.25 }, { x: -2.2, y: 0.85 }, { x: 0, y: 0.85 }, { x: 2.2, y: 0.85 });
+    } else if (layout === "staggered-3-2") {
+      coords.push({ x: -2.2, y: 2.25 }, { x: 0, y: 2.25 }, { x: 2.2, y: 2.25 }, { x: -1.3, y: 0.85 }, { x: 1.3, y: 0.85 });
+    } else {
+      coords.push({ x: -4.0, y: 1.55 }, { x: -2.0, y: 1.55 }, { x: 0, y: 1.55 }, { x: 2.0, y: 1.55 }, { x: 4.0, y: 1.55 });
+    }
+  } else if (count === 6) {
+    if (layout === "grid-2x3") {
+      coords.push(
+        { x: -1.4, y: 2.6 }, { x: 1.4, y: 2.6 },
+        { x: -1.4, y: 1.55 }, { x: 1.4, y: 1.55 },
+        { x: -1.4, y: 0.5 }, { x: 1.4, y: 0.5 }
+      );
+    } else if (layout === "horizontal-6") {
+      coords.push(
+        { x: -4.5, y: 1.55 }, { x: -2.7, y: 1.55 }, { x: -0.9, y: 1.55 },
+        { x: 0.9, y: 1.55 }, { x: 2.7, y: 1.55 }, { x: 4.5, y: 1.55 }
+      );
+    } else {
+      coords.push(
+        { x: -2.4, y: 2.25 }, { x: 0, y: 2.25 }, { x: 2.4, y: 2.25 },
+        { x: -2.4, y: 0.85 }, { x: 0, y: 0.85 }, { x: 2.4, y: 0.85 }
+      );
+    }
+  } else {
+    const half = Math.ceil(count / 2);
+    for (let i = 0; i < count; i++) {
+      const isTop = i < half;
+      const rowIdx = isTop ? i : i - half;
+      const rowLen = isTop ? half : count - half;
+      const rx = (rowIdx - (rowLen - 1) / 2) * 1.5;
+      coords.push({ x: rx, y: isTop ? 2.25 : 0.85 });
+    }
+  }
+
+  return coords.map((pt) => {
+    const fx = pt.x * spacingMult + offX;
+    const fy = pt.y + offY;
+    const leftPct = Math.max(8, Math.min(92, 50 + (fx / 12) * 100));
+    const bottomPct = Math.max(10, Math.min(90, (fy / 3.4) * 100));
+    return { leftPct, bottomPct };
+  });
 }
 
 export interface MediaGalleryBlockData {
@@ -76,6 +240,7 @@ export interface MediaGalleryBlockData {
   wallBackgroundMode?: "uniform" | "per-wall";
   wallCustomBackgrounds?: string[];
   wallEnvironments?: string[];
+  wallConfigs?: ExhibitionWallConfig[];
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
   wallLayout?: "salon" | "linear" | "grid";
@@ -127,8 +292,40 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const frameHeaderBg = data.frameHeaderBg ?? "#0F0E0D";
   const frameHeaderTextColor = data.frameHeaderTextColor ?? "#F5EBE1";
   const items = data.items ?? [];
+  const wallConfigs = data.wallConfigs;
 
-  const numWalls = Math.max(1, Math.ceil(items.length / maxArtworksPerWall));
+  // Dynamic synthesis or extraction of Exhibition Wall configurations
+  const effectiveWallConfigs = React.useMemo<ExhibitionWallConfig[]>(() => {
+    if (wallConfigs && wallConfigs.length > 0) {
+      return wallConfigs;
+    }
+    const count = Math.max(1, Math.ceil(items.length / maxArtworksPerWall));
+    const configs: ExhibitionWallConfig[] = [];
+    for (let w = 0; w < count; w++) {
+      const slice = items.slice(w * maxArtworksPerWall, (w + 1) * maxArtworksPerWall);
+      const artIds = slice.map((it) => it.id || it.artworkId || "").filter(Boolean);
+      let layout: WallArtworkLayoutType = "auto-balanced";
+      if (artIds.length === 1) layout = "single-centered";
+      else if (artIds.length === 2) layout = "horizontal-2";
+      else if (artIds.length === 3) layout = "horizontal-3";
+      else if (artIds.length === 4) layout = "grid-2x2";
+      else if (artIds.length === 5) layout = "centerpiece-flanked-5";
+      else if (artIds.length === 6) layout = "grid-3x2";
+
+      configs.push({
+        wallIndex: w,
+        artworkIds: artIds,
+        layoutType: layout,
+        offsetX: 0,
+        offsetY: 0,
+        spacingMultiplier: 1.0,
+        customBackgroundUrl: wallCustomBackgrounds[w] || (wallBackgroundMode === "uniform" ? customWallUrl : undefined),
+      });
+    }
+    return configs;
+  }, [wallConfigs, items, maxArtworksPerWall, wallCustomBackgrounds, wallBackgroundMode, customWallUrl]);
+
+  const numWalls = Math.max(1, effectiveWallConfigs.length);
   const [selectedWallTab, setSelectedWallTab] = React.useState<number>(0);
   const [activeItemIndex, setActiveItemIndex] = React.useState<number>(0);
   const [uploading, setUploading] = React.useState(false);
@@ -345,6 +542,121 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       culturalEnvironment: "custom",
     });
     toast.success(`Applied Wall #${sourceIndex + 1} background to all walls!`);
+  };
+
+  const handleUpdateWallConfig = (wIndex: number, updates: Partial<ExhibitionWallConfig>) => {
+    const current = [...effectiveWallConfigs];
+    while (current.length <= wIndex) {
+      current.push({
+        wallIndex: current.length,
+        artworkIds: [],
+        layoutType: "auto-balanced",
+        offsetX: 0,
+        offsetY: 0,
+        spacingMultiplier: 1.0,
+      });
+    }
+    current[wIndex] = {
+      ...current[wIndex],
+      ...updates,
+      wallIndex: wIndex,
+    };
+    onChange({
+      ...data,
+      wallConfigs: current,
+    });
+  };
+
+  const handleAddWall = () => {
+    const current = [...effectiveWallConfigs];
+    const newWallIndex = current.length;
+    current.push({
+      wallIndex: newWallIndex,
+      artworkIds: [],
+      layoutType: "auto-balanced",
+      offsetX: 0,
+      offsetY: 0,
+      spacingMultiplier: 1.0,
+    });
+    onChange({
+      ...data,
+      wallConfigs: current,
+    });
+    setSelectedWallTab(newWallIndex);
+    toast.success(`Created Wall #${newWallIndex + 1}!`);
+  };
+
+  const handleDeleteWall = (wIndex: number) => {
+    if (effectiveWallConfigs.length <= 1) {
+      toast.error("At least one wall must remain.");
+      return;
+    }
+    const current = effectiveWallConfigs.filter((_, idx) => idx !== wIndex).map((w, idx) => ({
+      ...w,
+      wallIndex: idx,
+    }));
+    onChange({
+      ...data,
+      wallConfigs: current,
+    });
+    setSelectedWallTab(Math.max(0, wIndex - 1));
+    toast.success(`Deleted Wall #${wIndex + 1}.`);
+  };
+
+  const handleReorderWallArtwork = (wIndex: number, slotIdx: number, direction: "prev" | "next") => {
+    const wall = effectiveWallConfigs[wIndex];
+    if (!wall || !wall.artworkIds) return;
+    const targetIdx = direction === "prev" ? slotIdx - 1 : slotIdx + 1;
+    if (targetIdx < 0 || targetIdx >= wall.artworkIds.length) return;
+    const copy = [...wall.artworkIds];
+    const [moved] = copy.splice(slotIdx, 1);
+    copy.splice(targetIdx, 0, moved);
+    handleUpdateWallConfig(wIndex, { artworkIds: copy });
+  };
+
+  const handleSwapWallArtwork = (wIndex: number, slotIdx: number, newArtworkId: string) => {
+    const wall = effectiveWallConfigs[wIndex];
+    if (!wall) return;
+    const copy = [...(wall.artworkIds || [])];
+    copy[slotIdx] = newArtworkId;
+    handleUpdateWallConfig(wIndex, { artworkIds: copy });
+  };
+
+  const handleAddArtworkToWall = (wIndex: number, artworkId: string) => {
+    const wall = effectiveWallConfigs[wIndex];
+    const currentIds = wall?.artworkIds ? [...wall.artworkIds] : [];
+    if (currentIds.length >= 8) {
+      toast.error("Maximum 8 artworks allowed per wall for museum elegance.");
+      return;
+    }
+    currentIds.push(artworkId);
+    const newCount = currentIds.length;
+    let nextLayout = wall?.layoutType || "auto-balanced";
+    if (newCount === 1) nextLayout = "single-centered";
+    else if (newCount === 2) nextLayout = "horizontal-2";
+    else if (newCount === 3) nextLayout = "horizontal-3";
+    else if (newCount === 4) nextLayout = "grid-2x2";
+    else if (newCount === 5) nextLayout = "centerpiece-flanked-5";
+    else if (newCount === 6) nextLayout = "grid-3x2";
+
+    handleUpdateWallConfig(wIndex, { artworkIds: currentIds, layoutType: nextLayout });
+  };
+
+  const handleRemoveArtworkFromWall = (wIndex: number, slotIdx: number) => {
+    const wall = effectiveWallConfigs[wIndex];
+    if (!wall || !wall.artworkIds) return;
+    const copy = wall.artworkIds.filter((_, idx) => idx !== slotIdx);
+    const newCount = copy.length;
+    let nextLayout = wall.layoutType;
+    if (newCount === 1) nextLayout = "single-centered";
+    else if (newCount === 2) nextLayout = "horizontal-2";
+    else if (newCount === 3) nextLayout = "horizontal-3";
+    else if (newCount === 4) nextLayout = "grid-2x2";
+    else if (newCount === 5) nextLayout = "centerpiece-flanked-5";
+    else if (newCount === 6) nextLayout = "grid-3x2";
+    else if (newCount === 0) nextLayout = "auto-balanced";
+
+    handleUpdateWallConfig(wIndex, { artworkIds: copy, layoutType: nextLayout });
   };
 
   const handleCanvasBgImageUrlChange = (url: string) => {
@@ -1093,6 +1405,470 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 })()}
               </div>
             )}
+          </div>
+
+          {/* -------------------------------------------------------------
+           * 2B. INTERACTIVE EXHIBITION WALL CURATION & LAYOUT STUDIO
+           * ----------------------------------------------------------- */}
+          <div className="p-4 rounded-xl border border-amber-500/40 bg-card/80 space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border/80">
+              <div className="space-y-0.5">
+                <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
+                  <LayoutGrid className="w-3.5 h-3.5 text-amber-600" />
+                  Wall Curation &amp; Layout Studio (Wall #{selectedWallTab + 1} of {numWalls})
+                </Label>
+                <p className="text-[11px] text-muted-foreground">
+                  Pick artworks, select multi-artwork layouts, and adjust framing offsets for this wall.
+                </p>
+              </div>
+
+              {/* Wall Selector Tabs + Add/Delete Wall Buttons */}
+              <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-lg border border-border">
+                  {effectiveWallConfigs.map((w, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedWallTab(idx)}
+                      className={cn(
+                        "px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer",
+                        selectedWallTab === idx
+                          ? "bg-amber-600 text-white shadow-xs font-semibold"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      )}
+                    >
+                      Wall {idx + 1}
+                      <span className="ml-1 text-[10px] opacity-80">({w.artworkIds?.length || 0})</span>
+                    </button>
+                  ))}
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddWall}
+                  className="h-7 text-xs px-2 cursor-pointer border-amber-500/40 text-amber-900 dark:text-amber-200"
+                  title="Add another Exhibition Wall"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Wall
+                </Button>
+
+                {effectiveWallConfigs.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteWall(selectedWallTab)}
+                    className="h-7 text-xs px-2 text-destructive hover:bg-destructive/10 cursor-pointer"
+                    title="Delete this Wall"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Selected Wall Scope */}
+            {(() => {
+              const currentWallConfig = effectiveWallConfigs[selectedWallTab] || effectiveWallConfigs[0];
+              const wallArtworkIds = currentWallConfig?.artworkIds || [];
+              const wallArtworks = wallArtworkIds
+                .map((id) => items.find((it) => it.id === id || it.artworkId === id))
+                .filter(Boolean) as MediaGalleryItem[];
+
+              const count = wallArtworks.length;
+              const currentLayout = currentWallConfig?.layoutType || "auto-balanced";
+              const currentSpacing = currentWallConfig?.spacingMultiplier ?? 1.0;
+              const currentOffX = currentWallConfig?.offsetX ?? 0;
+              const currentOffY = currentWallConfig?.offsetY ?? 0;
+              const availablePresets = getLayoutPresetsForCount(count);
+              const currentWallBg = currentWallConfig?.customBackgroundUrl || (wallBackgroundMode === "uniform" ? customWallUrl : (wallCustomBackgrounds[selectedWallTab] || ""));
+
+              // Calculate 2D schematic positions
+              const schematicPositions = getSchematicArtworkPositions(
+                count,
+                currentLayout,
+                currentSpacing,
+                currentOffX,
+                currentOffY
+              );
+
+              return (
+                <div className="space-y-4">
+                  {/* 1. Interactive 2D Wall Schematic Preview Box */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1 uppercase tracking-wider">
+                        <Eye className="w-3 h-3 text-amber-600" />
+                        Interactive 2D Wall Schematic
+                      </Label>
+                      <span className="text-[10px] font-mono text-muted-foreground">
+                        {count} Artwork{count === 1 ? "" : "s"} &bull; Layout: {currentLayout} &bull; Offset: ({currentOffX > 0 ? "+" : ""}{currentOffX.toFixed(1)}m, {currentOffY > 0 ? "+" : ""}{currentOffY.toFixed(2)}m)
+                      </span>
+                    </div>
+
+                    <div
+                      className="relative w-full h-48 sm:h-56 rounded-xl overflow-hidden border border-amber-500/30 shadow-inner bg-stone-900 flex items-center justify-center select-none"
+                      style={{
+                        backgroundImage: currentWallBg ? `url("${currentWallBg}")` : undefined,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    >
+                      {/* Subtle darkening scrim if no custom image */}
+                      {!currentWallBg && (
+                        <div className="absolute inset-0 bg-gradient-to-b from-stone-800 to-stone-950" />
+                      )}
+
+                      {/* Floor line & Eye-level guideline */}
+                      <div className="absolute bottom-4 inset-x-0 h-0.5 bg-amber-500/20" />
+                      <div className="absolute top-1/2 inset-x-0 h-px border-b border-dashed border-white/15" />
+                      <div className="absolute left-1/2 inset-y-0 w-px border-r border-dashed border-white/15" />
+
+                      {/* Eye-level badge */}
+                      <div className="absolute left-2 top-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[9px] font-mono text-amber-300 border border-amber-500/30">
+                        Wall #{selectedWallTab + 1} Centerline 1.55m
+                      </div>
+
+                      {count === 0 ? (
+                        <div className="text-center p-4 bg-stone-950/70 backdrop-blur-md rounded-lg border border-amber-500/20 max-w-xs z-10">
+                          <ImageIcon className="w-6 h-6 text-amber-400/60 mx-auto mb-1" />
+                          <p className="text-xs font-semibold text-foreground">No Artworks On This Wall</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            Click &quot;+ Add Artwork to Wall&quot; below to assign artworks to this wall corridor.
+                          </p>
+                        </div>
+                      ) : (
+                        schematicPositions.map((pos, idx) => {
+                          const art = wallArtworks[idx];
+                          return (
+                            <div
+                              key={art?.id || idx}
+                              className="absolute transition-all duration-300 ease-out group/slot hover:scale-105 z-10"
+                              style={{
+                                left: `${pos.leftPct}%`,
+                                bottom: `${pos.bottomPct}%`,
+                                transform: "translate(-50%, 50%)",
+                              }}
+                            >
+                              <div className="relative w-14 h-16 sm:w-16 sm:h-20 rounded bg-stone-950 border-2 border-amber-500/80 shadow-lg overflow-hidden flex flex-col justify-between">
+                                {art?.url ? (
+                                  <img
+                                    src={art.url}
+                                    alt={art.title || `Artwork ${idx + 1}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-stone-800 text-[10px] text-stone-400">
+                                    Slot {idx + 1}
+                                  </div>
+                                )}
+                                <div className="absolute top-1 left-1 bg-black/80 px-1 py-0.2 rounded text-[8px] font-mono text-amber-300 font-bold border border-amber-500/40">
+                                  #{idx + 1}
+                                </div>
+                                <div className="absolute inset-x-0 bottom-0 bg-stone-950/90 py-0.5 px-1 text-[8px] text-white truncate text-center">
+                                  {art?.title || `Piece ${idx + 1}`}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 2. Layout Presets Selector */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        <Columns className="w-3.5 h-3.5 text-amber-600" />
+                        Wall Layout Preset ({availablePresets.length} Options for {count} Artworks)
+                      </Label>
+                      <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-700 dark:text-amber-300">
+                        {currentLayout}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                      {availablePresets.map((preset) => {
+                        const isSelected = currentLayout === preset.id;
+                        return (
+                          <button
+                            key={preset.id}
+                            type="button"
+                            onClick={() => handleUpdateWallConfig(selectedWallTab, { layoutType: preset.id })}
+                            className={cn(
+                              "p-2.5 rounded-lg border text-left transition-all cursor-pointer",
+                              isSelected
+                                ? "bg-amber-500/15 border-amber-500 text-amber-950 dark:text-amber-200 ring-1 ring-amber-500/40 font-semibold"
+                                : "bg-card hover:bg-muted text-muted-foreground border-border"
+                            )}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-bold text-foreground">{preset.label}</span>
+                              <Badge variant="secondary" className="text-[9px] px-1 py-0">
+                                {preset.badge}
+                              </Badge>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground leading-tight">
+                              {preset.desc}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 3. Positioning & Alignment Controls (Horizontal Shift, Vertical Elevation, Spacing Multiplier) */}
+                  <div className="p-3 rounded-lg border border-border/80 bg-background/50 space-y-3">
+                    <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
+                      <Sliders className="w-3.5 h-3.5 text-amber-600" />
+                      Wall Alignment &amp; Fine Positioning Offsets
+                    </Label>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {/* Horizontal Shift */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                            <MoveHorizontal className="w-3 h-3 text-muted-foreground" />
+                            Horizontal Shift (X)
+                          </Label>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-mono text-primary">
+                              {currentOffX > 0 ? "+" : ""}{currentOffX.toFixed(1)}m
+                            </span>
+                            {currentOffX !== 0 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleUpdateWallConfig(selectedWallTab, { offsetX: 0 })}
+                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                                title="Reset to Center"
+                              >
+                                <RotateCcw className="w-2.5 h-2.5" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <Slider
+                          min={-2.5}
+                          max={2.5}
+                          step={0.1}
+                          value={[currentOffX]}
+                          onValueChange={([val]) => handleUpdateWallConfig(selectedWallTab, { offsetX: val })}
+                          className="py-1 cursor-pointer pointer-events-auto"
+                        />
+                        <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+                          <span>-2.5m (Left)</span>
+                          <span>0.0m</span>
+                          <span>+2.5m (Right)</span>
+                        </div>
+                      </div>
+
+                      {/* Vertical Elevation */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                            <MoveVertical className="w-3 h-3 text-muted-foreground" />
+                            Vertical Elevation (Y)
+                          </Label>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-mono text-primary">
+                              {currentOffY > 0 ? "+" : ""}{currentOffY.toFixed(2)}m
+                            </span>
+                            {currentOffY !== 0 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleUpdateWallConfig(selectedWallTab, { offsetY: 0 })}
+                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                                title="Reset to 1.55m Centerline"
+                              >
+                                <RotateCcw className="w-2.5 h-2.5" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <Slider
+                          min={-1.0}
+                          max={1.0}
+                          step={0.05}
+                          value={[currentOffY]}
+                          onValueChange={([val]) => handleUpdateWallConfig(selectedWallTab, { offsetY: val })}
+                          className="py-1 cursor-pointer pointer-events-auto"
+                        />
+                        <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+                          <span>-1.0m (Lower)</span>
+                          <span>1.55m Eye-Level</span>
+                          <span>+1.0m (Higher)</span>
+                        </div>
+                      </div>
+
+                      {/* Spacing Spread Multiplier */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                            <Maximize2 className="w-3 h-3 text-muted-foreground" />
+                            Spacing Spread Multiplier
+                          </Label>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-mono text-primary">
+                              {currentSpacing.toFixed(2)}x
+                            </span>
+                            {currentSpacing !== 1.0 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleUpdateWallConfig(selectedWallTab, { spacingMultiplier: 1.0 })}
+                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                                title="Reset to 1.0x"
+                              >
+                                <RotateCcw className="w-2.5 h-2.5" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <Slider
+                          min={0.6}
+                          max={1.6}
+                          step={0.05}
+                          value={[currentSpacing]}
+                          onValueChange={([val]) => handleUpdateWallConfig(selectedWallTab, { spacingMultiplier: val })}
+                          className="py-1 cursor-pointer pointer-events-auto"
+                        />
+                        <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+                          <span>0.6x (Tight)</span>
+                          <span>1.0x Standard</span>
+                          <span>1.6x Expansive</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4. Curated Artwork Slots on Wall */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        <Layers className="w-3.5 h-3.5 text-amber-600" />
+                        Curated Artwork Slots ({count} Pieces on Wall #{selectedWallTab + 1})
+                      </Label>
+                      {items.length > count && (
+                        <Select
+                          value=""
+                          onValueChange={(val) => {
+                            if (val) handleAddArtworkToWall(selectedWallTab, val);
+                          }}
+                        >
+                          <SelectTrigger className="h-7 text-xs w-44 bg-card border-amber-500/40 text-amber-900 dark:text-amber-200">
+                            <Plus className="w-3.5 h-3.5 mr-1" />
+                            <span>Add Artwork to Wall</span>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {items
+                              .filter((it) => !wallArtworkIds.includes(it.id || it.artworkId || ""))
+                              .map((it, idx) => (
+                                <SelectItem key={it.id || idx} value={it.id || it.artworkId || `art-${idx}`}>
+                                  {it.title || `Gallery Item ${idx + 1}`}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      {wallArtworks.map((art, slotIdx) => (
+                        <div
+                          key={art.id || slotIdx}
+                          className="flex items-center justify-between gap-2 p-2 rounded-lg border border-border/70 bg-card/60 hover:bg-card transition-colors"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-amber-500/40">
+                              {slotIdx + 1}
+                            </span>
+                            {art.url && (
+                              <img
+                                src={art.url}
+                                alt={art.title || `Artwork ${slotIdx + 1}`}
+                                className="w-9 h-9 object-cover rounded border border-border shrink-0"
+                              />
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-xs font-medium text-foreground truncate">
+                                {art.title || `Curated Artwork ${slotIdx + 1}`}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground truncate">
+                                {art.medium || "Archival Medium"} &bull; {art.dimensions || "Dimensions"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1 shrink-0">
+                            {/* Reorder buttons */}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              disabled={slotIdx === 0}
+                              onClick={() => handleReorderWallArtwork(selectedWallTab, slotIdx, "prev")}
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground cursor-pointer disabled:opacity-30"
+                              title="Move Previous Slot"
+                            >
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              disabled={slotIdx === wallArtworks.length - 1}
+                              onClick={() => handleReorderWallArtwork(selectedWallTab, slotIdx, "next")}
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground cursor-pointer disabled:opacity-30"
+                              title="Move Next Slot"
+                            >
+                              <ChevronRight className="w-3.5 h-3.5" />
+                            </Button>
+
+                            {/* Swap selector */}
+                            <Select
+                              value={art.id || art.artworkId || ""}
+                              onValueChange={(newId) => handleSwapWallArtwork(selectedWallTab, slotIdx, newId)}
+                            >
+                              <SelectTrigger className="h-6 text-[10px] w-28 bg-background">
+                                <SelectValue placeholder="Swap..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {items.map((it, itIdx) => (
+                                  <SelectItem key={it.id || itIdx} value={it.id || it.artworkId || `art-${itIdx}`}>
+                                    {it.title || `Item ${itIdx + 1}`}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            {/* Remove from Wall */}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveArtworkFromWall(selectedWallTab, slotIdx)}
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive cursor-pointer"
+                              title="Remove Artwork from this Wall"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Autoplay Tour, Dwell Speeds, and Bottom Card Toggle */}

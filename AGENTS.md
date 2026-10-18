@@ -170,6 +170,24 @@ All code generation and architectural modifications must adhere to the specializ
   - Mathematically guarantees that the physical clearance between the bottom edge of the top frame and the top edge of the bottom frame is strictly $0.28\text{ m}$ regardless of the individual aspect ratios or dimensions of the artworks, completely eliminating frame overlapping.
   - Multi-row walls ($count \ge 4$) scale artwork frames to $maxDim = 1.15\text{ m}$ so stacked artworks fit with museum elegance within standard wall heights.
   - Horizontal column gaps are expanded to generous spacing ($1.50\text{ m}$ for 2-column configurations, $1.20\text{ m}$ for 3-column configurations) symmetrically flanking the wall centerline ($14\text{ m}$ bay).
+- **Multi-Wall Zero-Bleed Corridor Framing & Dynamic Distance Calculation**:
+  - `WALL_SPACING` is set to $20.0\text{ m}$ between adjacent corridor walls.
+  - To prevent visible bleeding of adjacent walls into widescreen camera frames, overview camera distance is dynamically calculated:
+    $$\text{overviewZ} = \min\left(\frac{13.6}{2 \cdot \tan(\text{vFov}/2) \cdot \text{aspect}}, 8.2\right)$$
+    This bounds the visible wall width at rest to strictly $\le 13.6\text{ m}$, leaving neighboring bays starting at $\pm 10.0\text{ m}$ completely offscreen.
+  - In `animate()`, non-active wall bay meshes modulate opacity based on camera distance ($\text{distToCam} > 14\text{ m} \implies \text{opacity} = 0$), guaranteeing zero edge bleeding even during wide camera glides.
+- **Curatorial Multi-Artwork Layout Presets & Positioning Offsets**:
+  - `ExhibitionWallBlock` supports custom per-wall layout presets tailored to the artwork count $N$:
+    - **1 Artwork**: Centerpiece ($0, 1.55$), Flank Left ($-1.8, 1.55$), Flank Right ($+1.8, 1.55$).
+    - **2 Artworks**: Horizontal Line (side-by-side at $1.55\text{ m}$ eye-level); Vertical Column (stacked with $0.28\text{ m}$ clearance via `getStackedY`).
+    - **3 Artworks**: Horizontal Line of 3; Vertical Column of 3; Pyramid (1 top, 2 bottom); Inverted Pyramid (2 top, 1 bottom).
+    - **4 Artworks**: Balanced $2\times 2$ Quad Grid; Horizontal Line of 4; Pyramid 1-over-3; Inverted 3-over-1; Classical Salon Quad.
+    - **5 Artworks**: Centerpiece flanked by 2 stacked columns; Staggered 2-over-3; Staggered 3-over-2; Horizontal Line of 5.
+    - **6 Artworks**: Wide Grid ($3\times 2$); High-Ceiling Grid ($2\times 3$); Horizontal Line of 6.
+  - **Fine Positioning Offsets**: Supports per-wall horizontal shift ($X \in [-2.5\text{ m}, +2.5\text{ m}]$), vertical elevation ($Y \in [-1.0\text{ m}, +1.0\text{ m}]$), and spacing spread multiplier ($0.6\times$ to $1.6\times$) to align artworks with room furniture, consoles, or windows.
+- **WYSIWYG Wall Curation Studio**:
+  - In `MediaGalleryInspector`, an interactive 2D Wall Schematic preview renders the active wall's backdrop with miniature framed artworks positioned at their exact calculated coordinates in real time.
+  - Allows selecting layout presets, adjusting fine positioning sliders with 1-click resets, reordering slots with `<` and `>`, swapping artworks via dropdowns, and adding or removing walls.
 - **Universal Media Gallery Canvas Background Engine**:
   - All Media Gallery presentation options (Carousel, Snap Scroll, Curated Bento, Ken Burns, Soft Crossfade, Filmstrip Reel) support custom backdrop images via `canvasBgImageUrl`, `canvasBgMode` (`"cover" | "contain" | "tile" | "blur"`), and `canvasBgOpacity` (0–100%).
   - Integrated with local `/media/` mount on localhost:3060 and remote cloud storage (S3/R2) via direct upload or Media Vault picker.

@@ -77,6 +77,8 @@ export type MediaGalleryDisplayMode =
   | "filmstrip"
   | "exhibition-wall";
 
+import type { ExhibitionWallConfig } from "./gallery-exhibition-wall/exhibition-wall-block";
+
 export interface MediaGalleryBlockProps {
   items?: MediaGalleryItem[];
   displayMode?: MediaGalleryDisplayMode;
@@ -102,6 +104,7 @@ export interface MediaGalleryBlockProps {
   wallBackgroundMode?: "uniform" | "per-wall";
   wallCustomBackgrounds?: string[];
   wallEnvironments?: string[];
+  wallConfigs?: ExhibitionWallConfig[];
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
   wallLayout?: "salon" | "linear" | "grid";
@@ -342,6 +345,7 @@ export function MediaGalleryBlock({
   wallBackgroundMode = "uniform",
   wallCustomBackgrounds = [],
   wallEnvironments = [],
+  wallConfigs = [],
   cameraTourStyle = "drone",
   cameraTransitionStyle = "pan-zoom",
   wallLayout = "salon",
@@ -458,6 +462,7 @@ export function MediaGalleryBlock({
         wallBackgroundMode={wallBackgroundMode}
         wallCustomBackgrounds={wallCustomBackgrounds}
         wallEnvironments={wallEnvironments}
+        wallConfigs={wallConfigs}
         cameraTourStyle={cameraTourStyle}
         cameraTransitionStyle={cameraTransitionStyle}
         wallLayout={wallLayout}
