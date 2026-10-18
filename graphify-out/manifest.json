@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1792216839.6998725,
+    "mtime": 1792302610.1023972,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
@@ -735,8 +735,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\builder\\media-gallery-inspector.tsx": {
-    "mtime": 1790755946.9169867,
-    "ast_hash": "992b76f36766d54e6164ecbbd15bad95",
+    "mtime": 1792302371.7751122,
+    "ast_hash": "2c86349a604f6d4bab1c868799ac4dbe",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\blocks\\dynamic-form-block.tsx": {
@@ -745,8 +745,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\blocks\\media-gallery-block.tsx": {
-    "mtime": 1790742017.22113,
-    "ast_hash": "ad70bba5a60756ed39da5ea31a70d61a",
+    "mtime": 1792301971.2121148,
+    "ast_hash": "a776161ccc197938dfb7eb7c25f49b16",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\get-base-url-client.ts": {
@@ -1045,8 +1045,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\blocks\\gallery-3d\\ken-burns-canvas.tsx": {
-    "mtime": 1790222168.499944,
-    "ast_hash": "18e284fc51f2eee64a491817182efca5",
+    "mtime": 1792301848.1474416,
+    "ast_hash": "45c87403b15709ef5ba8d2cf9233e32c",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\blocks\\gallery-exhibition-wall\\exhibition-environments.ts": {
@@ -1055,8 +1055,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\public\\blocks\\gallery-exhibition-wall\\exhibition-wall-block.tsx": {
-    "mtime": 1790828660.7070975,
-    "ast_hash": "c8386fe0b75cdb7559e059209c29faaa",
+    "mtime": 1792302537.0401373,
+    "ast_hash": "3c860300b221ceca0cba0a3fd5a853e9",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\artwork-placard-sheet.tsx": {

@@ -88,6 +88,9 @@ export interface MediaGalleryBlockProps {
   overlayTextColor?: string;
   className?: string;
   canvasBgColor?: string;
+  canvasBgImageUrl?: string;
+  canvasBgMode?: "cover" | "contain" | "tile" | "blur";
+  canvasBgOpacity?: number;
   borderFilletColor?: string;
   borderWidth?: number;
   framePadding?: number;
@@ -96,6 +99,9 @@ export interface MediaGalleryBlockProps {
   culturalEnvironment?: string;
   customWallUrl?: string;
   customWallBackdropUrl?: string;
+  wallBackgroundMode?: "uniform" | "per-wall";
+  wallCustomBackgrounds?: string[];
+  wallEnvironments?: string[];
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
   wallLayout?: "salon" | "linear" | "grid";
@@ -322,6 +328,9 @@ export function MediaGalleryBlock({
   overlayTextColor,
   className = "",
   canvasBgColor,
+  canvasBgImageUrl,
+  canvasBgMode = "cover",
+  canvasBgOpacity = 85,
   borderFilletColor = "#D4AF37",
   borderWidth = 0,
   framePadding = 0,
@@ -330,6 +339,9 @@ export function MediaGalleryBlock({
   culturalEnvironment,
   customWallUrl,
   customWallBackdropUrl,
+  wallBackgroundMode = "uniform",
+  wallCustomBackgrounds = [],
+  wallEnvironments = [],
   cameraTourStyle = "drone",
   cameraTransitionStyle = "pan-zoom",
   wallLayout = "salon",
@@ -443,6 +455,9 @@ export function MediaGalleryBlock({
         culturalEnvironment={culturalEnvironment}
         customWallUrl={customWallUrl}
         customWallBackdropUrl={customWallBackdropUrl}
+        wallBackgroundMode={wallBackgroundMode}
+        wallCustomBackgrounds={wallCustomBackgrounds}
+        wallEnvironments={wallEnvironments}
         cameraTourStyle={cameraTourStyle}
         cameraTransitionStyle={cameraTransitionStyle}
         wallLayout={wallLayout}
@@ -472,6 +487,9 @@ export function MediaGalleryBlock({
         overlayTextColor={overlayTextColor}
         className={className}
         canvasBgColor={canvasBgColor}
+        canvasBgImageUrl={canvasBgImageUrl}
+        canvasBgMode={canvasBgMode}
+        canvasBgOpacity={canvasBgOpacity}
         borderFilletColor={borderFilletColor}
         borderWidth={borderWidth}
         framePadding={framePadding}
@@ -502,6 +520,10 @@ export function MediaGalleryBlock({
           )}
           style={{
             backgroundColor: canvasBgColor || "transparent",
+            backgroundImage: canvasBgImageUrl ? `url("${canvasBgImageUrl}")` : undefined,
+            backgroundSize: canvasBgMode === "contain" ? "contain" : canvasBgMode === "tile" ? "auto" : "cover",
+            backgroundRepeat: canvasBgMode === "tile" ? "repeat" : "no-repeat",
+            backgroundPosition: "center",
             padding: framePadding ? `${framePadding}px` : undefined,
             border: borderWidth > 0 ? `${borderWidth}px solid ${borderFilletColor}` : undefined,
           }}
@@ -627,7 +649,14 @@ export function MediaGalleryBlock({
         <div
           ref={scrollContainerRef}
           className="flex items-stretch gap-5 overflow-x-auto scroll-smooth py-3 px-2 scrollbar-none bg-stone-950/10 dark:bg-stone-950/40 rounded-2xl border border-amber-500/20 p-3"
-          style={{ scrollbarWidth: "none" }}
+          style={{
+            scrollbarWidth: "none",
+            backgroundColor: canvasBgColor || undefined,
+            backgroundImage: canvasBgImageUrl ? `url("${canvasBgImageUrl}")` : undefined,
+            backgroundSize: canvasBgMode === "contain" ? "contain" : canvasBgMode === "tile" ? "auto" : "cover",
+            backgroundRepeat: canvasBgMode === "tile" ? "repeat" : "no-repeat",
+            backgroundPosition: "center",
+          }}
         >
           {validItems.map((item, idx) => {
             const isLinked = !!getItemHref(item);
@@ -724,6 +753,10 @@ export function MediaGalleryBlock({
           )}
           style={{
             backgroundColor: canvasBgColor || "transparent",
+            backgroundImage: canvasBgImageUrl ? `url("${canvasBgImageUrl}")` : undefined,
+            backgroundSize: canvasBgMode === "contain" ? "contain" : canvasBgMode === "tile" ? "auto" : "cover",
+            backgroundRepeat: canvasBgMode === "tile" ? "repeat" : "no-repeat",
+            backgroundPosition: "center",
             padding: framePadding ? `${framePadding}px` : undefined,
             border: borderWidth > 0 ? `${borderWidth}px solid ${borderFilletColor}` : undefined,
           }}
@@ -837,8 +870,17 @@ export function MediaGalleryBlock({
         {/* Scrollable Track */}
         <div
           ref={scrollContainerRef}
-          className="flex items-stretch gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 px-1 scrollbar-none"
-          style={{ scrollbarWidth: "none" }}
+          className="flex items-stretch gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 px-1 scrollbar-none rounded-2xl"
+          style={{
+            scrollbarWidth: "none",
+            backgroundColor: canvasBgColor || undefined,
+            backgroundImage: canvasBgImageUrl ? `url("${canvasBgImageUrl}")` : undefined,
+            backgroundSize: canvasBgMode === "contain" ? "contain" : canvasBgMode === "tile" ? "auto" : "cover",
+            backgroundRepeat: canvasBgMode === "tile" ? "repeat" : "no-repeat",
+            backgroundPosition: "center",
+            padding: framePadding ? `${framePadding}px` : undefined,
+            border: borderWidth > 0 ? `${borderWidth}px solid ${borderFilletColor}` : undefined,
+          }}
         >
           {validItems.map((item, idx) => {
             const isLinked = !!getItemHref(item);
@@ -895,7 +937,18 @@ export function MediaGalleryBlock({
   const totalCollage = collageItems.length;
 
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-12 gap-3.5 sm:gap-4 w-full", className)}>
+    <div
+      className={cn("grid grid-cols-1 md:grid-cols-12 gap-3.5 sm:gap-4 w-full rounded-2xl", className)}
+      style={{
+        backgroundColor: canvasBgColor || undefined,
+        backgroundImage: canvasBgImageUrl ? `url("${canvasBgImageUrl}")` : undefined,
+        backgroundSize: canvasBgMode === "contain" ? "contain" : canvasBgMode === "tile" ? "auto" : "cover",
+        backgroundRepeat: canvasBgMode === "tile" ? "repeat" : "no-repeat",
+        backgroundPosition: "center",
+        padding: framePadding ? `${framePadding}px` : undefined,
+        border: borderWidth > 0 ? `${borderWidth}px solid ${borderFilletColor}` : undefined,
+      }}
+    >
       {collageItems.map((item, idx) => {
         const itemClass = getBentoItemClass(idx, totalCollage);
         const isFeatured = idx === 0 && totalCollage >= 3;

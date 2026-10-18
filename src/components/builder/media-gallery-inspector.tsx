@@ -62,6 +62,9 @@ export interface MediaGalleryBlockData {
   overlayTitleColor?: string;
   overlayTextColor?: string;
   canvasBgColor?: string;
+  canvasBgImageUrl?: string;
+  canvasBgMode?: "cover" | "contain" | "tile" | "blur";
+  canvasBgOpacity?: number;
   borderFilletColor?: string;
   borderWidth?: number;
   framePadding?: number;
@@ -70,6 +73,9 @@ export interface MediaGalleryBlockData {
   culturalEnvironment?: string;
   customWallUrl?: string;
   customWallBackdropUrl?: string;
+  wallBackgroundMode?: "uniform" | "per-wall";
+  wallCustomBackgrounds?: string[];
+  wallEnvironments?: string[];
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
   cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
   wallLayout?: "salon" | "linear" | "grid";
@@ -99,12 +105,17 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const overlayTitleColor = data.overlayTitleColor ?? "";
   const overlayTextColor = data.overlayTextColor ?? "";
   const canvasBgColor = data.canvasBgColor ?? "";
+  const canvasBgImageUrl = data.canvasBgImageUrl ?? "";
+  const canvasBgMode = data.canvasBgMode ?? "cover";
+  const canvasBgOpacity = data.canvasBgOpacity ?? 85;
   const borderFilletColor = data.borderFilletColor ?? "#D4AF37";
   const borderWidth = data.borderWidth ?? 0;
   const framePadding = data.framePadding ?? 0;
   const showCaptionRibbon = data.showCaptionRibbon ?? false;
   const environmentId = data.culturalEnvironment ?? data.environmentId ?? "modern-minimalist";
   const customWallUrl = data.customWallBackdropUrl ?? data.customWallUrl ?? "";
+  const wallBackgroundMode = data.wallBackgroundMode ?? "uniform";
+  const wallCustomBackgrounds = data.wallCustomBackgrounds ?? [];
   const cameraTourStyle = data.cameraTourStyle ?? "drone";
   const cameraTransitionStyle = data.cameraTransitionStyle ?? "pan-zoom";
   const wallLayout = data.wallLayout ?? "salon";
@@ -117,14 +128,19 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const frameHeaderTextColor = data.frameHeaderTextColor ?? "#F5EBE1";
   const items = data.items ?? [];
 
+  const numWalls = Math.max(1, Math.ceil(items.length / maxArtworksPerWall));
+  const [selectedWallTab, setSelectedWallTab] = React.useState<number>(0);
   const [activeItemIndex, setActiveItemIndex] = React.useState<number>(0);
   const [uploading, setUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const wallFileInputRef = React.useRef<HTMLInputElement>(null);
+  const canvasBgFileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Universal Media Dialog state
   const [isMediaDialogOpen, setIsMediaDialogOpen] = React.useState(false);
   const [mediaDialogTargetIndex, setMediaDialogTargetIndex] = React.useState<number | null>(null);
-  const [mediaDialogMode, setMediaDialogMode] = React.useState<"items" | "customWall">("items");
+  const [mediaDialogWallIndex, setMediaDialogWallIndex] = React.useState<number>(0);
+  const [mediaDialogMode, setMediaDialogMode] = React.useState<"items" | "customWall" | "perWall" | "canvasBg">("items");
 
   // Cached artworks and categories for item linking
   const [artworksList, setArtworksList] = React.useState<{
@@ -287,6 +303,105 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       customWallUrl: url,
       customWallBackdropUrl: url,
     });
+  };
+
+  const handleWallBackgroundModeChange = (mode: "uniform" | "per-wall") => {
+    onChange({
+      ...data,
+      wallBackgroundMode: mode,
+    });
+  };
+
+  const handlePerWallUrlChange = (wallIndex: number, url: string) => {
+    const copy = [...wallCustomBackgrounds];
+    while (copy.length <= wallIndex) {
+      copy.push("");
+    }
+    copy[wallIndex] = url;
+    onChange({
+      ...data,
+      wallCustomBackgrounds: copy,
+    });
+  };
+
+  const handleApplyWallToAll = (sourceIndex: number) => {
+    const sourceUrl = wallCustomBackgrounds[sourceIndex] || customWallUrl;
+    if (!sourceUrl) {
+      toast.error("No background image on this wall to apply.");
+      return;
+    }
+    const updated = Array(numWalls).fill(sourceUrl);
+    onChange({
+      ...data,
+      customWallUrl: sourceUrl,
+      customWallBackdropUrl: sourceUrl,
+      wallCustomBackgrounds: updated,
+    });
+    toast.success(`Applied Wall #${sourceIndex + 1} background to all walls!`);
+  };
+
+  const handleCanvasBgImageUrlChange = (url: string) => {
+    onChange({
+      ...data,
+      canvasBgImageUrl: url,
+    });
+  };
+
+  const handleCanvasBgModeChange = (mode: "cover" | "contain" | "tile" | "blur") => {
+    onChange({
+      ...data,
+      canvasBgMode: mode,
+    });
+  };
+
+  const handleCanvasBgOpacityChange = (opacity: number) => {
+    onChange({
+      ...data,
+      canvasBgOpacity: opacity,
+    });
+  };
+
+  const handleUploadFile = async (
+    file: File,
+    target: "customWall" | "perWall" | "canvasBg",
+    targetWallIndex = 0
+  ) => {
+    setUploading(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("mediaType", "general");
+    body.append("isArtwork", "false");
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      if (res.ok) {
+        const json = await res.json();
+        const uploadedUrl = json.publicUrl || json.watermarkedUrl || json.primaryImageUrl;
+        if (uploadedUrl) {
+          if (target === "customWall") {
+            handleCustomWallUrlChange(uploadedUrl);
+            toast.success("Wall background image uploaded successfully!");
+          } else if (target === "perWall") {
+            handlePerWallUrlChange(targetWallIndex, uploadedUrl);
+            toast.success(`Wall #${targetWallIndex + 1} background uploaded successfully!`);
+          } else if (target === "canvasBg") {
+            handleCanvasBgImageUrlChange(uploadedUrl);
+            toast.success("Canvas background image uploaded successfully!");
+          }
+        } else {
+          toast.error("Upload succeeded but URL was missing.");
+        }
+      } else {
+        toast.error("Upload failed.");
+      }
+    } catch {
+      toast.error("Network error during image upload.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleCameraTourStyleChange = (style: "overview" | "drone" | "walkthrough" | "inspection") => {
@@ -719,33 +834,248 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
             </div>
           </div>
 
-          {/* Custom Wall Backdrop URL (when custom environment is selected) */}
-          {environmentId === "custom" && (
-            <div className="space-y-1.5 pt-1">
-              <Label className="text-xs font-semibold text-foreground">Custom Wall Backdrop URL</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="text"
-                  placeholder="https://... or /uploads/..."
-                  value={customWallUrl}
-                  onChange={(e) => handleCustomWallUrlChange(e.target.value)}
-                  className="h-8 text-xs font-mono"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setMediaDialogMode("customWall");
-                    setIsMediaDialogOpen(true);
-                  }}
-                  className="h-8 text-xs shrink-0 cursor-pointer"
-                >
-                  <ImageIcon className="w-3.5 h-3.5 mr-1" /> Media Vault
-                </Button>
+          {/* Wall Background & Custom Atmosphere Studio */}
+          <div className="p-3.5 rounded-xl border border-amber-500/30 bg-card/70 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
+                  <ImageIcon className="w-3.5 h-3.5 text-amber-600" /> Wall Background &amp; Custom Backdrop
+                </Label>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Upload custom architectural backdrops for the exhibition walls or select from Media Vault.
+                </p>
               </div>
+              {numWalls > 1 && (
+                <div className="flex items-center gap-1.5 shrink-0 bg-muted/60 p-1 rounded-lg border border-border">
+                  <Button
+                    type="button"
+                    variant={wallBackgroundMode === "uniform" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => handleWallBackgroundModeChange("uniform")}
+                    className="h-6 px-2 text-[10px] font-medium"
+                  >
+                    Uniform (All Walls)
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={wallBackgroundMode === "per-wall" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => handleWallBackgroundModeChange("per-wall")}
+                    className="h-6 px-2 text-[10px] font-medium"
+                  >
+                    Per-Wall ({numWalls} Walls)
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* UNIFORM WALL BACKGROUND */}
+            {(wallBackgroundMode === "uniform" || numWalls <= 1) && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Upload custom wall background image or paste URL..."
+                    value={customWallUrl}
+                    onChange={(e) => handleCustomWallUrlChange(e.target.value)}
+                    className="h-8 text-xs font-mono"
+                  />
+                  <input
+                    ref={wallFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleUploadFile(f, "customWall");
+                      if (wallFileInputRef.current) wallFileInputRef.current.value = "";
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    disabled={uploading}
+                    onClick={() => wallFileInputRef.current?.click()}
+                    className="h-8 text-xs shrink-0 cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    <UploadCloud className="w-3.5 h-3.5 mr-1" /> Upload Image
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setMediaDialogMode("customWall");
+                      setIsMediaDialogOpen(true);
+                    }}
+                    className="h-8 text-xs shrink-0 cursor-pointer"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5 mr-1" /> Media Vault
+                  </Button>
+                  {customWallUrl && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCustomWallUrlChange("")}
+                      className="h-8 px-2 text-xs text-muted-foreground hover:text-destructive shrink-0 cursor-pointer"
+                      title="Clear custom background"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+
+                {customWallUrl && (
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                    <img
+                      src={customWallUrl}
+                      alt="Wall Background Preview"
+                      className="w-14 h-9 object-cover rounded border border-amber-500/40 shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-foreground truncate">
+                        Active Custom Wall Background (Applied to all walls)
+                      </p>
+                      <p className="text-[10px] font-mono text-muted-foreground truncate">{customWallUrl}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* PER-WALL BACKGROUND TABS */}
+            {wallBackgroundMode === "per-wall" && numWalls > 1 && (
+              <div className="space-y-3">
+                {/* Wall Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {Array.from({ length: numWalls }, (_, w) => {
+                    const wallBg = wallCustomBackgrounds[w] || "";
+                    const isSelected = selectedWallTab === w;
+                    return (
+                      <button
+                        key={w}
+                        type="button"
+                        onClick={() => setSelectedWallTab(w)}
+                        className={cn(
+                          "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-serif transition-all cursor-pointer border shrink-0",
+                          isSelected
+                            ? "bg-amber-500/20 border-amber-500 text-amber-950 dark:text-amber-200 font-bold shadow-xs ring-1 ring-amber-500/30"
+                            : "bg-card hover:bg-muted text-muted-foreground border-border font-medium"
+                        )}
+                      >
+                        {wallBg ? (
+                          <img
+                            src={wallBg}
+                            alt={`Wall ${w + 1}`}
+                            className="w-4 h-4 rounded-full object-cover border border-amber-500/60"
+                          />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-stone-400" />
+                        )}
+                        Wall {w + 1}
+                        {wallBg && (
+                          <Badge variant="outline" className="text-[9px] h-4 px-1 border-amber-500/40 text-amber-700 dark:text-amber-300">
+                            Custom
+                          </Badge>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Selected Wall Configuration Card */}
+                {(() => {
+                  const currentWallBg = wallCustomBackgrounds[selectedWallTab] || "";
+                  return (
+                    <div className="p-3 rounded-lg border border-border/80 bg-background/60 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs font-semibold text-foreground">
+                          Wall #{selectedWallTab + 1} Custom Background
+                        </Label>
+                        <span className="text-[10px] font-mono text-muted-foreground">
+                          Corridor Bay {selectedWallTab + 1} of {numWalls}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="text"
+                          placeholder={`Custom background URL for Wall #${selectedWallTab + 1}...`}
+                          value={currentWallBg}
+                          onChange={(e) => handlePerWallUrlChange(selectedWallTab, e.target.value)}
+                          className="h-8 text-xs font-mono"
+                        />
+                        <Button
+                          type="button"
+                          variant="default"
+                          size="sm"
+                          disabled={uploading}
+                          onClick={() => wallFileInputRef.current?.click()}
+                          className="h-8 text-xs shrink-0 cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                          <UploadCloud className="w-3.5 h-3.5 mr-1" /> Upload Image
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setMediaDialogWallIndex(selectedWallTab);
+                            setMediaDialogMode("perWall");
+                            setIsMediaDialogOpen(true);
+                          }}
+                          className="h-8 text-xs shrink-0 cursor-pointer"
+                        >
+                          <ImageIcon className="w-3.5 h-3.5 mr-1" /> Media Vault
+                        </Button>
+                        {currentWallBg && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handlePerWallUrlChange(selectedWallTab, "")}
+                            className="h-8 px-2 text-xs text-muted-foreground hover:text-destructive shrink-0 cursor-pointer"
+                            title="Clear background for this wall"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                      </div>
+
+                      {currentWallBg && (
+                        <div className="flex items-center justify-between gap-3 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <img
+                              src={currentWallBg}
+                              alt={`Wall ${selectedWallTab + 1} Preview`}
+                              className="w-12 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                            />
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-semibold text-foreground truncate">
+                                Custom Backdrop for Wall #{selectedWallTab + 1}
+                              </p>
+                              <p className="text-[10px] font-mono text-muted-foreground truncate">{currentWallBg}</p>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleApplyWallToAll(selectedWallTab)}
+                            className="h-7 text-[11px] shrink-0 border-amber-500/40 text-amber-900 dark:text-amber-200 hover:bg-amber-500/20"
+                          >
+                            Apply to All Walls
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
 
           {/* Autoplay Tour, Dwell Speeds, and Bottom Card Toggle */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-amber-500/20">
@@ -1007,6 +1337,114 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        {/* Custom Canvas Background Image */}
+        <div className="p-3.5 rounded-xl border border-border/80 bg-background/50 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
+                <ImageIcon className="w-3.5 h-3.5 text-primary" /> Custom Canvas Background Image
+              </Label>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                Renders a custom photographic, texture, or architectural backdrop behind all gallery slides/cards.
+              </p>
+            </div>
+            {canvasBgImageUrl && (
+              <Badge variant="outline" className="text-[10px] border-primary/40 text-primary font-semibold">
+                Active Backdrop
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder="https://... or /media/... for gallery backdrop"
+              value={canvasBgImageUrl}
+              onChange={(e) => handleCanvasBgImageUrlChange(e.target.value)}
+              className="h-8 text-xs font-mono"
+            />
+            <input
+              ref={canvasBgFileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleUploadFile(f, "canvasBg");
+                if (canvasBgFileInputRef.current) canvasBgFileInputRef.current.value = "";
+              }}
+            />
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              disabled={uploading}
+              onClick={() => canvasBgFileInputRef.current?.click()}
+              className="h-8 text-xs shrink-0 cursor-pointer"
+            >
+              <UploadCloud className="w-3.5 h-3.5 mr-1" /> Upload Image
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setMediaDialogMode("canvasBg");
+                setIsMediaDialogOpen(true);
+              }}
+              className="h-8 text-xs shrink-0 cursor-pointer"
+            >
+              <ImageIcon className="w-3.5 h-3.5 mr-1" /> Media Vault
+            </Button>
+            {canvasBgImageUrl && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleCanvasBgImageUrlChange("")}
+                className="h-8 px-2 text-xs text-muted-foreground hover:text-destructive shrink-0 cursor-pointer"
+                title="Clear canvas background image"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            )}
+          </div>
+
+          {canvasBgImageUrl && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border/40">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Background Scaling Mode</Label>
+                <Select
+                  value={canvasBgMode}
+                  onValueChange={(val: "cover" | "contain" | "tile" | "blur") => handleCanvasBgModeChange(val)}
+                >
+                  <SelectTrigger className="h-8 text-xs bg-card">
+                    <SelectValue placeholder="Scaling Mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cover">Cover (Fill &amp; Center)</SelectItem>
+                    <SelectItem value="contain">Contain (Fit Aspect)</SelectItem>
+                    <SelectItem value="tile">Pattern Tile (Repeat)</SelectItem>
+                    <SelectItem value="blur">Ambient Frosted Blur</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-3 p-2 rounded-lg bg-card border border-border">
+                <img
+                  src={canvasBgImageUrl}
+                  alt="Canvas Background Preview"
+                  className="w-12 h-9 object-cover rounded border border-border shrink-0"
+                />
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold text-foreground truncate">Backdrop Preview</p>
+                  <p className="text-[9px] font-mono text-muted-foreground truncate">{canvasBgImageUrl}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Toggle: Show Title & Caption Ribbon */}
@@ -1712,6 +2150,10 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
         title={
           mediaDialogMode === "customWall"
             ? "Select Custom Wall Backdrop Image"
+            : mediaDialogMode === "perWall"
+            ? `Select Image for Wall #${mediaDialogWallIndex + 1}`
+            : mediaDialogMode === "canvasBg"
+            ? "Select Custom Canvas Background Image"
             : mediaDialogTargetIndex !== null
             ? `Select Image for Photo #${mediaDialogTargetIndex + 1}`
             : "Select Media for Gallery"
@@ -1720,6 +2162,16 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           if (mediaDialogMode === "customWall") {
             handleCustomWallUrlChange(media.url);
             toast.success("Custom wall backdrop updated!");
+            return;
+          }
+          if (mediaDialogMode === "perWall") {
+            handlePerWallUrlChange(mediaDialogWallIndex, media.url);
+            toast.success(`Custom background updated for Wall #${mediaDialogWallIndex + 1}!`);
+            return;
+          }
+          if (mediaDialogMode === "canvasBg") {
+            handleCanvasBgImageUrlChange(media.url);
+            toast.success("Custom canvas background updated!");
             return;
           }
 

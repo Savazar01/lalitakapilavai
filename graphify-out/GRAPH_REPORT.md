@@ -1,16 +1,16 @@
-# Graph Report - lalitakapilavai  (2026-10-17)
+# Graph Report - lalitakapilavai  (2026-10-18)
 
 ## Corpus Check
-- 235 files · ~265,203 words
+- 235 files · ~267,072 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1499 nodes · 3566 edges · 104 communities (90 shown, 14 thin omitted)
+- 1499 nodes · 3566 edges · 103 communities (89 shown, 14 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f609640b`
+- Built from commit: `55c5eae7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -138,7 +138,7 @@
 - `POST()` --calls--> `sendAtelierEmail()`  [INFERRED]
   src/app/api/events/register/route.ts → src/lib/email-service.ts
 
-## Communities (104 total, 14 thin omitted)
+## Communities (103 total, 14 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.22
@@ -225,8 +225,8 @@ Cohesion: 0.11
 Nodes (25): EditablePageHeader(), EditablePageHeaderProps, ECatalogListItem, ArtCategoryItem, LeadItem, statusColors, AdminApiError, adminFetch() (+17 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.06
-Nodes (8): { GET, POST }, fetchThumbnailBuffer(), GET(), auth, AuthSession, MediaVaultItem, RouteParams, RouteParams
+Cohesion: 0.05
+Nodes (8): { GET, POST }, fetchThumbnailBuffer(), GET(), auth, AuthSession, globalForPrisma, MediaVaultItem, RouteParams
 
 ### Community 31 - "Community 31"
 Cohesion: 0.07
@@ -257,8 +257,8 @@ Cohesion: 0.18
 Nodes (19): clearStorageCache(), generatePresignedDownloadUrl(), generatePresignedUploadUrl(), getMediaStream(), getStorageClient(), getStorageConfig(), StorageConfig, uploadBuffer() (+11 more)
 
 ### Community 39 - "Community 39"
-Cohesion: 0.12
-Nodes (14): BORDER_WIDTH_OPTIONS, DEFAULT_DETAILED_THEME_CONFIG, FONT_SIZE_OPTIONS, HEADING_FONT_OPTIONS, AiConfig, DEFAULT_FORM_SECURITY_CONFIG, EmailConfig, FooterConfig (+6 more)
+Cohesion: 0.13
+Nodes (13): BORDER_WIDTH_OPTIONS, FONT_SIZE_OPTIONS, HEADING_FONT_OPTIONS, AiConfig, DEFAULT_FORM_SECURITY_CONFIG, EmailConfig, FooterConfig, FormSecurityConfig (+5 more)
 
 ### Community 40 - "Community 40"
 Cohesion: 0.15
@@ -353,8 +353,8 @@ Cohesion: 0.22
 Nodes (9): scripts, build, db:seed, dev, docker:dev, docker:dev:down, docker:dev:logs, lint (+1 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.10
-Nodes (12): metadata, metadata, metadata, ExhibitionWallViewer(), Footer(), FooterConfig, LegalLinkItem, SocialLinkItem (+4 more)
+Cohesion: 0.11
+Nodes (11): metadata, metadata, metadata, ExhibitionWallViewer(), Footer(), FooterConfig, LegalLinkItem, SocialLinkItem (+3 more)
 
 ### Community 68 - "Community 68"
 Cohesion: 0.25
@@ -401,20 +401,20 @@ Cohesion: 0.50
 Nodes (3): 1. Summary of Actions, 2. Quantitative Post-Remediation Security Posture, Validation Log - Run 2: Full Vulnerability Remediation Verification
 
 ### Community 79 - "Community 79"
-Cohesion: 0.29
-Nodes (3): metadata, BlogArchiveClient(), BlogPostData
+Cohesion: 0.17
+Nodes (5): metadata, metadata, BlogArchiveClient(), BlogPostData, DynamicPageSections()
 
 ### Community 80 - "Community 80"
 Cohesion: 0.22
 Nodes (10): 3. Docker Containerization & Production Build, 7. Production Environment Variables Template, code:bash (docker compose down), code:bash (# ==========================================================), code:bash (docker compose up -d --build), code:bash (docker compose ps), code:bash (curl http://localhost:3000/api/health), Full Multi-Stage Docker Build (+2 more)
 
 ### Community 81 - "Community 81"
-Cohesion: 0.08
-Nodes (4): checkAdminAuth(), GET(), POST(), globalForPrisma
+Cohesion: 0.29
+Nodes (4): checkAdminAuth(), GET(), POST(), RouteParams
 
 ### Community 82 - "Community 82"
-Cohesion: 0.15
-Nodes (15): ALLOWED_TOKENS, AllowedToken, DynamicThemeProvider(), BODY_FONT_OPTIONS, BORDER_RADIUS_OPTIONS, DetailedThemeConfig, FormThemeTokens, generateUnifiedThemeCSS() (+7 more)
+Cohesion: 0.14
+Nodes (16): ALLOWED_TOKENS, AllowedToken, DynamicThemeProvider(), BODY_FONT_OPTIONS, BORDER_RADIUS_OPTIONS, DEFAULT_DETAILED_THEME_CONFIG, DetailedThemeConfig, FormThemeTokens (+8 more)
 
 ### Community 85 - "Community 85"
 Cohesion: 0.21
@@ -486,9 +486,9 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `cn()` connect `Community 34` to `Community 0`, `Community 4`, `Community 7`, `Community 8`, `Community 18`, `Community 21`, `Community 31`, `Community 32`, `Community 33`, `Community 36`, `Community 39`, `Community 43`, `Community 44`, `Community 45`, `Community 50`, `Community 51`, `Community 53`, `Community 56`, `Community 59`, `Community 66`, `Community 87`, `Community 90`, `Community 93`, `Community 96`, `Community 98`, `Community 100`, `Community 102`?**
   _High betweenness centrality (0.065) - this node is a cross-community bridge._
-- **Why does `Button` connect `Community 32` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `Community 21`, `Community 31`, `Community 36`, `Community 39`, `Community 44`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 66`, `Community 86`, `Community 87`, `Community 90`, `Community 93`, `Community 96`, `Community 98`, `Community 101`, `Community 102`?**
+- **Why does `Button` connect `Community 32` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `Community 21`, `Community 31`, `Community 36`, `Community 39`, `Community 44`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 66`, `Community 86`, `Community 87`, `Community 90`, `Community 91`, `Community 93`, `Community 96`, `Community 98`, `Community 101`, `Community 102`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Why does `Badge()` connect `Community 32` to `Community 0`, `Community 1`, `Community 4`, `Community 7`, `Community 21`, `Community 34`, `Community 36`, `Community 39`, `Community 44`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 66`, `Community 87`, `Community 93`, `Community 96`, `Community 98`, `Community 102`?**
+- **Why does `Badge()` connect `Community 32` to `Community 0`, `Community 1`, `Community 4`, `Community 7`, `Community 21`, `Community 34`, `Community 36`, `Community 39`, `Community 44`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 66`, `Community 87`, `Community 91`, `Community 93`, `Community 96`, `Community 98`, `Community 102`?**
   _High betweenness centrality (0.013) - this node is a cross-community bridge._
 - **What connects `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig` to the rest of the system?**
   _557 weakly-connected nodes found - possible documentation gaps or missing edges._

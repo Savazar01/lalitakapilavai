@@ -16,6 +16,9 @@ export interface KenBurnsCanvasProps {
   overlayTextColor?: string;
   className?: string;
   canvasBgColor?: string;
+  canvasBgImageUrl?: string;
+  canvasBgMode?: "cover" | "contain" | "tile" | "blur";
+  canvasBgOpacity?: number;
   borderFilletColor?: string;
   borderWidth?: number;
   framePadding?: number;
@@ -42,6 +45,9 @@ export function KenBurnsCanvas({
   overlayTextColor,
   className = "",
   canvasBgColor,
+  canvasBgImageUrl,
+  canvasBgMode = "cover",
+  canvasBgOpacity = 85,
   borderFilletColor = "#D4AF37",
   borderWidth = 0,
   framePadding = 0,
@@ -147,6 +153,10 @@ export function KenBurnsCanvas({
         )}
         style={{
           backgroundColor: canvasBgColor || "transparent",
+          backgroundImage: canvasBgImageUrl ? `url("${canvasBgImageUrl}")` : undefined,
+          backgroundSize: canvasBgMode === "contain" ? "contain" : canvasBgMode === "tile" ? "auto" : "cover",
+          backgroundRepeat: canvasBgMode === "tile" ? "repeat" : "no-repeat",
+          backgroundPosition: "center",
           padding: framePadding ? `${framePadding}px` : undefined,
           border: borderWidth > 0 ? `${borderWidth}px solid ${borderFilletColor}` : undefined,
         }}

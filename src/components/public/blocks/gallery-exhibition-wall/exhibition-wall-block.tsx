@@ -28,6 +28,9 @@ export interface ExhibitionWallBlockProps {
   culturalEnvironment?: string;
   customWallUrl?: string;
   customWallBackdropUrl?: string;
+  wallBackgroundMode?: "uniform" | "per-wall";
+  wallCustomBackgrounds?: string[];
+  wallEnvironments?: string[];
   cameraTourStyle?: CameraTourStyle;
   cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
   wallLayout?: WallLayoutMatrix;
@@ -399,6 +402,9 @@ export function ExhibitionWallBlock({
   tourSpeedSeconds = 5,
   overviewDwellSeconds = 4,
   showExhibitionBadge: _showExhibitionBadge = true,
+  wallBackgroundMode = "uniform",
+  wallCustomBackgrounds = [],
+  wallEnvironments = [],
   maxArtworksPerWall = 4,
   showMetadataCardBelowWall = true,
   className = "",
@@ -408,9 +414,10 @@ export function ExhibitionWallBlock({
 
   const activeEnvId = culturalEnvironment || environmentId || "modern-minimalist";
   const activeCustomWallUrl = customWallBackdropUrl || customWallUrl;
+  const isPerWall = wallBackgroundMode === "per-wall" && wallCustomBackgrounds.some((u) => u && u.trim() !== "");
   const isCustomBackdrop =
-    (activeEnvId === "custom" || activeEnvId.toLowerCase().includes("custom")) &&
-    !!activeCustomWallUrl;
+    ((activeEnvId === "custom" || activeEnvId.toLowerCase().includes("custom")) && !!activeCustomWallUrl) ||
+    isPerWall;
 
   const isMounted = React.useSyncExternalStore(
     () => () => {},
@@ -588,7 +595,8 @@ export function ExhibitionWallBlock({
     spotlight: THREE.SpotLight;
     artSpotlights: THREE.SpotLight[];
     ambientLight: THREE.AmbientLight;
-    wallMesh: THREE.Mesh;
+    wallMesh?: THREE.Mesh;
+    wallMeshes?: THREE.Mesh[];
     decorGroup?: THREE.Group;
     animationId: number;
     clock: THREE.Clock;
@@ -770,37 +778,97 @@ export function ExhibitionWallBlock({
     bumpTex.wrapT = THREE.RepeatWrapping;
     bumpTex.repeat.set(Math.round(corridorLength / 2), 8);
 
-    const wallMat = new THREE.MeshStandardMaterial({
-      map: wallTex,
-      bumpMap: bumpTex,
-      bumpScale: 0.04,
-      roughness: 0.92,
-      metalness: 0.02,
-      transparent: isCustomBackdrop,
-      opacity: isCustomBackdrop ? 0.88 : 1.0,
-    });
+    const wallMeshes: THREE.Mesh[] = [];
 
-    if (env.wallTextureUrl) {
-      texLoader.load(
-        env.wallTextureUrl,
-        (loadedTex) => {
-          loadedTex.colorSpace = THREE.SRGBColorSpace;
-          loadedTex.wrapS = THREE.RepeatWrapping;
-          loadedTex.wrapT = THREE.ClampToEdgeWrapping;
-          wallMat.map = loadedTex;
-          wallMat.needsUpdate = true;
-        },
-        undefined,
-        (err) => {
-          console.warn("Could not load wall texture:", err);
+    if (numWalls <= 1) {
+      const wallMat = new THREE.MeshStandardMaterial({
+        map: wallTex,
+        bumpMap: bumpTex,
+        bumpScale: 0.04,
+        roughness: 0.92,
+        metalness: 0.02,
+        transparent: isCustomBackdrop,
+        opacity: isCustomBackdrop ? 0.88 : 1.0,
+      });
+
+      const singleCustomUrl =
+        (wallCustomBackgrounds && wallCustomBackgrounds[0]) ||
+        activeCustomWallUrl ||
+        env.wallTextureUrl;
+
+      if (singleCustomUrl) {
+        texLoader.load(
+          singleCustomUrl,
+          (loadedTex) => {
+            loadedTex.colorSpace = THREE.SRGBColorSpace;
+            loadedTex.wrapS = THREE.RepeatWrapping;
+            loadedTex.wrapT = THREE.ClampToEdgeWrapping;
+            wallMat.map = loadedTex;
+            wallMat.needsUpdate = true;
+          },
+          undefined,
+          (err) => {
+            console.warn("Could not load wall texture:", err);
+          }
+        );
+      }
+
+      const wallMesh = new THREE.Mesh(wallGeo, wallMat);
+      wallMesh.position.set(corridorCenterX, 2.5, 0);
+      wallMesh.receiveShadow = true;
+      scene.add(wallMesh);
+      wallMeshes.push(wallMesh);
+    } else {
+      // Modular Multi-Wall Bay Architecture: Dedicated Wall Bay Meshes for each corridor section
+      for (let w = 0; w < numWalls; w++) {
+        const bayCenterX = w * wallSpacing;
+        const isFirst = w === 0;
+        const isLast = w === numWalls - 1;
+        const leftExtension = isFirst ? 14.0 : 0.0;
+        const rightExtension = isLast ? 14.0 : 0.0;
+        const bayWidth = wallSpacing + leftExtension + rightExtension;
+        const adjustedCenterX = bayCenterX - leftExtension / 2 + rightExtension / 2;
+
+        const bayGeo = new THREE.PlaneGeometry(bayWidth, 12);
+        const bayCustomUrl = isPerWall
+          ? (wallCustomBackgrounds?.[w] || activeCustomWallUrl || env.wallTextureUrl)
+          : (activeCustomWallUrl || wallCustomBackgrounds?.[w] || env.wallTextureUrl);
+
+        const bayHasCustom = !!bayCustomUrl;
+        const bayMat = new THREE.MeshStandardMaterial({
+          map: wallTex,
+          bumpMap: bumpTex,
+          bumpScale: 0.04,
+          roughness: 0.92,
+          metalness: 0.02,
+          transparent: bayHasCustom && isCustomBackdrop,
+          opacity: bayHasCustom && isCustomBackdrop ? 0.88 : 1.0,
+        });
+
+        if (bayCustomUrl) {
+          texLoader.load(
+            bayCustomUrl,
+            (loadedTex) => {
+              loadedTex.colorSpace = THREE.SRGBColorSpace;
+              loadedTex.wrapS = THREE.ClampToEdgeWrapping;
+              loadedTex.wrapT = THREE.ClampToEdgeWrapping;
+              bayMat.map = loadedTex;
+              bayMat.needsUpdate = true;
+            },
+            undefined,
+            (err) => {
+              console.warn(`Could not load wall texture for wall ${w + 1}:`, err);
+            }
+          );
         }
-      );
-    }
 
-    const wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(corridorCenterX, 2.5, 0);
-    wallMesh.receiveShadow = true;
-    scene.add(wallMesh);
+        const bayMesh = new THREE.Mesh(bayGeo, bayMat);
+        bayMesh.position.set(adjustedCenterX, 2.5, 0);
+        bayMesh.receiveShadow = true;
+        scene.add(bayMesh);
+        wallMeshes.push(bayMesh);
+      }
+    }
 
     // 3D Architectural Crown Moulding Beam along Ceiling
     const crownGeo = new THREE.BoxGeometry(corridorLength, 0.28, 0.2);
@@ -1282,7 +1350,8 @@ export function ExhibitionWallBlock({
       spotlight,
       artSpotlights,
       ambientLight,
-      wallMesh,
+      wallMesh: wallMeshes[0],
+      wallMeshes,
       decorGroup,
       animationId: 0,
       clock,
@@ -1371,7 +1440,18 @@ export function ExhibitionWallBlock({
         threeRef.current.renderer.dispose();
       }
     };
-  }, [placements, env, activeTourStyle, isCustomBackdrop, numWalls, cameraTransitionStyle]);
+  }, [
+    placements,
+    env,
+    activeTourStyle,
+    isCustomBackdrop,
+    numWalls,
+    cameraTransitionStyle,
+    wallBackgroundMode,
+    wallCustomBackgrounds,
+    activeCustomWallUrl,
+    isPerWall,
+  ]);
 
   // Update Environment Lighting dynamically
   React.useEffect(() => {
@@ -1548,16 +1628,20 @@ export function ExhibitionWallBlock({
     <div className={cn("w-full flex flex-col", className)}>
       <div
         ref={containerRef}
-        style={
-          isCustomBackdrop
-            ? {
-                backgroundImage: `url("${activeCustomWallUrl}")`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }
-            : undefined
-        }
+        style={(() => {
+          const currentWallCustomUrl = isPerWall
+            ? (wallCustomBackgrounds?.[activeWallIndex] || activeCustomWallUrl)
+            : (activeCustomWallUrl || wallCustomBackgrounds?.[0]);
+          if (currentWallCustomUrl && isCustomBackdrop) {
+            return {
+              backgroundImage: `url("${currentWallCustomUrl}")`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            };
+          }
+          return undefined;
+        })()}
         className={cn(
           "relative w-full rounded-2xl overflow-hidden border border-border/60 bg-stone-950 select-none shadow-2xl transition-all duration-300",
           isFullscreen ? "fixed inset-0 z-50 rounded-none border-none h-screen w-screen" : "h-[540px] sm:h-[640px]"

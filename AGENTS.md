@@ -144,7 +144,7 @@ All code generation and architectural modifications must adhere to the specializ
   - The driver awaits `Promise.all(images.map(img => img.decode().catch(...)))` followed by a safety buffer before invoking `iframe.contentWindow.print()`.
   - In `src/components/public/catalog-print-button.tsx`, an in-situ decoding preloader displays a responsive progress indicator while decoding offscreen plates, completely eliminating blank image omissions on plates 2+ in browser PDF exports.
 
-### B. 3D WebGL Exhibition Salon Wall Engine
+### B. 3D WebGL Exhibition Salon Wall Engine & Gallery Background Architecture
 - **Aspect Ratio Preservation**:
   - NEVER force artworks into uniform square aspect ratios (`aspect-square` or $1:1$).
   - Calculate Three.js frame, gold fillet, matting, and canvas plane dimensions dynamically from the image's intrinsic ratio (`naturalWidth / naturalHeight`).
@@ -152,6 +152,15 @@ All code generation and architectural modifications must adhere to the specializ
 - **Multi-Wall Automatic Partitioning**:
   - Use `maxArtworksPerWall` (default: 4, range: 2–8).
   - When hung artworks exceed this threshold, the engine automatically partitions the collection into sequential corridor walls (Wall 1, Wall 2, etc.), preventing visual crowding.
+- **Multi-Wall Custom Image Backdrops & Uniform Fallback**:
+  - In `ExhibitionWallBlock`, the back wall geometry is partitioned into modular bay meshes (`w = 0` to `numWalls - 1`) aligned with architectural divider pilasters.
+  - Supports `wallBackgroundMode: "uniform" | "per_wall"`:
+    - `"uniform"`: All salon corridor bays share a single texture (`wallCustomBackgroundUrl`), with optional bump mapping and tone coordination.
+    - `"per_wall"`: Each bay (`wallCustomBackgrounds[w]`) receives an independent high-resolution texture map with independent sRGB color space rendering and bump dynamics.
+  - Wall bays seamlessly fallback to procedurally illuminated plaster walls when no custom texture is specified.
+- **Universal Media Gallery Canvas Background Engine**:
+  - All Media Gallery presentation options (Carousel, Snap Scroll, Curated Bento, Ken Burns, Soft Crossfade, Filmstrip Reel) support custom backdrop images via `canvasBgImageUrl`, `canvasBgMode` (`"cover" | "contain" | "tile" | "blur"`), and `canvasBgOpacity` (0–100%).
+  - Integrated with local `/media/` mount on localhost:3060 and remote cloud storage (S3/R2) via direct upload or Media Vault picker.
 - **Zero Overlay Invariant**:
   - Never overlay dark administrative cards, badges, or thumbnail strips across the 3D viewing canvas.
   - On desktop, mount the metadata placard as a physical white plaque on the wall to the right of the artwork.
