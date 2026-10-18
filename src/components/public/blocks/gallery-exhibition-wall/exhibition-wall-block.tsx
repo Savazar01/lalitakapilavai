@@ -54,15 +54,27 @@ export type WallArtworkLayoutType =
   | "grid-2x3"
   | "horizontal-6";
 
+export type WallFrameStyle =
+  | "gold-gilt"
+  | "teak-wood"
+  | "gallery-black"
+  | "museum-glass"
+  | "rosewood"
+  | "light-oak"
+  | "white-float"
+  | "curated-mix";
+
 export interface ExhibitionWallConfig {
   id?: string;
   wallIndex?: number;
   name?: string;
   layoutType?: WallArtworkLayoutType;
   artworkIds?: string[];
+  frameStyle?: WallFrameStyle;
   offsetX?: number;
   offsetY?: number;
   spacingMultiplier?: number;
+  verticalGap?: number;
   customBackgroundUrl?: string;
 }
 
@@ -76,7 +88,7 @@ export interface ExhibitionWallBlockProps {
   wallCustomBackgrounds?: string[];
   wallEnvironments?: string[];
   cameraTourStyle?: CameraTourStyle;
-  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
+  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade" | "cinematic-arc";
   wallLayout?: WallLayoutMatrix;
   autoplayTour?: boolean;
   tourSpeedSeconds?: number;
@@ -96,7 +108,7 @@ export interface ArtworkPlacement {
   height: number;
   wallIndex: number;
   wallCenterX: number;
-  frameType: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
+  frameType: WallFrameStyle | "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
   index: number;
 }
 
@@ -231,8 +243,12 @@ function computePlacements(
     // Tailor max dimension to layout
     let maxDim = 1.35;
     if (resolvedLayout === "single" || count === 1) maxDim = 2.0;
-    else if (resolvedLayout === "vertical-3") maxDim = 0.95;
+    else if (resolvedLayout === "vertical-3") maxDim = 0.90;
     else if (
+      resolvedLayout === "vertical-2" ||
+      resolvedLayout === "pyramid-1-2" ||
+      resolvedLayout === "pyramid-2-1" ||
+      (resolvedLayout as string) === "inverted-pyramid-2-1" ||
       resolvedLayout === "horizontal-4" ||
       resolvedLayout === "stack-1-3" ||
       resolvedLayout === "stack-3-1" ||
@@ -253,7 +269,7 @@ function computePlacements(
       resolvedLayout === "grid-2x3"
     )
       maxDim = 0.95;
-    else if (count <= 3) maxDim = 1.55;
+    else if (count <= 3) maxDim = 1.45;
     else maxDim = 1.15;
 
     const frameSizes = wallItems.map((item) => {
@@ -261,11 +277,14 @@ function computePlacements(
       return calculateFrameSize(ar, maxDim);
     });
 
-    // Helper for 2 stacked artworks with guaranteed vertical clearance
+    const baseVerticalGap = cfg?.verticalGap ?? 0.48;
+    const vClearance = baseVerticalGap * spacingMult;
+
+    // Helper for 2 stacked artworks with guaranteed vertical clearance accounting for frame padding (0.16m)
     const getStackedY = (topIdx: number, btmIdx: number) => {
-      const hTop = frameSizes[topIdx]?.height || 1.15;
-      const hBtm = frameSizes[btmIdx]?.height || 1.15;
-      const centerDist = hTop / 2 + VERTICAL_GAP + hBtm / 2;
+      const hTop = (frameSizes[topIdx]?.height || 1.10) + 0.16;
+      const hBtm = (frameSizes[btmIdx]?.height || 1.10) + 0.16;
+      const centerDist = hTop / 2 + vClearance + hBtm / 2;
       return {
         yTop: EYE_LEVEL_Y + centerDist / 2,
         yBtm: EYE_LEVEL_Y - centerDist / 2,
@@ -275,7 +294,7 @@ function computePlacements(
     let localSlots: {
       x: number;
       y: number;
-      frame: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
+      frame: WallFrameStyle | "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float";
     }[] = [];
 
     if (resolvedLayout === "single" || count === 1) {
@@ -307,36 +326,37 @@ function computePlacements(
         { x: totalSpan / 2 - w2 / 2, y: EYE_LEVEL_Y, frame: "light-oak" },
       ];
     } else if (resolvedLayout === "vertical-3") {
-      const h0 = frameSizes[0].height;
-      const h1 = frameSizes[1]?.height || 1.0;
-      const h2 = frameSizes[2]?.height || 1.0;
-      const vGap = 0.20 * spacingMult;
+      const h0 = (frameSizes[0]?.height || 0.9) + 0.16;
+      const h1 = (frameSizes[1]?.height || 0.9) + 0.16;
+      const h2 = (frameSizes[2]?.height || 0.9) + 0.16;
+      const centerDistTop = h1 / 2 + vClearance + h0 / 2;
+      const centerDistBtm = h1 / 2 + vClearance + h2 / 2;
       localSlots = [
-        { x: 0, y: EYE_LEVEL_Y + h1 / 2 + vGap + h0 / 2, frame: "gold-teak" },
+        { x: 0, y: EYE_LEVEL_Y + centerDistTop, frame: "gold-teak" },
         { x: 0, y: EYE_LEVEL_Y, frame: "rosewood-ivory" },
-        { x: 0, y: EYE_LEVEL_Y - (h1 / 2 + vGap + h2 / 2), frame: "light-oak" },
+        { x: 0, y: EYE_LEVEL_Y - centerDistBtm, frame: "light-oak" },
       ];
     } else if (resolvedLayout === "pyramid-1-2") {
       const w1 = frameSizes[1]?.width || 1.1;
       const w2 = frameSizes[2]?.width || 1.1;
       const colGap = 1.40 * spacingMult;
       const btmSpan = w1 + colGap + w2;
-      const hBtmMax = Math.max(frameSizes[1]?.height || 1.1, frameSizes[2]?.height || 1.1);
-      const h0 = frameSizes[0].height;
-      const centerDist = h0 / 2 + VERTICAL_GAP + hBtmMax / 2;
+      const hBtmMax = Math.max(frameSizes[1]?.height || 1.1, frameSizes[2]?.height || 1.1) + 0.16;
+      const h0 = (frameSizes[0]?.height || 1.1) + 0.16;
+      const centerDist = h0 / 2 + vClearance + hBtmMax / 2;
       localSlots = [
         { x: 0, y: EYE_LEVEL_Y + centerDist / 2, frame: "gold-teak" },
         { x: -btmSpan / 2 + w1 / 2, y: EYE_LEVEL_Y - centerDist / 2, frame: "rosewood-ivory" },
         { x: btmSpan / 2 - w2 / 2, y: EYE_LEVEL_Y - centerDist / 2, frame: "light-oak" },
       ];
-    } else if (resolvedLayout === "pyramid-2-1") {
+    } else if (resolvedLayout === "pyramid-2-1" || (resolvedLayout as string) === "inverted-pyramid-2-1") {
       const w0 = frameSizes[0]?.width || 1.1;
       const w1 = frameSizes[1]?.width || 1.1;
       const colGap = 1.40 * spacingMult;
       const topSpan = w0 + colGap + w1;
-      const hTopMax = Math.max(frameSizes[0]?.height || 1.1, frameSizes[1]?.height || 1.1);
-      const h2 = frameSizes[2]?.height || 1.1;
-      const centerDist = hTopMax / 2 + VERTICAL_GAP + h2 / 2;
+      const hTopMax = Math.max(frameSizes[0]?.height || 1.1, frameSizes[1]?.height || 1.1) + 0.16;
+      const h2 = (frameSizes[2]?.height || 1.1) + 0.16;
+      const centerDist = hTopMax / 2 + vClearance + h2 / 2;
       localSlots = [
         { x: -topSpan / 2 + w0 / 2, y: EYE_LEVEL_Y + centerDist / 2, frame: "rosewood-ivory" },
         { x: topSpan / 2 - w1 / 2, y: EYE_LEVEL_Y + centerDist / 2, frame: "light-oak" },
@@ -588,6 +608,8 @@ function computePlacements(
       };
       const globalIdx = placements.length;
       const { width, height } = frameSizes[localIdx] || { width: 1.2, height: 1.2 };
+      const wallFrameStyle: WallFrameStyle = cfg?.frameStyle || "curated-mix";
+      const resolvedFrameType = wallFrameStyle !== "curated-mix" ? wallFrameStyle : slot.frame;
       placements.push({
         item,
         x: wallCenterX + slot.x + offsetX,
@@ -596,7 +618,7 @@ function computePlacements(
         height,
         wallIndex: w,
         wallCenterX,
-        frameType: slot.frame,
+        frameType: resolvedFrameType,
         index: globalIdx,
       });
     });
@@ -1452,21 +1474,39 @@ export function ExhibitionWallBlock({
 
       // 2. Outer Frame
       let frameColor = 0xd4af37;
-      let roughness = 0.35;
-      let metalness = 0.65;
+      let roughness = 0.28;
+      let metalness = 0.75;
+      const ft = placement.frameType;
 
-      if (placement.frameType === "rosewood-ivory") {
+      if (ft === "teak-wood") {
+        frameColor = 0x5c3a21;
+        roughness = 0.65;
+        metalness = 0.05;
+      } else if (ft === "gallery-black") {
+        frameColor = 0x18181b;
+        roughness = 0.85;
+        metalness = 0.0;
+      } else if (ft === "museum-glass") {
+        frameColor = 0x242426;
+        roughness = 0.30;
+        metalness = 0.25;
+      } else if (ft === "rosewood" || ft === "rosewood-ivory") {
         frameColor = 0x3d1f14;
         roughness = 0.48;
         metalness = 0.12;
-      } else if (placement.frameType === "light-oak") {
+      } else if (ft === "light-oak") {
         frameColor = 0xc8ab83;
         roughness = 0.58;
         metalness = 0.06;
-      } else if (placement.frameType === "white-float") {
+      } else if (ft === "white-float") {
         frameColor = 0xf5f5f3;
         roughness = 0.75;
         metalness = 0.0;
+      } else {
+        // default "gold-gilt" / "gold-teak"
+        frameColor = 0xd4af37;
+        roughness = 0.28;
+        metalness = 0.75;
       }
 
       let frameGeo = new THREE.BoxGeometry(frameW, frameH, frameDepth);
@@ -1597,12 +1637,33 @@ export function ExhibitionWallBlock({
       canvasMesh.receiveShadow = true;
       artGroup.add(canvasMesh);
 
+      const artMaterials: THREE.Material[] = [frameMat, filletMat, matMaterial, canvasMat, shadowMat];
+
+      if (placement.frameType === "museum-glass") {
+        const glassGeo = new THREE.PlaneGeometry(placement.width, placement.height);
+        const glassMat = new THREE.MeshPhysicalMaterial({
+          color: 0xffffff,
+          transmission: 0.94,
+          opacity: 0.85,
+          transparent: true,
+          roughness: 0.04,
+          ior: 1.52,
+          reflectivity: 0.6,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.04,
+        });
+        const glassMesh = new THREE.Mesh(glassGeo, glassMat);
+        glassMesh.position.set(0, 0, frameDepth / 2 + 0.008);
+        artGroup.add(glassMesh);
+        artMaterials.push(glassMat);
+      }
+
       scene.add(artGroup);
 
       artworkMeshes.push({
         mesh: canvasMesh,
         group: artGroup,
-        materials: [frameMat, filletMat, matMaterial, canvasMat, shadowMat],
+        materials: artMaterials,
         placement,
         index: idx,
       });
@@ -1648,14 +1709,29 @@ export function ExhibitionWallBlock({
       const delta = state.clock.getDelta();
       const elapsed = state.clock.getElapsedTime();
 
-      // Smooth frame-rate independent camera damping
-      state.camera.position.x = THREE.MathUtils.damp(state.camera.position.x, state.targetCamPos.x, 3.2, delta);
-      state.camera.position.y = THREE.MathUtils.damp(state.camera.position.y, state.targetCamPos.y, 3.2, delta);
-      state.camera.position.z = THREE.MathUtils.damp(state.camera.position.z, state.targetCamPos.z, 2.8, delta);
+      // Dynamic Smooth Wall-to-Wall Transition Arc Physics
+      let effectiveTargetZ = state.targetCamPos.z;
+      let effectiveTargetY = state.targetCamPos.y;
+      const xDistance = Math.abs(state.targetCamPos.x - state.camera.position.x);
 
-      state.currentLookAt.x = THREE.MathUtils.damp(state.currentLookAt.x, state.targetLookAt.x, 3.5, delta);
-      state.currentLookAt.y = THREE.MathUtils.damp(state.currentLookAt.y, state.targetLookAt.y, 3.5, delta);
-      state.currentLookAt.z = THREE.MathUtils.damp(state.currentLookAt.z, state.targetLookAt.z, 3.5, delta);
+      if (cameraTransitionStyle === "cinematic-arc" && xDistance > 0.4) {
+        // Parabolic pullback in Z mid-transit creates an authentic Hollywood crane/Steadicam sweep
+        const travelProgress = Math.min(1, xDistance / WALL_SPACING);
+        const arcFactor = 4 * travelProgress * (1 - travelProgress * 0.85);
+        effectiveTargetZ += arcFactor * 2.2;
+        effectiveTargetY += Math.sin(travelProgress * Math.PI) * 0.25;
+      }
+
+      const dampSpeed =
+        cameraTransitionStyle === "cinematic-arc" ? 2.4 : cameraTransitionStyle === "dolly" ? 2.6 : 3.0;
+
+      state.camera.position.x = THREE.MathUtils.damp(state.camera.position.x, state.targetCamPos.x, dampSpeed, delta);
+      state.camera.position.y = THREE.MathUtils.damp(state.camera.position.y, effectiveTargetY, dampSpeed, delta);
+      state.camera.position.z = THREE.MathUtils.damp(state.camera.position.z, effectiveTargetZ, dampSpeed * 0.85, delta);
+
+      state.currentLookAt.x = THREE.MathUtils.damp(state.currentLookAt.x, state.targetLookAt.x, dampSpeed * 1.1, delta);
+      state.currentLookAt.y = THREE.MathUtils.damp(state.currentLookAt.y, state.targetLookAt.y, dampSpeed * 1.1, delta);
+      state.currentLookAt.z = THREE.MathUtils.damp(state.currentLookAt.z, state.targetLookAt.z, dampSpeed * 1.1, delta);
 
       state.camera.lookAt(state.currentLookAt);
 

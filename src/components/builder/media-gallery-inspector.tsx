@@ -30,6 +30,9 @@ import {
   Eye,
   GripVertical,
   RotateCcw,
+  Search,
+  Frame,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -41,6 +44,13 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -51,6 +61,7 @@ import { MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/b
 import type {
   ExhibitionWallConfig,
   WallArtworkLayoutType,
+  WallFrameStyle,
 } from "@/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block";
 import { WALL_ENVIRONMENTS } from "@/components/public/blocks/gallery-exhibition-wall/exhibition-environments";
 import { cn } from "@/lib/utils";
@@ -242,7 +253,7 @@ export interface MediaGalleryBlockData {
   wallEnvironments?: string[];
   wallConfigs?: ExhibitionWallConfig[];
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
-  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
+  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade" | "cinematic-arc";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
   overviewDwellSeconds?: number;
@@ -294,8 +305,71 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
   const items = data.items ?? [];
   const wallConfigs = data.wallConfigs;
 
-  // Dynamic synthesis or extraction of Exhibition Wall configurations
+  // Local state cache for smooth slider drags and reliable persistence
+  const [localWallConfigs, setLocalWallConfigs] = React.useState<ExhibitionWallConfig[] | null>(null);
+
+  // Catalog Artworks Search Dialog State
+  const [isCatalogSearchOpen, setIsCatalogSearchOpen] = React.useState(false);
+  const [catalogArtworks, setCatalogArtworks] = React.useState<{
+    id: string;
+    title: string;
+    primaryImageUrl?: string | null;
+    images?: string[];
+    medium?: string | null;
+    dimensions?: string | null;
+    year?: string | number | null;
+    slug?: string;
+    category?: { id: string; name: string } | null;
+  }[]>([]);
+  const [isLoadingCatalog, setIsLoadingCatalog] = React.useState(false);
+  const [catalogSearchQuery, setCatalogSearchQuery] = React.useState("");
+  const [catalogCategoryFilter, setCatalogCategoryFilter] = React.useState("ALL");
+
+  const handleOpenCatalogSearch = React.useCallback(() => {
+    setIsCatalogSearchOpen(true);
+    setIsLoadingCatalog(true);
+    fetch("/api/admin/artworks")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((artList: unknown) => {
+        if (Array.isArray(artList)) {
+          setCatalogArtworks(artList);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch artworks catalog:", err);
+      })
+      .finally(() => {
+        setIsLoadingCatalog(false);
+      });
+  }, []);
+
+  // Filtered catalog list
+  const catalogCategories = React.useMemo(() => {
+    const set = new Set<string>();
+    catalogArtworks.forEach((art) => {
+      if (art.category?.name) set.add(art.category.name);
+    });
+    return Array.from(set).sort();
+  }, [catalogArtworks]);
+
+  const filteredCatalogArtworks = React.useMemo(() => {
+    return catalogArtworks.filter((art) => {
+      const matchesCategory =
+        catalogCategoryFilter === "ALL" || art.category?.name === catalogCategoryFilter;
+      const q = catalogSearchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        art.title?.toLowerCase().includes(q) ||
+        art.medium?.toLowerCase().includes(q) ||
+        art.dimensions?.toLowerCase().includes(q) ||
+        art.category?.name?.toLowerCase().includes(q);
+      return matchesCategory && matchesSearch;
+    });
+  }, [catalogArtworks, catalogCategoryFilter, catalogSearchQuery]);
   const effectiveWallConfigs = React.useMemo<ExhibitionWallConfig[]>(() => {
+    if (localWallConfigs && localWallConfigs.length > 0) {
+      return localWallConfigs;
+    }
     if (wallConfigs && wallConfigs.length > 0) {
       return wallConfigs;
     }
@@ -316,14 +390,16 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
         wallIndex: w,
         artworkIds: artIds,
         layoutType: layout,
+        frameStyle: "curated-mix",
         offsetX: 0,
         offsetY: 0,
         spacingMultiplier: 1.0,
+        verticalGap: 0.48,
         customBackgroundUrl: wallCustomBackgrounds[w] || (wallBackgroundMode === "uniform" ? customWallUrl : undefined),
       });
     }
     return configs;
-  }, [wallConfigs, items, maxArtworksPerWall, wallCustomBackgrounds, wallBackgroundMode, customWallUrl]);
+  }, [localWallConfigs, items, maxArtworksPerWall, wallCustomBackgrounds, wallBackgroundMode, customWallUrl]);
 
   const numWalls = Math.max(1, effectiveWallConfigs.length);
   const [selectedWallTab, setSelectedWallTab] = React.useState<number>(0);
@@ -551,9 +627,11 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
         wallIndex: current.length,
         artworkIds: [],
         layoutType: "auto-balanced",
+        frameStyle: "curated-mix",
         offsetX: 0,
         offsetY: 0,
         spacingMultiplier: 1.0,
+        verticalGap: 0.48,
       });
     }
     current[wIndex] = {
@@ -561,6 +639,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       ...updates,
       wallIndex: wIndex,
     };
+    setLocalWallConfigs(current);
     onChange({
       ...data,
       wallConfigs: current,
@@ -574,10 +653,13 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       wallIndex: newWallIndex,
       artworkIds: [],
       layoutType: "auto-balanced",
+      frameStyle: "curated-mix",
       offsetX: 0,
       offsetY: 0,
       spacingMultiplier: 1.0,
+      verticalGap: 0.48,
     });
+    setLocalWallConfigs(current);
     onChange({
       ...data,
       wallConfigs: current,
@@ -595,12 +677,56 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
       ...w,
       wallIndex: idx,
     }));
+    setLocalWallConfigs(current);
     onChange({
       ...data,
       wallConfigs: current,
     });
     setSelectedWallTab(Math.max(0, wIndex - 1));
     toast.success(`Deleted Wall #${wIndex + 1}.`);
+  };
+
+  const handleAddCatalogArtworkToWall = (
+    wIndex: number,
+    catalogArt: {
+      id: string;
+      title: string;
+      primaryImageUrl?: string | null;
+      images?: string[];
+      medium?: string | null;
+      dimensions?: string | null;
+      year?: string | number | null;
+      slug?: string;
+    }
+  ) => {
+    // 1. Ensure artwork item is present in data.items
+    const existingIndex = items.findIndex((it) => it.id === catalogArt.id || it.artworkId === catalogArt.id);
+    const updatedItems = [...items];
+    const artUrl = catalogArt.primaryImageUrl || catalogArt.images?.[0] || "";
+
+    if (existingIndex < 0) {
+      const newItem: MediaGalleryItem = enrichItemWithArtwork({
+        id: catalogArt.id,
+        artworkId: catalogArt.id,
+        url: artUrl,
+        title: catalogArt.title,
+        alt: "",
+        medium: catalogArt.medium || undefined,
+        dimensions: catalogArt.dimensions || undefined,
+        year: catalogArt.year ? String(catalogArt.year) : undefined,
+        slug: catalogArt.slug,
+      });
+      updatedItems.push(newItem);
+      onChange({
+        ...data,
+        items: updatedItems,
+      });
+    }
+
+    // 2. Add artwork ID to current wall
+    handleAddArtworkToWall(wIndex, catalogArt.id);
+    setIsCatalogSearchOpen(false);
+    toast.success(`Added "${catalogArt.title}" to Wall #${wIndex + 1}!`);
   };
 
   const handleReorderWallArtwork = (wIndex: number, slotIdx: number, direction: "prev" | "next") => {
@@ -759,7 +885,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
     });
   };
 
-  const handleCameraTransitionStyleChange = (style: "pan-zoom" | "dolly" | "crossfade") => {
+  const handleCameraTransitionStyleChange = (style: "pan-zoom" | "dolly" | "crossfade" | "cinematic-arc") => {
     onChange({
       ...data,
       cameraTransitionStyle: style,
@@ -1108,50 +1234,71 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
               </p>
             </div>
 
-            {/* Camera Transition Style */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-foreground">Camera Transition Style</Label>
-              <Select
-                value={cameraTransitionStyle}
-                onValueChange={(val: "pan-zoom" | "dolly" | "crossfade") =>
-                  handleCameraTransitionStyleChange(val)
-                }
-              >
-                <SelectTrigger className="h-8 text-xs bg-card">
-                  <SelectValue placeholder="Select Transition" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pan-zoom">Cinematic Pan &amp; Gentle Zoom</SelectItem>
-                  <SelectItem value="dolly">Smooth Dolly Track</SelectItem>
-                  <SelectItem value="crossfade">Soft Crossfade / Dissolve</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-[10px] text-muted-foreground">
-                Damped cubic camera glide physics.
-              </p>
-            </div>
+              {/* Camera Transition Style */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Camera Transition Style</Label>
+                <Select
+                  value={cameraTransitionStyle}
+                  onValueChange={(val: "pan-zoom" | "dolly" | "crossfade" | "cinematic-arc") =>
+                    handleCameraTransitionStyleChange(val)
+                  }
+                >
+                  <SelectTrigger className="h-8 text-xs bg-card">
+                    <SelectValue placeholder="Select Transition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cinematic-arc">Cinematic Arc (Hollywood Crane &amp; Pullback)</SelectItem>
+                    <SelectItem value="pan-zoom">Cinematic Pan &amp; Gentle Zoom</SelectItem>
+                    <SelectItem value="dolly">Smooth Dolly Track</SelectItem>
+                    <SelectItem value="crossfade">Soft Crossfade / Dissolve</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-[10px] text-muted-foreground">
+                  Parabolic arc &amp; damped glide physics.
+                </p>
+              </div>
 
-            {/* Wall Layout Matrix */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-foreground">Wall Hanging Layout</Label>
-              <Select
-                value={wallLayout}
-                onValueChange={(val: "salon" | "linear" | "grid") => handleWallLayoutChange(val)}
-              >
-                <SelectTrigger className="h-8 text-xs bg-card">
-                  <SelectValue placeholder="Select Layout" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="salon">Asymmetrical Salon (Classical)</SelectItem>
-                  <SelectItem value="linear">Linear Eye-Level Promenade</SelectItem>
-                  <SelectItem value="grid">Balanced Curatorial Grid</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-[10px] text-muted-foreground">
-                0.8m minimum clearance spacing.
-              </p>
+              {/* Default Max Artworks Per Wall (Upfront) */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold text-foreground">Default Artworks Per Wall</Label>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={maxArtworksPerWall <= 1}
+                      onClick={() => handleMaxArtworksPerWallChange(Math.max(1, maxArtworksPerWall - 1))}
+                      className="h-5 w-5 p-0 text-xs cursor-pointer"
+                      title="Decrease artworks per wall"
+                    >
+                      -
+                    </Button>
+                    <span className="text-primary font-mono text-xs font-bold w-4 text-center">{maxArtworksPerWall}</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={maxArtworksPerWall >= 8}
+                      onClick={() => handleMaxArtworksPerWallChange(Math.min(8, maxArtworksPerWall + 1))}
+                      className="h-5 w-5 p-0 text-xs cursor-pointer"
+                      title="Increase artworks per wall"
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+                <Slider
+                  min={1}
+                  max={8}
+                  step={1}
+                  value={[maxArtworksPerWall]}
+                  onValueChange={([val]) => handleMaxArtworksPerWallChange(val)}
+                  className="py-1 cursor-pointer pointer-events-auto"
+                />
+                <span className="text-[10px] text-muted-foreground">Partitions corridor (1 to 8 pieces)</span>
+              </div>
             </div>
-          </div>
 
           {/* Wall Background & Custom Atmosphere Studio */}
           <div className="p-3.5 rounded-xl border border-amber-500/30 bg-card/70 space-y-3">
@@ -1578,6 +1725,42 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                     </div>
                   </div>
 
+                  {/* 1.5 Wall Frame Style Selector */}
+                  <div className="space-y-1.5 p-3 rounded-lg border border-border/80 bg-background/50">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
+                        <Frame className="w-3.5 h-3.5 text-amber-600" />
+                        Wall Frame Style (Applies to all artworks on this wall)
+                      </Label>
+                      <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-700 dark:text-amber-300">
+                        {currentWallConfig?.frameStyle || "curated-mix"}
+                      </Badge>
+                    </div>
+                    <Select
+                      value={currentWallConfig?.frameStyle || "curated-mix"}
+                      onValueChange={(val: WallFrameStyle) =>
+                        handleUpdateWallConfig(selectedWallTab, { frameStyle: val })
+                      }
+                    >
+                      <SelectTrigger className="h-8 text-xs bg-card">
+                        <SelectValue placeholder="Select Frame Style" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="curated-mix">Curated Mix (Original Dynamic Styling)</SelectItem>
+                        <SelectItem value="gold-gilt">Museum 24k Gold Leaf (Gilded Wood Fillet)</SelectItem>
+                        <SelectItem value="teak-wood">Burmese Teak Wood (Hand-Carved Heritage)</SelectItem>
+                        <SelectItem value="gallery-black">Contemporary Gallery Black (Minimalist Shadowbox)</SelectItem>
+                        <SelectItem value="museum-glass">Museum Glass &amp; Acrylic Float (Specular Glaze)</SelectItem>
+                        <SelectItem value="rosewood">Antique Rosewood (Deep Burgundy Classical)</SelectItem>
+                        <SelectItem value="light-oak">Scandinavian Light Oak (Modern Warm Matte)</SelectItem>
+                        <SelectItem value="white-float">Minimalist White Float (Clean Architectural)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-muted-foreground">
+                      Guarantees unified curatorial framing material, bevel, and specular glass across all works on Wall #{selectedWallTab + 1}.
+                    </p>
+                  </div>
+
                   {/* 2. Layout Presets Selector */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -1599,15 +1782,18 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                             type="button"
                             onClick={() => handleUpdateWallConfig(selectedWallTab, { layoutType: preset.id })}
                             className={cn(
-                              "p-2.5 rounded-lg border text-left transition-all cursor-pointer",
+                              "p-2.5 rounded-lg border text-left transition-all cursor-pointer relative",
                               isSelected
-                                ? "bg-amber-500/15 border-amber-500 text-amber-950 dark:text-amber-200 ring-1 ring-amber-500/40 font-semibold"
-                                : "bg-card hover:bg-muted text-muted-foreground border-border"
+                                ? "bg-amber-500/20 border-amber-500 text-amber-950 dark:text-amber-200 ring-2 ring-amber-500/50 shadow-sm font-semibold"
+                                : "bg-card hover:bg-muted text-muted-foreground border-border hover:border-amber-500/30"
                             )}
                           >
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-bold text-foreground">{preset.label}</span>
-                              <Badge variant="secondary" className="text-[9px] px-1 py-0">
+                              <span className="text-xs font-bold text-foreground flex items-center gap-1">
+                                {isSelected && <Check className="w-3 h-3 text-amber-600 shrink-0" />}
+                                {preset.label}
+                              </span>
+                              <Badge variant={isSelected ? "default" : "secondary"} className="text-[9px] px-1 py-0">
                                 {preset.badge}
                               </Badge>
                             </div>
@@ -1620,14 +1806,14 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                     </div>
                   </div>
 
-                  {/* 3. Positioning & Alignment Controls (Horizontal Shift, Vertical Elevation, Spacing Multiplier) */}
+                  {/* 3. Positioning & Alignment Controls (Horizontal Shift, Vertical Elevation, Spacing Multiplier, Vertical Clearance) */}
                   <div className="p-3 rounded-lg border border-border/80 bg-background/50 space-y-3">
                     <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
                       <Sliders className="w-3.5 h-3.5 text-amber-600" />
                       Wall Alignment &amp; Fine Positioning Offsets
                     </Label>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       {/* Horizontal Shift */}
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
@@ -1636,16 +1822,36 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                             Horizontal Shift (X)
                           </Label>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-mono text-primary">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateWallConfig(selectedWallTab, { offsetX: Math.max(-2.5, Number((currentOffX - 0.1).toFixed(2))) })}
+                              className="h-5 w-5 p-0 text-xs cursor-pointer"
+                              title="Shift Left"
+                            >
+                              -
+                            </Button>
+                            <span className="text-xs font-mono text-primary font-bold min-w-10 text-center">
                               {currentOffX > 0 ? "+" : ""}{currentOffX.toFixed(1)}m
                             </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateWallConfig(selectedWallTab, { offsetX: Math.min(2.5, Number((currentOffX + 0.1).toFixed(2))) })}
+                              className="h-5 w-5 p-0 text-xs cursor-pointer"
+                              title="Shift Right"
+                            >
+                              +
+                            </Button>
                             {currentOffX !== 0 && (
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleUpdateWallConfig(selectedWallTab, { offsetX: 0 })}
-                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer ml-0.5"
                                 title="Reset to Center"
                               >
                                 <RotateCcw className="w-2.5 h-2.5" />
@@ -1676,16 +1882,36 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                             Vertical Elevation (Y)
                           </Label>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-mono text-primary">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateWallConfig(selectedWallTab, { offsetY: Math.max(-1.0, Number((currentOffY - 0.05).toFixed(2))) })}
+                              className="h-5 w-5 p-0 text-xs cursor-pointer"
+                              title="Lower Artworks"
+                            >
+                              -
+                            </Button>
+                            <span className="text-xs font-mono text-primary font-bold min-w-10 text-center">
                               {currentOffY > 0 ? "+" : ""}{currentOffY.toFixed(2)}m
                             </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateWallConfig(selectedWallTab, { offsetY: Math.min(1.0, Number((currentOffY + 0.05).toFixed(2))) })}
+                              className="h-5 w-5 p-0 text-xs cursor-pointer"
+                              title="Raise Artworks"
+                            >
+                              +
+                            </Button>
                             {currentOffY !== 0 && (
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleUpdateWallConfig(selectedWallTab, { offsetY: 0 })}
-                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer ml-0.5"
                                 title="Reset to 1.55m Centerline"
                               >
                                 <RotateCcw className="w-2.5 h-2.5" />
@@ -1713,19 +1939,39 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                         <div className="flex items-center justify-between">
                           <Label className="text-xs font-semibold text-foreground flex items-center gap-1">
                             <Maximize2 className="w-3 h-3 text-muted-foreground" />
-                            Spacing Spread Multiplier
+                            Horizontal Spacing Spread
                           </Label>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-mono text-primary">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateWallConfig(selectedWallTab, { spacingMultiplier: Math.max(0.6, Number((currentSpacing - 0.05).toFixed(2))) })}
+                              className="h-5 w-5 p-0 text-xs cursor-pointer"
+                              title="Tighter Spacing"
+                            >
+                              -
+                            </Button>
+                            <span className="text-xs font-mono text-primary font-bold min-w-10 text-center">
                               {currentSpacing.toFixed(2)}x
                             </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateWallConfig(selectedWallTab, { spacingMultiplier: Math.min(1.6, Number((currentSpacing + 0.05).toFixed(2))) })}
+                              className="h-5 w-5 p-0 text-xs cursor-pointer"
+                              title="Wider Spacing"
+                            >
+                              +
+                            </Button>
                             {currentSpacing !== 1.0 && (
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleUpdateWallConfig(selectedWallTab, { spacingMultiplier: 1.0 })}
-                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer ml-0.5"
                                 title="Reset to 1.0x"
                               >
                                 <RotateCcw className="w-2.5 h-2.5" />
@@ -1747,38 +1993,115 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                           <span>1.6x Expansive</span>
                         </div>
                       </div>
+
+                      {/* Vertical Row Clearance Gap (Configurable for Pyramid, Stacked, Multi-row) */}
+                      {(() => {
+                        const currentVGap = currentWallConfig?.verticalGap ?? 0.48;
+                        return (
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <Label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                                <MoveVertical className="w-3 h-3 text-muted-foreground" />
+                                Vertical Row Gap
+                              </Label>
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleUpdateWallConfig(selectedWallTab, { verticalGap: Math.max(0.2, Number((currentVGap - 0.04).toFixed(2))) })}
+                                  className="h-5 w-5 p-0 text-xs cursor-pointer"
+                                  title="Reduce Row Clearance"
+                                >
+                                  -
+                                </Button>
+                                <span className="text-xs font-mono text-primary font-bold min-w-10 text-center">
+                                  {currentVGap.toFixed(2)}m
+                                </span>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleUpdateWallConfig(selectedWallTab, { verticalGap: Math.min(0.9, Number((currentVGap + 0.04).toFixed(2))) })}
+                                  className="h-5 w-5 p-0 text-xs cursor-pointer"
+                                  title="Increase Row Clearance"
+                                >
+                                  +
+                                </Button>
+                                {currentVGap !== 0.48 && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleUpdateWallConfig(selectedWallTab, { verticalGap: 0.48 })}
+                                    className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground cursor-pointer ml-0.5"
+                                    title="Reset to 0.48m Default"
+                                  >
+                                    <RotateCcw className="w-2.5 h-2.5" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                            <Slider
+                              min={0.2}
+                              max={0.9}
+                              step={0.02}
+                              value={[currentVGap]}
+                              onValueChange={([val]) => handleUpdateWallConfig(selectedWallTab, { verticalGap: val })}
+                              className="py-1 cursor-pointer pointer-events-auto"
+                            />
+                            <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+                              <span>0.20m (Close)</span>
+                              <span>0.48m (Standard)</span>
+                              <span>0.90m (Airy)</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
                   {/* 4. Curated Artwork Slots on Wall */}
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
                       <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                         <Layers className="w-3.5 h-3.5 text-amber-600" />
                         Curated Artwork Slots ({count} Pieces on Wall #{selectedWallTab + 1})
                       </Label>
-                      {items.length > count && (
-                        <Select
-                          value=""
-                          onValueChange={(val) => {
-                            if (val) handleAddArtworkToWall(selectedWallTab, val);
-                          }}
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleOpenCatalogSearch}
+                          className="h-7 text-xs px-2 cursor-pointer border-amber-500/40 text-amber-900 dark:text-amber-200 bg-amber-500/10 hover:bg-amber-500/20"
                         >
-                          <SelectTrigger className="h-7 text-xs w-44 bg-card border-amber-500/40 text-amber-900 dark:text-amber-200">
-                            <Plus className="w-3.5 h-3.5 mr-1" />
-                            <span>Add Artwork to Wall</span>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {items
-                              .filter((it) => !wallArtworkIds.includes(it.id || it.artworkId || ""))
-                              .map((it, idx) => (
-                                <SelectItem key={it.id || idx} value={it.id || it.artworkId || `art-${idx}`}>
-                                  {it.title || `Gallery Item ${idx + 1}`}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                      )}
+                          <Search className="w-3.5 h-3.5 mr-1" />
+                          <span>Search Artwork Catalog</span>
+                        </Button>
+                        {items.length > count && (
+                          <Select
+                            value=""
+                            onValueChange={(val) => {
+                              if (val) handleAddArtworkToWall(selectedWallTab, val);
+                            }}
+                          >
+                            <SelectTrigger className="h-7 text-xs w-40 bg-card border-amber-500/40 text-amber-900 dark:text-amber-200">
+                              <Plus className="w-3.5 h-3.5 mr-1" />
+                              <span>Add From Gallery</span>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {items
+                                .filter((it) => !wallArtworkIds.includes(it.id || it.artworkId || ""))
+                                .map((it, idx) => (
+                                  <SelectItem key={it.id || idx} value={it.id || it.artworkId || `art-${idx}`}>
+                                    {it.title || `Gallery Item ${idx + 1}`}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">
@@ -1872,7 +2195,7 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           </div>
 
           {/* Autoplay Tour, Dwell Speeds, and Bottom Card Toggle */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-amber-500/20">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-amber-500/20">
             <div className="flex items-center justify-between sm:flex-col sm:items-start sm:justify-center gap-1.5">
               <div>
                 <Label className="text-xs font-semibold text-foreground">Autoplay Tour</Label>
@@ -1885,22 +2208,6 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
                 onCheckedChange={(checked) => handleAutoplayTourChange(checked)}
                 className="cursor-pointer pointer-events-auto"
               />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
-                <span>Max Artworks Per Wall</span>
-                <span className="text-primary font-mono text-xs">{maxArtworksPerWall}</span>
-              </Label>
-              <Slider
-                min={1}
-                max={8}
-                step={1}
-                value={[maxArtworksPerWall]}
-                onValueChange={([val]) => handleMaxArtworksPerWallChange(val)}
-                className="py-1 cursor-pointer pointer-events-auto"
-              />
-              <span className="text-[10px] text-muted-foreground">Partitions corridor (1 to 8)</span>
             </div>
 
             <div className="space-y-1.5">
@@ -3019,6 +3326,137 @@ export function MediaGalleryInspector({ data, onChange }: MediaGalleryInspectorP
           toast.success(`Added ${newItems.length} photos with curatorial metadata!`);
         }}
       />
+
+      {/* Artwork Catalog Search & Add Dialog */}
+      <Dialog open={isCatalogSearchOpen} onOpenChange={setIsCatalogSearchOpen}>
+        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-serif font-bold text-foreground flex items-center gap-2">
+              <Search className="w-5 h-5 text-amber-600" />
+              Add Artwork from Catalog to Wall #{selectedWallTab + 1}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Search the permanent atelier archive by title, medium, dimensions, or category and assign directly to Wall #{selectedWallTab + 1}.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Search Bar & Category Filter */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search artworks by title, medium, dimensions..."
+                value={catalogSearchQuery}
+                onChange={(e) => setCatalogSearchQuery(e.target.value)}
+                className="pl-9 h-9 text-xs"
+              />
+            </div>
+            {catalogCategories.length > 0 && (
+              <Select value={catalogCategoryFilter} onValueChange={setCatalogCategoryFilter}>
+                <SelectTrigger className="h-9 text-xs w-44">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Categories</SelectItem>
+                  {catalogCategories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          {/* Results Grid */}
+          <div className="flex-1 overflow-y-auto mt-4 pr-1 min-h-[300px]">
+            {isLoadingCatalog ? (
+              <div className="flex flex-col items-center justify-center h-48 space-y-2 text-muted-foreground">
+                <div className="w-6 h-6 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                <p className="text-xs">Loading museum archive...</p>
+              </div>
+            ) : filteredCatalogArtworks.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-48 space-y-2 text-center text-muted-foreground">
+                <ImageIcon className="w-8 h-8 text-muted-foreground/40" />
+                <p className="text-sm font-medium">No artworks found</p>
+                <p className="text-xs">Try adjusting your search query or category filter.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {filteredCatalogArtworks.map((art) => {
+                  const artImg = art.primaryImageUrl || art.images?.[0] || "";
+                  const isAlreadyOnWall = effectiveWallConfigs[selectedWallTab]?.artworkIds?.includes(art.id);
+                  return (
+                    <div
+                      key={art.id}
+                      className="group relative rounded-lg border border-border/70 bg-card overflow-hidden flex flex-col justify-between hover:border-amber-500/50 hover:shadow-md transition-all"
+                    >
+                      <div className="relative aspect-4/3 bg-stone-900 overflow-hidden">
+                        {artImg ? (
+                          <img
+                            src={artImg}
+                            alt={art.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                            No Image
+                          </div>
+                        )}
+                        {art.category?.name && (
+                          <span className="absolute top-1.5 left-1.5 bg-black/70 backdrop-blur-xs text-[9px] text-amber-300 px-1.5 py-0.5 rounded font-medium">
+                            {art.category.name}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="p-2.5 flex-1 flex flex-col justify-between">
+                        <div>
+                          <h4 className="text-xs font-semibold text-foreground line-clamp-1 group-hover:text-amber-600 transition-colors">
+                            {art.title}
+                          </h4>
+                          <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
+                            {art.medium || "Archival Media"}
+                          </p>
+                          {art.dimensions && (
+                            <p className="text-[9px] font-mono text-muted-foreground/80 line-clamp-1">
+                              {art.dimensions}
+                            </p>
+                          )}
+                        </div>
+
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={isAlreadyOnWall}
+                          onClick={() => handleAddCatalogArtworkToWall(selectedWallTab, art)}
+                          className={cn(
+                            "w-full mt-2 h-7 text-xs cursor-pointer",
+                            isAlreadyOnWall
+                              ? "bg-muted text-muted-foreground cursor-not-allowed"
+                              : "bg-amber-600 hover:bg-amber-700 text-white"
+                          )}
+                        >
+                          {isAlreadyOnWall ? (
+                            <span className="flex items-center gap-1">
+                              <Check className="w-3 h-3" /> On Wall
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1">
+                              <Plus className="w-3 h-3" /> Add to Wall
+                            </span>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1422,6 +1422,8 @@ export function PageMatrixStudio({
                             maxArtworksPerWall={block.galleryMaxArtworksPerWall}
                             overviewDwellSeconds={block.galleryOverviewWallDwell}
                             showMetadataCardBelowWall={block.galleryShowMetadataCardBelowWall}
+                            wallConfigs={block.galleryWallConfigs}
+                            cameraTransitionStyle={block.galleryCameraTransitionStyle}
                           />
                         </div>
                       )}
@@ -1971,6 +1973,8 @@ export function PageMatrixStudio({
                 overviewWallDwell: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryOverviewWallDwell,
                 overviewDwellSeconds: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryOverviewWallDwell,
                 showMetadataCardBelowWall: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryShowMetadataCardBelowWall,
+                wallConfigs: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryWallConfigs,
+                cameraTransitionStyle: selectedCell?.blocks?.find((b) => b.id === galleryEditingCell.blockId)?.galleryCameraTransitionStyle,
               }}
               onChange={(updated) => {
                 updateBlockInCell(
@@ -1999,6 +2003,7 @@ export function PageMatrixStudio({
                     galleryWallBackgroundMode: updated.wallBackgroundMode,
                     galleryWallCustomBackgrounds: updated.wallCustomBackgrounds,
                     galleryCameraTourStyle: updated.cameraTourStyle,
+                    galleryCameraTransitionStyle: updated.cameraTransitionStyle,
                     galleryWallLayout: updated.wallLayout,
                     galleryAutoplayTour: updated.autoplayTour,
                     galleryShowFrameHeader: updated.showFrameHeader,
@@ -2007,6 +2012,7 @@ export function PageMatrixStudio({
                     galleryMaxArtworksPerWall: updated.maxArtworksPerWall,
                     galleryOverviewWallDwell: updated.overviewWallDwell ?? updated.overviewDwellSeconds,
                     galleryShowMetadataCardBelowWall: updated.showMetadataCardBelowWall,
+                    galleryWallConfigs: updated.wallConfigs,
                   }
                 );
               }}

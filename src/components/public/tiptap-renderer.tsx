@@ -19,6 +19,7 @@ import { PdfViewerBlock } from "@/components/public/blocks/pdf-viewer-block";
 import { TimelineBlock, TimelineMilestone } from "@/components/public/blocks/timeline-block";
 import { DynamicFormBlock, FormFieldConfig, DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryBlock, MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
+import type { ExhibitionWallConfig } from "@/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block";
 import { HeroShowcaseBlock, type HeroArchetype, type HotspotPin } from "@/components/public/blocks/hero-showcase-block";
 import { ArchetypeShowcaseBlock } from "@/components/public/blocks/landing/archetype-showcase-blocks";
 import {
@@ -819,6 +820,8 @@ export interface ColumnBlock {
   galleryMaxArtworksPerWall?: number;
   galleryOverviewWallDwell?: number;
   galleryShowMetadataCardBelowWall?: boolean;
+  galleryWallConfigs?: ExhibitionWallConfig[];
+  galleryCameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade" | "cinematic-arc";
   // Hero Showcase Properties
   heroArchetype?: HeroArchetype;
   heroTitle?: string;
@@ -1001,6 +1004,8 @@ export function renderColumnBlock(
           maxArtworksPerWall={block.galleryMaxArtworksPerWall}
           overviewDwellSeconds={block.galleryOverviewWallDwell}
           showMetadataCardBelowWall={block.galleryShowMetadataCardBelowWall}
+          wallConfigs={block.galleryWallConfigs}
+          cameraTransitionStyle={block.galleryCameraTransitionStyle}
         />
       </div>
     );

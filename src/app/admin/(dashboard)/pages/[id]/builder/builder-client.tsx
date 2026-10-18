@@ -60,6 +60,7 @@ import { TimelineGranularity, TimelineLayout, TimelineItem } from "@/types/timel
 import { FormBlockInspector, FormFieldConfig } from "@/components/builder/form-block-inspector";
 import { DynamicFormBlock, DynamicFormConfig } from "@/components/public/blocks/dynamic-form-block";
 import { MediaGalleryInspector } from "@/components/builder/media-gallery-inspector";
+import type { ExhibitionWallConfig } from "@/components/public/blocks/gallery-exhibition-wall/exhibition-wall-block";
 import { MediaGalleryBlock, MediaGalleryItem, MediaGalleryDisplayMode } from "@/components/public/blocks/media-gallery-block";
 import { HeroBlockInspector, HeroBlockData } from "@/components/builder/hero-block-inspector";
 import { HeroShowcaseBlock } from "@/components/public/blocks/hero-showcase-block";
@@ -594,6 +595,8 @@ function SortableSection({
     maxArtworksPerWall?: number;
     overviewWallDwell?: number;
     showMetadataCardBelowWall?: boolean;
+    galleryWallConfigs?: ExhibitionWallConfig[];
+    cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade" | "cinematic-arc";
   } | null>(null);
 
   const [activeHeroModal, setActiveHeroModal] = React.useState<{
@@ -1511,6 +1514,8 @@ function SortableSection({
                                   maxArtworksPerWall: block.galleryMaxArtworksPerWall,
                                   overviewWallDwell: block.galleryOverviewWallDwell,
                                   showMetadataCardBelowWall: block.galleryShowMetadataCardBelowWall,
+                                  galleryWallConfigs: block.galleryWallConfigs,
+                                  cameraTransitionStyle: block.galleryCameraTransitionStyle,
                                 })
                               }
                               className="text-xs h-7 border-primary/40 text-primary hover:bg-primary/10 gap-1 cursor-pointer"
@@ -1551,6 +1556,8 @@ function SortableSection({
                               maxArtworksPerWall={block.galleryMaxArtworksPerWall}
                               overviewDwellSeconds={block.galleryOverviewWallDwell}
                               showMetadataCardBelowWall={block.galleryShowMetadataCardBelowWall}
+                              wallConfigs={block.galleryWallConfigs}
+                              cameraTransitionStyle={block.galleryCameraTransitionStyle}
                             />
                           </div>
                         </div>
@@ -2065,6 +2072,8 @@ function SortableSection({
                 overviewWallDwell: activeGalleryModal.overviewWallDwell,
                 overviewDwellSeconds: activeGalleryModal.overviewWallDwell,
                 showMetadataCardBelowWall: activeGalleryModal.showMetadataCardBelowWall,
+                wallConfigs: activeGalleryModal.galleryWallConfigs,
+                cameraTransitionStyle: activeGalleryModal.cameraTransitionStyle,
               }}
               onChange={(updated) => {
                 const nextMaxArtworks = updated.maxArtworksPerWall ?? activeGalleryModal.maxArtworksPerWall;
@@ -2092,6 +2101,7 @@ function SortableSection({
                   galleryWallBackgroundMode: updated.wallBackgroundMode,
                   galleryWallCustomBackgrounds: updated.wallCustomBackgrounds,
                   galleryCameraTourStyle: updated.cameraTourStyle,
+                  galleryCameraTransitionStyle: updated.cameraTransitionStyle,
                   galleryWallLayout: updated.wallLayout,
                   galleryAutoplayTour: updated.autoplayTour,
                   galleryShowFrameHeader: updated.showFrameHeader,
@@ -2101,6 +2111,7 @@ function SortableSection({
                   galleryMaxArtworksPerWall: nextMaxArtworks,
                   galleryOverviewWallDwell: nextDwell,
                   galleryShowMetadataCardBelowWall: nextShowCard,
+                  galleryWallConfigs: updated.wallConfigs,
                 });
                 setActiveGalleryModal((prev) =>
                   prev
@@ -2126,6 +2137,7 @@ function SortableSection({
                         wallBackgroundMode: updated.wallBackgroundMode,
                         wallCustomBackgrounds: updated.wallCustomBackgrounds,
                         cameraTourStyle: updated.cameraTourStyle,
+                        cameraTransitionStyle: updated.cameraTransitionStyle,
                         wallLayout: updated.wallLayout,
                         autoplayTour: updated.autoplayTour,
                         showFrameHeader: updated.showFrameHeader,
@@ -2135,6 +2147,7 @@ function SortableSection({
                         maxArtworksPerWall: nextMaxArtworks,
                         overviewWallDwell: nextDwell,
                         showMetadataCardBelowWall: nextShowCard,
+                        galleryWallConfigs: updated.wallConfigs,
                       }
                     : null
                 );

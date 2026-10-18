@@ -106,7 +106,7 @@ export interface MediaGalleryBlockProps {
   wallEnvironments?: string[];
   wallConfigs?: ExhibitionWallConfig[];
   cameraTourStyle?: "overview" | "drone" | "walkthrough" | "inspection";
-  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade";
+  cameraTransitionStyle?: "pan-zoom" | "dolly" | "crossfade" | "cinematic-arc";
   wallLayout?: "salon" | "linear" | "grid";
   autoplayTour?: boolean;
   overviewDwellSeconds?: number;

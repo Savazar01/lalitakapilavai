@@ -184,10 +184,23 @@ All code generation and architectural modifications must adhere to the specializ
     - **4 Artworks**: Balanced $2\times 2$ Quad Grid; Horizontal Line of 4; Pyramid 1-over-3; Inverted 3-over-1; Classical Salon Quad.
     - **5 Artworks**: Centerpiece flanked by 2 stacked columns; Staggered 2-over-3; Staggered 3-over-2; Horizontal Line of 5.
     - **6 Artworks**: Wide Grid ($3\times 2$); High-Ceiling Grid ($2\times 3$); Horizontal Line of 6.
-  - **Fine Positioning Offsets**: Supports per-wall horizontal shift ($X \in [-2.5\text{ m}, +2.5\text{ m}]$), vertical elevation ($Y \in [-1.0\text{ m}, +1.0\text{ m}]$), and spacing spread multiplier ($0.6\times$ to $1.6\times$) to align artworks with room furniture, consoles, or windows.
+  - **Independent Wall Curation & Artwork Allocation**:
+    - Each exhibition corridor wall is fully decoupled with independent artwork assignments, layout presets, fine positioning offsets, and vertical clearances.
+    - Upfront "Default Artworks per Wall" configuration slider with `[-]` and `[+]` discrete steppers partitions collections cleanly before individual wall curation.
+  - **Curatorial Wall Frame Styles**:
+    - Supports per-wall unified framing styles (`frameStyle`): `Museum 24k Gold Leaf`, `Burmese Teak Wood`, `Contemporary Gallery Black`, `Museum Glass & Acrylic Float` (with reflective specular glaze), `Antique Rosewood`, `Scandinavian Light Oak`, `Minimalist White Float`, and `Curated Mix`.
+    - Automatically wraps all artworks assigned to that wall in identical museum materials, bevels, fillets, and matting dimensions.
+  - **Cinematic Wall-to-Wall Camera Transitions**:
+    - Supports `cameraTransitionStyle`: `"cinematic-arc"`, `"pan-zoom"`, `"dolly"`, and `"crossfade"`.
+    - `"cinematic-arc"` executes a Hollywood crane shot with parabolic $Z$-pullback ($\Delta Z = +2.2\text{ m}$ mid-flight) and subtle Steadicam elevation lift, delivering velvety smooth wall traversal without velocity spikes or visual clipping.
+  - **Fine Positioning Offsets & Row Clearance**:
+    - Supports per-wall horizontal shift ($X \in [-2.5\text{ m}, +2.5\text{ m}]$), vertical elevation ($Y \in [-1.0\text{ m}, +1.0\text{ m}]$), spacing spread multiplier ($0.6\times$ to $1.6\times$), and a dedicated **Vertical Row Clearance Gap** slider ($0.20\text{ m}$ to $0.90\text{ m}$, default $0.48\text{ m}$) with discrete step buttons and 1-click resets.
+    - Vertical gap calculation includes actual outer frame and matting thickness ($0.16\text{ m}$), eliminating frame collisions in Pyramid, Inverted Pyramid, and multi-row grids.
+  - **Searchable Artwork Catalog Modal**:
+    - In `MediaGalleryInspector`, "+ Search Artwork Catalog" opens an in-situ modal to query the permanent museum archive by title, medium, dimensions, tags, or category, allowing 1-click addition of artworks to any active wall.
 - **WYSIWYG Wall Curation Studio**:
   - In `MediaGalleryInspector`, an interactive 2D Wall Schematic preview renders the active wall's backdrop with miniature framed artworks positioned at their exact calculated coordinates in real time.
-  - Allows selecting layout presets, adjusting fine positioning sliders with 1-click resets, reordering slots with `<` and `>`, swapping artworks via dropdowns, and adding or removing walls.
+  - Allows selecting layout presets with visual checkmark badges, adjusting fine positioning sliders with steppers and 1-click resets, reordering slots with `<` and `>`, swapping artworks via dropdowns, and adding or removing walls.
 - **Universal Media Gallery Canvas Background Engine**:
   - All Media Gallery presentation options (Carousel, Snap Scroll, Curated Bento, Ken Burns, Soft Crossfade, Filmstrip Reel) support custom backdrop images via `canvasBgImageUrl`, `canvasBgMode` (`"cover" | "contain" | "tile" | "blur"`), and `canvasBgOpacity` (0–100%).
   - Integrated with local `/media/` mount on localhost:3060 and remote cloud storage (S3/R2) via direct upload or Media Vault picker.
