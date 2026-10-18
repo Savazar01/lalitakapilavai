@@ -118,6 +118,7 @@ SavazAI WebApps Platform
    - Interactive timeline blocks highlighting master artist lineages, exhibitions, and classical vocal performances.
 2. **3D WebGL Spatial Exhibition Salon Corridor**:
    - Museum standard eye-level centerline hanging strictly aligned to $1.55\text{ m}$ (58–60 inches from floor) with an absolute minimum floor clearance of $0.98\text{ m}$ for any bottom-row frame (`Math.max(1.28, 0.98 + H/2)`).
+   - **Dynamic Non-Overlapping Vertical Clearance & Balanced Horizontal Spacing**: Mathematically guaranteed $28\text{ cm}$ physical clearance between vertically stacked frames in multi-row salon walls (`getStackedY`) regardless of natural aspect ratios or heights, eradicating frame collisions. Stacked walls dynamically scale to $maxDim = 1.15\text{ m}$ and utilize generous horizontal column separation ($1.50\text{ m}$ for 2 columns, $1.20\text{ m}$ for 3 columns) symmetrically flanking the corridor centerline.
    - Natural artwork aspect ratio preservation (`naturalWidth / naturalHeight`), wrapping canvas, gilded fillets, and outer timber frames without cropping.
    - Symmetrical architectural framing with divider pilasters placed at every wall bay boundary ($w \cdot 14.0 \pm 7.0\text{ m}$) ensuring bilateral balance and identical outer margins.
    - Salon cluster positioning dynamically centering the total cluster span symmetrically around the wall midpoint ($X = wallCenterX$).

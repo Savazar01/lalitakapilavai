@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-10-18)
 
 ## Corpus Check
-- 235 files · ~267,619 words
+- 235 files · ~267,944 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1500 nodes · 3567 edges · 100 communities (86 shown, 14 thin omitted)
+- 1500 nodes · 3567 edges · 100 communities (85 shown, 15 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4edfd865`
+- Built from commit: `c2521020`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -103,6 +103,7 @@
 - [[_COMMUNITY_Community 90|Community 90]]
 - [[_COMMUNITY_Community 91|Community 91]]
 - [[_COMMUNITY_Community 92|Community 92]]
+- [[_COMMUNITY_Community 93|Community 93]]
 - [[_COMMUNITY_Community 97|Community 97]]
 - [[_COMMUNITY_Community 98|Community 98]]
 - [[_COMMUNITY_Community 99|Community 99]]
@@ -134,7 +135,7 @@
 - `CategoryGalleryPage()` --calls--> `cn()`  [EXTRACTED]
   src/app/(public)/gallery/[categorySlug]/page.tsx → src/lib/utils.ts
 
-## Communities (100 total, 14 thin omitted)
+## Communities (100 total, 15 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.23
@@ -169,8 +170,8 @@ Cohesion: 0.15
 Nodes (12): CatalogSinglePlateEditor(), CatalogSinglePlateEditorProps, EditorialModeSwitcher(), MATTING_PRESETS, UniversalMediaDialog(), UniversalMediaDialogProps, UniversalMediaItem, VaultItem (+4 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.07
-Nodes (33): ASPECT_RATIOS, CustomImageAttributes, CustomImageNode, ImageAspectRatio, ImageLayoutMode, ImageViewComponent(), LAYOUT_MODES, ECatalogThemeConfig (+25 more)
+Cohesion: 0.09
+Nodes (27): ASPECT_RATIOS, CustomImageAttributes, CustomImageNode, ImageAspectRatio, ImageLayoutMode, ImageViewComponent(), LAYOUT_MODES, ECatalogThemeConfig (+19 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.07
@@ -233,8 +234,8 @@ Cohesion: 0.16
 Nodes (18): ArtworkBulkImportModal(), ArtworkBulkImportModalProps, ImportAuditItem, ImportAuditResult, EmailTiptapEditorProps, MediaVaultDialogProps, MediaVaultItem, CATEGORY_OPTIONS (+10 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.15
-Nodes (24): SortableSection(), isLightColor, PageMatrixStudio(), reconcilePageMatrixCells(), SortableSection(), BackgroundStyleConfig, computeRelativeLuminance(), ContainerThemeScope (+16 more)
+Cohesion: 0.09
+Nodes (39): SortableSection(), isLightColor, PageMatrixStudio(), reconcilePageMatrixCells(), SortableSection(), ArchetypeShowcaseBlock(), getPatternById(), getPatternStyle() (+31 more)
 
 ### Community 34 - "Community 34"
 Cohesion: 0.19
@@ -422,7 +423,7 @@ Nodes (4): Commands, TextOrientationExtension, TextOrientationOptions, TextOrien
 
 ### Community 89 - "Community 89"
 Cohesion: 0.07
-Nodes (6): DiscoveredFormCategory, DiscoveredFormItem, fetchThumbnailBuffer(), GET(), globalForPrisma, RouteParams
+Nodes (4): fetchThumbnailBuffer(), GET(), globalForPrisma, RouteParams
 
 ### Community 90 - "Community 90"
 Cohesion: 0.29
@@ -437,8 +438,8 @@ Cohesion: 0.39
 Nodes (9): CatalogMatrixConfig, SinglePlateConfigState, ECatalogCoverConfig, ECatalogCustomPageItem, ECatalogEndPageConfig, ECatalogEssayConfig, EditorialPageMode, SpineDecoratorSlot (+1 more)
 
 ### Community 98 - "Community 98"
-Cohesion: 0.11
-Nodes (18): artisticBorderPresets, availableIcons, colorPresets, fontFamilies, StyleInspector(), StyleInspectorProps, ArchetypeShowcaseBlock(), BACKGROUND_PATTERNS (+10 more)
+Cohesion: 0.20
+Nodes (9): artisticBorderPresets, availableIcons, colorPresets, fontFamilies, StyleInspector(), StyleInspectorProps, BACKGROUND_PATTERNS, BackgroundPattern (+1 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.29
@@ -459,14 +460,14 @@ Nodes (23): DashboardLayoutManager(), DashboardWidgetData, iconRegistry, Metrics
 ## Knowledge Gaps
 - **558 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+553 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `Community 34` to `Community 0`, `Community 1`, `Community 4`, `Community 7`, `Community 8`, `Community 18`, `Community 21`, `Community 31`, `Community 32`, `Community 33`, `Community 36`, `Community 43`, `Community 44`, `Community 45`, `Community 50`, `Community 53`, `Community 56`, `Community 66`, `Community 82`, `Community 90`, `Community 98`, `Community 100`, `Community 102`?**
+- **Why does `cn()` connect `Community 34` to `Community 0`, `Community 1`, `Community 4`, `Community 7`, `Community 18`, `Community 21`, `Community 31`, `Community 32`, `Community 33`, `Community 36`, `Community 43`, `Community 44`, `Community 45`, `Community 50`, `Community 53`, `Community 56`, `Community 66`, `Community 82`, `Community 90`, `Community 98`, `Community 100`, `Community 102`?**
   _High betweenness centrality (0.064) - this node is a cross-community bridge._
-- **Why does `Button` connect `Community 21` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `Community 18`, `Community 31`, `Community 32`, `Community 36`, `Community 44`, `Community 45`, `Community 47`, `Community 50`, `Community 51`, `Community 53`, `Community 56`, `Community 82`, `Community 86`, `Community 87`, `Community 90`, `Community 91`, `Community 98`, `Community 101`, `Community 102`?**
+- **Why does `Button` connect `Community 21` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `Community 18`, `Community 31`, `Community 32`, `Community 33`, `Community 36`, `Community 44`, `Community 45`, `Community 47`, `Community 50`, `Community 51`, `Community 53`, `Community 56`, `Community 82`, `Community 86`, `Community 87`, `Community 90`, `Community 91`, `Community 98`, `Community 101`, `Community 102`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Why does `Badge()` connect `Community 102` to `Community 0`, `Community 1`, `Community 4`, `Community 7`, `Community 18`, `Community 21`, `Community 32`, `Community 34`, `Community 36`, `Community 44`, `Community 45`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 53`, `Community 56`, `Community 82`, `Community 87`, `Community 91`?**
   _High betweenness centrality (0.013) - this node is a cross-community bridge._

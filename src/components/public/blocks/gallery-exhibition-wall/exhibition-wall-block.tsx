@@ -161,11 +161,14 @@ function computePlacements(
       });
     } else if (layout === "grid") {
       const cols = Math.min(count, count > 4 ? 3 : 2);
-      const minColGap = 0.85;
+      const minColGap = cols === 2 ? 1.50 : 1.10;
+      const VERTICAL_GAP = 0.28;
+      const EYE_LEVEL_Y = 1.55;
 
       const frameSizes = wallItems.map((item) => {
         const ar = parseArtworkAspectRatio(item);
-        return calculateFrameSize(ar, 1.3);
+        const maxDim = count <= 2 ? 1.6 : 1.15;
+        return calculateFrameSize(ar, maxDim);
       });
 
       // Compute max width per column
@@ -188,14 +191,29 @@ function computePlacements(
 
       const totalRows = Math.ceil(count / cols);
 
+      // Pre-calculate dynamic Y position per column to guarantee no vertical overlap
+      const colYPositions: { [col: number]: { [row: number]: number } } = {};
+      for (let c = 0; c < cols; c++) {
+        colYPositions[c] = {};
+        const topIdx = c;
+        const btmIdx = c + cols;
+        if (totalRows === 1 || btmIdx >= count) {
+          colYPositions[c][0] = EYE_LEVEL_Y;
+        } else {
+          const hTop = frameSizes[topIdx].height;
+          const hBtm = frameSizes[btmIdx].height;
+          const centerDist = hTop / 2 + VERTICAL_GAP + hBtm / 2;
+          colYPositions[c][0] = EYE_LEVEL_Y + centerDist / 2;
+          colYPositions[c][1] = EYE_LEVEL_Y - centerDist / 2;
+        }
+      }
+
       wallItems.forEach((item, localIdx) => {
         const globalIdx = w * safeMax + localIdx;
         const col = localIdx % cols;
         const row = Math.floor(localIdx / cols);
         const { width, height } = frameSizes[localIdx];
-
-        // 1 row: 1.55m eye level; 2 rows: 1.95m and 1.15m (average is 1.55m)
-        const yPos = totalRows === 1 ? 1.55 : row === 0 ? 1.95 : 1.15;
+        const yPos = colYPositions[col]?.[row] ?? EYE_LEVEL_Y;
 
         placements.push({
           item,
@@ -215,12 +233,27 @@ function computePlacements(
         });
       });
     } else {
-      // "salon" layout per wall with dynamic clearance
+      // "salon" layout per wall with dynamic vertical clearance & generous horizontal separation
+      const VERTICAL_GAP = 0.28;
+      const EYE_LEVEL_Y = 1.55;
+
       const frameSizes = wallItems.map((item) => {
         const ar = parseArtworkAspectRatio(item);
-        const maxDim = count === 1 ? 2.0 : count <= 3 ? 1.65 : 1.35;
+        // Multi-row layouts (count >= 4) use maxDim 1.15m so stacked artworks fit cleanly within wall height
+        const maxDim = count === 1 ? 2.0 : count <= 3 ? 1.65 : 1.15;
         return calculateFrameSize(ar, maxDim);
       });
+
+      // Helper for calculating non-overlapping vertical positions for a stacked column pair
+      const getStackedY = (topIdx: number, btmIdx: number) => {
+        const hTop = frameSizes[topIdx]?.height || 1.15;
+        const hBtm = frameSizes[btmIdx]?.height || 1.15;
+        const centerDist = hTop / 2 + VERTICAL_GAP + hBtm / 2;
+        return {
+          yTop: EYE_LEVEL_Y + centerDist / 2,
+          yBtm: EYE_LEVEL_Y - centerDist / 2,
+        };
+      };
 
       let localSlots: {
         x: number;
@@ -229,81 +262,100 @@ function computePlacements(
       }[] = [];
 
       if (count === 1) {
-        localSlots = [{ x: 0, y: 1.55, frame: "gold-teak" }];
+        localSlots = [{ x: 0, y: EYE_LEVEL_Y, frame: "gold-teak" }];
       } else if (count === 2) {
         const w0 = frameSizes[0].width;
         const w1 = frameSizes[1].width;
-        const totalSpan = w0 + minGap + w1;
+        const colGap = 1.40;
+        const totalSpan = w0 + colGap + w1;
         localSlots = [
-          { x: -totalSpan / 2 + w0 / 2, y: 1.55, frame: "gold-teak" },
-          { x: totalSpan / 2 - w1 / 2, y: 1.55, frame: "rosewood-ivory" },
+          { x: -totalSpan / 2 + w0 / 2, y: EYE_LEVEL_Y, frame: "gold-teak" },
+          { x: totalSpan / 2 - w1 / 2, y: EYE_LEVEL_Y, frame: "rosewood-ivory" },
         ];
       } else if (count === 3) {
         const w0 = frameSizes[0].width;
         const w1 = frameSizes[1].width;
         const w2 = frameSizes[2].width;
+        const colGap = 1.20;
         localSlots = [
-          { x: -(w1 / 2 + minGap + w0 / 2), y: 1.55, frame: "rosewood-ivory" },
-          { x: 0, y: 1.58, frame: "gold-teak" },
-          { x: +(w1 / 2 + minGap + w2 / 2), y: 1.55, frame: "light-oak" },
+          { x: -(w1 / 2 + colGap + w0 / 2), y: EYE_LEVEL_Y, frame: "rosewood-ivory" },
+          { x: 0, y: EYE_LEVEL_Y + 0.03, frame: "gold-teak" },
+          { x: +(w1 / 2 + colGap + w2 / 2), y: EYE_LEVEL_Y, frame: "light-oak" },
         ];
       } else if (count === 4) {
+        // 2 columns, 2 rows each: (0 top, 1 bottom) and (2 top, 3 bottom)
         const leftColW = Math.max(frameSizes[0].width, frameSizes[1].width);
         const rightColW = Math.max(frameSizes[2].width, frameSizes[3].width);
-        const totalSpan = leftColW + minGap + rightColW;
+        const colGap = 1.50; // Generous 1.5m horizontal separation across 14m wall bay
+        const totalSpan = leftColW + colGap + rightColW;
         const leftColX = -totalSpan / 2 + leftColW / 2;
         const rightColX = totalSpan / 2 - rightColW / 2;
 
+        const leftY = getStackedY(0, 1);
+        const rightY = getStackedY(2, 3);
+
         localSlots = [
-          { x: leftColX, y: 1.95, frame: "light-oak" },
-          { x: leftColX, y: 1.15, frame: "rosewood-ivory" },
-          { x: rightColX, y: 1.95, frame: "gold-teak" },
-          { x: rightColX, y: 1.15, frame: "white-float" },
+          { x: leftColX, y: leftY.yTop, frame: "light-oak" },
+          { x: leftColX, y: leftY.yBtm, frame: "rosewood-ivory" },
+          { x: rightColX, y: rightY.yTop, frame: "gold-teak" },
+          { x: rightColX, y: rightY.yBtm, frame: "white-float" },
         ];
       } else if (count === 5) {
+        // Centerpiece at eye-level flanked by 2 stacked columns (1 top, 2 btm) and (3 top, 4 btm)
         const centerW = frameSizes[0].width;
         const leftColW = Math.max(frameSizes[1].width, frameSizes[2].width);
         const rightColW = Math.max(frameSizes[3].width, frameSizes[4].width);
-        const totalSpan = leftColW + minGap + centerW + minGap + rightColW;
-        const leftColX = -totalSpan / 2 + leftColW / 2;
-        const rightColX = totalSpan / 2 - rightColW / 2;
+        const sideGap = 1.35;
+        const leftColX = -(centerW / 2 + sideGap + leftColW / 2);
+        const rightColX = +(centerW / 2 + sideGap + rightColW / 2);
+
+        const leftY = getStackedY(1, 2);
+        const rightY = getStackedY(3, 4);
 
         localSlots = [
-          { x: 0, y: 1.55, frame: "gold-teak" },
-          { x: leftColX, y: 1.95, frame: "light-oak" },
-          { x: leftColX, y: 1.15, frame: "rosewood-ivory" },
-          { x: rightColX, y: 1.95, frame: "light-oak" },
-          { x: rightColX, y: 1.15, frame: "rosewood-ivory" },
+          { x: 0, y: EYE_LEVEL_Y, frame: "gold-teak" },
+          { x: leftColX, y: leftY.yTop, frame: "light-oak" },
+          { x: leftColX, y: leftY.yBtm, frame: "rosewood-ivory" },
+          { x: rightColX, y: rightY.yTop, frame: "light-oak" },
+          { x: rightColX, y: rightY.yBtm, frame: "rosewood-ivory" },
         ];
       } else if (count === 6) {
+        // 3 columns of 2 rows each: (0, 1), (2, 3), (4, 5)
         const col0W = Math.max(frameSizes[0].width, frameSizes[1].width);
         const col1W = Math.max(frameSizes[2].width, frameSizes[3].width);
         const col2W = Math.max(frameSizes[4].width, frameSizes[5].width);
-        const totalSpan = col0W + col1W + col2W + 2 * minGap;
+        const colGap = 1.20;
+        const totalSpan = col0W + colGap + col1W + colGap + col2W;
         const col0X = -totalSpan / 2 + col0W / 2;
-        const col1X = -totalSpan / 2 + col0W + minGap + col1W / 2;
+        const col1X = 0;
         const col2X = totalSpan / 2 - col2W / 2;
 
+        const yCol0 = getStackedY(0, 1);
+        const yCol1 = getStackedY(2, 3);
+        const yCol2 = getStackedY(4, 5);
+
         localSlots = [
-          { x: col0X, y: 1.95, frame: "rosewood-ivory" },
-          { x: col0X, y: 1.15, frame: "light-oak" },
-          { x: col1X, y: 1.95, frame: "gold-teak" },
-          { x: col1X, y: 1.15, frame: "rosewood-ivory" },
-          { x: col2X, y: 1.95, frame: "light-oak" },
-          { x: col2X, y: 1.15, frame: "gold-teak" },
+          { x: col0X, y: yCol0.yTop, frame: "rosewood-ivory" },
+          { x: col0X, y: yCol0.yBtm, frame: "light-oak" },
+          { x: col1X, y: yCol1.yTop, frame: "gold-teak" },
+          { x: col1X, y: yCol1.yBtm, frame: "rosewood-ivory" },
+          { x: col2X, y: yCol2.yTop, frame: "light-oak" },
+          { x: col2X, y: yCol2.yBtm, frame: "gold-teak" },
         ];
       } else {
+        // 4 columns of up to 2 rows each (count = 7 or 8)
         const colWidths = [
-          Math.max(frameSizes[0].width, frameSizes[1]?.width || 1.2),
-          Math.max(frameSizes[2]?.width || 1.2, frameSizes[3]?.width || 1.2),
-          Math.max(frameSizes[4]?.width || 1.2, frameSizes[5]?.width || 1.2),
-          Math.max(frameSizes[6]?.width || 1.2, frameSizes[7]?.width || 1.2),
+          Math.max(frameSizes[0].width, frameSizes[1]?.width || 1.15),
+          Math.max(frameSizes[2]?.width || 1.15, frameSizes[3]?.width || 1.15),
+          Math.max(frameSizes[4]?.width || 1.15, frameSizes[5]?.width || 1.15),
+          Math.max(frameSizes[6]?.width || 1.15, frameSizes[7]?.width || 1.15),
         ];
-        const totalSpan = colWidths.reduce((a, b) => a + b, 0) + 3 * minGap;
+        const colGap = 0.95;
+        const totalSpan = colWidths.reduce((a, b) => a + b, 0) + 3 * colGap;
         let cur = -totalSpan / 2;
         const centers = colWidths.map((cw) => {
           const c = cur + cw / 2;
-          cur += cw + minGap;
+          cur += cw + colGap;
           return c;
         });
 
@@ -313,10 +365,16 @@ function computePlacements(
           btmItemIdx: number,
           fTop: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float",
           fBtm: "gold-teak" | "rosewood-ivory" | "light-oak" | "white-float"
-        ) => [
-          { x: centers[colIdx], y: 1.95, frame: fTop },
-          { x: centers[colIdx], y: 1.15, frame: fBtm },
-        ];
+        ) => {
+          if (btmItemIdx >= count) {
+            return [{ x: centers[colIdx], y: EYE_LEVEL_Y, frame: fTop }];
+          }
+          const y = getStackedY(topItemIdx, btmItemIdx);
+          return [
+            { x: centers[colIdx], y: y.yTop, frame: fTop },
+            { x: centers[colIdx], y: y.yBtm, frame: fBtm },
+          ];
+        };
 
         localSlots = [
           ...getColSlots(0, 0, 1, "gold-teak", "rosewood-ivory"),

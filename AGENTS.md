@@ -163,6 +163,13 @@ All code generation and architectural modifications must adhere to the specializ
     - Switches ambient and spotlight illumination to clean, neutral white (`0xffffff`, ambient $1.0$, spotlight $7.0$), eliminating unwanted color tinting or dimming from cultural environment presets.
     - Artworks maintain museum-standard eye-level centerline hanging ($1.55\text{ m}$) with balanced, proportional horizontal spacing centered at `wallCenterX`.
   - Wall bays seamlessly fallback to procedurally illuminated plaster walls when no custom texture is specified.
+- **Dynamic Non-Overlapping Vertical Clearance & Balanced Horizontal Spacing Invariant**:
+  - In `ExhibitionWallBlock` (`computePlacements`), vertically stacked artworks in multi-row layouts (e.g. 4+ artworks across 2 rows) dynamically compute non-overlapping frame positions via `getStackedY`:
+    $$\text{centerDist} = \frac{h_{\text{top}}}{2} + \text{VERTICAL\_GAP} + \frac{h_{\text{bottom}}}{2} \quad (\text{where } \text{VERTICAL\_GAP} = 0.28\text{ m})$$
+    $$y_{\text{top}} = 1.55 + \frac{\text{centerDist}}{2}, \quad y_{\text{bottom}} = 1.55 - \frac{\text{centerDist}}{2}$$
+  - Mathematically guarantees that the physical clearance between the bottom edge of the top frame and the top edge of the bottom frame is strictly $0.28\text{ m}$ regardless of the individual aspect ratios or dimensions of the artworks, completely eliminating frame overlapping.
+  - Multi-row walls ($count \ge 4$) scale artwork frames to $maxDim = 1.15\text{ m}$ so stacked artworks fit with museum elegance within standard wall heights.
+  - Horizontal column gaps are expanded to generous spacing ($1.50\text{ m}$ for 2-column configurations, $1.20\text{ m}$ for 3-column configurations) symmetrically flanking the wall centerline ($14\text{ m}$ bay).
 - **Universal Media Gallery Canvas Background Engine**:
   - All Media Gallery presentation options (Carousel, Snap Scroll, Curated Bento, Ken Burns, Soft Crossfade, Filmstrip Reel) support custom backdrop images via `canvasBgImageUrl`, `canvasBgMode` (`"cover" | "contain" | "tile" | "blur"`), and `canvasBgOpacity` (0–100%).
   - Integrated with local `/media/` mount on localhost:3060 and remote cloud storage (S3/R2) via direct upload or Media Vault picker.
