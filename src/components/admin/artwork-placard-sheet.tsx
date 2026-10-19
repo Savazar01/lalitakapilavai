@@ -731,8 +731,10 @@ export function ArtworkPlacardSheet({
                               className={cn(
                                 "card-title font-bold leading-tight italic",
                                 styling.titleScale === "compact" && "text-[12px] sm:text-[13px]",
-                                styling.titleScale === "standard" && "text-[13.5px] sm:text-[14.5px]",
-                                styling.titleScale === "large" && "text-[15.5px] sm:text-[16.5px]"
+                                styling.titleScale === "standard" && "text-[15px] sm:text-[16px]",
+                                styling.titleScale === "large" && "text-[18px] sm:text-[20px]",
+                                styling.titleScale === "xlarge" && "text-[22px] sm:text-[24px]",
+                                styling.titleScale === "jumbo" && "text-[26px] sm:text-[28px]"
                               )}
                               style={{ color: styling.titleColor }}
                             >
@@ -745,9 +747,11 @@ export function ArtworkPlacardSheet({
                             <p
                               className={cn(
                                 "card-medium italic leading-snug",
-                                styling.bodyScale === "compact" && "text-[8px] sm:text-[8.5px]",
-                                styling.bodyScale === "standard" && "text-[9px] sm:text-[9.5px]",
-                                styling.bodyScale === "large" && "text-[10px] sm:text-[10.5px]"
+                                styling.bodyScale === "compact" && "text-[8.5px] sm:text-[9px]",
+                                styling.bodyScale === "standard" && "text-[10px] sm:text-[10.5px]",
+                                styling.bodyScale === "large" && "text-[11.5px] sm:text-[12px]",
+                                styling.bodyScale === "xlarge" && "text-[13px] sm:text-[14px]",
+                                styling.bodyScale === "jumbo" && "text-[15px] sm:text-[16px]"
                               )}
                               style={{ color: styling.textColor }}
                             >
@@ -853,9 +857,11 @@ export function ArtworkPlacardSheet({
                               <h4
                                 className={cn(
                                   "card-title font-bold leading-tight italic",
-                                  styling.titleScale === "compact" && "text-[11.5px] sm:text-[12.5px]",
-                                  styling.titleScale === "standard" && "text-[13px] sm:text-[14px]",
-                                  styling.titleScale === "large" && "text-[14.5px] sm:text-[15.5px]"
+                                  styling.titleScale === "compact" && "text-[12px] sm:text-[13px]",
+                                  styling.titleScale === "standard" && "text-[15px] sm:text-[16px]",
+                                  styling.titleScale === "large" && "text-[18px] sm:text-[20px]",
+                                  styling.titleScale === "xlarge" && "text-[22px] sm:text-[24px]",
+                                  styling.titleScale === "jumbo" && "text-[26px] sm:text-[28px]"
                                 )}
                                 style={{ color: styling.titleColor }}
                               >
@@ -867,9 +873,11 @@ export function ArtworkPlacardSheet({
                               <p
                                 className={cn(
                                   "card-medium italic leading-snug",
-                                  styling.bodyScale === "compact" && "text-[8px]",
-                                  styling.bodyScale === "standard" && "text-[9px]",
-                                  styling.bodyScale === "large" && "text-[10px]"
+                                  styling.bodyScale === "compact" && "text-[8.5px] sm:text-[9px]",
+                                  styling.bodyScale === "standard" && "text-[10px] sm:text-[10.5px]",
+                                  styling.bodyScale === "large" && "text-[11.5px] sm:text-[12px]",
+                                  styling.bodyScale === "xlarge" && "text-[13px] sm:text-[14px]",
+                                  styling.bodyScale === "jumbo" && "text-[15px] sm:text-[16px]"
                                 )}
                                 style={{ color: styling.textColor }}
                               >
@@ -1058,15 +1066,17 @@ export function ArtworkPlacardSheet({
                   </Label>
                   <Select
                     value={styling.titleScale}
-                    onValueChange={(val: "compact" | "standard" | "large") => updateStyling("titleScale", val)}
+                    onValueChange={(val: "compact" | "standard" | "large" | "xlarge" | "jumbo") => updateStyling("titleScale", val)}
                   >
                     <SelectTrigger className="h-8 text-xs bg-background">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="compact">Compact (12px)</SelectItem>
-                      <SelectItem value="standard">Standard (14px)</SelectItem>
-                      <SelectItem value="large">Large (16px)</SelectItem>
+                      <SelectItem value="standard">Standard (16px)</SelectItem>
+                      <SelectItem value="large">Large (20px)</SelectItem>
+                      <SelectItem value="xlarge">Extra Large (24px)</SelectItem>
+                      <SelectItem value="jumbo">Jumbo (28px)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1078,15 +1088,17 @@ export function ArtworkPlacardSheet({
                   </Label>
                   <Select
                     value={styling.bodyScale}
-                    onValueChange={(val: "compact" | "standard" | "large") => updateStyling("bodyScale", val)}
+                    onValueChange={(val: "compact" | "standard" | "large" | "xlarge" | "jumbo") => updateStyling("bodyScale", val)}
                   >
                     <SelectTrigger className="h-8 text-xs bg-background">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="compact">Compact (8.5px)</SelectItem>
-                      <SelectItem value="standard">Standard (9.5px)</SelectItem>
-                      <SelectItem value="large">Large (10.5px)</SelectItem>
+                      <SelectItem value="compact">Compact (9px)</SelectItem>
+                      <SelectItem value="standard">Standard (10.5px)</SelectItem>
+                      <SelectItem value="large">Large (12px)</SelectItem>
+                      <SelectItem value="xlarge">Extra Large (14px)</SelectItem>
+                      <SelectItem value="jumbo">Jumbo (16px)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

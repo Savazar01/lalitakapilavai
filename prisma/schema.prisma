@@ -133,6 +133,10 @@ model SystemSetting {
   logoUrl           String?
   faviconUrl        String?
 
+  // Archival Provenance & Copyright Notice for Artwork Pages
+  copyrightNoticeHeader  String?  @default("Archival Provenance & Copyright Notice")
+  copyrightNoticeContent String?  @db.Text
+
   // Dynamic Footer, Email/Gmail SMTP & Multi-Provider AI Configuration
   footerConfig      Json?
   emailConfig       Json?

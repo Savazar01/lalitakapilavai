@@ -22,7 +22,6 @@ import {
   Download,
   ExternalLink,
   Compass,
-  Lock,
 } from "lucide-react";
 import { CatalogMatrixPage } from "@/components/public/catalog-matrix-page";
 import { ProtectedImage } from "@/components/public/protected-image";
@@ -269,7 +268,7 @@ function CatalogSinglePlateView({
         <div className="flex-1 flex flex-row items-stretch overflow-hidden w-full">
           {leftSpineSlot && <SpineDecoratorSlotView slot={leftSpineSlot} position="left" />}
 
-          <div className="flex-1 flex flex-col justify-between p-4 sm:p-8 overflow-y-auto w-full">
+          <div className="flex-1 flex flex-col justify-between p-4 sm:p-8 overflow-y-auto print:overflow-visible w-full">
             {children}
 
             {primaryImageUrl && (
@@ -648,6 +647,13 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                 box-sizing: border-box !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+              }
+              *::-webkit-scrollbar {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
               }
               html, body {
                 width: 100% !important;
@@ -666,27 +672,24 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
               }
-              .catalog-plate-page, .plate-page, .catalog-page {
+              .catalog-plate-page, .plate-page, .catalog-page, .cover-page, .essay-page, .editorial-page {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
                 page-break-after: always !important;
                 break-after: page !important;
+                overflow: visible !important;
+                max-height: none !important;
+              }
+              .catalog-frame, .plate-details-col, .plate-body-flow, .magazine-layout-container, .magazine-col {
+                overflow: visible !important;
+                max-height: none !important;
+                background-color: #FAF7F2 !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
               }
               .print-hidden, .print\\:hidden {
                 display: none !important;
                 visibility: hidden !important;
-              }
-              ${
-                !isAdminPrint
-                  ? `
-              .catalog-document > *:not(.public-catalog-print-guard) {
-                display: none !important;
-              }
-              .public-catalog-print-guard {
-                display: flex !important;
-              }
-              `
-                  : ""
               }
             }
           `,
@@ -702,26 +705,6 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
         className="catalog-document flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-12 print:p-0 print:m-0 print:max-w-none print:space-y-0"
         style={{ maxWidth: `${geometry.maxWidthPx}px` }}
       >
-        {/* Public Anti-Print Guard Banner (Displays only during window.print for unauthenticated/public viewers) */}
-        {!isAdminPrint && (
-          <div className="public-catalog-print-guard hidden print:flex flex-col items-center justify-center p-12 text-center min-h-[60vh] space-y-5 bg-white text-slate-900 border-2 border-amber-300 rounded-2xl mx-auto my-12 max-w-xl">
-            <div className="p-4 rounded-full bg-amber-50 border border-amber-200 shadow-xs">
-              <Lock className="w-8 h-8 text-amber-700" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-serif font-bold text-slate-900 tracking-tight">
-                Restricted Curatorial Publication
-              </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Direct browser printing is disabled for this archival catalog. Please contact the Atelier administration to request an authenticated, high-resolution physical publication copy.
-              </p>
-            </div>
-            <div className="pt-2 text-[11px] font-mono uppercase tracking-widest text-amber-800/80">
-              {settings?.siteName || "SavazAI Atelier"} • Archival Protection
-            </div>
-          </div>
-        )}
-
         {/* Navigation & Actions Top Bar */}
         <div
           data-catalog-toolbar="true"
@@ -1325,10 +1308,8 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
         {catalog.items.map((item, idx) => {
           const layoutMode = item.plateLayout || catalog.plateLayout || "SIDE_BY_SIDE";
           const displayTitle = item.customTitle?.trim() || item.artwork.title;
-          const displaySubtitle =
-            item.customSubtitle?.trim() ||
-            item.artwork.category?.name ||
-            "Traditional Fine Art";
+          const categoryName = item.artwork.category?.name || "Traditional Indian School";
+          const displaySubtitle = item.customSubtitle?.trim() || "";
           const showPlateNumber = item.showPlateNumber !== false;
 
           return (
@@ -1351,8 +1332,9 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                 fallbackOverlayOpacity={overlayOpacity}
               />
               <div
-                className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-card/40 backdrop-blur-xs`}
+                className={`catalog-frame relative z-10 ${frameClass} p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full bg-[#FAF7F2] dark:bg-card/40 print:bg-[#FAF7F2]`}
                 style={{
+                  backgroundColor: "#FAF7F2",
                   ...(syncArtworkPlates && coverInnerBorderColor ? { borderColor: coverInnerBorderColor } : {}),
                 }}
               >
@@ -1397,16 +1379,19 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
 
                     <div className="space-y-3">
                       <div>
-                        <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-1.5 font-mono uppercase tracking-wider">
-                          {item.artwork.category?.name || "Traditional Indian School"}
-                        </span>
+                        {displaySubtitle && (
+                          <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-1.5 font-mono uppercase tracking-wider">
+                            {displaySubtitle}
+                          </span>
+                        )}
                         <h3 className="text-2xl sm:text-3xl font-serif text-foreground font-bold leading-tight">
                           {displayTitle}
                         </h3>
-                        <p className="text-sm text-stone-400 font-serif mt-1">
-                          {displaySubtitle}
-                          {item.artwork.yearCreated ? ` • ${item.artwork.yearCreated}` : ""}
-                        </p>
+                        {item.artwork.yearCreated && (
+                          <p className="text-sm text-stone-400 font-serif mt-1">
+                            Year: {item.artwork.yearCreated}
+                          </p>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-foreground/90 border-t border-primary/20 pt-2.5">
@@ -1503,18 +1488,21 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                         </div>
 
                         {/* Right Column: Curatorial Details & Specifications */}
-                        <div className="plate-details-col flex flex-col justify-center space-y-3 text-left w-full overflow-y-auto max-h-[64vh] print:max-h-[60vh]">
+                        <div className="plate-details-col flex flex-col justify-center space-y-3 text-left w-full overflow-y-auto print:overflow-visible max-h-[64vh] print:max-h-none">
                           <div>
-                            <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-2 font-mono uppercase tracking-wider">
-                              {item.artwork.category?.name || "Traditional Indian School"}
-                            </span>
+                            {displaySubtitle && (
+                              <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-2 font-mono uppercase tracking-wider">
+                                {displaySubtitle}
+                              </span>
+                            )}
                             <h3 className="text-2xl sm:text-3xl font-serif text-foreground font-bold leading-tight">
                               {displayTitle}
                             </h3>
-                            <p className="text-sm text-stone-400 font-serif mt-1">
-                              {displaySubtitle}
-                              {item.artwork.yearCreated ? ` • ${item.artwork.yearCreated}` : ""}
-                            </p>
+                            {item.artwork.yearCreated && (
+                              <p className="text-sm text-stone-400 font-serif mt-1">
+                                Year: {item.artwork.yearCreated}
+                              </p>
+                            )}
                           </div>
 
                           <div className="space-y-1.5 text-xs text-foreground/90 border-t border-primary/20 pt-3">

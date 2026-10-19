@@ -139,10 +139,19 @@ All code generation and architectural modifications must adhere to the specializ
     - **Museum Placard (Portrait)**: $63.5\text{ mm} \times 101.6\text{ mm}$ ($2.5 \times 4\text{ in}$).
   - All cards enforce `page-break-inside: avoid !important; break-inside: avoid !important;`.
   - Maintain an $18\text{ mm}$ safe margin at the base of every card to prevent physical acrylic/brass stand clamps from occluding metadata.
+  - **Expanded Placard Typography Scales**:
+    - Extends `titleScale` and `bodyScale` beyond the legacy 16px cap to 5 granular sizes: `compact` (12px Title / 9px Body), `standard` (16px / 10.5px), `large` (20px / 12px), `xlarge` (24px / 14px), and `jumbo` (28px / 16px).
+    - Dynamically scales card typography and eliminates unwanted whitespace margins across both standard Visiting Cards ($3.5 \times 2\text{ in}$) and Museum Placards ($4 \times 2.5\text{ in}$).
 - **e-Catalog Synchronous Preloader & Asynchronous Decoding Barrier**:
   - In `src/lib/print-isolated-html.ts`, normalize all HTML images to force `loading="eager"` and `decoding="sync"`.
   - The driver awaits `Promise.all(images.map(img => img.decode().catch(...)))` followed by a safety buffer before invoking `iframe.contentWindow.print()`.
   - In `src/components/public/catalog-print-button.tsx`, an in-situ decoding preloader displays a responsive progress indicator while decoding offscreen plates, completely eliminating blank image omissions on plates 2+ in browser PDF exports.
+- **Unrestricted Native Catalog Printing & High-Resolution PDF Canvas**:
+  - Eradicated `.public-catalog-print-guard` modal, unlocking native browser printing (`Ctrl+P` / `Cmd+P`) and PDF saving across all digital monographs.
+  - Universal print scrollbar suppression: `@media print { * { scrollbar-width: none !important; } *::-webkit-scrollbar { display: none !important; } }`.
+  - Container expansion: `.catalog-frame`, `.cover-page`, `.plate-page`, and `.plate-details-col` enforce `overflow: visible !important` and `print:overflow-visible`, completely eliminating trapped scrollbar containers in exported PDF covers and plates.
+  - Theme canvas color fidelity: `.catalog-frame` enforces solid `#FAF7F2` background with `backdrop-filter: none !important` during print, preventing outer dark or terracotta red cover borders from bleeding through translucent cards as a pinkish tint.
+  - Metadata deduplication: Category badges are cleanly suppressed when Category is already displayed in the plate top header, dedicating subtitles to creation year and custom notes.
 
 ### B. 3D WebGL Exhibition Salon Wall Engine & Gallery Background Architecture
 - **Aspect Ratio Preservation**:
@@ -235,6 +244,9 @@ All code generation and architectural modifications must adhere to the specializ
 
 ### E. Multi-Tenant Brand Identity & Asset Engine (.ico Favicon & Conditional Phone)
 - **Dynamic Brand Notice**: The public footer never hardcodes copyright notices or watermark fallbacks; it renders dynamic `footerConfig.copyrightNotice` exclusively.
+- **Configurable Archival Provenance & Copyright Notice Box**:
+  - `SystemSetting.copyrightNoticeHeader` and `SystemSetting.copyrightNoticeContent` provide dedicated fields in Admin Settings -> General to configure the copyright & provenance card on public artwork detail pages (`/artwork/[slug]`).
+  - **Zero-Ghost Invariant**: If both fields (or content) are left empty or blank by administrators, the entire archival provenance & copyright box is completely suppressed on public artwork pages without rendering empty outlines, borders, or default fallback strings.
 - **Conditional Contact Phone Suppression**: Whenever Studio / Contact Phone is blank, empty, or null in System Settings, the UI completely suppresses the phone row (both icon and text) across public footers and headers without displaying default placeholder phone numbers.
 - **Native Favicon & Vector Engine**: Media upload pipeline provides dedicated direct passthrough bypass for `.ico` (`image/x-icon`, `image/vnd.microsoft.icon`) and `.svg` (`image/svg+xml`), preventing Sharp rasterization or WebP degradation of multi-resolution icons and scalable vector graphics.
 

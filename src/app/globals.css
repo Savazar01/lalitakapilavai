@@ -218,6 +218,17 @@ body {
     print-color-adjust: exact !important;
   }
 
+  /* Eradicate all browser scrollbars completely in print / PDF generation */
+  *, *::before, *::after {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
   /* Suppress navigation, footer, and interactive utility toolbars */
   nav, footer, .print-hidden, [data-catalog-toolbar="true"] {
     display: none !important;
@@ -259,7 +270,7 @@ body {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     position: relative !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -271,7 +282,7 @@ body {
     break-after: auto !important;
   }
 
-  /* Luxury Frame Fillers in Print */
+  /* Luxury Frame Fillers in Print (Solid opaque background prevents color desync / pink bleed) */
   .catalog-frame {
     height: 100% !important;
     width: 100% !important;
@@ -283,6 +294,10 @@ body {
     border-radius: 4px !important;
     position: relative !important;
     z-index: 10 !important;
+    background-color: #FAF7F2 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: visible !important;
   }
 
   .catalog-frame-gold {

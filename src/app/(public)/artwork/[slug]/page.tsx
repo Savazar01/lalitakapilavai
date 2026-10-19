@@ -82,6 +82,8 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
       watermarkConfig: true,
       siteName: true,
       formSecurityConfig: true,
+      copyrightNoticeHeader: true,
+      copyrightNoticeContent: true,
     },
   });
   const watermarkConfig = (settings?.watermarkConfig as Record<string, unknown>) || {};
@@ -158,16 +160,20 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
               artistName={settings?.siteName || "Master Artist"}
             />
 
-            {/* Copyright & Provenance Notice */}
-            <div className="p-4 rounded-xl border border-border/80 bg-card/60 flex items-start gap-3 text-xs text-muted-foreground">
-              <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <div>
-                <span className="font-serif font-bold text-foreground block mb-0.5">
-                  Archival Provenance &amp; Copyright Notice
-                </span>
-                Original hand-crafted masterwork by {settings?.siteName || "the master artist"}. Layered on unblemished teakwood planks, gilded with certified {artwork.customFoilLabel || artwork.goldPurity || defaultFoilText || "authentic gold foil"}, and finished with semi-precious gemstones. Unauthorized reproduction or digital harvesting is prohibited.
+            {/* Copyright & Provenance Notice (Configurable via Admin System Settings -> General tab) */}
+            {Boolean(settings?.copyrightNoticeContent !== undefined && settings?.copyrightNoticeContent !== null ? settings.copyrightNoticeContent.trim() : true) && (
+              <div className="p-4 rounded-xl border border-border/80 bg-card/60 flex items-start gap-3 text-xs text-muted-foreground">
+                <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-serif font-bold text-foreground block mb-0.5">
+                    {settings?.copyrightNoticeHeader?.trim() || "Archival Provenance & Copyright Notice"}
+                  </span>
+                  {settings?.copyrightNoticeContent !== undefined && settings?.copyrightNoticeContent !== null
+                    ? settings.copyrightNoticeContent.trim()
+                    : `Original hand-crafted masterwork by ${settings?.siteName || "the master artist"}. Layered on unblemished teakwood planks, gilded with certified ${artwork.customFoilLabel || artwork.goldPurity || defaultFoilText || "authentic gold foil"}, and finished with semi-precious gemstones. Unauthorized reproduction or digital harvesting is prohibited.`}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Column: Curatorial Details & Inquiries */}

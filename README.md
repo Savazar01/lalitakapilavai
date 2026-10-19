@@ -140,7 +140,10 @@ SavazAI WebApps Platform
 4. **Interactive e-Catalog Digital Monographs**:
    - Virtual page-flip presentation simulating high-end physical exhibition catalogs.
    - Curatorial essays, high-resolution artwork plates, and provenance notes.
-   - One-click downloadable PDF generation.
+   - **Unrestricted Native Printing & PDF Saving**: Native browser printing (`Ctrl+P` / `Cmd+P`) and PDF saving unlocked without restrictive publication guards.
+   - **High-Resolution PDF Engine Canvas**: Solid theme canvas (`#FAF7F2`) with `@media print` universal scrollbar suppression (`scrollbar-width: none !important; *::-webkit-scrollbar { display: none !important; }`) and `overflow: visible !important`, preventing dark/terracotta border bleed and eliminating trapped scrollbar containers.
+   - **Clean Metadata Formatting**: Granular metadata hierarchy with automatic deduplication of redundant Category badges across plates.
+
 5. **Cultural Events, Recitals & Multi-Day RSVP Hub**:
    - Multi-day exhibition calendars and daily schedule agendas with venue maps and dynamic hero earmark badges (`{event.earmarkText}`).
    - Configurable RSVP booking modal supporting multi-day date selections, configurable time slots (Mandatory / Optional / Disabled), flexible arrival windows, and automated confirmation emails.
@@ -162,6 +165,7 @@ SavazAI WebApps Platform
 
 #### 2. Museum Placard & e-Catalog Print Engine (`src/lib/print-isolated-html.ts`)
 - **Exact Physical Dimensions**: Supports Standard Visiting Cards ($3.5 \times 2\text{ in}$ / $88.9 \times 50.8\text{ mm}$) and Museum Wall Placards ($4 \times 2.5\text{ in}$ / $101.6 \times 63.5\text{ mm}$) in both Landscape and Portrait orientations.
+- **Expanded Placard Typography Scales**: Granular title scaling from Compact (`12px`) up to Jumbo (`28px`) and body scaling from Compact (`9px`) up to Jumbo (`16px`), enabling administrators to maximize typography size and fill white space across diverse placard dimensions.
 - **Isolated Iframe Print Driver**: Renders print layouts in a dedicated, headless `<iframe>`, eliminating modal background bleed and Chromium $0\times0\text{ px}$ blank page collapses.
 - **e-Catalog Synchronous Image Decoding Barrier**: Normalizes all image markup to `loading="eager"` and `decoding="sync"`, executing `Promise.all(images.map(img => img.decode()))` before triggering print. A responsive loading indicator in `catalog-print-button.tsx` guarantees that plates 2+ render with 100% asset fidelity in browser PDF downloads.
 - **Editorial Hierarchy**: Header -> Title -> Medium -> Dimensions -> Thumbnail/QR Provenance -> Year -> Curatorial Notes.
@@ -214,6 +218,7 @@ SavazAI WebApps Platform
 
 #### 9. White-Label Theme & System Studio (`/admin/settings`)
 - **General Branding**: Dynamic atelier title, configurable Archive Subtitle / Brand Tagline (`SystemSetting.archiveSubtitle`), bio, contact email, optional phone suppression, and single-source-of-truth brand logo URL.
+- **Configurable Archival Provenance & Copyright Box**: Dedicated controls for Notice Header (`copyrightNoticeHeader`) and Notice Content (`copyrightNoticeContent`) rendered across all public artwork detail views, with complete suppression if content is omitted.
 - **Header Integration**: Dynamic subtitle rendering in public `Navbar` and mobile navigation drawer, cleanly suppressed when omitted without empty layout artifacts.
 - **Theme Studio**: Live palette selector with the flagship **"Imperial Atelier"** preset, custom primary/accent hex picker, and strict binary theme preview.
 - **Gmail / SMTP Configuration**: Dynamic SMTP host, port, credentials, and admin alert routing recipient.

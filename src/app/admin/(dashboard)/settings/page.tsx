@@ -6,6 +6,7 @@ import * as React from "react";
 import {
   Settings,
   Shield,
+  ShieldCheck,
   Cloud,
   Share2,
   Save,
@@ -253,6 +254,8 @@ export default function AdminSettingsPage() {
     contactPhone: "",
     logoUrl: "",
     faviconUrl: "",
+    copyrightNoticeHeader: "Archival Provenance & Copyright Notice",
+    copyrightNoticeContent: "",
     defaultCurrency: "INR",
     defaultTimezone: "Asia/Kolkata",
     watermarkText: "© SavazAI WebApps | All Rights Reserved",
@@ -369,6 +372,8 @@ export default function AdminSettingsPage() {
             emailFooterText: data.emailFooterText || "",
             contactEmail: data.contactEmail || "",
             contactPhone: data.contactPhone || "",
+            copyrightNoticeHeader: data.copyrightNoticeHeader ?? "Archival Provenance & Copyright Notice",
+            copyrightNoticeContent: data.copyrightNoticeContent ?? "",
             defaultCurrency: data.defaultCurrency || "INR",
             defaultTimezone: data.defaultTimezone || "Asia/Kolkata",
             watermarkText: data.watermarkText || "© SavazAI WebApps | All Rights Reserved",
@@ -1160,6 +1165,45 @@ export default function AdminSettingsPage() {
                             }
                           />
                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Artwork Archival Provenance & Copyright Notice */}
+                  <div className="p-4 rounded-lg border border-primary/30 bg-primary/5 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground flex items-center gap-1.5 text-sm">
+                        <ShieldCheck className="w-4 h-4 text-primary" />
+                        Artwork Archival Provenance &amp; Copyright Notice Box
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Configure the provenance and legal copyright notice displayed on public artwork detail pages. If left completely blank, the notice box will be hidden entirely.
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 pt-1">
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Notice Box Header Title</Label>
+                        <Input
+                          value={form.copyrightNoticeHeader}
+                          onChange={(e) => setForm({ ...form, copyrightNoticeHeader: e.target.value })}
+                          placeholder="e.g. Archival Provenance & Copyright Notice"
+                          className="text-xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Notice Box Content Text</Label>
+                        <Textarea
+                          value={form.copyrightNoticeContent}
+                          onChange={(e) => setForm({ ...form, copyrightNoticeContent: e.target.value })}
+                          rows={3}
+                          placeholder="e.g. Original hand-crafted masterwork. All rights reserved. Leave completely blank to suppress this box on artwork pages."
+                          className="text-xs"
+                        />
+                        <p className="text-[11px] text-muted-foreground">
+                          Leaving this content field blank will suppress the entire copyright box across all public artwork pages.
+                        </p>
                       </div>
                     </div>
                   </div>

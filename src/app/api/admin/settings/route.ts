@@ -111,6 +111,14 @@ export async function PUT(request: NextRequest) {
       pinterestUrl: body.pinterestUrl,
       logoUrl: body.logoUrl,
       faviconUrl: body.faviconUrl,
+      copyrightNoticeHeader:
+        body.copyrightNoticeHeader !== undefined
+          ? (body.copyrightNoticeHeader ? String(body.copyrightNoticeHeader).trim() : null)
+          : undefined,
+      copyrightNoticeContent:
+        body.copyrightNoticeContent !== undefined
+          ? (body.copyrightNoticeContent ? String(body.copyrightNoticeContent).trim() : null)
+          : undefined,
       footerConfig: body.footerConfig !== undefined ? {
         ...body.footerConfig,
         contactEmail: body.footerConfig?.contactEmail !== undefined ? String(body.footerConfig.contactEmail).trim() : undefined,

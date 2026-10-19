@@ -13,8 +13,8 @@ export interface PlacardStylingConfig {
   textColor: string;
   headerColor: string;
   borderStyle: "double-fillet" | "single-rule" | "none";
-  titleScale: "compact" | "standard" | "large";
-  bodyScale: "compact" | "standard" | "large";
+  titleScale: "compact" | "standard" | "large" | "xlarge" | "jumbo";
+  bodyScale: "compact" | "standard" | "large" | "xlarge" | "jumbo";
   showThumbnail: boolean;
   showQr: boolean;
   showCategory: boolean;
