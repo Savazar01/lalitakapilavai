@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-10-19)
 
 ## Corpus Check
-- 235 files · ~275,747 words
+- 235 files · ~276,453 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1506 nodes · 3590 edges · 100 communities (87 shown, 13 thin omitted)
+- 1506 nodes · 3590 edges · 99 communities (85 shown, 14 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `068111f0`
+- Built from commit: `b5692271`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -99,11 +99,12 @@
 - [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
 - [[_COMMUNITY_Community 87|Community 87]]
+- [[_COMMUNITY_Community 88|Community 88]]
 - [[_COMMUNITY_Community 89|Community 89]]
 - [[_COMMUNITY_Community 90|Community 90]]
+- [[_COMMUNITY_Community 91|Community 91]]
 - [[_COMMUNITY_Community 92|Community 92]]
 - [[_COMMUNITY_Community 93|Community 93]]
-- [[_COMMUNITY_Community 95|Community 95]]
 - [[_COMMUNITY_Community 97|Community 97]]
 - [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
@@ -133,7 +134,7 @@
 - `POST()` --calls--> `sendAtelierEmail()`  [INFERRED]
   src/app/api/events/register/route.ts → src/lib/email-service.ts
 
-## Communities (100 total, 13 thin omitted)
+## Communities (99 total, 14 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.46
@@ -164,8 +165,8 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.17
-Nodes (19): DEFAULT_EMAIL_TEMPLATES, EmailDispatchOptions, EmailLogoAttachment, encryptEmailToken(), getAbsoluteAssetUrl(), getBaseAppUrl(), getTenantBranding(), getTransporter() (+11 more)
+Cohesion: 0.15
+Nodes (20): POST(), DEFAULT_EMAIL_TEMPLATES, EmailDispatchOptions, EmailLogoAttachment, encryptEmailToken(), getAbsoluteAssetUrl(), getBaseAppUrl(), getTenantBranding() (+12 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -220,8 +221,8 @@ Cohesion: 0.13
 Nodes (21): ArtworkBulkImportModal(), ArtworkBulkImportModalProps, ImportAuditItem, ImportAuditResult, MediaVaultDialogProps, MediaVaultItem, MenuItemNode, positions (+13 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.05
-Nodes (7): { GET, POST }, fetchThumbnailBuffer(), GET(), auth, AuthSession, MediaVaultItem, RouteParams
+Cohesion: 0.06
+Nodes (6): { GET, POST }, fetchThumbnailBuffer(), GET(), auth, AuthSession, MediaVaultItem
 
 ### Community 31 - "Community 31"
 Cohesion: 0.14
@@ -288,7 +289,7 @@ Cohesion: 0.05
 Nodes (55): geistMono, geistSans, generateMetadata(), metadata, POST(), ThemeProvider(), getCellValue(), parseBoolean() (+47 more)
 
 ### Community 52 - "Community 52"
-Cohesion: 0.70
+Cohesion: 0.24
 Nodes (4): checkAdminAuth(), DELETE(), GET(), PUT()
 
 ### Community 53 - "Community 53"
@@ -308,8 +309,8 @@ Cohesion: 0.18
 Nodes (7): CategoryGalleryPage(), PageProps, metadata, Artwork, Category, GalleryGrid(), GalleryGridProps
 
 ### Community 57 - "Community 57"
-Cohesion: 0.13
-Nodes (24): POST(), checkRateLimit(), cleanupExpired(), getClientIp(), lastCleanup, rateLimitMap, RateLimitOptions, RateLimitRecord (+16 more)
+Cohesion: 0.12
+Nodes (25): GET(), checkRateLimit(), cleanupExpired(), getClientIp(), lastCleanup, rateLimitMap, RateLimitOptions, RateLimitRecord (+17 more)
 
 ### Community 58 - "Community 58"
 Cohesion: 0.20
@@ -425,7 +426,7 @@ Nodes (22): AiAssistantModal(), CatalogMatrixStudio(), CatalogTemplateItem, Matr
 
 ### Community 89 - "Community 89"
 Cohesion: 0.08
-Nodes (8): checkAdminAuth(), GET(), POST(), DiscoveredFormCategory, DiscoveredFormItem, globalForPrisma, RouteParams, RouteParams
+Nodes (7): checkAdminAuth(), GET(), POST(), DiscoveredFormCategory, DiscoveredFormItem, globalForPrisma, RouteParams
 
 ### Community 90 - "Community 90"
 Cohesion: 0.22
@@ -458,7 +459,7 @@ Nodes (10): DashboardLayoutManager(), DashboardWidgetData, metadata, metadata, a
 ## Knowledge Gaps
 - **557 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+552 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

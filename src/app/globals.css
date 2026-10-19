@@ -886,6 +886,160 @@ body {
   transform-style: flat !important;
 }
 
+/* =============================================================================
+ * e-Catalog Mobile Responsiveness & Fluid Viewport Architecture
+ * On mobile screens (< 768px), eliminates rigid desktop aspect-ratio box collapse,
+ * eradicates inner scroll windows, and stacks multi-column artwork plates vertically.
+ * ============================================================================= */
+@media screen and (max-width: 767px) {
+  /* Fluid Natural Height Page Containers */
+  [data-catalog-reader="true"] .catalog-page,
+  [data-catalog-reader="true"] .plate-page,
+  [data-catalog-reader="true"] .cover-page,
+  [data-catalog-reader="true"] .essay-page,
+  [data-catalog-reader="true"] .editorial-page,
+  [data-catalog-reader="true"] .end-page,
+  [data-catalog-reader="true"] .catalog-matrix-page-wrapper,
+  .catalog-document .catalog-page,
+  .catalog-document .plate-page,
+  .catalog-document .cover-page,
+  .catalog-document .essay-page,
+  .catalog-document .editorial-page,
+  .catalog-document .end-page,
+  .catalog-document .catalog-matrix-page-wrapper {
+    aspect-ratio: auto !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 10px !important;
+    border-radius: 1.25rem !important;
+  }
+
+  /* Eradicate Inner Scroll Windows & Collapsed Frames */
+  [data-catalog-reader="true"] .catalog-frame,
+  [data-catalog-reader="true"] .plate-details-col,
+  [data-catalog-reader="true"] .plate-body-flow,
+  [data-catalog-reader="true"] .magazine-col,
+  [data-catalog-reader="true"] .catalog-matrix-body,
+  [data-catalog-reader="true"] .catalog-matrix-spine,
+  [data-catalog-reader="true"] .catalog-matrix-cell,
+  .catalog-document .catalog-frame,
+  .catalog-document .plate-details-col,
+  .catalog-document .plate-body-flow,
+  .catalog-document .magazine-col,
+  .catalog-document .catalog-matrix-body,
+  .catalog-document .catalog-matrix-spine,
+  .catalog-document .catalog-matrix-cell {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    padding: 1.25rem 1rem !important;
+    border-radius: 1rem !important;
+  }
+
+  /* Transform Side-by-Side Artwork Plates into Single Stacked Vertical Column */
+  [data-catalog-reader="true"] .catalog-plate-body.plate-body-grid,
+  .catalog-document .catalog-plate-body.plate-body-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.25rem !important;
+    width: 100% !important;
+  }
+
+  [data-catalog-reader="true"] .plate-image-col,
+  .catalog-document .plate-image-col {
+    width: 100% !important;
+    max-height: none !important;
+    margin-bottom: 0.5rem !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  [data-catalog-reader="true"] .plate-image-col img,
+  [data-catalog-reader="true"] .plate-image-container img,
+  .catalog-document .plate-image-col img,
+  .catalog-document .plate-image-container img {
+    max-height: 48vh !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    object-fit: contain !important;
+  }
+
+  [data-catalog-reader="true"] .plate-details-col,
+  .catalog-document .plate-details-col {
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  /* Unwrap Top-Left Float Layouts for Natural Mobile Reading */
+  [data-catalog-reader="true"] .plate-image-float,
+  .catalog-document .plate-image-float {
+    float: none !important;
+    max-width: 100% !important;
+    margin: 0 auto 1.25rem auto !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  [data-catalog-reader="true"] .plate-image-float img,
+  .catalog-document .plate-image-float img {
+    max-height: 48vh !important;
+    width: auto !important;
+    max-width: 100% !important;
+  }
+
+  /* Matrix Layouts Stack Vertically on Mobile */
+  [data-catalog-reader="true"] .catalog-matrix-body,
+  .catalog-document .catalog-matrix-body {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  [data-catalog-reader="true"] .catalog-matrix-spine,
+  .catalog-document .catalog-matrix-spine {
+    width: 100% !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(180, 83, 9, 0.25) !important;
+    padding: 0.75rem 0 !important;
+  }
+
+  [data-catalog-reader="true"] .catalog-matrix-grid,
+  .catalog-document .catalog-matrix-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    height: auto !important;
+  }
+
+  [data-catalog-reader="true"] .catalog-matrix-cell,
+  .catalog-document .catalog-matrix-cell {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Magazine Multi-Column Layouts Stack Vertically on Mobile */
+  [data-catalog-reader="true"] .magazine-layout-container,
+  .catalog-document .magazine-layout-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.25rem !important;
+  }
+
+  [data-catalog-reader="true"] .magazine-col,
+  .catalog-document .magazine-col {
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
 @media print {
   body,
   html,

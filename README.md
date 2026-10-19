@@ -141,6 +141,7 @@ SavazAI WebApps Platform
    - Virtual page-flip presentation simulating high-end physical exhibition catalogs.
    - Curatorial essays, high-resolution artwork plates, and provenance notes.
    - **Unrestricted Native Printing & PDF Saving**: Native browser printing (`Ctrl+P` / `Cmd+P`) and PDF saving unlocked without restrictive publication guards.
+   - **Fluid Mobile Viewport Architecture**: On mobile viewports (`max-width: 767px`), pages expand to natural fluid height (`aspect-ratio: auto !important`), eradicating rigid aspect-ratio height collapse (~260px) and inner scrollboxes. Artwork plates stack into a single vertical column (`flex-col`) with centered images (`max-h: 48vh`) and naturally flowing curatorial metadata.
    - **High-Resolution PDF Engine Canvas**: Solid theme canvas (`#FAF7F2`) with `@media print` universal scrollbar suppression (`scrollbar-width: none !important; *::-webkit-scrollbar { display: none !important; }`) and `overflow: visible !important`, preventing dark/terracotta border bleed and eliminating trapped scrollbar containers.
    - **Clean Metadata Formatting**: Granular metadata hierarchy with automatic deduplication of redundant Category badges across plates.
 

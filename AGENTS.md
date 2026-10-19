@@ -152,6 +152,11 @@ All code generation and architectural modifications must adhere to the specializ
   - Container expansion: `.catalog-frame`, `.cover-page`, `.plate-page`, and `.plate-details-col` enforce `overflow: visible !important` and `print:overflow-visible`, completely eliminating trapped scrollbar containers in exported PDF covers and plates.
   - Theme canvas color fidelity: `.catalog-frame` enforces solid `#FAF7F2` background with `backdrop-filter: none !important` during print, preventing outer dark or terracotta red cover borders from bleeding through translucent cards as a pinkish tint.
   - Metadata deduplication: Category badges are cleanly suppressed when Category is already displayed in the plate top header, dedicating subtitles to creation year and custom notes.
+- **e-Catalog Fluid Mobile Viewport & Inner Scrollbar Eradication Invariant**:
+  - On mobile screens (`max-width: 767px`), all e-catalog pages (`.catalog-page`, `.cover-page`, `.plate-page`, `.essay-page`, `.editorial-page`, `.end-page`, `.catalog-matrix-page-wrapper`) enforce `aspect-ratio: auto !important`, `height: auto !important`, and `overflow: visible !important`.
+  - Eradicates rigid desktop aspect ratio height collapse (~260px) and eliminates trapped inner scrollbars (`overflow-y: auto`) on `.catalog-frame`, `.plate-details-col`, `.plate-body-flow`, `.magazine-col`, and `.catalog-matrix-cell`.
+  - Multi-column artwork plates (`plate-body-grid`) automatically stack into a single vertical column (`flex-direction: column !important`) with centered artwork image (`max-height: 48vh`) and natural vertical flow of curatorial notes, title, medium, dimensions, and descriptions.
+  - Desktop view ($\ge 768\text{px}$) and Chromium PDF print engine (`@media print`) remain 100% untouched and preserved.
 
 ### B. 3D WebGL Exhibition Salon Wall Engine & Gallery Background Architecture
 - **Aspect Ratio Preservation**:

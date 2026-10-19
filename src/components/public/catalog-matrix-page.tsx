@@ -161,7 +161,7 @@ export function CatalogMatrixPage({
           {/* Vertical Sidebar Spine */}
           {isSpineActive && (
             <aside
-              className="catalog-matrix-spine shrink-0 border-primary/25 flex flex-col justify-center text-center overflow-y-auto print:overflow-visible font-serif p-2"
+              className="catalog-matrix-spine shrink-0 border-primary/25 flex flex-col justify-center text-center overflow-visible md:overflow-y-auto print:overflow-visible font-serif p-2"
               style={{
                 width: verticalSpineWidth || "25%",
                 borderRightWidth: verticalSpineMode === "LEFT" ? "1px" : "0px",
@@ -202,7 +202,7 @@ export function CatalogMatrixPage({
                       gridColumn: `span ${cSpan}`,
                     }}
                     className={cn(
-                      "catalog-matrix-cell overflow-y-auto print:overflow-visible font-serif leading-relaxed text-justify flex flex-col",
+                      "catalog-matrix-cell overflow-visible md:overflow-y-auto print:overflow-visible font-serif leading-relaxed text-justify flex flex-col",
                       typographyClasses
                     )}
                   >
@@ -218,7 +218,7 @@ export function CatalogMatrixPage({
             </div>
           ) : fallbackContentHtml ? (
             <div className={cn(
-              "catalog-matrix-cell flex-1 overflow-y-auto print:overflow-visible font-serif leading-relaxed text-justify",
+              "catalog-matrix-cell flex-1 overflow-visible md:overflow-y-auto print:overflow-visible font-serif leading-relaxed text-justify",
               typographyClasses
             )}>
               <TiptapRenderer content={fallbackContentHtml} contrast={contrast} />

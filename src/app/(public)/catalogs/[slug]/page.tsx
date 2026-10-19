@@ -203,7 +203,7 @@ function CatalogSinglePlateView({
   if (isFullBleed && primaryImageUrl) {
     return (
       <div
-        className="catalog-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none min-h-[640px] text-white"
+        className="catalog-page relative rounded-3xl overflow-hidden flex flex-col justify-between print:rounded-none min-h-0 md:min-h-[640px] text-white"
         style={{ aspectRatio: `${aspectRatio}` }}
       >
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -268,7 +268,7 @@ function CatalogSinglePlateView({
         <div className="flex-1 flex flex-row items-stretch overflow-hidden w-full">
           {leftSpineSlot && <SpineDecoratorSlotView slot={leftSpineSlot} position="left" />}
 
-          <div className="flex-1 flex flex-col justify-between p-4 sm:p-8 overflow-y-auto print:overflow-visible w-full">
+          <div className="flex-1 flex flex-col justify-between p-4 sm:p-8 overflow-visible md:overflow-y-auto print:overflow-visible w-full">
             {children}
 
             {primaryImageUrl && (
@@ -692,6 +692,108 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                 visibility: hidden !important;
               }
             }
+            @media screen and (max-width: 767px) {
+              .catalog-document .catalog-page,
+              .catalog-document .plate-page,
+              .catalog-document .cover-page,
+              .catalog-document .essay-page,
+              .catalog-document .editorial-page,
+              .catalog-document .end-page,
+              .catalog-document .catalog-matrix-page-wrapper {
+                aspect-ratio: auto !important;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 10px !important;
+                border-radius: 1.25rem !important;
+              }
+              .catalog-document .catalog-frame,
+              .catalog-document .plate-details-col,
+              .catalog-document .plate-body-flow,
+              .catalog-document .magazine-col,
+              .catalog-document .catalog-matrix-body,
+              .catalog-document .catalog-matrix-spine,
+              .catalog-document .catalog-matrix-cell {
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+                overflow-y: visible !important;
+                padding: 1.25rem 1rem !important;
+                border-radius: 1rem !important;
+              }
+              .catalog-document .catalog-plate-body.plate-body-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1.25rem !important;
+                width: 100% !important;
+              }
+              .catalog-document .plate-image-col {
+                width: 100% !important;
+                max-height: none !important;
+                margin-bottom: 0.5rem !important;
+                display: flex !important;
+                justify-content: center !important;
+              }
+              .catalog-document .plate-image-col img,
+              .catalog-document .plate-image-container img {
+                max-height: 48vh !important;
+                width: auto !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                object-fit: contain !important;
+              }
+              .catalog-document .plate-details-col {
+                width: 100% !important;
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 0 !important;
+              }
+              .catalog-document .plate-image-float {
+                float: none !important;
+                max-width: 100% !important;
+                margin: 0 auto 1.25rem auto !important;
+                display: flex !important;
+                justify-content: center !important;
+              }
+              .catalog-document .plate-image-float img {
+                max-height: 48vh !important;
+                width: auto !important;
+                max-width: 100% !important;
+              }
+              .catalog-document .catalog-matrix-body {
+                flex-direction: column !important;
+                gap: 1rem !important;
+              }
+              .catalog-document .catalog-matrix-spine {
+                width: 100% !important;
+                border: none !important;
+                border-bottom: 1px solid rgba(180, 83, 9, 0.25) !important;
+                padding: 0.75rem 0 !important;
+              }
+              .catalog-document .catalog-matrix-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1rem !important;
+                height: auto !important;
+              }
+              .catalog-document .catalog-matrix-cell {
+                grid-column: auto !important;
+                grid-row: auto !important;
+                height: auto !important;
+                overflow: visible !important;
+              }
+              .catalog-document .magazine-layout-container {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1.25rem !important;
+              }
+              .catalog-document .magazine-col {
+                width: 100% !important;
+                max-height: none !important;
+                overflow: visible !important;
+              }
+            }
           `,
         }}
       />
@@ -1079,7 +1181,7 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                 <BookOpen className="w-4 h-4 text-primary" />
               </div>
 
-              <div className="prose prose-sm sm:prose-base dark:prose-invert font-serif leading-relaxed text-foreground/90 max-w-none flex-1 overflow-y-auto print:overflow-visible py-4 text-justify">
+              <div className="prose prose-sm sm:prose-base dark:prose-invert font-serif leading-relaxed text-foreground/90 max-w-none flex-1 overflow-visible md:overflow-y-auto print:overflow-visible py-4 text-justify">
                 <TiptapRenderer
                   content={catalog.curatorialEssay}
                   catalogPageSize={geometry.size}
@@ -1263,12 +1365,12 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                 )}
 
                 {/* Editorial Multi-Segment Content Layout */}
-                <div className={`magazine-layout-container flex-1 overflow-y-auto print:overflow-visible font-serif leading-relaxed py-2 ${gridClass}`}>
+                <div className={`magazine-layout-container flex-1 overflow-visible md:overflow-y-auto print:overflow-visible font-serif leading-relaxed py-2 ${gridClass}`}>
                   {segments.length > 0 ? (
                     segments.map((seg, sIdx) => (
                       <div
                         key={seg.id || sIdx}
-                        className={cn("magazine-col font-serif leading-relaxed overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}
+                        className={cn("magazine-col font-serif leading-relaxed overflow-visible md:overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}
                       >
                         <TiptapRenderer
                           content={seg.contentHtml}
@@ -1279,7 +1381,7 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                       </div>
                     ))
                   ) : page.contentHtml ? (
-                    <div className={cn("magazine-col font-serif leading-relaxed overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}>
+                    <div className={cn("magazine-col font-serif leading-relaxed overflow-visible md:overflow-y-auto print:overflow-visible text-justify", pageTypographyClasses)}>
                       <TiptapRenderer
                         content={page.contentHtml}
                         contrast={pageScope.contrastMode}
@@ -1362,7 +1464,7 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                 {/* Conditional Plate Layout */}
                 {layoutMode === "TOP_LEFT_FLOW" ? (
                   /* TOP-LEFT ARTWORK WITH WRAPPED TEXT ARCHETYPE (Eliminates text truncation) */
-                  <div className="plate-body-flow flex-1 my-auto w-full text-left overflow-y-auto print:overflow-visible">
+                  <div className="plate-body-flow flex-1 my-auto w-full text-left overflow-visible md:overflow-y-auto print:overflow-visible">
                     <div className="float-left mr-8 mb-4 max-w-[45%] w-auto max-h-[56vh] print:max-h-[50vh] plate-image-float">
                       <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group">
                         <ProtectedImage
@@ -1384,7 +1486,7 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                             {displaySubtitle}
                           </span>
                         )}
-                        <h3 className="text-2xl sm:text-3xl font-serif text-foreground font-bold leading-tight">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-serif text-foreground font-bold leading-tight">
                           {displayTitle}
                         </h3>
                         {item.artwork.yearCreated && (
@@ -1473,7 +1575,7 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                         }}
                       >
                         {/* Left Column: Framed Masterwork Plate */}
-                        <div className="plate-image-col flex items-center justify-center max-h-[64vh] print:max-h-[60vh] w-full">
+                        <div className="plate-image-col flex items-center justify-center max-h-none md:max-h-[64vh] print:max-h-[60vh] w-full">
                           <div className="relative rounded-xl overflow-hidden border border-primary/20 bg-background/50 shadow-2xl group max-h-full">
                             <ProtectedImage
                               useImg={true}
@@ -1482,20 +1584,20 @@ export default async function ECatalogReaderPage({ params, searchParams }: PageP
                               decoding="sync"
                               src={item.artwork.watermarkedWebpUrl || item.artwork.primaryImageUrl}
                               alt={displayTitle}
-                              className="max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
+                              className="max-h-[48vh] md:max-h-[58vh] print:max-h-[56vh] max-w-full w-auto object-contain rounded shadow-2xl mx-auto group-hover:scale-101 transition-transform duration-500"
                             />
                           </div>
                         </div>
 
                         {/* Right Column: Curatorial Details & Specifications */}
-                        <div className="plate-details-col flex flex-col justify-center space-y-3 text-left w-full overflow-y-auto print:overflow-visible max-h-[64vh] print:max-h-none">
+                        <div className="plate-details-col flex flex-col justify-center space-y-3 text-left w-full overflow-visible md:overflow-y-auto print:overflow-visible max-h-none md:max-h-[64vh] print:max-h-none">
                           <div>
                             {displaySubtitle && (
                               <span className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border border-primary/30 rounded mb-2 font-mono uppercase tracking-wider">
                                 {displaySubtitle}
                               </span>
                             )}
-                            <h3 className="text-2xl sm:text-3xl font-serif text-foreground font-bold leading-tight">
+                            <h3 className="text-xl sm:text-2xl md:text-3xl font-serif text-foreground font-bold leading-tight">
                               {displayTitle}
                             </h3>
                             {item.artwork.yearCreated && (
