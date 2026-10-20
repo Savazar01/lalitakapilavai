@@ -5,8 +5,24 @@
  * Enforces true physical metric/imperial dimensions and anti-splitting page break rules.
  */
 
+export type PlacardPrintFormat =
+  | "visiting-card"
+  | "museum-placard"
+  | "museum-large"
+  | "museum-xlarge";
+
+export interface PlacardFieldStyle {
+  fontFamily?: "inherit" | "cinzel" | "cormorant" | "inter" | "georgia" | "playfair";
+  fontSize?: string; // e.g. "8pt", "10pt", "12pt", "14pt", "16pt", "18pt", "20pt", "24pt"
+  fontWeight?: "inherit" | "normal" | "medium" | "semibold" | "bold";
+  fontStyle?: "inherit" | "normal" | "italic";
+  textDecoration?: "none" | "underline";
+  color?: string; // hex color or empty/inherit
+  textTransform?: "none" | "uppercase" | "capitalize";
+}
+
 export interface PlacardStylingConfig {
-  fontFamily: "cinzel" | "cormorant" | "inter" | "georgia";
+  fontFamily: "cinzel" | "cormorant" | "inter" | "georgia" | "playfair";
   textAlign: "left" | "center" | "right";
   cardBgColor: string;
   titleColor: string;
@@ -27,11 +43,34 @@ export interface PlacardStylingConfig {
   showPrice?: boolean;
   showNotes?: boolean;
   fieldOrder?: string[];
+  // Granular Field Typography Overrides
+  fieldStyles?: {
+    title?: PlacardFieldStyle;
+    medium?: PlacardFieldStyle;
+    dimensions?: PlacardFieldStyle;
+    year?: PlacardFieldStyle;
+    price?: PlacardFieldStyle;
+    category?: PlacardFieldStyle;
+    artist?: PlacardFieldStyle;
+    notes?: PlacardFieldStyle;
+    qrLabel?: PlacardFieldStyle;
+  };
+  // Configurable Thumbnail & QR Positioning
+  mediaPlacement?: "top-right" | "bottom-right" | "inline" | "stacked";
+  mediaLayout?: "side-by-side" | "stacked";
+  thumbnailSize?: "compact" | "standard" | "large" | "xlarge";
+  thumbnailShape?: "rounded" | "square" | "circle";
+  thumbnailBorder?: boolean;
+  qrSize?: "compact" | "standard" | "large";
+  // Acrylic Base Clamp Margin
+  clampMargin?: "none" | "minimal" | "standard" | "acrylic-clamp";
+  // Valuation / Price Styling
+  priceStyle?: "clean" | "badge";
 }
 
 export interface PlacardPrintOptions {
   title?: string;
-  format?: "visiting-card" | "museum-placard";
+  format?: PlacardPrintFormat;
   orientation?: "landscape" | "portrait";
   borderStyle?: "double-fillet" | "single-rule" | "none";
   showCropMarks?: boolean;
@@ -44,6 +83,8 @@ export function getFontFamilyCss(font?: string): string {
       return "'Cinzel', Georgia, serif";
     case "cormorant":
       return "'Cormorant Garamond', Garamond, Georgia, serif";
+    case "playfair":
+      return "'Playfair Display', Georgia, serif";
     case "inter":
       return "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     case "georgia":
@@ -60,15 +101,28 @@ export interface PhysicalDimensions {
 }
 
 export function getPhysicalDimensions(
-  format: "visiting-card" | "museum-placard" = "visiting-card",
+  format: PlacardPrintFormat = "visiting-card",
   orientation: "landscape" | "portrait" = "landscape"
 ): PhysicalDimensions {
+  if (format === "museum-xlarge") {
+    // Museum Extra Large: 6" x 3.5" (152.4mm x 88.9mm)
+    return orientation === "portrait"
+      ? { widthMm: 88.9, heightMm: 152.4, widthIn: "3.5in", heightIn: "6in" }
+      : { widthMm: 152.4, heightMm: 88.9, widthIn: "6in", heightIn: "3.5in" };
+  }
+  if (format === "museum-large") {
+    // Museum Large: 5" x 3" (127mm x 76.2mm)
+    return orientation === "portrait"
+      ? { widthMm: 76.2, heightMm: 127.0, widthIn: "3in", heightIn: "5in" }
+      : { widthMm: 127.0, heightMm: 76.2, widthIn: "5in", heightIn: "3in" };
+  }
   if (format === "museum-placard") {
+    // Museum Placard: 4" x 2.5" (101.6mm x 63.5mm)
     return orientation === "portrait"
       ? { widthMm: 63.5, heightMm: 101.6, widthIn: "2.5in", heightIn: "4in" }
       : { widthMm: 101.6, heightMm: 63.5, widthIn: "4in", heightIn: "2.5in" };
   }
-  // Default: Visiting Card (3.5" x 2")
+  // Default: Visiting Card (3.5" x 2") (88.9mm x 50.8mm)
   return orientation === "portrait"
     ? { widthMm: 50.8, heightMm: 88.9, widthIn: "2in", heightIn: "3.5in" }
     : { widthMm: 88.9, heightMm: 50.8, widthIn: "3.5in", heightIn: "2in" };

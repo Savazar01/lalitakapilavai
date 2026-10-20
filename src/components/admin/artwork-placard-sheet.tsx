@@ -14,18 +14,20 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Palette,
   Sliders,
   FileText,
-  ArrowUp,
-  ArrowDown,
   DollarSign,
   Save,
-  RefreshCw,
   Loader2,
+  Maximize2,
+  Bold,
+  Italic,
+  Underline,
+  LayoutGrid,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
-import { formatCurrency } from "@/lib/formatters";
+import { SUPPORTED_CURRENCIES } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,10 +52,15 @@ import { getClientBaseUrl } from "@/lib/get-base-url-client";
 import { cn } from "@/lib/utils";
 import {
   printIsolatedElement,
-  getPhysicalDimensions,
-  getFontFamilyCss,
   type PlacardStylingConfig,
+  type PlacardPrintFormat,
+  type PlacardFieldStyle,
 } from "@/lib/print-isolated-html";
+import {
+  PlacardCard,
+  type PlacardCardData,
+} from "@/components/admin/placard-card";
+import { PlacardLivePreviewModal } from "@/components/admin/placard-live-preview-modal";
 
 export interface PlacardArtwork {
   id: string;
@@ -79,20 +86,7 @@ export interface ArtworkPlacardSheetProps {
   defaultArtistName?: string;
 }
 
-export interface EditablePlacardItem {
-  id: string;
-  title: string;
-  artistName: string;
-  category: string;
-  medium: string;
-  dimensions: string;
-  year: string;
-  price?: string;
-  currency?: string;
-  additionalNotes?: string;
-  thumbnail?: string;
-  slug: string;
-}
+export type EditablePlacardItem = PlacardCardData;
 
 export const DEFAULT_PLACARD_STYLING: PlacardStylingConfig = {
   fontFamily: "cormorant",
@@ -124,6 +118,25 @@ export const DEFAULT_PLACARD_STYLING: PlacardStylingConfig = {
     "price",
     "notes",
   ],
+  mediaPlacement: "top-right",
+  mediaLayout: "side-by-side",
+  thumbnailSize: "standard",
+  thumbnailShape: "rounded",
+  thumbnailBorder: true,
+  qrSize: "standard",
+  clampMargin: "minimal",
+  priceStyle: "clean",
+  fieldStyles: {
+    title: { fontFamily: "inherit", fontWeight: "bold", fontStyle: "italic", textDecoration: "none", color: "", fontSize: "inherit" },
+    medium: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "italic", textDecoration: "none", color: "", fontSize: "inherit" },
+    dimensions: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
+    year: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
+    price: { fontFamily: "inherit", fontWeight: "semibold", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
+    category: { fontFamily: "inherit", fontWeight: "bold", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit", textTransform: "uppercase" },
+    artist: { fontFamily: "inherit", fontWeight: "semibold", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
+    notes: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "italic", textDecoration: "none", color: "", fontSize: "inherit" },
+    qrLabel: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
+  },
 };
 
 // Preset Swatches for Quick Customization
@@ -155,6 +168,47 @@ const HEADER_COLOR_SWATCHES = [
   { label: "Deep Olive", value: "#3f6212" },
 ];
 
+type ConfigurableFieldKey =
+  | "title"
+  | "medium"
+  | "dimensions"
+  | "year"
+  | "price"
+  | "category"
+  | "artist"
+  | "notes"
+  | "qrLabel";
+
+const FIELD_METADATA: Array<{ key: ConfigurableFieldKey; label: string; icon: string }> = [
+  { key: "title", label: "Artwork Title", icon: "Type" },
+  { key: "medium", label: "Medium & Materials", icon: "FileText" },
+  { key: "dimensions", label: "Dimensions", icon: "Sliders" },
+  { key: "year", label: "Year Created", icon: "Clock" },
+  { key: "price", label: "Valuation / Price", icon: "DollarSign" },
+  { key: "category", label: "Category / School", icon: "Layers" },
+  { key: "artist", label: "Artist Credit", icon: "Sparkles" },
+  { key: "notes", label: "Curatorial Notes", icon: "FileText" },
+  { key: "qrLabel", label: "QR Provenance Label", icon: "QrCode" },
+];
+
+const FONT_SIZE_PRESETS = [
+  { label: "Inherit Scale", value: "inherit" },
+  { label: "7pt (Micro)", value: "7pt" },
+  { label: "8pt (Fine)", value: "8pt" },
+  { label: "9pt (Compact)", value: "9pt" },
+  { label: "10pt (Standard Small)", value: "10pt" },
+  { label: "11pt (Standard)", value: "11pt" },
+  { label: "12pt (Medium)", value: "12pt" },
+  { label: "13pt (Subhead)", value: "13pt" },
+  { label: "14pt (Prominent)", value: "14pt" },
+  { label: "16pt (Headline)", value: "16pt" },
+  { label: "18pt (Large)", value: "18pt" },
+  { label: "20pt (Title)", value: "20pt" },
+  { label: "24pt (Display)", value: "24pt" },
+  { label: "28pt (Jumbo)", value: "28pt" },
+  { label: "32pt (Monumental)", value: "32pt" },
+];
+
 export function ArtworkPlacardSheet({
   open,
   onOpenChange,
@@ -162,7 +216,7 @@ export function ArtworkPlacardSheet({
   defaultArtistName = "Master Artist",
 }: ArtworkPlacardSheetProps) {
   // Format & Orientation
-  const [cardFormat, setCardFormat] = React.useState<"visiting-card" | "museum-placard">("visiting-card");
+  const [cardFormat, setCardFormat] = React.useState<PlacardPrintFormat>("visiting-card");
   const [orientation, setOrientation] = React.useState<"landscape" | "portrait">("portrait");
 
   // Customizer Studio Styling State with LocalStorage Persistence
@@ -171,7 +225,15 @@ export function ArtworkPlacardSheet({
       try {
         const saved = localStorage.getItem("savazai_placard_layout_prefs");
         if (saved) {
-          return { ...DEFAULT_PLACARD_STYLING, ...JSON.parse(saved) };
+          const parsed = JSON.parse(saved);
+          return {
+            ...DEFAULT_PLACARD_STYLING,
+            ...parsed,
+            fieldStyles: {
+              ...DEFAULT_PLACARD_STYLING.fieldStyles,
+              ...(parsed.fieldStyles || {}),
+            },
+          };
         }
       } catch {}
     }
@@ -180,6 +242,15 @@ export function ArtworkPlacardSheet({
 
   // Active View Tab: "preview" vs "edit"
   const [activeTab, setActiveTab] = React.useState<"preview" | "edit">("preview");
+
+  // Granular Field Styling Tab
+  const [activeFieldTab, setActiveFieldTab] = React.useState<ConfigurableFieldKey>("title");
+
+  // Live Preview Modal State
+  const [livePreviewModalOpen, setLivePreviewModalOpen] = React.useState(false);
+
+  // In-Studio Live Card Selector (index)
+  const [inStudioCardIndex, setInStudioCardIndex] = React.useState(0);
 
   // Editable In-Modal Card Data Overrides with LocalStorage Persistence
   const [userOverrides, setUserOverrides] = React.useState<Record<string, Partial<EditablePlacardItem>>>(() => {
@@ -246,17 +317,53 @@ export function ArtworkPlacardSheet({
     });
   };
 
+  const updateFieldStyle = (
+    fieldKey: ConfigurableFieldKey,
+    updates: Partial<PlacardFieldStyle>
+  ) => {
+    setStyling((prev) => {
+      const current = prev.fieldStyles?.[fieldKey] || {};
+      const nextFieldStyles = {
+        ...prev.fieldStyles,
+        [fieldKey]: { ...current, ...updates },
+      };
+      const next = { ...prev, fieldStyles: nextFieldStyles };
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("savazai_placard_layout_prefs", JSON.stringify(next));
+        } catch {}
+      }
+      return next;
+    });
+  };
+
+  const resetFieldStyle = (fieldKey: ConfigurableFieldKey) => {
+    setStyling((prev) => {
+      const nextFieldStyles = { ...prev.fieldStyles };
+      delete nextFieldStyles[fieldKey];
+      const next = { ...prev, fieldStyles: nextFieldStyles };
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("savazai_placard_layout_prefs", JSON.stringify(next));
+        } catch {}
+      }
+      return next;
+    });
+    toast.success(`Reset ${fieldKey} to global defaults`);
+  };
+
   const getItemData = React.useCallback(
     (art: PlacardArtwork): EditablePlacardItem => {
       const over = userOverrides[art.id] || {};
       const live = liveArtworkData[art.id];
-      const effectivePrice = over.price !== undefined
-        ? over.price
-        : live?.price !== undefined && live.price !== null
-        ? String(live.price)
-        : art.price !== undefined && art.price !== null
-        ? String(art.price)
-        : "";
+      const effectivePrice =
+        over.price !== undefined
+          ? over.price
+          : live?.price !== undefined && live.price !== null
+          ? String(live.price)
+          : art.price !== undefined && art.price !== null
+          ? String(art.price)
+          : "";
       const effectiveCurrency = over.currency || live?.currency || art.currency || "INR";
 
       return {
@@ -393,26 +500,6 @@ export function ArtworkPlacardSheet({
   };
 
   const handlePrint = () => {
-    if (activeTab !== "preview") {
-      setActiveTab("preview");
-      setTimeout(() => {
-        const printContainer = document.getElementById("placard-render-cards");
-        if (!printContainer) return;
-        printIsolatedElement(
-          printContainer.innerHTML,
-          "Exhibition Display Cards",
-          {
-            format: cardFormat,
-            orientation,
-            borderStyle: styling.borderStyle,
-            showCropMarks: styling.showCropMarks,
-            styling,
-          }
-        );
-      }, 150);
-      return;
-    }
-
     const printContainer = document.getElementById("placard-render-cards");
     if (!printContainer) return;
     printIsolatedElement(
@@ -428,835 +515,938 @@ export function ArtworkPlacardSheet({
     );
   };
 
-  const dim = getPhysicalDimensions(cardFormat, orientation);
-  const activeFontFamilyCss = getFontFamilyCss(styling.fontFamily);
+  const allCardData = React.useMemo(() => {
+    return artworks.map(getItemData);
+  }, [artworks, getItemData]);
+
+  const previewCardData = allCardData[inStudioCardIndex] || allCardData[0];
+
+  const activeFieldStyle = styling.fieldStyles?.[activeFieldTab] || {};
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[92vh] flex flex-col p-0 overflow-hidden bg-background">
-        <DialogHeader className="no-print p-4 sm:p-5 border-b border-border/80 bg-muted/20 shrink-0">
-          <div className="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <DialogTitle className="font-serif text-lg sm:text-xl font-bold flex items-center gap-2 text-foreground">
-                <Printer className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                Printable Artwork Display Placards &amp; Cards
-              </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                Balanced editorial fine-art exhibition cards with live typography &amp; styling customizer.
-              </DialogDescription>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-6xl max-h-[94vh] flex flex-col p-0 overflow-hidden bg-background">
+          <DialogHeader className="no-print p-4 sm:p-5 border-b border-border/80 bg-muted/20 shrink-0">
+            <div className="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <DialogTitle className="font-serif text-lg sm:text-xl font-bold flex items-center gap-2 text-foreground">
+                  <Printer className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  Printable Artwork Display Placards &amp; Cards
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                  Museum-grade physical display cards with granular field styling, unstyled prices, flexible layout, and large museum formats.
+                </DialogDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Tab Selector */}
+                <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/60">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("preview")}
+                    className={cn(
+                      "px-3 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer",
+                      activeTab === "preview"
+                        ? "bg-background text-foreground shadow-xs font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Print Sheet</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("edit")}
+                    className={cn(
+                      "px-3 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer",
+                      activeTab === "edit"
+                        ? "bg-background text-foreground shadow-xs font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Design Studio &amp; Details</span>
+                  </button>
+                </div>
+
+                {/* Dedicated Interactive Live Preview Launcher */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setLivePreviewModalOpen(true)}
+                  className="text-xs h-8 gap-1.5 border-amber-500/40 text-amber-900 dark:text-amber-200 hover:bg-amber-500/10 cursor-pointer"
+                  title="Open Dedicated Live Interactive Preview Studio"
+                >
+                  <Maximize2 className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="hidden sm:inline">Live Preview</span>
+                </Button>
+
+                <Badge variant="outline" className="text-xs border-amber-500/40 text-amber-800 dark:text-amber-300 flex items-center gap-1">
+                  {syncingPrices && <Loader2 className="w-3 h-3 animate-spin text-amber-600" />}
+                  <span>{artworks.length} Selected</span>
+                </Badge>
+                <Button
+                  type="button"
+                  onClick={handlePrint}
+                  className="text-xs h-8 gap-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-md cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print / PDF</span>
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              {/* Tab Selector */}
-              <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/60">
+
+            {/* Primary Quick Controls Toolbar */}
+            <div className="no-print grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 pt-3 mt-1 border-t border-border/60">
+              {/* Format: visiting-card, museum-placard, museum-large, museum-xlarge */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Format</span>
+                <Select
+                  value={cardFormat}
+                  onValueChange={(val: PlacardPrintFormat) => setCardFormat(val)}
+                >
+                  <SelectTrigger className="h-7 text-xs bg-card">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="visiting-card">Visiting Card (3.5 × 2 in)</SelectItem>
+                    <SelectItem value="museum-placard">Museum Placard (4 × 2.5 in)</SelectItem>
+                    <SelectItem value="museum-large">Museum Large (5 × 3 in)</SelectItem>
+                    <SelectItem value="museum-xlarge">Museum Extra Large (6 × 3.5 in)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Orientation */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Orientation</span>
+                <Select
+                  value={orientation}
+                  onValueChange={(val: "landscape" | "portrait") => setOrientation(val)}
+                >
+                  <SelectTrigger className="h-7 text-xs bg-card">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="portrait">Portrait</SelectItem>
+                    <SelectItem value="landscape">Landscape</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Border Options */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Border Style</span>
+                <Select
+                  value={styling.borderStyle}
+                  onValueChange={(val: "double-fillet" | "single-rule" | "none") => updateStyling("borderStyle", val)}
+                >
+                  <SelectTrigger className="h-7 text-xs bg-card">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="double-fillet">Double Gold Fillet</SelectItem>
+                    <SelectItem value="single-rule">Vintage Single Hairline</SelectItem>
+                    <SelectItem value="none">Borderless</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Media Placement (Configurable Thumbnail & QR Positioning) */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Media Position</span>
+                <Select
+                  value={styling.mediaPlacement || "top-right"}
+                  onValueChange={(val: "top-right" | "bottom-right" | "inline" | "stacked") => updateStyling("mediaPlacement", val)}
+                >
+                  <SelectTrigger className="h-7 text-xs bg-card">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="top-right">Top-Right Flank</SelectItem>
+                    <SelectItem value="bottom-right">Bottom-Right Corner</SelectItem>
+                    <SelectItem value="stacked">Stacked Right</SelectItem>
+                    <SelectItem value="inline">Inline Below Text</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Base Clamp Margin (Dead Space Elimination) */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Clamp Margin</span>
+                <Select
+                  value={styling.clampMargin || "minimal"}
+                  onValueChange={(val: "none" | "minimal" | "standard" | "acrylic-clamp") => updateStyling("clampMargin", val)}
+                >
+                  <SelectTrigger className="h-7 text-xs bg-card">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None (0mm) Full Canvas</SelectItem>
+                    <SelectItem value="minimal">Minimal (3mm)</SelectItem>
+                    <SelectItem value="standard">Standard (7mm)</SelectItem>
+                    <SelectItem value="acrylic-clamp">Acrylic Clamp (16mm)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Price Style (Unstyled vs Badge) */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Price Style</span>
+                <Select
+                  value={styling.priceStyle || "clean"}
+                  onValueChange={(val: "clean" | "badge") => updateStyling("priceStyle", val)}
+                >
+                  <SelectTrigger className="h-7 text-xs bg-card">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="clean">Unstyled Clean Text</SelectItem>
+                    <SelectItem value="badge">Curatorial Earmark</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Toggle: Thumbnail */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Thumbnail</span>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("preview")}
+                  onClick={() => updateStyling("showThumbnail", !styling.showThumbnail)}
                   className={cn(
-                    "px-3 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer",
-                    activeTab === "preview"
-                      ? "bg-background text-foreground shadow-xs font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
+                    "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
+                    styling.showThumbnail
+                      ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
+                      : "border-border bg-card text-muted-foreground"
                   )}
                 >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Preview</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("edit")}
-                  className={cn(
-                    "px-3 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer",
-                    activeTab === "edit"
-                      ? "bg-background text-foreground shadow-xs font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Edit Details</span>
+                  <span>Image</span>
+                  {styling.showThumbnail ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
                 </button>
               </div>
 
-              <Badge variant="outline" className="text-xs border-amber-500/40 text-amber-800 dark:text-amber-300">
-                {artworks.length} Selected
-              </Badge>
-              <Button
-                type="button"
-                onClick={handlePrint}
-                className="text-xs h-8 gap-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-md cursor-pointer"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print / PDF</span>
-              </Button>
+              {/* Toggle: QR Code */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">QR Code</span>
+                <button
+                  type="button"
+                  onClick={() => updateStyling("showQr", !styling.showQr)}
+                  className={cn(
+                    "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
+                    styling.showQr
+                      ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
+                      : "border-border bg-card text-muted-foreground"
+                  )}
+                >
+                  <span>QR Code</span>
+                  {styling.showQr ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
+                </button>
+              </div>
             </div>
-          </div>
+          </DialogHeader>
 
-          {/* Primary Quick Controls Toolbar */}
-          <div className="no-print grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 pt-3 mt-1 border-t border-border/60">
-            {/* Format */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Format</span>
-              <Select
-                value={cardFormat}
-                onValueChange={(val: "visiting-card" | "museum-placard") => setCardFormat(val)}
-              >
-                <SelectTrigger className="h-7 text-xs bg-card">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="visiting-card">Visiting Card (3.5 x 2 in)</SelectItem>
-                  <SelectItem value="museum-placard">Museum Placard (4 x 2.5 in)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Orientation */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Orientation</span>
-              <Select
-                value={orientation}
-                onValueChange={(val: "landscape" | "portrait") => setOrientation(val)}
-              >
-                <SelectTrigger className="h-7 text-xs bg-card">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="portrait">Portrait</SelectItem>
-                  <SelectItem value="landscape">Landscape</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Border Options */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Border Style</span>
-              <Select
-                value={styling.borderStyle}
-                onValueChange={(val: "double-fillet" | "single-rule" | "none") => updateStyling("borderStyle", val)}
-              >
-                <SelectTrigger className="h-7 text-xs bg-card">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="double-fillet">Double Gold Fillet</SelectItem>
-                  <SelectItem value="single-rule">Vintage Single Hairline</SelectItem>
-                  <SelectItem value="none">Borderless</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Toggle: Thumbnail */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Thumbnail</span>
-              <button
-                type="button"
-                onClick={() => updateStyling("showThumbnail", !styling.showThumbnail)}
+          {/* TAB 1: Print Sheet View */}
+          {activeTab === "preview" && (
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60 print:p-0 print:m-0 print:overflow-visible print:bg-white print:h-auto print:block">
+              <div
+                id="placard-render-cards"
                 className={cn(
-                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
-                  styling.showThumbnail
-                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
-                    : "border-border bg-card text-muted-foreground"
+                  "mx-auto shadow-xl print:shadow-none p-6 print:p-0 transition-all",
+                  "flex flex-wrap gap-5 items-start justify-center",
+                  cardFormat === "museum-xlarge"
+                    ? "max-w-[1100px]"
+                    : cardFormat === "museum-large"
+                    ? "max-w-[980px]"
+                    : cardFormat === "museum-placard"
+                    ? "max-w-[860px]"
+                    : "max-w-[780px]"
                 )}
+                style={{ backgroundColor: styling.cardBgColor }}
               >
-                <span>Image</span>
-                {styling.showThumbnail ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
-              </button>
+                {allCardData.map((itemData, idx) => (
+                  <PlacardCard
+                    key={itemData.id || idx}
+                    itemData={itemData}
+                    qrDataUrl={qrCodeDataUrls[itemData.id]}
+                    styling={styling}
+                    cardFormat={cardFormat}
+                    orientation={orientation}
+                    showAcrylicGuide={true}
+                  />
+                ))}
+              </div>
             </div>
+          )}
 
-            {/* Toggle: QR Code */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">QR Code</span>
-              <button
-                type="button"
-                onClick={() => updateStyling("showQr", !styling.showQr)}
-                className={cn(
-                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
-                  styling.showQr
-                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
-                    : "border-border bg-card text-muted-foreground"
-                )}
-              >
-                <span>QR Code</span>
-                {styling.showQr ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
-              </button>
-            </div>
+          {/* TAB 2: Design Studio & Details Editor */}
+          {activeTab === "edit" && (
+            <div className="no-print flex-1 overflow-y-auto p-4 sm:p-6 bg-background space-y-6">
+              {/* STICKY LIVE REAL-TIME CARD PREVIEW PANE */}
+              <div className="p-4 rounded-xl border border-amber-500/50 bg-amber-500/5 dark:bg-amber-950/20 shadow-xs space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-amber-500/20 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                    <h3 className="text-xs font-serif font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                      <Eye className="w-4 h-4 text-amber-600" />
+                      Live Real-Time Card Preview
+                    </h3>
+                    <Badge variant="outline" className="border-amber-500/40 text-amber-800 dark:text-amber-300 text-[10px]">
+                      Instant WYSIWYG
+                    </Badge>
+                  </div>
 
-            {/* Toggle: Category Header */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Category</span>
-              <button
-                type="button"
-                onClick={() => updateStyling("showCategory", !styling.showCategory)}
-                className={cn(
-                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
-                  styling.showCategory
-                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
-                    : "border-border bg-card text-muted-foreground"
-                )}
-              >
-                <span>School</span>
-                {styling.showCategory ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
-              </button>
-            </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-muted-foreground">Preview Card:</span>
+                    <Select
+                      value={String(inStudioCardIndex)}
+                      onValueChange={(val) => setInStudioCardIndex(Number(val))}
+                    >
+                      <SelectTrigger className="h-7 text-xs w-[220px] bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allCardData.map((c, i) => (
+                          <SelectItem key={c.id || i} value={String(i)}>
+                            #{i + 1}: {c.title || "Untitled"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setLivePreviewModalOpen(true)}
+                      className="h-7 text-xs gap-1 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10"
+                    >
+                      <Maximize2 className="w-3.5 h-3.5" /> Fullscreen
+                    </Button>
+                  </div>
+                </div>
 
-            {/* Toggle: Artist Header */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Artist</span>
-              <button
-                type="button"
-                onClick={() => updateStyling("showArtist", !styling.showArtist)}
-                className={cn(
-                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
-                  styling.showArtist
-                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
-                    : "border-border bg-card text-muted-foreground"
-                )}
-              >
-                <span>Artist</span>
-                {styling.showArtist ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
-              </button>
-            </div>
-
-            {/* Toggle: Crop Marks */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Crop Marks</span>
-              <button
-                type="button"
-                onClick={() => updateStyling("showCropMarks", !styling.showCropMarks)}
-                className={cn(
-                  "w-full h-7 px-2 text-xs rounded border text-left flex items-center justify-between cursor-pointer",
-                  styling.showCropMarks
-                    ? "border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-semibold"
-                    : "border-border bg-card text-muted-foreground"
-                )}
-              >
-                <span>Guides</span>
-                {styling.showCropMarks ? <CheckSquare className="w-3 h-3 text-amber-600" /> : <Square className="w-3 h-3 text-muted-foreground" />}
-              </button>
-            </div>
-          </div>
-        </DialogHeader>
-
-        {/* Tab 1: Live Interactive Print Preview */}
-        {activeTab === "preview" && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-stone-100 dark:bg-stone-900/60 print:p-0 print:m-0 print:overflow-visible print:bg-white print:h-auto print:block">
-            <div
-              id="placard-render-cards"
-              className={cn(
-                "mx-auto shadow-xl print:shadow-none p-6 print:p-0 transition-all",
-                "flex flex-wrap gap-5 items-start justify-center",
-                cardFormat === "visiting-card"
-                  ? "max-w-[780px]"
-                  : "max-w-[860px]"
-              )}
-              style={{ backgroundColor: styling.cardBgColor }}
-            >
-              {artworks.map((art, idx) => {
-                const itemData = getItemData(art);
-                const qrDataUrl = qrCodeDataUrls[art.id];
-
-                return (
-                  <div
-                    key={art.id || idx}
-                    style={{
-                      width: `${dim.widthMm}mm`,
-                      height: `${dim.heightMm}mm`,
-                      minWidth: `${dim.widthMm}mm`,
-                      minHeight: `${dim.heightMm}mm`,
-                      maxWidth: `${dim.widthMm}mm`,
-                      maxHeight: `${dim.heightMm}mm`,
-                      backgroundColor: styling.cardBgColor,
-                      fontFamily: activeFontFamilyCss,
-                      textAlign: styling.textAlign,
-                      pageBreakInside: "avoid",
-                      breakInside: "avoid",
-                    }}
-                    className={cn(
-                      "placard-card-item relative border border-stone-200/80 p-3 sm:p-3.5 print:p-2.5 transition-all flex flex-col justify-between overflow-hidden shrink-0 select-none",
-                      styling.showCropMarks && "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1"
+                {/* Centered Live Preview Card */}
+                <div className="p-4 sm:p-6 bg-stone-200/50 dark:bg-stone-900/80 rounded-lg flex items-center justify-center overflow-x-auto">
+                  <div className="shadow-lg rounded-[2px] overflow-hidden">
+                    {previewCardData && (
+                      <PlacardCard
+                        itemData={previewCardData}
+                        qrDataUrl={qrCodeDataUrls[previewCardData.id]}
+                        styling={styling}
+                        cardFormat={cardFormat}
+                        orientation={orientation}
+                        showAcrylicGuide={true}
+                      />
                     )}
-                  >
-                    {/* Border Options */}
-                    {styling.borderStyle === "double-fillet" && (
-                      <div
-                        className="absolute inset-1.5 border pointer-events-none rounded-[1px]"
-                        style={{ borderColor: styling.headerColor + "55" }}
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION A: GRANULAR FIELD TYPOGRAPHY & STYLING STUDIO */}
+              <div className="p-4 rounded-xl border border-amber-500/40 bg-card shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border/60 pb-2">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                      <Type className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      Granular Field Typography &amp; Text Styling Engine
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      Configure independent font family, font size, bold, italic, underline, uppercase, and color for every active placard field.
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="border-amber-500/40 text-amber-800 dark:text-amber-300 text-[10px]">
+                    Per-Field Precision
+                  </Badge>
+                </div>
+
+                {/* Field Selection Pills */}
+                <div className="flex flex-wrap gap-1.5 p-1 bg-muted/40 rounded-lg border border-border/60">
+                  {FIELD_METADATA.map((f) => (
+                    <button
+                      key={f.key}
+                      type="button"
+                      onClick={() => setActiveFieldTab(f.key)}
+                      className={cn(
+                        "px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer flex items-center gap-1.5",
+                        activeFieldTab === f.key
+                          ? "bg-amber-600 text-white font-semibold shadow-xs"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      )}
+                    >
+                      <span>{f.label}</span>
+                      {styling.fieldStyles?.[f.key] && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Active Field Customizer Controls */}
+                <div className="p-3.5 rounded-lg border border-border/70 bg-muted/20 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                        Styling for: &quot;{FIELD_METADATA.find((m) => m.key === activeFieldTab)?.label}&quot;
+                      </span>
+                      {styling.fieldStyles?.[activeFieldTab] && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          Customized
+                        </Badge>
+                      )}
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => resetFieldStyle(activeFieldTab)}
+                      className="h-6 text-[10px] gap-1 text-muted-foreground hover:text-destructive cursor-pointer"
+                    >
+                      <RotateCcw className="w-3 h-3" /> Reset to Global
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    {/* 1. Font Family */}
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Font Family
+                      </Label>
+                      <Select
+                        value={activeFieldStyle.fontFamily || "inherit"}
+                        onValueChange={(val: "inherit" | "cinzel" | "cormorant" | "inter" | "georgia" | "playfair") =>
+                          updateFieldStyle(activeFieldTab, { fontFamily: val })
+                        }
                       >
-                        <div
-                          className="absolute inset-0.5 border pointer-events-none"
-                          style={{ borderColor: styling.headerColor + "25" }}
+                        <SelectTrigger className="h-8 text-xs bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="inherit">Inherit from Global</SelectItem>
+                          <SelectItem value="cormorant" className="font-serif">Cormorant Garamond (Classical)</SelectItem>
+                          <SelectItem value="cinzel" className="font-serif font-semibold">Cinzel (Roman Gilded)</SelectItem>
+                          <SelectItem value="playfair" className="font-serif">Playfair Display (Luxury Serif)</SelectItem>
+                          <SelectItem value="georgia" className="font-serif">Georgia (Heritage Editorial)</SelectItem>
+                          <SelectItem value="inter" className="font-sans">Inter (Modern Clean Sans)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* 2. Font Size */}
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Font Size
+                      </Label>
+                      <Select
+                        value={activeFieldStyle.fontSize || "inherit"}
+                        onValueChange={(val) =>
+                          updateFieldStyle(activeFieldTab, { fontSize: val })
+                        }
+                      >
+                        <SelectTrigger className="h-8 text-xs bg-background font-mono">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_SIZE_PRESETS.map((p) => (
+                            <SelectItem key={p.value} value={p.value} className="font-mono text-xs">
+                              {p.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* 3. Text Styling Buttons: Bold, Italic, Underline, Uppercase */}
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Text Styling
+                      </Label>
+                      <div className="flex items-center gap-1 bg-background p-0.5 rounded border border-border h-8">
+                        {/* Bold */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateFieldStyle(activeFieldTab, {
+                              fontWeight: activeFieldStyle.fontWeight === "bold" ? "normal" : "bold",
+                            })
+                          }
+                          className={cn(
+                            "flex-1 h-full rounded text-xs flex items-center justify-center cursor-pointer transition-colors",
+                            activeFieldStyle.fontWeight === "bold"
+                              ? "bg-amber-600 text-white font-bold"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                          title="Toggle Bold"
+                        >
+                          <Bold className="w-3.5 h-3.5" />
+                        </button>
+
+                        {/* Italic */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateFieldStyle(activeFieldTab, {
+                              fontStyle: activeFieldStyle.fontStyle === "italic" ? "normal" : "italic",
+                            })
+                          }
+                          className={cn(
+                            "flex-1 h-full rounded text-xs flex items-center justify-center cursor-pointer transition-colors",
+                            activeFieldStyle.fontStyle === "italic"
+                              ? "bg-amber-600 text-white font-bold"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                          title="Toggle Italics"
+                        >
+                          <Italic className="w-3.5 h-3.5" />
+                        </button>
+
+                        {/* Underline */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateFieldStyle(activeFieldTab, {
+                              textDecoration: activeFieldStyle.textDecoration === "underline" ? "none" : "underline",
+                            })
+                          }
+                          className={cn(
+                            "flex-1 h-full rounded text-xs flex items-center justify-center cursor-pointer transition-colors",
+                            activeFieldStyle.textDecoration === "underline"
+                              ? "bg-amber-600 text-white font-bold"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                          title="Toggle Underline"
+                        >
+                          <Underline className="w-3.5 h-3.5" />
+                        </button>
+
+                        {/* Uppercase */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateFieldStyle(activeFieldTab, {
+                              textTransform: activeFieldStyle.textTransform === "uppercase" ? "none" : "uppercase",
+                            })
+                          }
+                          className={cn(
+                            "flex-1 h-full rounded text-[11px] font-mono font-bold flex items-center justify-center cursor-pointer transition-colors",
+                            activeFieldStyle.textTransform === "uppercase"
+                              ? "bg-amber-600 text-white"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                          title="Toggle Uppercase"
+                        >
+                          AA
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 4. Text Color */}
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                        <span>Text Color</span>
+                        <span className="font-mono text-[9px] text-muted-foreground">
+                          {activeFieldStyle.color || "Inherit"}
+                        </span>
+                      </Label>
+                      <div className="flex items-center gap-1.5 h-8">
+                        <input
+                          type="color"
+                          value={activeFieldStyle.color || "#111827"}
+                          onChange={(e) => updateFieldStyle(activeFieldTab, { color: e.target.value })}
+                          className="w-8 h-8 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                          title="Choose Color"
+                        />
+                        <Input
+                          type="text"
+                          value={activeFieldStyle.color || ""}
+                          placeholder="Inherit"
+                          onChange={(e) => updateFieldStyle(activeFieldTab, { color: e.target.value })}
+                          className="h-8 text-xs font-mono flex-1 bg-background"
                         />
                       </div>
-                    )}
-                    {styling.borderStyle === "single-rule" && (
-                      <div className="absolute inset-1.5 border border-stone-300 print:border-black pointer-events-none rounded-[1px]" />
-                    )}
-
-                    {/* Corner Crop Marks for Professional Trimmer Guides */}
-                    {styling.showCropMarks && (
-                      <>
-                        <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-stone-400 print:border-black pointer-events-none" />
-                        <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-stone-400 print:border-black pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-stone-400 print:border-black pointer-events-none" />
-                        <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-stone-400 print:border-black pointer-events-none" />
-                      </>
-                    )}
-
-                    {/* Header: Category / Traditional School on Left; Artist Name on Right */}
-                    {(styling.showCategory || styling.showArtist) && (
-                      <div
-                        className="relative z-10 flex items-center justify-between border-b pb-0.5 mb-1 shrink-0"
-                        style={{
-                          borderColor: styling.headerColor + "40",
-                          color: styling.headerColor,
-                        }}
-                      >
-                        <span className="tracking-widest text-[8px] sm:text-[8.5px] uppercase font-bold truncate max-w-[55%]">
-                          {styling.showCategory ? itemData.category : ""}
-                        </span>
-                        <span className="tracking-wide text-[8px] sm:text-[8.5px] font-semibold shrink-0">
-                          {styling.showArtist ? itemData.artistName : ""}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* ORIENTATION-AWARE EDITORIAL FLOW (Zero Dead Space) */}
-                    {orientation === "portrait" ? (
-                      /* PORTRAIT ORIENTATION: Continuous Vertical Flow with Strict Hierarchy */
-                      <div className="relative z-10 flex-1 flex flex-col justify-between overflow-hidden pb-[18mm]">
-                        {/* 1. Header (Rendered above) */}
-                        {/* 2. Artwork Title */}
-                        <div className="space-y-0.5">
-                          {styling.showTitle !== false && (
-                            <h4
-                              className={cn(
-                                "card-title font-bold leading-tight italic",
-                                styling.titleScale === "compact" && "text-[12px] sm:text-[13px]",
-                                styling.titleScale === "standard" && "text-[15px] sm:text-[16px]",
-                                styling.titleScale === "large" && "text-[18px] sm:text-[20px]",
-                                styling.titleScale === "xlarge" && "text-[22px] sm:text-[24px]",
-                                styling.titleScale === "jumbo" && "text-[26px] sm:text-[28px]"
-                              )}
-                              style={{ color: styling.titleColor }}
-                            >
-                              {itemData.title || "Untitled Masterwork"}
-                            </h4>
-                          )}
-
-                          {/* 3. Medium / Technique */}
-                          {styling.showMedium !== false && itemData.medium && (
-                            <p
-                              className={cn(
-                                "card-medium italic leading-snug",
-                                styling.bodyScale === "compact" && "text-[8.5px] sm:text-[9px]",
-                                styling.bodyScale === "standard" && "text-[10px] sm:text-[10.5px]",
-                                styling.bodyScale === "large" && "text-[11.5px] sm:text-[12px]",
-                                styling.bodyScale === "xlarge" && "text-[13px] sm:text-[14px]",
-                                styling.bodyScale === "jumbo" && "text-[15px] sm:text-[16px]"
-                              )}
-                              style={{ color: styling.textColor }}
-                            >
-                              {itemData.medium}
-                            </p>
-                          )}
-
-                          {/* 4. Dimensions & Year (located directly ABOVE visual cluster) */}
-                          {(styling.showDimensions !== false || styling.showYear !== false) && (
-                            <p
-                              className="card-dimensions font-mono text-[8px] leading-tight"
-                              style={{ color: styling.textColor + "cc" }}
-                            >
-                              {[
-                                styling.showDimensions !== false ? itemData.dimensions : "",
-                                styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
-                              ]
-                                .filter(Boolean)
-                                .join(" • ")}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* 5. Visual Media Cluster: Artwork Thumbnail & Direct QR Code */}
-                        {(styling.showThumbnail || styling.showQr) && (
-                          <div
-                            className={cn(
-                              "card-media-cluster flex items-center gap-2.5 my-1 shrink-0",
-                              styling.textAlign === "center"
-                                ? "justify-center"
-                                : styling.textAlign === "right"
-                                ? "justify-end"
-                                : "justify-start"
-                            )}
-                          >
-                            {styling.showThumbnail && itemData.thumbnail && (
-                              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded overflow-hidden border border-stone-300 shadow-xs shrink-0">
-                                <img
-                                  src={itemData.thumbnail}
-                                  alt={itemData.title}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            )}
-
-                            {styling.showQr && qrDataUrl && (
-                              <div className="flex flex-col items-center shrink-0">
-                                <div className="w-11 h-11 bg-white p-0.5 rounded border border-stone-300 shadow-xs print:shadow-none">
-                                  <img
-                                    src={qrDataUrl}
-                                    alt={`QR for ${itemData.title}`}
-                                    className="w-full h-full object-contain block"
-                                  />
-                                </div>
-                                <span className="text-[6.5px] font-sans text-stone-500 tracking-tight mt-0.5 whitespace-nowrap">
-                                  Scan Provenance
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* 6. Valuation / Acquisition Price (Positioned immediately BENEATH Visual Cluster) */}
-                        {styling.showPrice !== false && itemData.price && (
-                          <div
-                            className={cn(
-                              "card-price-row flex items-center my-0.5 shrink-0",
-                              styling.textAlign === "center"
-                                ? "justify-center"
-                                : styling.textAlign === "right"
-                                ? "justify-end"
-                                : "justify-start"
-                            )}
-                          >
-                            <span
-                              className="font-mono font-bold text-[9px] px-1.5 py-0.5 rounded border bg-amber-500/10 border-amber-500/30"
-                              style={{ color: styling.headerColor }}
-                            >
-                              {formatCurrency(itemData.price, itemData.currency || "INR")}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* 7. Curatorial Commentary / Notes */}
-                        {styling.showNotes !== false && itemData.additionalNotes && (
-                          <div className="space-y-0.5">
-                            <p
-                              className="card-additional-notes text-[8px] italic leading-tight line-clamp-3"
-                              style={{ color: styling.textColor }}
-                            >
-                              {itemData.additionalNotes}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      /* LANDSCAPE ORIENTATION: Balanced Two-Column Proportional Flow */
-                      <div className="relative z-10 flex-1 flex items-stretch justify-between gap-3 overflow-hidden pb-[18mm]">
-                        {/* Left Column (58%): Title, Medium, Dimensions, Year & Notes */}
-                        <div className="w-[58%] flex flex-col justify-between h-full pr-1 overflow-hidden">
-                          <div className="space-y-0.5">
-                            {styling.showTitle !== false && (
-                              <h4
-                                className={cn(
-                                  "card-title font-bold leading-tight italic",
-                                  styling.titleScale === "compact" && "text-[12px] sm:text-[13px]",
-                                  styling.titleScale === "standard" && "text-[15px] sm:text-[16px]",
-                                  styling.titleScale === "large" && "text-[18px] sm:text-[20px]",
-                                  styling.titleScale === "xlarge" && "text-[22px] sm:text-[24px]",
-                                  styling.titleScale === "jumbo" && "text-[26px] sm:text-[28px]"
-                                )}
-                                style={{ color: styling.titleColor }}
-                              >
-                                {itemData.title || "Untitled Masterwork"}
-                              </h4>
-                            )}
-
-                            {styling.showMedium !== false && itemData.medium && (
-                              <p
-                                className={cn(
-                                  "card-medium italic leading-snug",
-                                  styling.bodyScale === "compact" && "text-[8.5px] sm:text-[9px]",
-                                  styling.bodyScale === "standard" && "text-[10px] sm:text-[10.5px]",
-                                  styling.bodyScale === "large" && "text-[11.5px] sm:text-[12px]",
-                                  styling.bodyScale === "xlarge" && "text-[13px] sm:text-[14px]",
-                                  styling.bodyScale === "jumbo" && "text-[15px] sm:text-[16px]"
-                                )}
-                                style={{ color: styling.textColor }}
-                              >
-                                {itemData.medium}
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="space-y-0.5 mt-auto">
-                            {(styling.showDimensions !== false || styling.showYear !== false) && (
-                              <p
-                                className="card-dimensions font-mono text-[8px] leading-tight"
-                                style={{ color: styling.textColor + "cc" }}
-                              >
-                                {[
-                                  styling.showDimensions !== false ? itemData.dimensions : "",
-                                  styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
-                                ]
-                                  .filter(Boolean)
-                                  .join(" • ")}
-                              </p>
-                            )}
-
-                            {styling.showNotes !== false && itemData.additionalNotes && (
-                              <p
-                                className="card-additional-notes text-[7.5px] italic leading-tight line-clamp-2"
-                                style={{ color: styling.textColor }}
-                              >
-                                {itemData.additionalNotes}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Right Column (42%): Paired Thumbnail & QR with Price immediately beneath */}
-                        <div className="w-[42%] flex flex-col items-center justify-center h-full pl-1 shrink-0 space-y-1">
-                          {(styling.showThumbnail || styling.showQr) && (
-                            <div className="flex items-center gap-1.5 shrink-0">
-                              {styling.showThumbnail && itemData.thumbnail && (
-                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded overflow-hidden border border-stone-300 shadow-xs shrink-0">
-                                  <img
-                                    src={itemData.thumbnail}
-                                    alt={itemData.title}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              )}
-
-                              {styling.showQr && qrDataUrl && (
-                                <div className="flex flex-col items-center shrink-0">
-                                  <div className="w-11 h-11 bg-white p-0.5 rounded border border-stone-300 shadow-xs print:shadow-none">
-                                    <img
-                                      src={qrDataUrl}
-                                      alt={`QR for ${itemData.title}`}
-                                      className="w-full h-full object-contain block"
-                                    />
-                                  </div>
-                                  <span className="text-[6px] font-sans text-stone-500 tracking-tight mt-0.5 whitespace-nowrap">
-                                    Scan Provenance
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Price immediately BENEATH Thumbnail & QR cluster */}
-                          {styling.showPrice !== false && itemData.price && (
-                            <span
-                              className="font-mono font-bold text-[8px] px-1 py-0.5 rounded border bg-amber-500/10 border-amber-500/30 text-center leading-none"
-                              style={{ color: styling.headerColor }}
-                            >
-                              {formatCurrency(itemData.price, itemData.currency || "INR")}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Acrylic Base Margin Indicator (Subtle UI guide, hidden on print) */}
-                    <div
-                      data-acrylic-guide="true"
-                      className="absolute bottom-0 inset-x-0 h-2 border-t border-dashed border-stone-300/60 bg-stone-50/50 print:hidden flex items-center justify-center pointer-events-none"
-                    >
-                      <span className="text-[6px] uppercase tracking-wider text-stone-400 font-mono">
-                        Base Margin
-                      </span>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Tab 2: Placard Design Customizer Studio & Details Editor */}
-        {activeTab === "edit" && (
-          <div className="no-print flex-1 overflow-y-auto p-4 sm:p-6 bg-background space-y-6">
-            {/* DESIGN & TYPOGRAPHY CUSTOMIZER STUDIO */}
-            <div className="p-4 rounded-xl border border-amber-500/40 bg-card shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                <div className="space-y-0.5">
-                  <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
-                    <Sliders className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                    Placard Design &amp; Typography Studio
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground">
-                    Customize typography, color swatches, alignment, and background palettes in real-time.
-                  </p>
-                </div>
-                <Badge variant="outline" className="border-amber-500/40 text-amber-800 dark:text-amber-300 text-[10px]">
-                  Global Design Config
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                {/* 1. Font Family */}
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                    <Type className="w-3 h-3 text-amber-600" /> Font Family
-                  </Label>
-                  <Select
-                    value={styling.fontFamily}
-                    onValueChange={(val: "cinzel" | "cormorant" | "inter" | "georgia") => updateStyling("fontFamily", val)}
-                  >
-                    <SelectTrigger className="h-8 text-xs bg-background">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cormorant" className="font-serif">Cormorant Garamond (Classical Serif)</SelectItem>
-                      <SelectItem value="cinzel" className="font-serif font-semibold">Cinzel (Roman Gilded)</SelectItem>
-                      <SelectItem value="georgia" className="font-serif">Georgia (Heritage Editorial)</SelectItem>
-                      <SelectItem value="inter" className="font-sans">Inter (Modern Clean Sans)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* 2. Text Alignment */}
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Text Alignment
-                  </Label>
-                  <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80">
-                    <button
-                      type="button"
-                      onClick={() => updateStyling("textAlign", "left")}
-                      className={cn(
-                        "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
-                        styling.textAlign === "left"
-                          ? "bg-background text-foreground font-semibold shadow-xs"
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      <AlignLeft className="w-3.5 h-3.5" /> Left
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateStyling("textAlign", "center")}
-                      className={cn(
-                        "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
-                        styling.textAlign === "center"
-                          ? "bg-background text-foreground font-semibold shadow-xs"
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      <AlignCenter className="w-3.5 h-3.5" /> Center
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateStyling("textAlign", "right")}
-                      className={cn(
-                        "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
-                        styling.textAlign === "right"
-                          ? "bg-background text-foreground font-semibold shadow-xs"
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      <AlignRight className="w-3.5 h-3.5" /> Right
-                    </button>
-                  </div>
-                </div>
-
-                {/* 3. Title Size Scale */}
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Title Size Scale
-                  </Label>
-                  <Select
-                    value={styling.titleScale}
-                    onValueChange={(val: "compact" | "standard" | "large" | "xlarge" | "jumbo") => updateStyling("titleScale", val)}
-                  >
-                    <SelectTrigger className="h-8 text-xs bg-background">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="compact">Compact (12px)</SelectItem>
-                      <SelectItem value="standard">Standard (16px)</SelectItem>
-                      <SelectItem value="large">Large (20px)</SelectItem>
-                      <SelectItem value="xlarge">Extra Large (24px)</SelectItem>
-                      <SelectItem value="jumbo">Jumbo (28px)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* 4. Body Size Scale */}
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Body / Medium Size
-                  </Label>
-                  <Select
-                    value={styling.bodyScale}
-                    onValueChange={(val: "compact" | "standard" | "large" | "xlarge" | "jumbo") => updateStyling("bodyScale", val)}
-                  >
-                    <SelectTrigger className="h-8 text-xs bg-background">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="compact">Compact (9px)</SelectItem>
-                      <SelectItem value="standard">Standard (10.5px)</SelectItem>
-                      <SelectItem value="large">Large (12px)</SelectItem>
-                      <SelectItem value="xlarge">Extra Large (14px)</SelectItem>
-                      <SelectItem value="jumbo">Jumbo (16px)</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
 
-              {/* Color Palettes & Custom Hex Pickers */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-3 border-t border-border/60">
-                {/* Background Color */}
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
-                    <span>Card Background</span>
-                    <span className="font-mono text-[9px] text-muted-foreground">{styling.cardBgColor}</span>
-                  </Label>
-                  <div className="flex items-center gap-1.5">
-                    {CARD_BG_SWATCHES.map((swatch) => (
+              {/* SECTION B: GLOBAL PLACARD DESIGN & COLOR PALETTES */}
+              <div className="p-4 rounded-xl border border-border bg-card shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                      <Sliders className="w-4 h-4 text-amber-600" />
+                      Global Design Presets &amp; Color Palettes
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      Base defaults used across cards when individual fields are set to &quot;Inherit&quot;.
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">
+                    Global Base
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  {/* Global Font Family */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Default Font Family
+                    </Label>
+                    <Select
+                      value={styling.fontFamily}
+                      onValueChange={(val: "cinzel" | "cormorant" | "inter" | "georgia" | "playfair") => updateStyling("fontFamily", val)}
+                    >
+                      <SelectTrigger className="h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cormorant" className="font-serif">Cormorant Garamond (Classical)</SelectItem>
+                        <SelectItem value="cinzel" className="font-serif font-semibold">Cinzel (Roman Gilded)</SelectItem>
+                        <SelectItem value="playfair" className="font-serif">Playfair Display (Luxury Serif)</SelectItem>
+                        <SelectItem value="georgia" className="font-serif">Georgia (Heritage Editorial)</SelectItem>
+                        <SelectItem value="inter" className="font-sans">Inter (Modern Clean Sans)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Text Alignment */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Text Alignment
+                    </Label>
+                    <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80">
                       <button
-                        key={swatch.value}
                         type="button"
-                        onClick={() => updateStyling("cardBgColor", swatch.value)}
-                        title={swatch.label}
+                        onClick={() => updateStyling("textAlign", "left")}
                         className={cn(
-                          "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
-                          styling.cardBgColor.toLowerCase() === swatch.value.toLowerCase()
-                            ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
-                            : "border-stone-300"
+                          "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
+                          styling.textAlign === "left"
+                            ? "bg-background text-foreground font-semibold shadow-xs"
+                            : "text-muted-foreground hover:text-foreground"
                         )}
-                        style={{ backgroundColor: swatch.value }}
-                      />
-                    ))}
-                    <input
-                      type="color"
-                      value={styling.cardBgColor}
-                      onChange={(e) => updateStyling("cardBgColor", e.target.value)}
-                      className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
-                      title="Custom Card Background"
-                    />
+                      >
+                        <AlignLeft className="w-3.5 h-3.5" /> Left
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateStyling("textAlign", "center")}
+                        className={cn(
+                          "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
+                          styling.textAlign === "center"
+                            ? "bg-background text-foreground font-semibold shadow-xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <AlignCenter className="w-3.5 h-3.5" /> Center
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateStyling("textAlign", "right")}
+                        className={cn(
+                          "flex-1 h-7 text-xs rounded flex items-center justify-center gap-1 cursor-pointer transition-all",
+                          styling.textAlign === "right"
+                            ? "bg-background text-foreground font-semibold shadow-xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <AlignRight className="w-3.5 h-3.5" /> Right
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Title Scale */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Default Title Scale
+                    </Label>
+                    <Select
+                      value={styling.titleScale}
+                      onValueChange={(val: "compact" | "standard" | "large" | "xlarge" | "jumbo") => updateStyling("titleScale", val)}
+                    >
+                      <SelectTrigger className="h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="compact">Compact (12px)</SelectItem>
+                        <SelectItem value="standard">Standard (16px)</SelectItem>
+                        <SelectItem value="large">Large (20px)</SelectItem>
+                        <SelectItem value="xlarge">Extra Large (24px)</SelectItem>
+                        <SelectItem value="jumbo">Jumbo (28px)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Body Scale */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Default Body / Medium Scale
+                    </Label>
+                    <Select
+                      value={styling.bodyScale}
+                      onValueChange={(val: "compact" | "standard" | "large" | "xlarge" | "jumbo") => updateStyling("bodyScale", val)}
+                    >
+                      <SelectTrigger className="h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="compact">Compact (9px)</SelectItem>
+                        <SelectItem value="standard">Standard (10.5px)</SelectItem>
+                        <SelectItem value="large">Large (12px)</SelectItem>
+                        <SelectItem value="xlarge">Extra Large (14px)</SelectItem>
+                        <SelectItem value="jumbo">Jumbo (16px)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
-                {/* Title Color */}
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
-                    <span>Title Color</span>
-                    <span className="font-mono text-[9px] text-muted-foreground">{styling.titleColor}</span>
-                  </Label>
-                  <div className="flex items-center gap-1.5">
-                    {TITLE_COLOR_SWATCHES.map((swatch) => (
-                      <button
-                        key={swatch.value}
-                        type="button"
-                        onClick={() => updateStyling("titleColor", swatch.value)}
-                        title={swatch.label}
-                        className={cn(
-                          "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
-                          styling.titleColor.toLowerCase() === swatch.value.toLowerCase()
-                            ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
-                            : "border-stone-300"
-                        )}
-                        style={{ backgroundColor: swatch.value }}
+                {/* Color Swatches */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-3 border-t border-border/60">
+                  {/* Background Color */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                      <span>Card Background</span>
+                      <span className="font-mono text-[9px] text-muted-foreground">{styling.cardBgColor}</span>
+                    </Label>
+                    <div className="flex items-center gap-1.5">
+                      {CARD_BG_SWATCHES.map((swatch) => (
+                        <button
+                          key={swatch.value}
+                          type="button"
+                          onClick={() => updateStyling("cardBgColor", swatch.value)}
+                          title={swatch.label}
+                          className={cn(
+                            "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
+                            styling.cardBgColor.toLowerCase() === swatch.value.toLowerCase()
+                              ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
+                              : "border-stone-300"
+                          )}
+                          style={{ backgroundColor: swatch.value }}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        value={styling.cardBgColor}
+                        onChange={(e) => updateStyling("cardBgColor", e.target.value)}
+                        className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                        title="Custom Card Background"
                       />
-                    ))}
-                    <input
-                      type="color"
-                      value={styling.titleColor}
-                      onChange={(e) => updateStyling("titleColor", e.target.value)}
-                      className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
-                      title="Custom Title Color"
-                    />
+                    </div>
+                  </div>
+
+                  {/* Title Color */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                      <span>Default Title Color</span>
+                      <span className="font-mono text-[9px] text-muted-foreground">{styling.titleColor}</span>
+                    </Label>
+                    <div className="flex items-center gap-1.5">
+                      {TITLE_COLOR_SWATCHES.map((swatch) => (
+                        <button
+                          key={swatch.value}
+                          type="button"
+                          onClick={() => updateStyling("titleColor", swatch.value)}
+                          title={swatch.label}
+                          className={cn(
+                            "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
+                            styling.titleColor.toLowerCase() === swatch.value.toLowerCase()
+                              ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
+                              : "border-stone-300"
+                          )}
+                          style={{ backgroundColor: swatch.value }}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        value={styling.titleColor}
+                        onChange={(e) => updateStyling("titleColor", e.target.value)}
+                        className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                        title="Custom Title Color"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Medium / Body Text Color */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                      <span>Default Body Text Color</span>
+                      <span className="font-mono text-[9px] text-muted-foreground">{styling.textColor}</span>
+                    </Label>
+                    <div className="flex items-center gap-1.5">
+                      {TEXT_COLOR_SWATCHES.map((swatch) => (
+                        <button
+                          key={swatch.value}
+                          type="button"
+                          onClick={() => updateStyling("textColor", swatch.value)}
+                          title={swatch.label}
+                          className={cn(
+                            "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
+                            styling.textColor.toLowerCase() === swatch.value.toLowerCase()
+                              ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
+                              : "border-stone-300"
+                          )}
+                          style={{ backgroundColor: swatch.value }}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        value={styling.textColor}
+                        onChange={(e) => updateStyling("textColor", e.target.value)}
+                        className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                        title="Custom Text Color"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Header Fillet Color */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                      <span>Fillet / Header Color</span>
+                      <span className="font-mono text-[9px] text-muted-foreground">{styling.headerColor}</span>
+                    </Label>
+                    <div className="flex items-center gap-1.5">
+                      {HEADER_COLOR_SWATCHES.map((swatch) => (
+                        <button
+                          key={swatch.value}
+                          type="button"
+                          onClick={() => updateStyling("headerColor", swatch.value)}
+                          title={swatch.label}
+                          className={cn(
+                            "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
+                            styling.headerColor.toLowerCase() === swatch.value.toLowerCase()
+                              ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
+                              : "border-stone-300"
+                          )}
+                          style={{ backgroundColor: swatch.value }}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        value={styling.headerColor}
+                        onChange={(e) => updateStyling("headerColor", e.target.value)}
+                        className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
+                        title="Custom Header Fillet Color"
+                      />
+                    </div>
                   </div>
                 </div>
-
-                {/* Medium / Body Text Color */}
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
-                    <span>Body Text Color</span>
-                    <span className="font-mono text-[9px] text-muted-foreground">{styling.textColor}</span>
-                  </Label>
-                  <div className="flex items-center gap-1.5">
-                    {TEXT_COLOR_SWATCHES.map((swatch) => (
-                      <button
-                        key={swatch.value}
-                        type="button"
-                        onClick={() => updateStyling("textColor", swatch.value)}
-                        title={swatch.label}
-                        className={cn(
-                          "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
-                          styling.textColor.toLowerCase() === swatch.value.toLowerCase()
-                            ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
-                            : "border-stone-300"
-                        )}
-                        style={{ backgroundColor: swatch.value }}
-                      />
-                    ))}
-                    <input
-                      type="color"
-                      value={styling.textColor}
-                      onChange={(e) => updateStyling("textColor", e.target.value)}
-                      className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
-                      title="Custom Text Color"
-                    />
-                  </div>
-                </div>
-
-                {/* Header Fillet Color */}
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
-                    <span>Fillet / Header Color</span>
-                    <span className="font-mono text-[9px] text-muted-foreground">{styling.headerColor}</span>
-                  </Label>
-                  <div className="flex items-center gap-1.5">
-                    {HEADER_COLOR_SWATCHES.map((swatch) => (
-                      <button
-                        key={swatch.value}
-                        type="button"
-                        onClick={() => updateStyling("headerColor", swatch.value)}
-                        title={swatch.label}
-                        className={cn(
-                          "w-6 h-6 rounded-full border shadow-xs transition-transform hover:scale-110 cursor-pointer",
-                          styling.headerColor.toLowerCase() === swatch.value.toLowerCase()
-                            ? "ring-2 ring-amber-500 ring-offset-1 border-amber-600"
-                            : "border-stone-300"
-                        )}
-                        style={{ backgroundColor: swatch.value }}
-                      />
-                    ))}
-                    <input
-                      type="color"
-                      value={styling.headerColor}
-                      onChange={(e) => updateStyling("headerColor", e.target.value)}
-                      className="w-6 h-6 rounded cursor-pointer border border-border p-0 bg-transparent shrink-0"
-                      title="Custom Header Fillet Color"
-                    />
-                  </div>
-                </div>
-            </div>
-
-            {/* PLACARD FIELD VISIBILITY & SEQUENCE CUSTOMIZER */}
-            <div className="p-4 rounded-xl border border-border bg-card shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                <div className="space-y-0.5">
-                  <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
-                    <Sliders className="w-4 h-4 text-primary" />
-                    Placard Field Visibility &amp; Ordering Engine
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground">
-                    Toggle field displays and order priority. Preferences are persistently saved in your workspace.
-                  </p>
-                </div>
-                <Badge variant="outline" className="text-[10px]">
-                  Layout Hierarchy
-                </Badge>
               </div>
 
-              {/* Field Visibility Toggles */}
-              <div className="space-y-2">
-                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
-                  Field Display Toggles
-                </span>
+              {/* SECTION C: MEDIA FORMATTING & POSITIONING ENGINE */}
+              <div className="p-4 rounded-xl border border-border bg-card shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                      <LayoutGrid className="w-4 h-4 text-amber-600" />
+                      Visual Media Layout &amp; Thumbnail Dimensions
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      Fine-tune thumbnail size, geometry, borders, and QR code provenance sizing.
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">
+                    Media Styling
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  {/* Thumbnail Size */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Thumbnail Size
+                    </Label>
+                    <Select
+                      value={styling.thumbnailSize || "standard"}
+                      onValueChange={(val: "compact" | "standard" | "large" | "xlarge") => updateStyling("thumbnailSize", val)}
+                    >
+                      <SelectTrigger className="h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="compact">Compact (36px)</SelectItem>
+                        <SelectItem value="standard">Standard (44px)</SelectItem>
+                        <SelectItem value="large">Large (60px)</SelectItem>
+                        <SelectItem value="xlarge">Extra Large (76px)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Thumbnail Shape */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Thumbnail Geometry
+                    </Label>
+                    <Select
+                      value={styling.thumbnailShape || "rounded"}
+                      onValueChange={(val: "rounded" | "square" | "circle") => updateStyling("thumbnailShape", val)}
+                    >
+                      <SelectTrigger className="h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="rounded">Soft Rounded (Gallery Standard)</SelectItem>
+                        <SelectItem value="square">Architectural Square</SelectItem>
+                        <SelectItem value="circle">Circular Cameo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* QR Size */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      QR Code Provenance Size
+                    </Label>
+                    <Select
+                      value={styling.qrSize || "standard"}
+                      onValueChange={(val: "compact" | "standard" | "large") => updateStyling("qrSize", val)}
+                    >
+                      <SelectTrigger className="h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="compact">Compact (36px)</SelectItem>
+                        <SelectItem value="standard">Standard (44px)</SelectItem>
+                        <SelectItem value="large">Large (56px)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Media Cluster Arrangement */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Media Pairing
+                    </Label>
+                    <Select
+                      value={styling.mediaLayout || "side-by-side"}
+                      onValueChange={(val: "side-by-side" | "stacked") => updateStyling("mediaLayout", val)}
+                    >
+                      <SelectTrigger className="h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="side-by-side">Side-by-Side Horizontal</SelectItem>
+                        <SelectItem value="stacked">Vertical Stacked</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION D: FIELD VISIBILITY & SEQUENCE PRIORITY */}
+              <div className="p-4 rounded-xl border border-border bg-card shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                      <Sliders className="w-4 h-4 text-primary" />
+                      Placard Field Visibility &amp; Ordering Engine
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      Toggle active field displays and adjust layout hierarchy.
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">
+                    Field Controls
+                  </Badge>
+                </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
                   <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
                     <input
@@ -1370,357 +1560,307 @@ export function ArtworkPlacardSheet({
                 </div>
               </div>
 
-              {/* Field Sequence Reordering */}
-              <div className="space-y-2 pt-2 border-t border-border/60">
-                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
-                  Field Sequence Priority (Up / Down Reordering)
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                  {(styling.fieldOrder || [
-                    "header",
-                    "title",
-                    "medium",
-                    "dimensions_year",
-                    "visual_cluster",
-                    "price",
-                    "notes",
-                  ]).map((fieldKey, fIdx, arr) => {
-                    const labelMap: Record<string, string> = {
-                      header: "1. Header (School & Artist)",
-                      title: "2. Artwork Title",
-                      medium: "3. Medium & Technique",
-                      dimensions_year: "4. Dimensions & Year",
-                      visual_cluster: "5. Visual Media (Thumbnail & QR)",
-                      price: "6. Valuation / Acquisition Price",
-                      notes: "7. Curatorial Commentary / Notes",
-                    };
-                    return (
-                      <div
-                        key={fieldKey}
-                        className="p-2 rounded-lg border border-border bg-muted/20 flex items-center justify-between text-xs"
-                      >
-                        <span className="font-medium text-foreground truncate">
-                          {labelMap[fieldKey] || fieldKey}
-                        </span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            type="button"
-                            disabled={fIdx === 0}
-                            onClick={() => {
-                              const newArr = [...arr];
-                              const temp = newArr[fIdx];
-                              newArr[fIdx] = newArr[fIdx - 1];
-                              newArr[fIdx - 1] = temp;
-                              updateStyling("fieldOrder", newArr);
-                            }}
-                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                            title="Move Up"
-                          >
-                            <ArrowUp className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={fIdx === arr.length - 1}
-                            onClick={() => {
-                              const newArr = [...arr];
-                              const temp = newArr[fIdx];
-                              newArr[fIdx] = newArr[fIdx + 1];
-                              newArr[fIdx + 1] = temp;
-                              updateStyling("fieldOrder", newArr);
-                            }}
-                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                            title="Move Down"
-                          >
-                            <ArrowDown className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+              {/* SECTION E: GLOBAL ACTIONS & SYNC BAR */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Apply Artist Name */}
+                <div className="p-3.5 rounded-xl border border-border bg-card flex flex-col justify-between gap-3 shadow-xs">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Apply Artist Name to All Cards
+                    </Label>
+                    <p className="text-[11px] text-muted-foreground">
+                      Update the artist credit across all selected display cards simultaneously.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="text"
+                      value={globalArtistName}
+                      onChange={(e) => setGlobalArtistName(e.target.value)}
+                      className="h-8 text-xs flex-1 bg-background"
+                      placeholder="e.g. Master Artist"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={applyGlobalArtistToAll}
+                      className="h-8 text-xs shrink-0 cursor-pointer border-amber-500/40 text-amber-800 dark:text-amber-200"
+                    >
+                      Apply All
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Global Actions & Sync Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Apply Artist Name */}
-              <div className="p-3.5 rounded-xl border border-border bg-card flex flex-col justify-between gap-3 shadow-xs">
-                <div className="space-y-0.5">
-                  <Label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Apply Artist Name to All Cards
-                  </Label>
-                  <p className="text-[11px] text-muted-foreground">
-                    Update the artist credit across all selected display cards simultaneously.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={globalArtistName}
-                    onChange={(e) => setGlobalArtistName(e.target.value)}
-                    className="h-8 text-xs flex-1 bg-background"
-                    placeholder="e.g. Master Artist"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={applyGlobalArtistToAll}
-                    className="h-8 text-xs shrink-0 cursor-pointer border-amber-500/40 text-amber-800 dark:text-amber-200"
-                  >
-                    Apply All
-                  </Button>
+                {/* Save & Sync Overrides to Database */}
+                <div className="p-3.5 rounded-xl border border-border bg-card flex flex-col justify-between gap-3 shadow-xs">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                      <Save className="w-3.5 h-3.5 text-amber-600" /> Save Placard Customizations
+                    </Label>
+                    <p className="text-[11px] text-muted-foreground">
+                      Persist edited card prices, titles, dimensions, and medium directly to the database.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] font-mono border-amber-500/40">
+                      {Object.keys(userOverrides).length} customized
+                    </Badge>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={savingOverrides || Object.keys(userOverrides).length === 0}
+                      onClick={handleSaveCustomizationsToDb}
+                      className="h-8 text-xs ml-auto gap-1.5 bg-amber-600 hover:bg-amber-700 text-white cursor-pointer font-semibold shadow-xs"
+                    >
+                      {savingOverrides ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Save className="w-3.5 h-3.5" />
+                      )}
+                      Sync &amp; Save DB
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              {/* Save & Sync Overrides to Database */}
-              <div className="p-3.5 rounded-xl border border-border bg-card flex flex-col justify-between gap-3 shadow-xs">
-                <div className="space-y-0.5">
-                  <Label className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
-                    <Save className="w-3.5 h-3.5 text-amber-600" /> Save Placard Customizations
-                  </Label>
-                  <p className="text-[11px] text-muted-foreground">
-                    Persist edited card prices, titles, dimensions, and medium directly to the database.
-                  </p>
+              {/* SECTION F: INDIVIDUAL CARD EDITORS */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                  <h3 className="text-xs font-serif font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                    <FileText className="w-4 h-4 text-amber-600" />
+                    Individual Card Metadata Customizer
+                  </h3>
+                  <span className="text-[11px] text-muted-foreground">
+                    Customize prices, currencies, titles, and curatorial notes per card
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-[10px] font-mono border-amber-500/40">
-                    {Object.keys(userOverrides).length} customized
-                  </Badge>
-                  <Button
-                    type="button"
-                    size="sm"
-                    disabled={savingOverrides || Object.keys(userOverrides).length === 0}
-                    onClick={handleSaveCustomizationsToDb}
-                    className="h-8 text-xs ml-auto gap-1.5 bg-amber-600 hover:bg-amber-700 text-white cursor-pointer font-semibold shadow-xs"
-                  >
-                    {savingOverrides ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Save className="w-3.5 h-3.5" />
-                    )}
-                    Sync &amp; Save DB
-                  </Button>
-                </div>
-              </div>
-            </div>
 
-            {/* Individual Card Editors */}
-            <div className="space-y-3">
-              {artworks.map((art, idx) => {
-                const itemData = getItemData(art);
+                {artworks.map((art, idx) => {
+                  const itemData = getItemData(art);
 
-                return (
-                  <div
-                    key={art.id || idx}
-                    className="p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-3"
-                  >
-                    <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                      <div className="flex items-center gap-2.5">
-                        {itemData.thumbnail ? (
-                          <img
-                            src={itemData.thumbnail}
-                            alt=""
-                            className="w-8 h-8 rounded object-cover border border-border/80 shrink-0"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded bg-muted flex items-center justify-center shrink-0">
-                            <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                  return (
+                    <div
+                      key={art.id || idx}
+                      className="p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-3"
+                    >
+                      <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                        <div className="flex items-center gap-2.5">
+                          {itemData.thumbnail ? (
+                            <img
+                              src={itemData.thumbnail}
+                              alt=""
+                              className="w-8 h-8 rounded object-cover border border-border/80 shrink-0"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded bg-muted flex items-center justify-center shrink-0">
+                              <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div>
+                            <h4 className="font-serif font-bold text-xs text-foreground truncate max-w-[280px]">
+                              {itemData.title || "Untitled Masterwork"}
+                            </h4>
+                            <span className="text-[10px] text-muted-foreground font-mono">
+                              {art.slug}
+                            </span>
                           </div>
-                        )}
-                        <div>
-                          <h4 className="font-serif font-bold text-xs text-foreground truncate max-w-[280px]">
-                            {itemData.title || "Untitled Masterwork"}
-                          </h4>
-                          <span className="text-[10px] text-muted-foreground font-mono">
-                            {art.slug}
-                          </span>
                         </div>
-                      </div>
-                      <Badge variant="secondary" className="text-[10px]">
-                        Card #{idx + 1}
-                      </Badge>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-                      {/* Title */}
-                      <div className="space-y-1">
-                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                          Artwork Title
-                        </Label>
-                        <Input
-                          type="text"
-                          value={itemData.title}
-                          onChange={(e) => updateCardItem(art.id, "title", e.target.value)}
-                          className="h-8 text-xs font-serif"
-                        />
+                        <Badge variant="secondary" className="text-[10px]">
+                          Card #{idx + 1}
+                        </Badge>
                       </div>
 
-                      {/* Artist Name */}
-                      <div className="space-y-1">
-                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                          Artist Name
-                        </Label>
-                        <Input
-                          type="text"
-                          value={itemData.artistName}
-                          onChange={(e) => updateCardItem(art.id, "artistName", e.target.value)}
-                          className="h-8 text-xs font-serif"
-                        />
-                      </div>
-
-                      {/* Category / School */}
-                      <div className="space-y-1">
-                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                          Category / School
-                        </Label>
-                        <Input
-                          type="text"
-                          value={itemData.category}
-                          onChange={(e) => updateCardItem(art.id, "category", e.target.value)}
-                          className="h-8 text-xs"
-                        />
-                      </div>
-
-                      {/* Medium & Materials */}
-                      <div className="space-y-1">
-                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                          Medium &amp; Materials
-                        </Label>
-                        <Input
-                          type="text"
-                          value={itemData.medium}
-                          onChange={(e) => updateCardItem(art.id, "medium", e.target.value)}
-                          className="h-8 text-xs font-serif italic"
-                        />
-                      </div>
-
-                      {/* Dimensions */}
-                      <div className="space-y-1">
-                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                          Dimensions
-                        </Label>
-                        <Input
-                          type="text"
-                          value={itemData.dimensions}
-                          onChange={(e) => updateCardItem(art.id, "dimensions", e.target.value)}
-                          className="h-8 text-xs font-mono"
-                          placeholder="e.g. 24 x 36 inches"
-                        />
-                      </div>
-
-                      {/* Year Created */}
-                      <div className="space-y-1">
-                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                          Year Created
-                        </Label>
-                        <Input
-                          type="text"
-                          value={itemData.year}
-                          onChange={(e) => updateCardItem(art.id, "year", e.target.value)}
-                          className="h-8 text-xs font-mono"
-                          placeholder="e.g. 2026"
-                        />
-                      </div>
-
-                      {/* Valuation / Price & Currency */}
-                      <div className="space-y-1">
-                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                          <DollarSign className="w-3 h-3 text-amber-600" />
-                          Valuation &amp; Currency
-                        </Label>
-                        <div className="flex items-center gap-1.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                        {/* Title */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            Artwork Title
+                          </Label>
                           <Input
                             type="text"
-                            value={itemData.price || ""}
-                            onChange={(e) => updateCardItem(art.id, "price", e.target.value)}
-                            className="h-8 text-xs font-mono flex-1"
-                            placeholder="e.g. 150000"
+                            value={itemData.title}
+                            onChange={(e) => updateCardItem(art.id, "title", e.target.value)}
+                            className="h-8 text-xs font-serif"
                           />
-                          <Select
-                            value={itemData.currency || "INR"}
-                            onValueChange={(val) => updateCardItem(art.id, "currency", val)}
-                          >
-                            <SelectTrigger className="h-8 text-xs w-24 shrink-0 bg-background">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="INR">INR (₹)</SelectItem>
-                              <SelectItem value="USD">USD ($)</SelectItem>
-                              <SelectItem value="EUR">EUR (€)</SelectItem>
-                              <SelectItem value="GBP">GBP (£)</SelectItem>
-                              <SelectItem value="AED">AED</SelectItem>
-                              <SelectItem value="SGD">SGD ($)</SelectItem>
-                            </SelectContent>
-                          </Select>
+                        </div>
+
+                        {/* Artist Name */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            Artist Name
+                          </Label>
+                          <Input
+                            type="text"
+                            value={itemData.artistName}
+                            onChange={(e) => updateCardItem(art.id, "artistName", e.target.value)}
+                            className="h-8 text-xs font-serif"
+                          />
+                        </div>
+
+                        {/* Category / School */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            Category / School
+                          </Label>
+                          <Input
+                            type="text"
+                            value={itemData.category}
+                            onChange={(e) => updateCardItem(art.id, "category", e.target.value)}
+                            className="h-8 text-xs"
+                          />
+                        </div>
+
+                        {/* Medium & Materials */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            Medium &amp; Materials
+                          </Label>
+                          <Input
+                            type="text"
+                            value={itemData.medium}
+                            onChange={(e) => updateCardItem(art.id, "medium", e.target.value)}
+                            className="h-8 text-xs font-serif italic"
+                          />
+                        </div>
+
+                        {/* Dimensions */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            Dimensions
+                          </Label>
+                          <Input
+                            type="text"
+                            value={itemData.dimensions}
+                            onChange={(e) => updateCardItem(art.id, "dimensions", e.target.value)}
+                            className="h-8 text-xs font-mono"
+                            placeholder="e.g. 24 x 36 inches"
+                          />
+                        </div>
+
+                        {/* Year Created */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            Year Created
+                          </Label>
+                          <Input
+                            type="text"
+                            value={itemData.year}
+                            onChange={(e) => updateCardItem(art.id, "year", e.target.value)}
+                            className="h-8 text-xs font-mono"
+                            placeholder="e.g. 2026"
+                          />
+                        </div>
+
+                        {/* Valuation / Price & Currency (Neatly paired with currency symbol) */}
+                        <div className="space-y-1 sm:col-span-2 md:col-span-1">
+                          <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                            <DollarSign className="w-3 h-3 text-amber-600" />
+                            Valuation &amp; Currency
+                          </Label>
+                          <div className="flex items-center gap-1.5">
+                            <Input
+                              type="text"
+                              value={itemData.price || ""}
+                              onChange={(e) => updateCardItem(art.id, "price", e.target.value)}
+                              className="h-8 text-xs font-mono flex-1"
+                              placeholder="e.g. 150000"
+                            />
+                            <Select
+                              value={itemData.currency || "INR"}
+                              onValueChange={(val) => updateCardItem(art.id, "currency", val)}
+                            >
+                              <SelectTrigger className="h-8 text-xs w-28 shrink-0 bg-background font-mono">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {SUPPORTED_CURRENCIES.map((c) => (
+                                  <SelectItem key={c.code} value={c.code} className="font-mono text-xs">
+                                    {c.code} ({c.symbol})
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Block 5: Additional Curatorial Notes */}
-                    <div className="space-y-1 pt-1">
-                      <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                        <FileText className="w-3 h-3 text-amber-600" />
-                        Additional Curatorial Information / Notes
-                      </Label>
-                      <Textarea
-                        value={itemData.additionalNotes || ""}
-                        onChange={(e) => updateCardItem(art.id, "additionalNotes", e.target.value)}
-                        placeholder="Provenance, donor attribution, historical note, or gallery wall placement details..."
-                        className="text-xs min-h-[58px] resize-y"
-                      />
+                      {/* Additional Curatorial Notes */}
+                      <div className="space-y-1 pt-1">
+                        <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                          <FileText className="w-3 h-3 text-amber-600" />
+                          Additional Curatorial Information / Notes
+                        </Label>
+                        <Textarea
+                          value={itemData.additionalNotes || ""}
+                          onChange={(e) => updateCardItem(art.id, "additionalNotes", e.target.value)}
+                          placeholder="Provenance, donor attribution, historical note, or gallery wall placement details..."
+                          className="text-xs min-h-[52px] resize-y"
+                        />
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-          </div>
-        )}
+          )}
 
-        <DialogFooter className="no-print p-3 border-t border-border/80 bg-muted/20 shrink-0 flex items-center justify-between sm:justify-between">
-          <p className="text-[11px] text-muted-foreground hidden sm:block">
-            Tip: In print dialog, select &quot;Margins: None&quot; and check &quot;Background graphics&quot; for accurate double-fillet borders.
-          </p>
-          <div className="flex items-center gap-2">
-            {Object.keys(userOverrides).length > 0 && (
+          <DialogFooter className="no-print p-3 border-t border-border/80 bg-muted/20 shrink-0 flex items-center justify-between sm:justify-between">
+            <p className="text-[11px] text-muted-foreground hidden sm:block">
+              Tip: In print dialog, select &quot;Margins: None&quot; and check &quot;Background graphics&quot; for accurate double-fillet borders.
+            </p>
+            <div className="flex items-center gap-2">
+              {Object.keys(userOverrides).length > 0 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={savingOverrides}
+                  onClick={handleSaveCustomizationsToDb}
+                  className="text-xs gap-1.5 border-amber-500/40 text-amber-900 dark:text-amber-200 hover:bg-amber-500/10 cursor-pointer"
+                >
+                  {savingOverrides ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Save className="w-3.5 h-3.5 text-amber-600" />
+                  )}
+                  Save DB Overrides ({Object.keys(userOverrides).length})
+                </Button>
+              )}
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={savingOverrides}
-                onClick={handleSaveCustomizationsToDb}
-                className="text-xs gap-1.5 border-amber-500/40 text-amber-900 dark:text-amber-200 hover:bg-amber-500/10 cursor-pointer"
+                onClick={() => onOpenChange(false)}
+                className="text-xs"
               >
-                {savingOverrides ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Save className="w-3.5 h-3.5 text-amber-600" />
-                )}
-                Save DB Overrides ({Object.keys(userOverrides).length})
+                Close
               </Button>
-            )}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              className="text-xs"
-            >
-              Close
-            </Button>
-            <Button
-              type="button"
-              onClick={handlePrint}
-              size="sm"
-              className="text-xs gap-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-xs"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              Print Cards ({artworks.length})
-            </Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+              <Button
+                type="button"
+                onClick={handlePrint}
+                size="sm"
+                className="text-xs gap-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-xs"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                Print Cards ({artworks.length})
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DEDICATED LIVE INTERACTIVE PREVIEW MODAL */}
+      <PlacardLivePreviewModal
+        open={livePreviewModalOpen}
+        onOpenChange={setLivePreviewModalOpen}
+        cards={allCardData}
+        qrCodeDataUrls={qrCodeDataUrls}
+        styling={styling}
+        cardFormat={cardFormat}
+        orientation={orientation}
+        onPrint={handlePrint}
+      />
+    </>
   );
 }

@@ -137,11 +137,21 @@ All code generation and architectural modifications must adhere to the specializ
     - **Visiting Card (Portrait)**: $50.8\text{ mm} \times 88.9\text{ mm}$ ($2 \times 3.5\text{ in}$).
     - **Museum Placard (Landscape)**: $101.6\text{ mm} \times 63.5\text{ mm}$ ($4 \times 2.5\text{ in}$).
     - **Museum Placard (Portrait)**: $63.5\text{ mm} \times 101.6\text{ mm}$ ($2.5 \times 4\text{ in}$).
+    - **Museum Large (Landscape)**: $127.0\text{ mm} \times 76.2\text{ mm}$ ($5 \times 3\text{ in}$).
+    - **Museum Large (Portrait)**: $76.2\text{ mm} \times 127.0\text{ mm}$ ($3 \times 5\text{ in}$).
+    - **Museum Extra Large (Landscape)**: $152.4\text{ mm} \times 88.9\text{ mm}$ ($6 \times 3.5\text{ in}$).
+    - **Museum Extra Large (Portrait)**: $88.9\text{ mm} \times 152.4\text{ mm}$ ($3.5 \times 6\text{ in}$).
   - All cards enforce `page-break-inside: avoid !important; break-inside: avoid !important;`.
-  - Maintain an $18\text{ mm}$ safe margin at the base of every card to prevent physical acrylic/brass stand clamps from occluding metadata.
-  - **Expanded Placard Typography Scales**:
-    - Extends `titleScale` and `bodyScale` beyond the legacy 16px cap to 5 granular sizes: `compact` (12px Title / 9px Body), `standard` (16px / 10.5px), `large` (20px / 12px), `xlarge` (24px / 14px), and `jumbo` (28px / 16px).
-    - Dynamically scales card typography and eliminates unwanted whitespace margins across both standard Visiting Cards ($3.5 \times 2\text{ in}$) and Museum Placards ($4 \times 2.5\text{ in}$).
+  - **Configurable Stand Clamp Safety Margin & Dead Space Elimination**:
+    - Replaced rigid 18mm void with configurable clamp margin: `none` ($0\text{ mm}$ - full canvas utilization), `minimal` ($3\text{ mm}$), `standard` ($7\text{ mm}$), and `acrylic-clamp` ($16\text{ mm}$).
+  - **Granular Per-Field Typography & Styling Engine**:
+    - Every active placard field (Title, Medium & Materials, Dimensions, Year Created, Valuation/Price, Category/School, Artist Credit, QR Code, Thumbnail, Notes) supports independent font family (`cinzel`, `cormorant`, `playfair`, `georgia`, `inter`), font size scale (7pt to 32pt), bold/italic/underline/uppercase styling, and custom text color.
+  - **Unstyled Price & Currency Formatting**:
+    - Eliminates rigid background earmarks/badges; prices render as clean fine-art metadata paired with localized currency symbols (`₹`, `$`, `€`, `£`, `AED`, `S$`, etc.) or optional curatorial badge styling.
+  - **Configurable Thumbnail & QR Code Positioning & Flow**:
+    - Supports `top-right`, `bottom-right`, `inline`, and `stacked` right-panel media placement, eliminating spatial crowding and permitting multi-row title wrapping without clipping or metadata drop-off.
+  - **Dedicated Live Interactive Preview Studio**:
+    - Fullscreen interactive WYSIWYG modal (`PlacardLivePreviewModal`) with physical millimeter scale, zoom controls ($50\%$ to $250\%$), single-card inspection, and full gang-run sheet preview.
 - **e-Catalog Synchronous Preloader & Asynchronous Decoding Barrier**:
   - In `src/lib/print-isolated-html.ts`, normalize all HTML images to force `loading="eager"` and `decoding="sync"`.
   - The driver awaits `Promise.all(images.map(img => img.decode().catch(...)))` followed by a safety buffer before invoking `iframe.contentWindow.print()`.
