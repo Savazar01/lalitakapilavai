@@ -159,8 +159,9 @@ All code generation and architectural modifications must adhere to the specializ
     - Interactive Up/Down sequence buttons directly reorder fields (`header`, `title`, `medium`, `dimensions`, `year`, `price`, `visual_cluster`, `notes`) across both portrait and landscape layouts with 1-click reset to museum standards.
   - **Unified Global Font Inheritance Engine**:
     - All fields strictly inherit the master global font family (`styling.fontFamily`) and color hierarchy by default, completely eliminating hardcoded disjointed monospace/serif styling while allowing granular overrides when explicitly chosen.
-  - **Dedicated Live Interactive Preview Studio**:
-    - Fullscreen interactive WYSIWYG modal (`PlacardLivePreviewModal`) with physical millimeter scale, zoom controls ($50\%$ to $250\%$), single-card inspection, and full gang-run sheet preview.
+  - **Dedicated Live Interactive Preview Studio & Fullscreen Inspect Engine**:
+    - High-precision interactive WYSIWYG studio (`PlacardLivePreviewModal`) decoupled from Radix dialog hierarchies and rendered via a dedicated React Portal directly to `document.body` (`fixed inset-0 z-[100]`), eliminating Chromium translate trapping bugs (`translate-x-[-50%] translate-y-[-50%]`).
+    - Features physical millimeter scale, zoom controls ($50\%$ to $250\%$), single-card inspection, full gang-run sheet preview, stand clamp guides, and dedicated top-level `Escape` key capture listeners with sticky "✕ Exit Fullscreen (Esc)" controls.
 - **e-Catalog Synchronous Preloader & Asynchronous Decoding Barrier**:
   - In `src/lib/print-isolated-html.ts`, normalize all HTML images to force `loading="eager"` and `decoding="sync"`.
   - The driver awaits `Promise.all(images.map(img => img.decode().catch(...)))` followed by a safety buffer before invoking `iframe.contentWindow.print()`.

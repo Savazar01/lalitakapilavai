@@ -433,6 +433,22 @@ export function ArtworkPlacardSheet({
     };
   }, [open, artworks]);
 
+  // Handle global Escape key to restore from Fullscreen Workspace without closing the entire modal
+  React.useEffect(() => {
+    if (!open || !isFullscreen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // If live preview fullscreen modal is open, let its own capture listener handle it
+      if (livePreviewModalOpen) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown, { capture: true });
+    return () => window.removeEventListener("keydown", handleKeyDown, { capture: true });
+  }, [open, isFullscreen, livePreviewModalOpen]);
+
   const updateCardItem = (id: string, field: keyof EditablePlacardItem, value: string) => {
     setUserOverrides((prev) => {
       const next = {
@@ -565,7 +581,7 @@ export function ArtworkPlacardSheet({
           className={cn(
             "flex flex-col p-0 overflow-hidden bg-background transition-all duration-200",
             isFullscreen
-              ? "fixed inset-0 w-screen h-screen max-w-none max-h-none rounded-none z-50 border-0"
+              ? "fixed !inset-0 !left-0 !top-0 !right-0 !bottom-0 !translate-x-0 !translate-y-0 !transform-none w-screen h-screen max-w-none max-h-none rounded-none z-50 border-0"
               : "max-w-[96vw] w-[1480px] h-[94vh] max-h-[94vh] rounded-xl"
           )}
         >
@@ -619,12 +635,12 @@ export function ArtworkPlacardSheet({
                   variant="outline"
                   onClick={() => setIsFullscreen(!isFullscreen)}
                   className="text-xs h-8 gap-1.5 border-border hover:bg-muted cursor-pointer"
-                  title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Workspace"}
+                  title={isFullscreen ? "Exit Fullscreen (Esc)" : "Fullscreen Workspace"}
                 >
                   {isFullscreen ? (
                     <>
                       <Minimize2 className="w-3.5 h-3.5 text-amber-600" />
-                      <span className="hidden sm:inline">Exit Fullscreen</span>
+                      <span className="hidden sm:inline">Exit Fullscreen (Esc)</span>
                     </>
                   ) : (
                     <>
@@ -1967,8 +1983,10 @@ export function ArtworkPlacardSheet({
                       size="sm"
                       onClick={() => setLivePreviewModalOpen(true)}
                       className="h-7 text-xs gap-1 text-muted-foreground hover:text-foreground cursor-pointer"
+                      title="Open High-Precision Fullscreen Preview Studio (Esc to exit)"
                     >
-                      <Maximize2 className="w-3 h-3" /> Fullscreen Inspect
+                      <Maximize2 className="w-3 h-3 text-amber-600" />
+                      <span>Fullscreen Inspect</span>
                     </Button>
                     <Button
                       type="button"
