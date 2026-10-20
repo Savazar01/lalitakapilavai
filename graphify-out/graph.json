@@ -4074,7 +4074,7 @@
       "label": "PlacardArtwork",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L69",
+      "source_location": "L70",
       "id": "admin_artwork_placard_sheet_placardartwork",
       "community": 37,
       "norm_label": "placardartwork"
@@ -4083,7 +4083,7 @@
       "label": "ArtworkPlacardSheetProps",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L86",
+      "source_location": "L87",
       "id": "admin_artwork_placard_sheet_artworkplacardsheetprops",
       "community": 37,
       "norm_label": "artworkplacardsheetprops"
@@ -4092,7 +4092,7 @@
       "label": "EditablePlacardItem",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L93",
+      "source_location": "L94",
       "id": "admin_artwork_placard_sheet_editableplacarditem",
       "community": 37,
       "norm_label": "editableplacarditem"
@@ -4101,7 +4101,7 @@
       "label": "DEFAULT_PLACARD_STYLING",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L95",
+      "source_location": "L96",
       "id": "admin_artwork_placard_sheet_default_placard_styling",
       "community": 37,
       "norm_label": "default_placard_styling"
@@ -4110,7 +4110,7 @@
       "label": "CARD_BG_SWATCHES",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L148",
+      "source_location": "L149",
       "id": "admin_artwork_placard_sheet_card_bg_swatches",
       "community": 37,
       "norm_label": "card_bg_swatches"
@@ -4119,7 +4119,7 @@
       "label": "TITLE_COLOR_SWATCHES",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L155",
+      "source_location": "L156",
       "id": "admin_artwork_placard_sheet_title_color_swatches",
       "community": 37,
       "norm_label": "title_color_swatches"
@@ -4128,7 +4128,7 @@
       "label": "TEXT_COLOR_SWATCHES",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L162",
+      "source_location": "L163",
       "id": "admin_artwork_placard_sheet_text_color_swatches",
       "community": 37,
       "norm_label": "text_color_swatches"
@@ -4137,7 +4137,7 @@
       "label": "HEADER_COLOR_SWATCHES",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L169",
+      "source_location": "L170",
       "id": "admin_artwork_placard_sheet_header_color_swatches",
       "community": 37,
       "norm_label": "header_color_swatches"
@@ -4146,7 +4146,7 @@
       "label": "ConfigurableFieldKey",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L176",
+      "source_location": "L177",
       "id": "admin_artwork_placard_sheet_configurablefieldkey",
       "community": 37,
       "norm_label": "configurablefieldkey"
@@ -4155,7 +4155,7 @@
       "label": "FIELD_METADATA",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L187",
+      "source_location": "L188",
       "id": "admin_artwork_placard_sheet_field_metadata",
       "community": 37,
       "norm_label": "field_metadata"
@@ -4164,7 +4164,7 @@
       "label": "FONT_SIZE_PRESETS",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L199",
+      "source_location": "L200",
       "id": "admin_artwork_placard_sheet_font_size_presets",
       "community": 37,
       "norm_label": "font_size_presets"
@@ -4173,7 +4173,7 @@
       "label": "ArtworkPlacardSheet()",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L217",
+      "source_location": "L218",
       "id": "admin_artwork_placard_sheet_artworkplacardsheet",
       "community": 37,
       "norm_label": "artworkplacardsheet()"
@@ -4731,7 +4731,7 @@
       "label": "PlacardCard()",
       "file_type": "code",
       "source_file": "src/components/admin/placard-card.tsx",
-      "source_location": "L107",
+      "source_location": "L108",
       "id": "admin_placard_card_placardcard",
       "community": 100,
       "norm_label": "placardcard()"
@@ -10293,7 +10293,7 @@
       "label": "B. 3D WebGL Exhibition Salon Wall Engine & Gallery Background Architecture",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L180",
+      "source_location": "L181",
       "id": "lalitakapilavai_agents_b_3d_webgl_exhibition_salon_wall_engine_gallery_background_architecture",
       "community": 9,
       "norm_label": "b. 3d webgl exhibition salon wall engine & gallery background architecture"
@@ -10302,7 +10302,7 @@
       "label": "C. Universal Email Notification & Form Dispatch Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L245",
+      "source_location": "L246",
       "id": "lalitakapilavai_agents_c_universal_email_notification_form_dispatch_engine",
       "community": 9,
       "norm_label": "c. universal email notification & form dispatch engine"
@@ -10311,7 +10311,7 @@
       "label": "D. Strict Binary Theme & Contrast Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L263",
+      "source_location": "L264",
       "id": "lalitakapilavai_agents_d_strict_binary_theme_contrast_invariant",
       "community": 9,
       "norm_label": "d. strict binary theme & contrast invariant"
@@ -10320,7 +10320,7 @@
       "label": "E. Multi-Tenant Brand Identity & Asset Engine (.ico Favicon & Conditional Phone)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L269",
+      "source_location": "L270",
       "id": "lalitakapilavai_agents_e_multi_tenant_brand_identity_asset_engine_ico_favicon_conditional_phone",
       "community": 9,
       "norm_label": "e. multi-tenant brand identity & asset engine (.ico favicon & conditional phone)"
@@ -10329,7 +10329,7 @@
       "label": "F. Dynamic Archive Subtitle & Idempotent Non-Destructive Tenant Deployment",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L277",
+      "source_location": "L278",
       "id": "lalitakapilavai_agents_f_dynamic_archive_subtitle_idempotent_non_destructive_tenant_deployment",
       "community": 9,
       "norm_label": "f. dynamic archive subtitle & idempotent non-destructive tenant deployment"
@@ -10338,7 +10338,7 @@
       "label": "G. Universal Contact Form & Generalized Multi-Tenant Email Templates",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L287",
+      "source_location": "L288",
       "id": "lalitakapilavai_agents_g_universal_contact_form_generalized_multi_tenant_email_templates",
       "community": 9,
       "norm_label": "g. universal contact form & generalized multi-tenant email templates"
@@ -10347,7 +10347,7 @@
       "label": "H. Dynamic Admin Dashboard Metric Calculation Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L292",
+      "source_location": "L293",
       "id": "lalitakapilavai_agents_h_dynamic_admin_dashboard_metric_calculation_engine",
       "community": 9,
       "norm_label": "h. dynamic admin dashboard metric calculation engine"
@@ -10356,7 +10356,7 @@
       "label": "I. Multi-Cloud Storage Architecture (Google Workspace & Nextcloud WebDAV)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L298",
+      "source_location": "L299",
       "id": "lalitakapilavai_agents_i_multi_cloud_storage_architecture_google_workspace_nextcloud_webdav",
       "community": 9,
       "norm_label": "i. multi-cloud storage architecture (google workspace & nextcloud webdav)"
@@ -10365,7 +10365,7 @@
       "label": "J. Dynamic Enterprise Landing Page Studio & Atomic Homepage Promotion",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L307",
+      "source_location": "L308",
       "id": "lalitakapilavai_agents_j_dynamic_enterprise_landing_page_studio_atomic_homepage_promotion",
       "community": 9,
       "norm_label": "j. dynamic enterprise landing page studio & atomic homepage promotion"
@@ -10374,7 +10374,7 @@
       "label": "K. SavazAI Multi-Tenant Brand Neutrality Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L323",
+      "source_location": "L324",
       "id": "lalitakapilavai_agents_k_savazai_multi_tenant_brand_neutrality_invariant",
       "community": 9,
       "norm_label": "k. savazai multi-tenant brand neutrality invariant"
@@ -10383,7 +10383,7 @@
       "label": "L. Multi-Day Event RSVP Interval Engine & Dynamic Attendance Tracking",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L332",
+      "source_location": "L333",
       "id": "lalitakapilavai_agents_l_multi_day_event_rsvp_interval_engine_dynamic_attendance_tracking",
       "community": 9,
       "norm_label": "l. multi-day event rsvp interval engine & dynamic attendance tracking"
@@ -10392,7 +10392,7 @@
       "label": "M. 3D WebGL Exhibition Salon Wall Studio & Realistic Environments",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L345",
+      "source_location": "L346",
       "id": "lalitakapilavai_agents_m_3d_webgl_exhibition_salon_wall_studio_realistic_environments",
       "community": 9,
       "norm_label": "m. 3d webgl exhibition salon wall studio & realistic environments"
@@ -10401,7 +10401,7 @@
       "label": "N. Placard Customizer Live Data Sync & Currency Overrides",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L363",
+      "source_location": "L364",
       "id": "lalitakapilavai_agents_n_placard_customizer_live_data_sync_currency_overrides",
       "community": 9,
       "norm_label": "n. placard customizer live data sync & currency overrides"
@@ -10410,7 +10410,7 @@
       "label": "O. Enterprise Page Builder Studio & Sanitized Ingestion",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L369",
+      "source_location": "L370",
       "id": "lalitakapilavai_agents_o_enterprise_page_builder_studio_sanitized_ingestion",
       "community": 9,
       "norm_label": "o. enterprise page builder studio & sanitized ingestion"
@@ -10419,7 +10419,7 @@
       "label": "P. Exhibition Hall Placard Contrast & HTML Sanitization Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L379",
+      "source_location": "L380",
       "id": "lalitakapilavai_agents_p_exhibition_hall_placard_contrast_html_sanitization_invariant",
       "community": 9,
       "norm_label": "p. exhibition hall placard contrast & html sanitization invariant"
@@ -10428,7 +10428,7 @@
       "label": "Q. Mobile QR Scan Onboarding, Safe-Area & Persistent Device Identity",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L387",
+      "source_location": "L388",
       "id": "lalitakapilavai_agents_q_mobile_qr_scan_onboarding_safe_area_persistent_device_identity",
       "community": 9,
       "norm_label": "q. mobile qr scan onboarding, safe-area & persistent device identity"
@@ -10437,7 +10437,7 @@
       "label": "R. Dedicated QR Scans & CRM Lead Administration Pipeline",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L397",
+      "source_location": "L398",
       "id": "lalitakapilavai_agents_r_dedicated_qr_scans_crm_lead_administration_pipeline",
       "community": 9,
       "norm_label": "r. dedicated qr scans & crm lead administration pipeline"
@@ -10446,7 +10446,7 @@
       "label": "S. Universal 1-Click Unsubscribe Pipeline & Promotional Suppression",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L406",
+      "source_location": "L407",
       "id": "lalitakapilavai_agents_s_universal_1_click_unsubscribe_pipeline_promotional_suppression",
       "community": 9,
       "norm_label": "s. universal 1-click unsubscribe pipeline & promotional suppression"
@@ -10455,7 +10455,7 @@
       "label": "T. GDPR Personal Data Erasure & Universal Privacy Consent Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L415",
+      "source_location": "L416",
       "id": "lalitakapilavai_agents_t_gdpr_personal_data_erasure_universal_privacy_consent_invariant",
       "community": 9,
       "norm_label": "t. gdpr personal data erasure & universal privacy consent invariant"
@@ -10464,7 +10464,7 @@
       "label": "U. Multi-Stage Container Prisma Client Inheritance & Fail-Fast Lifecycle Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L426",
+      "source_location": "L427",
       "id": "lalitakapilavai_agents_u_multi_stage_container_prisma_client_inheritance_fail_fast_lifecycle_invariant",
       "community": 9,
       "norm_label": "u. multi-stage container prisma client inheritance & fail-fast lifecycle invariant"
@@ -10473,7 +10473,7 @@
       "label": "V. Form Security, Lightweight CAPTCHA & Email OTP Verification Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L436",
+      "source_location": "L437",
       "id": "lalitakapilavai_agents_v_form_security_lightweight_captcha_email_otp_verification_engine",
       "community": 9,
       "norm_label": "v. form security, lightweight captcha & email otp verification engine"
@@ -10482,7 +10482,7 @@
       "label": "W. Public Settings API, Dynamic Form Security Propagation & Targeted Cache Revalidation",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L456",
+      "source_location": "L457",
       "id": "lalitakapilavai_agents_w_public_settings_api_dynamic_form_security_propagation_targeted_cache_revalidation",
       "community": 9,
       "norm_label": "w. public settings api, dynamic form security propagation & targeted cache revalidation"
@@ -10491,7 +10491,7 @@
       "label": "X. Flagship Platform Product Tour Page (/product) & 100% WYSIWYG Editorial Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L466",
+      "source_location": "L467",
       "id": "lalitakapilavai_agents_x_flagship_platform_product_tour_page_product_100_wysiwyg_editorial_engine",
       "community": 9,
       "norm_label": "x. flagship platform product tour page (/product) & 100% wysiwyg editorial engine"
@@ -10500,7 +10500,7 @@
       "label": "Y. Administrative 401/403 Interception, Safe Deserialization & Zero-Data-Loss Architecture",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L488",
+      "source_location": "L489",
       "id": "lalitakapilavai_agents_y_administrative_401_403_interception_safe_deserialization_zero_data_loss_architecture",
       "community": 9,
       "norm_label": "y. administrative 401/403 interception, safe deserialization & zero-data-loss architecture"
@@ -10509,7 +10509,7 @@
       "label": "Z. Anti-Loop Invariant, Session Edge Guard & CPU Protection Protocol",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L502",
+      "source_location": "L503",
       "id": "lalitakapilavai_agents_z_anti_loop_invariant_session_edge_guard_cpu_protection_protocol",
       "community": 9,
       "norm_label": "z. anti-loop invariant, session edge guard & cpu protection protocol"
@@ -10635,7 +10635,7 @@
       "label": "3. Visual Page Builder & Enterprise Landing Page Studio (`/admin/pages`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L180",
+      "source_location": "L181",
       "id": "lalitakapilavai_readme_3_visual_page_builder_enterprise_landing_page_studio_admin_pages",
       "community": 49,
       "norm_label": "3. visual page builder & enterprise landing page studio (`/admin/pages`)"
@@ -10644,7 +10644,7 @@
       "label": "4. Interactive e-Catalog Studio (`/admin/catalogs`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L196",
+      "source_location": "L197",
       "id": "lalitakapilavai_readme_4_interactive_e_catalog_studio_admin_catalogs",
       "community": 49,
       "norm_label": "4. interactive e-catalog studio (`/admin/catalogs`)"
@@ -10653,7 +10653,7 @@
       "label": "5. Events & Concerts Studio (`/admin/events`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L201",
+      "source_location": "L202",
       "id": "lalitakapilavai_readme_5_events_concerts_studio_admin_events",
       "community": 49,
       "norm_label": "5. events & concerts studio (`/admin/events`)"
@@ -10662,7 +10662,7 @@
       "label": "6. Dynamic Mail Message Studio & Audit Telemetry (`/admin/settings` -> Mail Msg Config)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L207",
+      "source_location": "L208",
       "id": "lalitakapilavai_readme_6_dynamic_mail_message_studio_audit_telemetry_admin_settings_mail_msg_config",
       "community": 49,
       "norm_label": "6. dynamic mail message studio & audit telemetry (`/admin/settings` -> mail msg config)"
@@ -10671,7 +10671,7 @@
       "label": "7. Unified CRM Leads & Acquisition Inbox (`/admin/leads`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L215",
+      "source_location": "L216",
       "id": "lalitakapilavai_readme_7_unified_crm_leads_acquisition_inbox_admin_leads",
       "community": 49,
       "norm_label": "7. unified crm leads & acquisition inbox (`/admin/leads`)"
@@ -10680,7 +10680,7 @@
       "label": "8. Curatorial Posts & Blog Publisher (`/admin/posts`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L220",
+      "source_location": "L221",
       "id": "lalitakapilavai_readme_8_curatorial_posts_blog_publisher_admin_posts",
       "community": 49,
       "norm_label": "8. curatorial posts & blog publisher (`/admin/posts`)"
@@ -10689,7 +10689,7 @@
       "label": "9. White-Label Theme & System Studio (`/admin/settings`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L224",
+      "source_location": "L225",
       "id": "lalitakapilavai_readme_9_white_label_theme_system_studio_admin_settings",
       "community": 49,
       "norm_label": "9. white-label theme & system studio (`/admin/settings`)"
@@ -10698,7 +10698,7 @@
       "label": "10. Security, Better-Auth RBAC & User Administration (`/admin/users`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L235",
+      "source_location": "L236",
       "id": "lalitakapilavai_readme_10_security_better_auth_rbac_user_administration_admin_users",
       "community": 49,
       "norm_label": "10. security, better-auth rbac & user administration (`/admin/users`)"
@@ -10707,7 +10707,7 @@
       "label": "11. Dynamic Admin Overview & Metric Engine (`/admin` and `src/components/admin/dashboard-layout-manager.tsx`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L240",
+      "source_location": "L241",
       "id": "lalitakapilavai_readme_11_dynamic_admin_overview_metric_engine_admin_and_src_components_admin_dashboard_layout_manager_tsx",
       "community": 49,
       "norm_label": "11. dynamic admin overview & metric engine (`/admin` and `src/components/admin/dashboard-layout-manager.tsx`)"
@@ -10716,7 +10716,7 @@
       "label": "12. Form Security, Anti-Bot CAPTCHA & Email OTP Verification Engine",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L247",
+      "source_location": "L248",
       "id": "lalitakapilavai_readme_12_form_security_anti_bot_captcha_email_otp_verification_engine",
       "community": 49,
       "norm_label": "12. form security, anti-bot captcha & email otp verification engine"
@@ -10725,7 +10725,7 @@
       "label": "13. Resilient Session Guard, 401 Interception & Anti-Loop Architecture",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L253",
+      "source_location": "L254",
       "id": "lalitakapilavai_readme_13_resilient_session_guard_401_interception_anti_loop_architecture",
       "community": 49,
       "norm_label": "13. resilient session guard, 401 interception & anti-loop architecture"
@@ -10734,7 +10734,7 @@
       "label": "5. Quickstart & Local Development",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L261",
+      "source_location": "L262",
       "id": "lalitakapilavai_readme_5_quickstart_local_development",
       "community": 3,
       "norm_label": "5. quickstart & local development"
@@ -10743,7 +10743,7 @@
       "label": "Prerequisites",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L263",
+      "source_location": "L264",
       "id": "lalitakapilavai_readme_prerequisites",
       "community": 3,
       "norm_label": "prerequisites"
@@ -10752,7 +10752,7 @@
       "label": "Step 1: Clone and Configure Environment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L268",
+      "source_location": "L269",
       "id": "lalitakapilavai_readme_step_1_clone_and_configure_environment",
       "community": 3,
       "norm_label": "step 1: clone and configure environment"
@@ -10761,7 +10761,7 @@
       "label": "code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L269",
+      "source_location": "L270",
       "id": "lalitakapilavai_readme_codeblock_2",
       "community": 3,
       "norm_label": "code:bash (git clone https://github.com/savazar01/lalitakapilavai.git)"
@@ -10770,7 +10770,7 @@
       "label": "Step 2: Launch Local Multi-Container Stack",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L275",
+      "source_location": "L276",
       "id": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
       "community": 3,
       "norm_label": "step 2: launch local multi-container stack"
@@ -10779,7 +10779,7 @@
       "label": "code:bash (docker compose -f docker-compose.dev.yml up -d)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L277",
+      "source_location": "L278",
       "id": "lalitakapilavai_readme_codeblock_3",
       "community": 3,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml up -d)"
@@ -10788,7 +10788,7 @@
       "label": "code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L282",
+      "source_location": "L283",
       "id": "lalitakapilavai_readme_codeblock_4",
       "community": 3,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p)"
@@ -10797,7 +10797,7 @@
       "label": "Step 3: Initialize Database & Run Idempotent Seed",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L286",
+      "source_location": "L287",
       "id": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed",
       "community": 3,
       "norm_label": "step 3: initialize database & run idempotent seed"
@@ -10806,7 +10806,7 @@
       "label": "code:bash (npx prisma generate)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L287",
+      "source_location": "L288",
       "id": "lalitakapilavai_readme_codeblock_5",
       "community": 3,
       "norm_label": "code:bash (npx prisma generate)"
@@ -10815,7 +10815,7 @@
       "label": "Step 4: Access Endpoints",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L293",
+      "source_location": "L294",
       "id": "lalitakapilavai_readme_step_4_access_endpoints",
       "community": 3,
       "norm_label": "step 4: access endpoints"
@@ -10824,7 +10824,7 @@
       "label": "6. Zero-Touch Coolify VPS Deployment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L301",
+      "source_location": "L302",
       "id": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment",
       "community": 40,
       "norm_label": "6. zero-touch coolify vps deployment"
@@ -10833,7 +10833,7 @@
       "label": "Deployment Runbook",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L305",
+      "source_location": "L306",
       "id": "lalitakapilavai_readme_deployment_runbook",
       "community": 40,
       "norm_label": "deployment runbook"
@@ -10842,7 +10842,7 @@
       "label": "7. Production Environment Variables Template",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L322",
+      "source_location": "L323",
       "id": "lalitakapilavai_readme_7_production_environment_variables_template",
       "community": 80,
       "norm_label": "7. production environment variables template"
@@ -10851,7 +10851,7 @@
       "label": "code:bash (# ==========================================================)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L324",
+      "source_location": "L325",
       "id": "lalitakapilavai_readme_codeblock_6",
       "community": 80,
       "norm_label": "code:bash (# ==========================================================)"
@@ -10860,7 +10860,7 @@
       "label": "8. Architectural Documentation & Living Governance",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L363",
+      "source_location": "L364",
       "id": "lalitakapilavai_readme_8_architectural_documentation_living_governance",
       "community": 40,
       "norm_label": "8. architectural documentation & living governance"
@@ -31309,6 +31309,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
+      "target": "lib_print_isolated_html_getfontfamilycss"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/artwork-placard-sheet.tsx",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_admin_artwork_placard_sheet_tsx",
       "target": "lib_print_isolated_html_placardstylingconfig"
     },
     {
@@ -31520,17 +31531,6 @@
       "target": "lib_formatters_formatcurrency"
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L43",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "lib_print_isolated_html_getfontfamilycss"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -31547,10 +31547,10 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L247",
+      "source_location": "L273",
       "weight": 1.0,
       "source": "admin_artwork_placard_sheet_artworkplacardsheet",
-      "target": "lib_utils_cn"
+      "target": "lib_print_isolated_html_getfontfamilycss"
     },
     {
       "relation": "calls",
@@ -31558,10 +31558,10 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L273",
+      "source_location": "L247",
       "weight": 1.0,
       "source": "admin_artwork_placard_sheet_artworkplacardsheet",
-      "target": "lib_print_isolated_html_getfontfamilycss"
+      "target": "lib_utils_cn"
     },
     {
       "relation": "imports_from",
@@ -52509,5 +52509,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "287cc512511efa13c7dc2cabb0c987ee4ca22715"
+  "built_at_commit": "64fc662688bcecb48727b6cac38ade6cf769c2f9"
 }

@@ -49,12 +49,13 @@ export function getResolvedFieldStyle(
   const f: PlacardFieldStyle | undefined = styling.fieldStyles?.[fieldKey];
   const style: React.CSSProperties = {};
 
-  // 1. Unified Global Font Family Inheritance
-  if (f?.fontFamily && f.fontFamily !== "inherit") {
-    style.fontFamily = getFontFamilyCss(f.fontFamily);
-  } else {
-    style.fontFamily = getFontFamilyCss(styling.fontFamily);
-  }
+  // 1. Strict Universal Master Font Family Cascade
+  const activeFontFamily =
+    f?.fontFamily && f.fontFamily !== "inherit" && (f.fontFamily as string) !== "Inherit"
+      ? f.fontFamily
+      : styling.fontFamily;
+
+  style.fontFamily = getFontFamilyCss(activeFontFamily);
 
   // 2. Font Weight
   if (f?.fontWeight && f.fontWeight !== "inherit") {
@@ -203,7 +204,6 @@ export function PlacardCard({
   const titleClass = cn(
     "card-title leading-snug break-words hyphens-auto",
     !styling.fieldStyles?.title?.fontWeight && "font-bold",
-    !styling.fieldStyles?.title?.fontStyle && "italic",
     !styling.fieldStyles?.title?.fontSize && [
       styling.titleScale === "compact" && (isXLarge ? "text-[16px]" : isLargeFormat ? "text-[14px]" : "text-[12px] sm:text-[13px]"),
       styling.titleScale === "standard" && (isXLarge ? "text-[20px]" : isLargeFormat ? "text-[18px]" : "text-[15px] sm:text-[16px]"),
@@ -215,7 +215,6 @@ export function PlacardCard({
 
   const mediumClass = cn(
     "card-medium leading-snug break-words",
-    !styling.fieldStyles?.medium?.fontStyle && "italic",
     !styling.fieldStyles?.medium?.fontSize && [
       styling.bodyScale === "compact" && (isLargeFormat ? "text-[11px]" : "text-[8.5px] sm:text-[9px]"),
       styling.bodyScale === "standard" && (isLargeFormat ? "text-[12.5px]" : "text-[10px] sm:text-[10.5px]"),
@@ -245,7 +244,6 @@ export function PlacardCard({
 
   const notesClass = cn(
     "card-additional-notes leading-snug break-words",
-    !styling.fieldStyles?.notes?.fontStyle && "italic",
     !styling.fieldStyles?.notes?.fontSize && (isLargeFormat ? "text-[9.5px]" : "text-[8px]")
   );
 
@@ -339,14 +337,18 @@ export function PlacardCard({
   };
 
   const renderDimensionsAndYear = () => {
-    const hasDim = styling.showDimensions !== false && !!itemData.dimensions;
-    const hasYr = styling.showYear !== false && !!itemData.year;
+    const hasDim = styling.showDimensions !== false && !!itemData.dimensions?.trim();
+    const hasYr = styling.showYear !== false && !!itemData.year?.trim();
     if (!hasDim && !hasYr) return null;
 
     return (
       <div key="field-dimensions-year" className="flex items-center gap-2 flex-wrap">
         {hasDim && renderDimensions()}
-        {hasDim && hasYr && <span className="opacity-50 text-[8px]">•</span>}
+        {hasDim && hasYr && (
+          <span className="opacity-50 text-[8px]" style={{ fontFamily: masterFontFamily }}>
+            •
+          </span>
+        )}
         {hasYr && renderYear()}
       </div>
     );
@@ -369,7 +371,7 @@ export function PlacardCard({
   };
 
   const renderNotes = () => {
-    if (styling.showNotes === false || !itemData.additionalNotes) return null;
+    if (styling.showNotes === false || !itemData.additionalNotes || !itemData.additionalNotes.trim()) return null;
     return (
       <p
         key="field-notes"
@@ -378,7 +380,7 @@ export function PlacardCard({
           ...getResolvedFieldStyle("notes", styling),
         }}
       >
-        {itemData.additionalNotes}
+        {itemData.additionalNotes.trim()}
       </p>
     );
   };
@@ -467,6 +469,42 @@ export function PlacardCard({
     }
   };
 
+  // Dynamic sequential field stacker: eliminates dead gaps, pulls up following fields tightly,
+  // and groups adjacent dimensions + year on a single line
+  const renderOrderedFields = (keys: string[]): React.ReactNode[] => {
+    const rendered: React.ReactNode[] = [];
+    let skipNext = false;
+
+    for (let i = 0; i < keys.length; i++) {
+      if (skipNext) {
+        skipNext = false;
+        continue;
+      }
+      const k = keys[i];
+      const nextK = keys[i + 1];
+
+      // If dimensions and year are adjacent in sequence, pair them on a single line
+      if (
+        (k === "dimensions" && nextK === "year") ||
+        (k === "year" && nextK === "dimensions")
+      ) {
+        const dimYearNode = renderDimensionsAndYear();
+        if (dimYearNode) {
+          rendered.push(dimYearNode);
+        }
+        skipNext = true;
+        continue;
+      }
+
+      const node = renderField(k);
+      if (node) {
+        rendered.push(node);
+      }
+    }
+
+    return rendered;
+  };
+
   return (
     <div
       style={{
@@ -484,7 +522,7 @@ export function PlacardCard({
         ...style,
       }}
       className={cn(
-        "placard-card-item relative border border-stone-200/80 p-3 sm:p-3.5 print:p-2.5 transition-all flex flex-col justify-between overflow-hidden shrink-0 select-none box-border",
+        "placard-card-item relative border border-stone-200/80 p-3 sm:p-3.5 print:p-2.5 transition-all flex flex-col justify-start overflow-hidden shrink-0 select-none box-border",
         styling.showCropMarks &&
           "outline outline-1 outline-dashed outline-stone-300 print:outline-stone-400 -outline-offset-1",
         className
@@ -518,26 +556,26 @@ export function PlacardCard({
 
       {/* 3. Card Content Architecture */}
       <div
-        className="relative z-10 flex-1 flex flex-col justify-between overflow-hidden"
+        className="relative z-10 flex-1 flex flex-col justify-start overflow-hidden"
         style={{ paddingBottom: clampPaddingBottom }}
       >
         {orientation === "portrait" ? (
           /* PORTRAIT ORIENTATION: Continuous vertical flow respecting active field sequence */
-          <div className="flex-1 flex flex-col justify-between overflow-hidden space-y-1">
-            {activeFieldOrder.map((key) => renderField(key))}
+          <div className="flex-1 flex flex-col justify-start gap-1 sm:gap-1.5 overflow-hidden">
+            {renderOrderedFields(activeFieldOrder)}
           </div>
         ) : (
           /* LANDSCAPE ORIENTATION: Spatial bounding box allocation & flow */
-          <div className="flex-1 flex flex-col justify-between overflow-hidden">
+          <div className="flex-1 flex flex-col justify-start gap-1 sm:gap-1.5 overflow-hidden">
             {/* Header if defined in fieldOrder */}
             {activeFieldOrder.includes("header") && renderHeader()}
 
             {mediaPlacement === "top-right" ? (
               /* TOP-RIGHT MEDIA PLACEMENT (Collision-free top corner coordinate zone) */
-              <div className="flex-1 flex flex-col justify-between overflow-hidden">
+              <div className="flex-1 flex flex-col justify-start gap-1 sm:gap-1.5 overflow-hidden">
                 <div className="flex items-start justify-between gap-3 overflow-hidden">
                   {/* Left: Title & Medium with dedicated wrap space */}
-                  <div className="flex-1 space-y-1 overflow-hidden pr-1">
+                  <div className="flex-1 min-w-0 space-y-1 overflow-hidden pr-1">
                     {renderTitle()}
                     {renderMedium()}
                   </div>
@@ -545,54 +583,54 @@ export function PlacardCard({
                   {renderMediaCluster("shrink-0 pt-0.5")}
                 </div>
 
-                {/* Trailing Metadata: Dimensions, Year, Notes, Price */}
-                <div className="flex items-end justify-between gap-2 pt-1.5 mt-auto border-t border-stone-200/40">
-                  <div className="space-y-0.5 flex-1 overflow-hidden">
-                    {renderDimensionsAndYear()}
-                    {renderNotes()}
-                  </div>
-                  {renderPrice()}
+                {/* Trailing Metadata: Dimensions, Year, Price, Notes tightly pulled up */}
+                <div className="flex-1 flex flex-col justify-start gap-1 overflow-hidden">
+                  {renderOrderedFields(
+                    activeFieldOrder.filter(
+                      (k) => k !== "header" && k !== "title" && k !== "medium" && k !== "visual_cluster"
+                    )
+                  )}
                 </div>
               </div>
             ) : mediaPlacement === "bottom-right" ? (
               /* BOTTOM-RIGHT MEDIA PLACEMENT (Zero dead space between title, medium, and metadata) */
-              <div className="flex-1 flex flex-col justify-between overflow-hidden">
-                <div className="space-y-1">
+              <div className="flex-1 flex flex-col justify-start gap-1 sm:gap-1.5 overflow-hidden">
+                {/* Upper Section: Title & Medium */}
+                <div className="space-y-1 shrink-0">
                   {renderTitle()}
                   {renderMedium()}
                 </div>
 
-                <div className="flex items-end justify-between gap-3 mt-auto pt-1">
-                  <div className="space-y-1 flex-1 overflow-hidden">
-                    {renderDimensionsAndYear()}
-                    {renderPrice()}
-                    {renderNotes()}
+                {/* Lower Section: Metadata flowing immediately beneath Medium, Media anchored in bottom right */}
+                <div className="flex items-start justify-between gap-3 flex-1 min-h-0 overflow-hidden">
+                  <div className="flex-1 min-w-0 flex flex-col justify-start gap-1 overflow-hidden">
+                    {renderOrderedFields(
+                      activeFieldOrder.filter(
+                        (k) => k !== "header" && k !== "title" && k !== "medium" && k !== "visual_cluster"
+                      )
+                    )}
                   </div>
-                  {renderMediaCluster("shrink-0")}
+                  <div className="shrink-0 flex flex-col justify-end items-center self-end mt-auto">
+                    {renderMediaCluster("shrink-0")}
+                  </div>
                 </div>
               </div>
             ) : mediaPlacement === "stacked" ? (
               /* STACKED RIGHT COLUMN (Slim side panel giving 74%+ width to titles and metadata) */
               <div className="flex items-stretch justify-between gap-3 flex-1 overflow-hidden">
-                <div className="flex-1 flex flex-col justify-between overflow-hidden pr-1 space-y-1">
-                  <div className="space-y-1">
-                    {renderTitle()}
-                    {renderMedium()}
-                  </div>
-                  <div className="space-y-1 mt-auto">
-                    {renderDimensionsAndYear()}
-                    {renderPrice()}
-                    {renderNotes()}
-                  </div>
+                <div className="flex-1 min-w-0 flex flex-col justify-start gap-1 sm:gap-1.5 overflow-hidden pr-1">
+                  {renderOrderedFields(
+                    activeFieldOrder.filter((k) => k !== "header" && k !== "visual_cluster")
+                  )}
                 </div>
                 {renderMediaCluster("shrink-0 justify-center flex-col")}
               </div>
             ) : (
               /* INLINE FLOW (Strict fieldOrder sequence across full card width) */
-              <div className="flex-1 flex flex-col justify-between overflow-hidden space-y-1">
-                {activeFieldOrder
-                  .filter((k) => k !== "header")
-                  .map((key) => renderField(key))}
+              <div className="flex-1 flex flex-col justify-start gap-1 sm:gap-1.5 overflow-hidden">
+                {renderOrderedFields(
+                  activeFieldOrder.filter((k) => k !== "header")
+                )}
               </div>
             )}
           </div>

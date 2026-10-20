@@ -157,8 +157,13 @@ All code generation and architectural modifications must adhere to the specializ
     - **Fullscreen Mode**: 1-click toggle expanding the studio to the full browser viewport (`w-screen h-screen`) for distraction-free physical layout inspection.
   - **Restored Interactive Field Reordering**:
     - Interactive Up/Down sequence buttons directly reorder fields (`header`, `title`, `medium`, `dimensions`, `year`, `price`, `visual_cluster`, `notes`) across both portrait and landscape layouts with 1-click reset to museum standards.
-  - **Unified Global Font Inheritance Engine**:
-    - All fields strictly inherit the master global font family (`styling.fontFamily`) and color hierarchy by default, completely eliminating hardcoded disjointed monospace/serif styling while allowing granular overrides when explicitly chosen.
+  - **Eliminated Mid-Card Dead Gaps & Strict Natural Vertical Stacking**:
+    - Removed `justify-between` and `mt-auto` from card containers, establishing a top-aligned flex stack (`justify-start gap-1` to `gap-1.5`).
+    - Implemented `renderOrderedFields` which renders fields in exact priority order, pairs adjacent `dimensions` and `year` into a clean single line, skips empty or unchecked curatorial notes with zero reserved height, and pulls subsequent fields (`dimensions`, `year`, `price`) up tightly beneath `medium`.
+    - Any unused card canvas resides strictly at the bottom of the card, completely eradicating internal dead voids.
+  - **Universal Master Font Family Cascade**:
+    - All text nodes (Category/School, Artist, Title, Medium, Dimensions, Year, Price, Notes, QR label, and customizer inputs) strictly inherit the active Master Font Family (`styling.fontFamily`: Cinzel, Cormorant Garamond, Playfair Display, Inter, Georgia) via `getResolvedFieldStyle`.
+    - Integrated Google Web Fonts `<link>` preconnects in `layout.tsx` to ensure immediate real-time rendering in browser previews without fallback glitches.
   - **Dedicated Live Interactive Preview Studio & Fullscreen Inspect Engine**:
     - High-precision interactive WYSIWYG studio (`PlacardLivePreviewModal`) decoupled from Radix dialog hierarchies and rendered via a dedicated React Portal directly to `document.body` (`fixed inset-0 z-[100]`), eliminating Chromium translate trapping bugs (`translate-x-[-50%] translate-y-[-50%]`).
     - Features physical millimeter scale, zoom controls ($50\%$ to $250\%$), single-card inspection, full gang-run sheet preview, stand clamp guides, and dedicated top-level `Escape` key capture listeners with sticky "✕ Exit Fullscreen (Esc)" controls.

@@ -56,6 +56,7 @@ import { cn } from "@/lib/utils";
 import {
   printIsolatedElement,
   getPhysicalDimensions,
+  getFontFamilyCss,
   type PlacardStylingConfig,
   type PlacardPrintFormat,
   type PlacardFieldStyle,
@@ -132,14 +133,14 @@ export const DEFAULT_PLACARD_STYLING: PlacardStylingConfig = {
   clampMargin: "minimal",
   priceStyle: "clean",
   fieldStyles: {
-    title: { fontFamily: "inherit", fontWeight: "bold", fontStyle: "italic", textDecoration: "none", color: "", fontSize: "inherit" },
+    title: { fontFamily: "inherit", fontWeight: "bold", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
     medium: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "italic", textDecoration: "none", color: "", fontSize: "inherit" },
     dimensions: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
     year: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
     price: { fontFamily: "inherit", fontWeight: "semibold", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
     category: { fontFamily: "inherit", fontWeight: "bold", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit", textTransform: "uppercase" },
     artist: { fontFamily: "inherit", fontWeight: "semibold", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
-    notes: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "italic", textDecoration: "none", color: "", fontSize: "inherit" },
+    notes: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
     qrLabel: { fontFamily: "inherit", fontWeight: "normal", fontStyle: "normal", textDecoration: "none", color: "", fontSize: "inherit" },
   },
 };
@@ -548,6 +549,7 @@ export function ArtworkPlacardSheet({
   const previewCardData = allCardData[inStudioCardIndex] || allCardData[0];
   const activeFieldStyle = styling.fieldStyles?.[activeFieldTab] || {};
   const dim = getPhysicalDimensions(cardFormat, orientation);
+  const masterFontFamily = getFontFamilyCss(styling.fontFamily);
 
   // Active field order array
   const activeFieldOrder = React.useMemo(() => {
@@ -1765,7 +1767,8 @@ export function ArtworkPlacardSheet({
                               type="text"
                               value={itemData.title}
                               onChange={(e) => updateCardItem(art.id, "title", e.target.value)}
-                              className="h-8 text-xs font-serif"
+                              style={{ fontFamily: masterFontFamily }}
+                              className="h-8 text-xs font-semibold"
                             />
                           </div>
 
@@ -1778,7 +1781,8 @@ export function ArtworkPlacardSheet({
                               type="text"
                               value={itemData.artistName}
                               onChange={(e) => updateCardItem(art.id, "artistName", e.target.value)}
-                              className="h-8 text-xs font-serif"
+                              style={{ fontFamily: masterFontFamily }}
+                              className="h-8 text-xs font-medium"
                             />
                           </div>
 
@@ -1791,7 +1795,8 @@ export function ArtworkPlacardSheet({
                               type="text"
                               value={itemData.category}
                               onChange={(e) => updateCardItem(art.id, "category", e.target.value)}
-                              className="h-8 text-xs"
+                              style={{ fontFamily: masterFontFamily }}
+                              className="h-8 text-xs uppercase"
                             />
                           </div>
 
@@ -1804,7 +1809,8 @@ export function ArtworkPlacardSheet({
                               type="text"
                               value={itemData.medium}
                               onChange={(e) => updateCardItem(art.id, "medium", e.target.value)}
-                              className="h-8 text-xs font-serif italic"
+                              style={{ fontFamily: masterFontFamily }}
+                              className="h-8 text-xs italic"
                             />
                           </div>
 
@@ -1817,7 +1823,8 @@ export function ArtworkPlacardSheet({
                               type="text"
                               value={itemData.dimensions}
                               onChange={(e) => updateCardItem(art.id, "dimensions", e.target.value)}
-                              className="h-8 text-xs font-mono"
+                              style={{ fontFamily: masterFontFamily }}
+                              className="h-8 text-xs"
                               placeholder="e.g. 24 x 36 inches"
                             />
                           </div>
@@ -1831,7 +1838,8 @@ export function ArtworkPlacardSheet({
                               type="text"
                               value={itemData.year}
                               onChange={(e) => updateCardItem(art.id, "year", e.target.value)}
-                              className="h-8 text-xs font-mono"
+                              style={{ fontFamily: masterFontFamily }}
+                              className="h-8 text-xs"
                               placeholder="e.g. 2026"
                             />
                           </div>
@@ -1847,19 +1855,20 @@ export function ArtworkPlacardSheet({
                                 type="text"
                                 value={itemData.price || ""}
                                 onChange={(e) => updateCardItem(art.id, "price", e.target.value)}
-                                className="h-8 text-xs font-mono flex-1"
+                                style={{ fontFamily: masterFontFamily }}
+                                className="h-8 text-xs font-semibold flex-1"
                                 placeholder="e.g. 150000"
                               />
                               <Select
                                 value={itemData.currency || "INR"}
                                 onValueChange={(val) => updateCardItem(art.id, "currency", val)}
                               >
-                                <SelectTrigger className="h-8 text-xs w-28 shrink-0 bg-background font-mono">
+                                <SelectTrigger className="h-8 text-xs w-28 shrink-0 bg-background" style={{ fontFamily: masterFontFamily }}>
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {SUPPORTED_CURRENCIES.map((c) => (
-                                    <SelectItem key={c.code} value={c.code} className="font-mono text-xs">
+                                    <SelectItem key={c.code} value={c.code} className="text-xs" style={{ fontFamily: masterFontFamily }}>
                                       {c.code} ({c.symbol})
                                     </SelectItem>
                                   ))}
@@ -1879,6 +1888,7 @@ export function ArtworkPlacardSheet({
                             value={itemData.additionalNotes || ""}
                             onChange={(e) => updateCardItem(art.id, "additionalNotes", e.target.value)}
                             placeholder="Provenance, donor attribution, historical note, or gallery wall placement details..."
+                            style={{ fontFamily: masterFontFamily }}
                             className="text-xs min-h-[52px] resize-y"
                           />
                         </div>
