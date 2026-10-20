@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\next-env.d.ts": {
-    "mtime": 1792498342.636455,
+    "mtime": 1792500695.0487459,
     "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
     "semantic_hash": ""
   },
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\AGENTS.md": {
-    "mtime": 1792410177.4783106,
-    "ast_hash": "3d502fe99369c8ddf54575a4454e5422",
+    "mtime": 1792498419.8975399,
+    "ast_hash": "6318034769f341068c0c854aeefd235e",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\CLAUDE.md": {
@@ -285,8 +285,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\README.md": {
-    "mtime": 1792410192.8127463,
-    "ast_hash": "870b512c0b1664915d518a0c6a09f022",
+    "mtime": 1792498430.9013107,
+    "ast_hash": "4a3821d27654c08e7eb2b66c8ab22489",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\.skills\\better-auth-best-practices.md": {
@@ -1060,8 +1060,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\artwork-placard-sheet.tsx": {
-    "mtime": 1792498254.4061186,
-    "ast_hash": "f6585c7b2fb89e99b086f1f1a698ee21",
+    "mtime": 1792500604.08282,
+    "ast_hash": "802745ac980a04219c7dd120647fd5cb",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\lib\\print-isolated-html.ts": {
@@ -1230,8 +1230,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\placard-card.tsx": {
-    "mtime": 1792498249.0577712,
-    "ast_hash": "ba902060e77558b387cadc469c6b62af",
+    "mtime": 1792500634.371478,
+    "ast_hash": "df68129ca05a9d5115b2923e06f05d21",
     "semantic_hash": ""
   },
   "C:\\Users\\AVASA\\Downloads\\OpenC\\lalitakapilavai\\src\\components\\admin\\placard-live-preview-modal.tsx": {

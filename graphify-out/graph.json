@@ -2249,7 +2249,7 @@
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/builder-client.tsx",
       "source_location": "L93",
       "id": "builder_builder_client_subsectiondata",
-      "community": 4,
+      "community": 44,
       "norm_label": "subsectiondata"
     },
     {
@@ -4074,7 +4074,7 @@
       "label": "PlacardArtwork",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L65",
+      "source_location": "L69",
       "id": "admin_artwork_placard_sheet_placardartwork",
       "community": 37,
       "norm_label": "placardartwork"
@@ -4083,7 +4083,7 @@
       "label": "ArtworkPlacardSheetProps",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L82",
+      "source_location": "L86",
       "id": "admin_artwork_placard_sheet_artworkplacardsheetprops",
       "community": 37,
       "norm_label": "artworkplacardsheetprops"
@@ -4092,7 +4092,7 @@
       "label": "EditablePlacardItem",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L89",
+      "source_location": "L93",
       "id": "admin_artwork_placard_sheet_editableplacarditem",
       "community": 37,
       "norm_label": "editableplacarditem"
@@ -4101,7 +4101,7 @@
       "label": "DEFAULT_PLACARD_STYLING",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L91",
+      "source_location": "L95",
       "id": "admin_artwork_placard_sheet_default_placard_styling",
       "community": 37,
       "norm_label": "default_placard_styling"
@@ -4110,7 +4110,7 @@
       "label": "CARD_BG_SWATCHES",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L143",
+      "source_location": "L148",
       "id": "admin_artwork_placard_sheet_card_bg_swatches",
       "community": 37,
       "norm_label": "card_bg_swatches"
@@ -4119,7 +4119,7 @@
       "label": "TITLE_COLOR_SWATCHES",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L150",
+      "source_location": "L155",
       "id": "admin_artwork_placard_sheet_title_color_swatches",
       "community": 37,
       "norm_label": "title_color_swatches"
@@ -4128,7 +4128,7 @@
       "label": "TEXT_COLOR_SWATCHES",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L157",
+      "source_location": "L162",
       "id": "admin_artwork_placard_sheet_text_color_swatches",
       "community": 37,
       "norm_label": "text_color_swatches"
@@ -4137,7 +4137,7 @@
       "label": "HEADER_COLOR_SWATCHES",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L164",
+      "source_location": "L169",
       "id": "admin_artwork_placard_sheet_header_color_swatches",
       "community": 37,
       "norm_label": "header_color_swatches"
@@ -4146,7 +4146,7 @@
       "label": "ConfigurableFieldKey",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L171",
+      "source_location": "L176",
       "id": "admin_artwork_placard_sheet_configurablefieldkey",
       "community": 37,
       "norm_label": "configurablefieldkey"
@@ -4155,7 +4155,7 @@
       "label": "FIELD_METADATA",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L182",
+      "source_location": "L187",
       "id": "admin_artwork_placard_sheet_field_metadata",
       "community": 37,
       "norm_label": "field_metadata"
@@ -4164,7 +4164,7 @@
       "label": "FONT_SIZE_PRESETS",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L194",
+      "source_location": "L199",
       "id": "admin_artwork_placard_sheet_font_size_presets",
       "community": 37,
       "norm_label": "font_size_presets"
@@ -4173,7 +4173,7 @@
       "label": "ArtworkPlacardSheet()",
       "file_type": "code",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L212",
+      "source_location": "L217",
       "id": "admin_artwork_placard_sheet_artworkplacardsheet",
       "community": 37,
       "norm_label": "artworkplacardsheet()"
@@ -4265,7 +4265,7 @@
       "source_file": "src/components/admin/catalog-matrix-studio.tsx",
       "source_location": "L101",
       "id": "admin_catalog_matrix_studio_catalogmatrixstudioprops",
-      "community": 4,
+      "community": 45,
       "norm_label": "catalogmatrixstudioprops"
     },
     {
@@ -4722,7 +4722,7 @@
       "label": "getResolvedFieldStyle()",
       "file_type": "code",
       "source_file": "src/components/admin/placard-card.tsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "id": "admin_placard_card_getresolvedfieldstyle",
       "community": 100,
       "norm_label": "getresolvedfieldstyle()"
@@ -4731,7 +4731,7 @@
       "label": "PlacardCard()",
       "file_type": "code",
       "source_file": "src/components/admin/placard-card.tsx",
-      "source_location": "L97",
+      "source_location": "L107",
       "id": "admin_placard_card_placardcard",
       "community": 100,
       "norm_label": "placardcard()"
@@ -4886,7 +4886,7 @@
       "source_file": "src/components/builder/form-block-inspector.tsx",
       "source_location": "L46",
       "id": "builder_form_block_inspector_formblockdata",
-      "community": 45,
+      "community": 44,
       "norm_label": "formblockdata"
     },
     {
@@ -5075,7 +5075,7 @@
       "source_file": "src/components/builder/page-matrix-studio.tsx",
       "source_location": "L113",
       "id": "builder_page_matrix_studio_pagematrixstudioprops",
-      "community": 4,
+      "community": 45,
       "norm_label": "pagematrixstudioprops"
     },
     {
@@ -5111,7 +5111,7 @@
       "source_file": "src/components/builder/style-inspector.tsx",
       "source_location": "L43",
       "id": "builder_style_inspector_sectionstyle",
-      "community": 4,
+      "community": 44,
       "norm_label": "sectionstyle"
     },
     {
@@ -5624,7 +5624,7 @@
       "source_file": "src/components/builder/viewport-switcher.tsx",
       "source_location": "L1",
       "id": "src_components_builder_viewport_switcher_tsx",
-      "community": 44,
+      "community": 4,
       "norm_label": "viewport-switcher.tsx"
     },
     {
@@ -5633,7 +5633,7 @@
       "source_file": "src/components/builder/viewport-switcher.tsx",
       "source_location": "L8",
       "id": "builder_viewport_switcher_viewportmode",
-      "community": 44,
+      "community": 4,
       "norm_label": "viewportmode"
     },
     {
@@ -5642,7 +5642,7 @@
       "source_file": "src/components/builder/viewport-switcher.tsx",
       "source_location": "L10",
       "id": "builder_viewport_switcher_viewportswitcherprops",
-      "community": 44,
+      "community": 4,
       "norm_label": "viewportswitcherprops"
     },
     {
@@ -5651,7 +5651,7 @@
       "source_file": "src/components/builder/viewport-switcher.tsx",
       "source_location": "L15",
       "id": "builder_viewport_switcher_viewportswitcher",
-      "community": 44,
+      "community": 4,
       "norm_label": "viewportswitcher()"
     },
     {
@@ -6479,7 +6479,7 @@
       "source_file": "src/components/public/tiptap-renderer.tsx",
       "source_location": "L78",
       "id": "public_tiptap_renderer_tiptaprendererprops",
-      "community": 4,
+      "community": 45,
       "norm_label": "tiptaprendererprops"
     },
     {
@@ -6587,7 +6587,7 @@
       "source_file": "src/components/public/blocks/dynamic-form-block.tsx",
       "source_location": "L37",
       "id": "blocks_dynamic_form_block_dynamicformconfig",
-      "community": 45,
+      "community": 44,
       "norm_label": "dynamicformconfig"
     },
     {
@@ -9566,7 +9566,7 @@
       "source_file": "src/lib/theme-contrast.ts",
       "source_location": "L155",
       "id": "lib_theme_contrast_dynamiccontrastscope",
-      "community": 4,
+      "community": 45,
       "norm_label": "dynamiccontrastscope"
     },
     {
@@ -9575,7 +9575,7 @@
       "source_file": "src/lib/theme-contrast.ts",
       "source_location": "L156",
       "id": "lib_theme_contrast_contrastmode",
-      "community": 4,
+      "community": 45,
       "norm_label": "contrastmode"
     },
     {
@@ -10293,7 +10293,7 @@
       "label": "B. 3D WebGL Exhibition Salon Wall Engine & Gallery Background Architecture",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L161",
+      "source_location": "L171",
       "id": "lalitakapilavai_agents_b_3d_webgl_exhibition_salon_wall_engine_gallery_background_architecture",
       "community": 9,
       "norm_label": "b. 3d webgl exhibition salon wall engine & gallery background architecture"
@@ -10302,7 +10302,7 @@
       "label": "C. Universal Email Notification & Form Dispatch Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L226",
+      "source_location": "L236",
       "id": "lalitakapilavai_agents_c_universal_email_notification_form_dispatch_engine",
       "community": 9,
       "norm_label": "c. universal email notification & form dispatch engine"
@@ -10311,7 +10311,7 @@
       "label": "D. Strict Binary Theme & Contrast Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L244",
+      "source_location": "L254",
       "id": "lalitakapilavai_agents_d_strict_binary_theme_contrast_invariant",
       "community": 9,
       "norm_label": "d. strict binary theme & contrast invariant"
@@ -10320,7 +10320,7 @@
       "label": "E. Multi-Tenant Brand Identity & Asset Engine (.ico Favicon & Conditional Phone)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L250",
+      "source_location": "L260",
       "id": "lalitakapilavai_agents_e_multi_tenant_brand_identity_asset_engine_ico_favicon_conditional_phone",
       "community": 9,
       "norm_label": "e. multi-tenant brand identity & asset engine (.ico favicon & conditional phone)"
@@ -10329,7 +10329,7 @@
       "label": "F. Dynamic Archive Subtitle & Idempotent Non-Destructive Tenant Deployment",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L258",
+      "source_location": "L268",
       "id": "lalitakapilavai_agents_f_dynamic_archive_subtitle_idempotent_non_destructive_tenant_deployment",
       "community": 9,
       "norm_label": "f. dynamic archive subtitle & idempotent non-destructive tenant deployment"
@@ -10338,7 +10338,7 @@
       "label": "G. Universal Contact Form & Generalized Multi-Tenant Email Templates",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L268",
+      "source_location": "L278",
       "id": "lalitakapilavai_agents_g_universal_contact_form_generalized_multi_tenant_email_templates",
       "community": 9,
       "norm_label": "g. universal contact form & generalized multi-tenant email templates"
@@ -10347,7 +10347,7 @@
       "label": "H. Dynamic Admin Dashboard Metric Calculation Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L273",
+      "source_location": "L283",
       "id": "lalitakapilavai_agents_h_dynamic_admin_dashboard_metric_calculation_engine",
       "community": 9,
       "norm_label": "h. dynamic admin dashboard metric calculation engine"
@@ -10356,7 +10356,7 @@
       "label": "I. Multi-Cloud Storage Architecture (Google Workspace & Nextcloud WebDAV)",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L279",
+      "source_location": "L289",
       "id": "lalitakapilavai_agents_i_multi_cloud_storage_architecture_google_workspace_nextcloud_webdav",
       "community": 9,
       "norm_label": "i. multi-cloud storage architecture (google workspace & nextcloud webdav)"
@@ -10365,7 +10365,7 @@
       "label": "J. Dynamic Enterprise Landing Page Studio & Atomic Homepage Promotion",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L288",
+      "source_location": "L298",
       "id": "lalitakapilavai_agents_j_dynamic_enterprise_landing_page_studio_atomic_homepage_promotion",
       "community": 9,
       "norm_label": "j. dynamic enterprise landing page studio & atomic homepage promotion"
@@ -10374,7 +10374,7 @@
       "label": "K. SavazAI Multi-Tenant Brand Neutrality Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L304",
+      "source_location": "L314",
       "id": "lalitakapilavai_agents_k_savazai_multi_tenant_brand_neutrality_invariant",
       "community": 9,
       "norm_label": "k. savazai multi-tenant brand neutrality invariant"
@@ -10383,7 +10383,7 @@
       "label": "L. Multi-Day Event RSVP Interval Engine & Dynamic Attendance Tracking",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L313",
+      "source_location": "L323",
       "id": "lalitakapilavai_agents_l_multi_day_event_rsvp_interval_engine_dynamic_attendance_tracking",
       "community": 9,
       "norm_label": "l. multi-day event rsvp interval engine & dynamic attendance tracking"
@@ -10392,7 +10392,7 @@
       "label": "M. 3D WebGL Exhibition Salon Wall Studio & Realistic Environments",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L326",
+      "source_location": "L336",
       "id": "lalitakapilavai_agents_m_3d_webgl_exhibition_salon_wall_studio_realistic_environments",
       "community": 9,
       "norm_label": "m. 3d webgl exhibition salon wall studio & realistic environments"
@@ -10401,7 +10401,7 @@
       "label": "N. Placard Customizer Live Data Sync & Currency Overrides",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L344",
+      "source_location": "L354",
       "id": "lalitakapilavai_agents_n_placard_customizer_live_data_sync_currency_overrides",
       "community": 9,
       "norm_label": "n. placard customizer live data sync & currency overrides"
@@ -10410,7 +10410,7 @@
       "label": "O. Enterprise Page Builder Studio & Sanitized Ingestion",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L350",
+      "source_location": "L360",
       "id": "lalitakapilavai_agents_o_enterprise_page_builder_studio_sanitized_ingestion",
       "community": 9,
       "norm_label": "o. enterprise page builder studio & sanitized ingestion"
@@ -10419,7 +10419,7 @@
       "label": "P. Exhibition Hall Placard Contrast & HTML Sanitization Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L360",
+      "source_location": "L370",
       "id": "lalitakapilavai_agents_p_exhibition_hall_placard_contrast_html_sanitization_invariant",
       "community": 9,
       "norm_label": "p. exhibition hall placard contrast & html sanitization invariant"
@@ -10428,7 +10428,7 @@
       "label": "Q. Mobile QR Scan Onboarding, Safe-Area & Persistent Device Identity",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L368",
+      "source_location": "L378",
       "id": "lalitakapilavai_agents_q_mobile_qr_scan_onboarding_safe_area_persistent_device_identity",
       "community": 9,
       "norm_label": "q. mobile qr scan onboarding, safe-area & persistent device identity"
@@ -10437,7 +10437,7 @@
       "label": "R. Dedicated QR Scans & CRM Lead Administration Pipeline",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L378",
+      "source_location": "L388",
       "id": "lalitakapilavai_agents_r_dedicated_qr_scans_crm_lead_administration_pipeline",
       "community": 9,
       "norm_label": "r. dedicated qr scans & crm lead administration pipeline"
@@ -10446,7 +10446,7 @@
       "label": "S. Universal 1-Click Unsubscribe Pipeline & Promotional Suppression",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L387",
+      "source_location": "L397",
       "id": "lalitakapilavai_agents_s_universal_1_click_unsubscribe_pipeline_promotional_suppression",
       "community": 9,
       "norm_label": "s. universal 1-click unsubscribe pipeline & promotional suppression"
@@ -10455,7 +10455,7 @@
       "label": "T. GDPR Personal Data Erasure & Universal Privacy Consent Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L396",
+      "source_location": "L406",
       "id": "lalitakapilavai_agents_t_gdpr_personal_data_erasure_universal_privacy_consent_invariant",
       "community": 9,
       "norm_label": "t. gdpr personal data erasure & universal privacy consent invariant"
@@ -10464,7 +10464,7 @@
       "label": "U. Multi-Stage Container Prisma Client Inheritance & Fail-Fast Lifecycle Invariant",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L407",
+      "source_location": "L417",
       "id": "lalitakapilavai_agents_u_multi_stage_container_prisma_client_inheritance_fail_fast_lifecycle_invariant",
       "community": 9,
       "norm_label": "u. multi-stage container prisma client inheritance & fail-fast lifecycle invariant"
@@ -10473,7 +10473,7 @@
       "label": "V. Form Security, Lightweight CAPTCHA & Email OTP Verification Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L417",
+      "source_location": "L427",
       "id": "lalitakapilavai_agents_v_form_security_lightweight_captcha_email_otp_verification_engine",
       "community": 9,
       "norm_label": "v. form security, lightweight captcha & email otp verification engine"
@@ -10482,7 +10482,7 @@
       "label": "W. Public Settings API, Dynamic Form Security Propagation & Targeted Cache Revalidation",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L437",
+      "source_location": "L447",
       "id": "lalitakapilavai_agents_w_public_settings_api_dynamic_form_security_propagation_targeted_cache_revalidation",
       "community": 9,
       "norm_label": "w. public settings api, dynamic form security propagation & targeted cache revalidation"
@@ -10491,7 +10491,7 @@
       "label": "X. Flagship Platform Product Tour Page (/product) & 100% WYSIWYG Editorial Engine",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L447",
+      "source_location": "L457",
       "id": "lalitakapilavai_agents_x_flagship_platform_product_tour_page_product_100_wysiwyg_editorial_engine",
       "community": 9,
       "norm_label": "x. flagship platform product tour page (/product) & 100% wysiwyg editorial engine"
@@ -10500,7 +10500,7 @@
       "label": "Y. Administrative 401/403 Interception, Safe Deserialization & Zero-Data-Loss Architecture",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L469",
+      "source_location": "L479",
       "id": "lalitakapilavai_agents_y_administrative_401_403_interception_safe_deserialization_zero_data_loss_architecture",
       "community": 9,
       "norm_label": "y. administrative 401/403 interception, safe deserialization & zero-data-loss architecture"
@@ -10509,7 +10509,7 @@
       "label": "Z. Anti-Loop Invariant, Session Edge Guard & CPU Protection Protocol",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L483",
+      "source_location": "L493",
       "id": "lalitakapilavai_agents_z_anti_loop_invariant_session_edge_guard_cpu_protection_protocol",
       "community": 9,
       "norm_label": "z. anti-loop invariant, session edge guard & cpu protection protocol"
@@ -10635,7 +10635,7 @@
       "label": "3. Visual Page Builder & Enterprise Landing Page Studio (`/admin/pages`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L176",
+      "source_location": "L180",
       "id": "lalitakapilavai_readme_3_visual_page_builder_enterprise_landing_page_studio_admin_pages",
       "community": 49,
       "norm_label": "3. visual page builder & enterprise landing page studio (`/admin/pages`)"
@@ -10644,7 +10644,7 @@
       "label": "4. Interactive e-Catalog Studio (`/admin/catalogs`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L192",
+      "source_location": "L196",
       "id": "lalitakapilavai_readme_4_interactive_e_catalog_studio_admin_catalogs",
       "community": 49,
       "norm_label": "4. interactive e-catalog studio (`/admin/catalogs`)"
@@ -10653,7 +10653,7 @@
       "label": "5. Events & Concerts Studio (`/admin/events`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L197",
+      "source_location": "L201",
       "id": "lalitakapilavai_readme_5_events_concerts_studio_admin_events",
       "community": 49,
       "norm_label": "5. events & concerts studio (`/admin/events`)"
@@ -10662,7 +10662,7 @@
       "label": "6. Dynamic Mail Message Studio & Audit Telemetry (`/admin/settings` -> Mail Msg Config)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L203",
+      "source_location": "L207",
       "id": "lalitakapilavai_readme_6_dynamic_mail_message_studio_audit_telemetry_admin_settings_mail_msg_config",
       "community": 49,
       "norm_label": "6. dynamic mail message studio & audit telemetry (`/admin/settings` -> mail msg config)"
@@ -10671,7 +10671,7 @@
       "label": "7. Unified CRM Leads & Acquisition Inbox (`/admin/leads`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L211",
+      "source_location": "L215",
       "id": "lalitakapilavai_readme_7_unified_crm_leads_acquisition_inbox_admin_leads",
       "community": 49,
       "norm_label": "7. unified crm leads & acquisition inbox (`/admin/leads`)"
@@ -10680,7 +10680,7 @@
       "label": "8. Curatorial Posts & Blog Publisher (`/admin/posts`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L216",
+      "source_location": "L220",
       "id": "lalitakapilavai_readme_8_curatorial_posts_blog_publisher_admin_posts",
       "community": 49,
       "norm_label": "8. curatorial posts & blog publisher (`/admin/posts`)"
@@ -10689,7 +10689,7 @@
       "label": "9. White-Label Theme & System Studio (`/admin/settings`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L220",
+      "source_location": "L224",
       "id": "lalitakapilavai_readme_9_white_label_theme_system_studio_admin_settings",
       "community": 49,
       "norm_label": "9. white-label theme & system studio (`/admin/settings`)"
@@ -10698,7 +10698,7 @@
       "label": "10. Security, Better-Auth RBAC & User Administration (`/admin/users`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L231",
+      "source_location": "L235",
       "id": "lalitakapilavai_readme_10_security_better_auth_rbac_user_administration_admin_users",
       "community": 49,
       "norm_label": "10. security, better-auth rbac & user administration (`/admin/users`)"
@@ -10707,7 +10707,7 @@
       "label": "11. Dynamic Admin Overview & Metric Engine (`/admin` and `src/components/admin/dashboard-layout-manager.tsx`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L236",
+      "source_location": "L240",
       "id": "lalitakapilavai_readme_11_dynamic_admin_overview_metric_engine_admin_and_src_components_admin_dashboard_layout_manager_tsx",
       "community": 49,
       "norm_label": "11. dynamic admin overview & metric engine (`/admin` and `src/components/admin/dashboard-layout-manager.tsx`)"
@@ -10716,7 +10716,7 @@
       "label": "12. Form Security, Anti-Bot CAPTCHA & Email OTP Verification Engine",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L243",
+      "source_location": "L247",
       "id": "lalitakapilavai_readme_12_form_security_anti_bot_captcha_email_otp_verification_engine",
       "community": 49,
       "norm_label": "12. form security, anti-bot captcha & email otp verification engine"
@@ -10725,7 +10725,7 @@
       "label": "13. Resilient Session Guard, 401 Interception & Anti-Loop Architecture",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L249",
+      "source_location": "L253",
       "id": "lalitakapilavai_readme_13_resilient_session_guard_401_interception_anti_loop_architecture",
       "community": 49,
       "norm_label": "13. resilient session guard, 401 interception & anti-loop architecture"
@@ -10734,7 +10734,7 @@
       "label": "5. Quickstart & Local Development",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L257",
+      "source_location": "L261",
       "id": "lalitakapilavai_readme_5_quickstart_local_development",
       "community": 3,
       "norm_label": "5. quickstart & local development"
@@ -10743,7 +10743,7 @@
       "label": "Prerequisites",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L259",
+      "source_location": "L263",
       "id": "lalitakapilavai_readme_prerequisites",
       "community": 3,
       "norm_label": "prerequisites"
@@ -10752,7 +10752,7 @@
       "label": "Step 1: Clone and Configure Environment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L264",
+      "source_location": "L268",
       "id": "lalitakapilavai_readme_step_1_clone_and_configure_environment",
       "community": 3,
       "norm_label": "step 1: clone and configure environment"
@@ -10761,7 +10761,7 @@
       "label": "code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L265",
+      "source_location": "L269",
       "id": "lalitakapilavai_readme_codeblock_2",
       "community": 3,
       "norm_label": "code:bash (git clone https://github.com/savazar01/lalitakapilavai.git)"
@@ -10770,7 +10770,7 @@
       "label": "Step 2: Launch Local Multi-Container Stack",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L271",
+      "source_location": "L275",
       "id": "lalitakapilavai_readme_step_2_launch_local_multi_container_stack",
       "community": 3,
       "norm_label": "step 2: launch local multi-container stack"
@@ -10779,7 +10779,7 @@
       "label": "code:bash (docker compose -f docker-compose.dev.yml up -d)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L273",
+      "source_location": "L277",
       "id": "lalitakapilavai_readme_codeblock_3",
       "community": 3,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml up -d)"
@@ -10788,7 +10788,7 @@
       "label": "code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L278",
+      "source_location": "L282",
       "id": "lalitakapilavai_readme_codeblock_4",
       "community": 3,
       "norm_label": "code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p)"
@@ -10797,7 +10797,7 @@
       "label": "Step 3: Initialize Database & Run Idempotent Seed",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L282",
+      "source_location": "L286",
       "id": "lalitakapilavai_readme_step_3_initialize_database_run_idempotent_seed",
       "community": 3,
       "norm_label": "step 3: initialize database & run idempotent seed"
@@ -10806,7 +10806,7 @@
       "label": "code:bash (npx prisma generate)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L283",
+      "source_location": "L287",
       "id": "lalitakapilavai_readme_codeblock_5",
       "community": 3,
       "norm_label": "code:bash (npx prisma generate)"
@@ -10815,7 +10815,7 @@
       "label": "Step 4: Access Endpoints",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L289",
+      "source_location": "L293",
       "id": "lalitakapilavai_readme_step_4_access_endpoints",
       "community": 3,
       "norm_label": "step 4: access endpoints"
@@ -10824,7 +10824,7 @@
       "label": "6. Zero-Touch Coolify VPS Deployment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L297",
+      "source_location": "L301",
       "id": "lalitakapilavai_readme_6_zero_touch_coolify_vps_deployment",
       "community": 40,
       "norm_label": "6. zero-touch coolify vps deployment"
@@ -10833,7 +10833,7 @@
       "label": "Deployment Runbook",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L301",
+      "source_location": "L305",
       "id": "lalitakapilavai_readme_deployment_runbook",
       "community": 40,
       "norm_label": "deployment runbook"
@@ -10842,7 +10842,7 @@
       "label": "7. Production Environment Variables Template",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L318",
+      "source_location": "L322",
       "id": "lalitakapilavai_readme_7_production_environment_variables_template",
       "community": 80,
       "norm_label": "7. production environment variables template"
@@ -10851,7 +10851,7 @@
       "label": "code:bash (# ==========================================================)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L320",
+      "source_location": "L324",
       "id": "lalitakapilavai_readme_codeblock_6",
       "community": 80,
       "norm_label": "code:bash (# ==========================================================)"
@@ -10860,7 +10860,7 @@
       "label": "8. Architectural Documentation & Living Governance",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L359",
+      "source_location": "L363",
       "id": "lalitakapilavai_readme_8_architectural_documentation_living_governance",
       "community": 40,
       "norm_label": "8. architectural documentation & living governance"
@@ -13300,7 +13300,7 @@
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/pages/[id]/builder/page.tsx",
       "source_location": "L82",
-      "community": 4,
+      "community": 44,
       "norm_label": "subsectiondata",
       "id": "builder_page_subsectiondata"
     },
@@ -30999,9 +30999,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "lib_formatters_supported_currencies",
-      "confidence_score": 1.0
+      "target": "lib_formatters_supported_currencies"
     },
     {
       "relation": "imports_from",
@@ -31294,6 +31294,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_admin_artwork_placard_sheet_tsx",
+      "target": "lib_print_isolated_html_getphysicaldimensions"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L43",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -31307,9 +31318,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "lib_print_isolated_html_placardprintformat",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardprintformat"
     },
     {
       "relation": "imports",
@@ -31318,9 +31329,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "lib_print_isolated_html_placardfieldstyle",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardfieldstyle"
     },
     {
       "relation": "imports_from",
@@ -31329,9 +31340,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "src_components_admin_placard_card_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_admin_placard_card_tsx"
     },
     {
       "relation": "imports",
@@ -31340,9 +31351,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "admin_placard_card_placardcard",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_placardcard"
     },
     {
       "relation": "imports",
@@ -31351,9 +31362,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "admin_placard_card_placardcarddata",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_placardcarddata"
     },
     {
       "relation": "imports_from",
@@ -31362,9 +31373,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "src_components_admin_placard_live_preview_modal_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_admin_placard_live_preview_modal_tsx"
     },
     {
       "relation": "imports",
@@ -31373,9 +31384,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "admin_placard_live_preview_modal_placardlivepreviewmodal",
-      "confidence_score": 1.0
+      "target": "admin_placard_live_preview_modal_placardlivepreviewmodal"
     },
     {
       "relation": "contains",
@@ -31463,9 +31474,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L171",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "admin_artwork_placard_sheet_configurablefieldkey",
-      "confidence_score": 1.0
+      "target": "admin_artwork_placard_sheet_configurablefieldkey"
     },
     {
       "relation": "contains",
@@ -31473,9 +31484,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L182",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "admin_artwork_placard_sheet_field_metadata",
-      "confidence_score": 1.0
+      "target": "admin_artwork_placard_sheet_field_metadata"
     },
     {
       "relation": "contains",
@@ -31483,9 +31494,9 @@
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L194",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "admin_artwork_placard_sheet_font_size_presets",
-      "confidence_score": 1.0
+      "target": "admin_artwork_placard_sheet_font_size_presets"
     },
     {
       "relation": "contains",
@@ -31513,17 +31524,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L35",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_admin_artwork_placard_sheet_tsx",
-      "target": "lib_print_isolated_html_getphysicaldimensions"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/admin/artwork-placard-sheet.tsx",
       "source_location": "L43",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -31536,10 +31536,10 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L247",
+      "source_location": "L205",
       "weight": 1.0,
       "source": "admin_artwork_placard_sheet_artworkplacardsheet",
-      "target": "lib_utils_cn"
+      "target": "lib_print_isolated_html_getphysicaldimensions"
     },
     {
       "relation": "calls",
@@ -31547,10 +31547,10 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/artwork-placard-sheet.tsx",
-      "source_location": "L205",
+      "source_location": "L247",
       "weight": 1.0,
       "source": "admin_artwork_placard_sheet_artworkplacardsheet",
-      "target": "lib_print_isolated_html_getphysicaldimensions"
+      "target": "lib_utils_cn"
     },
     {
       "relation": "calls",
@@ -34142,9 +34142,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "src_lib_formatters_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_formatters_ts"
     },
     {
       "relation": "imports",
@@ -34153,9 +34153,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "lib_formatters_formatcurrency",
-      "confidence_score": 1.0
+      "target": "lib_formatters_formatcurrency"
     },
     {
       "relation": "imports_from",
@@ -34164,9 +34164,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "src_lib_utils_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_utils_ts"
     },
     {
       "relation": "imports",
@@ -34175,9 +34175,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "lib_utils_cn",
-      "confidence_score": 1.0
+      "target": "lib_utils_cn"
     },
     {
       "relation": "imports_from",
@@ -34186,9 +34186,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "src_lib_print_isolated_html_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_print_isolated_html_ts"
     },
     {
       "relation": "imports",
@@ -34197,9 +34197,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "lib_print_isolated_html_getphysicaldimensions",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_getphysicaldimensions"
     },
     {
       "relation": "imports",
@@ -34208,9 +34208,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "lib_print_isolated_html_getfontfamilycss",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_getfontfamilycss"
     },
     {
       "relation": "imports",
@@ -34219,9 +34219,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "lib_print_isolated_html_placardstylingconfig",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardstylingconfig"
     },
     {
       "relation": "imports",
@@ -34230,9 +34230,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "lib_print_isolated_html_placardprintformat",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardprintformat"
     },
     {
       "relation": "imports",
@@ -34241,9 +34241,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "lib_print_isolated_html_placardfieldstyle",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardfieldstyle"
     },
     {
       "relation": "contains",
@@ -34251,9 +34251,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "admin_placard_card_placardcarddata",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_placardcarddata"
     },
     {
       "relation": "contains",
@@ -34261,9 +34261,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "admin_placard_card_placardcardprops",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_placardcardprops"
     },
     {
       "relation": "contains",
@@ -34271,9 +34271,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "admin_placard_card_getresolvedfieldstyle",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_getresolvedfieldstyle"
     },
     {
       "relation": "contains",
@@ -34281,9 +34281,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L97",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_card_tsx",
-      "target": "admin_placard_card_placardcard",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_placardcard"
     },
     {
       "relation": "imports_from",
@@ -34292,9 +34292,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "src_components_admin_placard_card_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_admin_placard_card_tsx"
     },
     {
       "relation": "imports",
@@ -34303,9 +34303,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "admin_placard_card_placardcarddata",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_placardcarddata"
     },
     {
       "relation": "references",
@@ -34314,9 +34314,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_placard_live_preview_modal_placardlivepreviewmodalprops",
-      "target": "admin_placard_card_placardcarddata",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_placardcarddata"
     },
     {
       "relation": "references",
@@ -34325,9 +34325,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_placard_card_placardcardprops",
-      "target": "lib_print_isolated_html_placardstylingconfig",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardstylingconfig"
     },
     {
       "relation": "references",
@@ -34336,20 +34336,9 @@
       "source_file": "src/components/admin/placard-card.tsx",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_placard_card_placardcardprops",
-      "target": "lib_print_isolated_html_placardprintformat",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/admin/placard-card.tsx",
-      "source_location": "L352",
-      "weight": 1.0,
-      "source": "admin_placard_card_placardcard",
-      "target": "admin_placard_card_getresolvedfieldstyle",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardprintformat"
     },
     {
       "relation": "calls",
@@ -34363,15 +34352,26 @@
       "target": "lib_print_isolated_html_getfontfamilycss"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/placard-card.tsx",
+      "source_location": "L352",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "admin_placard_card_placardcard",
+      "target": "admin_placard_card_getresolvedfieldstyle"
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "admin_placard_card_placardcard",
-      "confidence_score": 1.0
+      "target": "admin_placard_card_placardcard"
     },
     {
       "relation": "calls",
@@ -34413,9 +34413,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "src_components_ui_button_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_button_tsx"
     },
     {
       "relation": "imports",
@@ -34424,9 +34424,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "ui_button_button",
-      "confidence_score": 1.0
+      "target": "ui_button_button"
     },
     {
       "relation": "imports_from",
@@ -34435,9 +34435,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "src_components_ui_badge_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_badge_tsx"
     },
     {
       "relation": "imports",
@@ -34446,9 +34446,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "ui_badge_badge",
-      "confidence_score": 1.0
+      "target": "ui_badge_badge"
     },
     {
       "relation": "imports_from",
@@ -34457,9 +34457,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "src_components_ui_dialog_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_dialog_tsx"
     },
     {
       "relation": "imports",
@@ -34468,9 +34468,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "ui_dialog_dialogcontent",
-      "confidence_score": 1.0
+      "target": "ui_dialog_dialogcontent"
     },
     {
       "relation": "imports",
@@ -34479,9 +34479,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "ui_dialog_dialogheader",
-      "confidence_score": 1.0
+      "target": "ui_dialog_dialogheader"
     },
     {
       "relation": "imports",
@@ -34490,9 +34490,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "ui_dialog_dialogtitle",
-      "confidence_score": 1.0
+      "target": "ui_dialog_dialogtitle"
     },
     {
       "relation": "imports",
@@ -34501,9 +34501,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "ui_dialog_dialogdescription",
-      "confidence_score": 1.0
+      "target": "ui_dialog_dialogdescription"
     },
     {
       "relation": "imports_from",
@@ -34512,9 +34512,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "src_lib_print_isolated_html_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_print_isolated_html_ts"
     },
     {
       "relation": "imports",
@@ -34523,9 +34523,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "lib_print_isolated_html_getphysicaldimensions",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_getphysicaldimensions"
     },
     {
       "relation": "imports",
@@ -34534,9 +34534,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "lib_print_isolated_html_placardstylingconfig",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardstylingconfig"
     },
     {
       "relation": "imports",
@@ -34545,9 +34545,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "lib_print_isolated_html_placardprintformat",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardprintformat"
     },
     {
       "relation": "imports_from",
@@ -34556,9 +34556,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "src_lib_utils_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_utils_ts"
     },
     {
       "relation": "imports",
@@ -34567,9 +34567,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "lib_utils_cn",
-      "confidence_score": 1.0
+      "target": "lib_utils_cn"
     },
     {
       "relation": "contains",
@@ -34577,9 +34577,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "admin_placard_live_preview_modal_placardlivepreviewmodalprops",
-      "confidence_score": 1.0
+      "target": "admin_placard_live_preview_modal_placardlivepreviewmodalprops"
     },
     {
       "relation": "contains",
@@ -34587,9 +34587,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_admin_placard_live_preview_modal_tsx",
-      "target": "admin_placard_live_preview_modal_placardlivepreviewmodal",
-      "confidence_score": 1.0
+      "target": "admin_placard_live_preview_modal_placardlivepreviewmodal"
     },
     {
       "relation": "references",
@@ -34598,9 +34598,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_placard_live_preview_modal_placardlivepreviewmodalprops",
-      "target": "lib_print_isolated_html_placardstylingconfig",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardstylingconfig"
     },
     {
       "relation": "references",
@@ -34609,9 +34609,9 @@
       "source_file": "src/components/admin/placard-live-preview-modal.tsx",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_placard_live_preview_modal_placardlivepreviewmodalprops",
-      "target": "lib_print_isolated_html_placardprintformat",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardprintformat"
     },
     {
       "relation": "calls",
@@ -47191,9 +47191,9 @@
       "source_file": "src/lib/print-isolated-html.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_print_isolated_html_ts",
-      "target": "lib_print_isolated_html_placardprintformat",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardprintformat"
     },
     {
       "relation": "contains",
@@ -47201,9 +47201,9 @@
       "source_file": "src/lib/print-isolated-html.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_lib_print_isolated_html_ts",
-      "target": "lib_print_isolated_html_placardfieldstyle",
-      "confidence_score": 1.0
+      "target": "lib_print_isolated_html_placardfieldstyle"
     },
     {
       "relation": "contains",
@@ -52509,5 +52509,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a961e7027c52486848166c8f7ff65293f0d4bf01"
+  "built_at_commit": "3353c15080988fc66eee4ac5d3e9341beb40ad85"
 }

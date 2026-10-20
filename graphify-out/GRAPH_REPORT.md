@@ -1,7 +1,7 @@
 # Graph Report - lalitakapilavai  (2026-10-20)
 
 ## Corpus Check
-- 237 files · ~280,256 words
+- 237 files · ~280,870 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a961e702`
+- Built from commit: `3353c150`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -156,8 +156,8 @@ Cohesion: 0.15
 Nodes (19): 2. Quickstart & Local Development, 3. High-Level Modular Architecture, 5. Quickstart & Local Development, code:block1 (SavazAI WebApps Platform), code:bash (git clone https://github.com/Savazar01/lalitakapilavai.git), code:bash (docker compose -f docker-compose.dev.yml up -d), code:bash (docker compose -f docker-compose.dev.yml exec postgres-dev p), code:bash (npx prisma generate) (+11 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.08
-Nodes (41): CatalogMatrixStudioProps, AlternatingTimelineList(), categoryBadges, categoryIcons, MilestoneCard(), TimelineBlock(), TimelineBlockProps, TimelineMilestone (+33 more)
+Cohesion: 0.09
+Nodes (36): AlternatingTimelineList(), categoryBadges, categoryIcons, MilestoneCard(), TimelineBlock(), TimelineBlockProps, TimelineMilestone, FormBlockInspector() (+28 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.13
@@ -261,11 +261,11 @@ Nodes (13): 1. Executive Platform Overview, 2. Technology Stack & Modern Archite
 
 ### Community 44 - "Community 44"
 Cohesion: 0.11
-Nodes (19): AccordionBlock(), AccordionBlockItem, FeatureGridBlock(), FeatureGridItem, HeroBlock(), HeroBlockData, ICON_MAP, MetricGridBlock() (+11 more)
+Nodes (21): DynamicFormConfig, AccordionBlock(), AccordionBlockItem, FeatureGridBlock(), FeatureGridItem, HeroBlock(), HeroBlockData, ICON_MAP (+13 more)
 
 ### Community 45 - "Community 45"
 Cohesion: 0.10
-Nodes (21): DynamicFormBlock(), DynamicFormConfig, FormFieldConfig, HeroArchetype, HeroShowcaseBlock(), HeroShowcaseBlockProps, HotspotPin, PdfViewerBlock() (+13 more)
+Nodes (24): CatalogMatrixStudioProps, DynamicFormBlock(), FormFieldConfig, HeroArchetype, HeroShowcaseBlock(), HeroShowcaseBlockProps, HotspotPin, PdfViewerBlock() (+16 more)
 
 ### Community 47 - "Community 47"
 Cohesion: 0.20
@@ -471,13 +471,13 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.056) - this node is a cross-community bridge._
 - **Why does `Button` connect `Community 36` to `Community 0`, `Community 4`, `Community 21`, `Community 31`, `Community 33`, `Community 37`, `Community 39`, `Community 44`, `Community 45`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 56`, `Community 66`, `Community 81`, `Community 82`, `Community 87`, `Community 88`, `Community 90`, `Community 95`, `Community 97`, `Community 100`, `Community 102`?**
   _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **Why does `Badge()` connect `Community 102` to `Community 97`, `Community 66`, `Community 34`, `Community 36`, `Community 37`, `Community 100`, `Community 39`, `Community 4`, `Community 44`, `Community 45`, `Community 50`, `Community 51`, `Community 82`, `Community 21`, `Community 87`, `Community 56`, `Community 59`, `Community 95`?**
+- **Why does `Badge()` connect `Community 102` to `Community 97`, `Community 66`, `Community 34`, `Community 36`, `Community 37`, `Community 100`, `Community 39`, `Community 4`, `Community 45`, `Community 50`, `Community 51`, `Community 82`, `Community 21`, `Community 87`, `Community 56`, `Community 59`, `Community 95`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **What connects `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig` to the rest of the system?**
   _560 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.044444444444444446 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
-  _Cohesion score 0.07993966817496229 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08687943262411348 - nodes in this community are weakly interconnected._
 - **Should `Community 5` be split into smaller, more focused modules?**
   _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._

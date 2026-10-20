@@ -150,6 +150,15 @@ All code generation and architectural modifications must adhere to the specializ
     - Eliminates rigid background earmarks/badges; prices render as clean fine-art metadata paired with localized currency symbols (`₹`, `$`, `€`, `£`, `AED`, `S$`, etc.) or optional curatorial badge styling.
   - **Configurable Thumbnail & QR Code Positioning & Flow**:
     - Supports `top-right`, `bottom-right`, `inline`, and `stacked` right-panel media placement, eliminating spatial crowding and permitting multi-row title wrapping without clipping or metadata drop-off.
+  - **Two-Column Master Workspace & Persistent Sticky Live Preview**:
+    - The placard customizer features a master 2-column atelier layout:
+      - **Left Pane (`lg:col-span-7`)**: Dedicated scrollable studio for field typography, global color palettes, media geometry, and individual card metadata overrides.
+      - **Right Pane (`lg:col-span-5 sticky top-0`)**: Persistent Live Real-Time Card Preview anchored in place, updating instantly on every keystroke with zoom controls ($50\%$ to $175\%$), card stepper, and stand clamp guides.
+    - **Fullscreen Mode**: 1-click toggle expanding the studio to the full browser viewport (`w-screen h-screen`) for distraction-free physical layout inspection.
+  - **Restored Interactive Field Reordering**:
+    - Interactive Up/Down sequence buttons directly reorder fields (`header`, `title`, `medium`, `dimensions`, `year`, `price`, `visual_cluster`, `notes`) across both portrait and landscape layouts with 1-click reset to museum standards.
+  - **Unified Global Font Inheritance Engine**:
+    - All fields strictly inherit the master global font family (`styling.fontFamily`) and color hierarchy by default, completely eliminating hardcoded disjointed monospace/serif styling while allowing granular overrides when explicitly chosen.
   - **Dedicated Live Interactive Preview Studio**:
     - Fullscreen interactive WYSIWYG modal (`PlacardLivePreviewModal`) with physical millimeter scale, zoom controls ($50\%$ to $250\%$), single-card inspection, and full gang-run sheet preview.
 - **e-Catalog Synchronous Preloader & Asynchronous Decoding Barrier**:

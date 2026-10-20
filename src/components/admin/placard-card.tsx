@@ -38,20 +38,22 @@ export interface PlacardCardProps {
 }
 
 /**
- * Resolves per-field typography styling (font family, weight, style, color, size, transform)
- * falling back gracefully to global typography tokens and card scale.
+ * Resolves per-field typography styling with Unified Global Font Inheritance.
+ * By default, every field inherits the master global font family and color tokens
+ * unless explicitly customized via granular field styling.
  */
 export function getResolvedFieldStyle(
   fieldKey: "title" | "medium" | "dimensions" | "year" | "price" | "category" | "artist" | "notes" | "qrLabel",
-  styling: PlacardStylingConfig,
-  _cardFormat?: PlacardPrintFormat
+  styling: PlacardStylingConfig
 ): React.CSSProperties {
   const f: PlacardFieldStyle | undefined = styling.fieldStyles?.[fieldKey];
   const style: React.CSSProperties = {};
 
-  // 1. Font Family
+  // 1. Unified Global Font Family Inheritance
   if (f?.fontFamily && f.fontFamily !== "inherit") {
     style.fontFamily = getFontFamilyCss(f.fontFamily);
+  } else {
+    style.fontFamily = getFontFamilyCss(styling.fontFamily);
   }
 
   // 2. Font Weight
@@ -81,9 +83,17 @@ export function getResolvedFieldStyle(
     style.textTransform = f.textTransform;
   }
 
-  // 6. Text Color
+  // 6. Text Color Inheritance
   if (f?.color && f.color.trim()) {
     style.color = f.color;
+  } else {
+    if (fieldKey === "title") {
+      style.color = styling.titleColor;
+    } else if (fieldKey === "category" || fieldKey === "artist") {
+      style.color = styling.headerColor;
+    } else {
+      style.color = styling.textColor;
+    }
   }
 
   // 7. Font Size
@@ -105,20 +115,18 @@ export function PlacardCard({
   showAcrylicGuide = true,
 }: PlacardCardProps) {
   const dim = getPhysicalDimensions(cardFormat, orientation);
-  const activeFontFamilyCss = getFontFamilyCss(styling.fontFamily);
+  const masterFontFamily = getFontFamilyCss(styling.fontFamily);
 
   // Clamp padding calculation to eliminate dead space
   const clampMargin = styling.clampMargin || "minimal";
-  const clampPaddingStyle: React.CSSProperties = {
-    paddingBottom:
-      clampMargin === "none"
-        ? "0mm"
-        : clampMargin === "minimal"
-        ? "3mm"
-        : clampMargin === "standard"
-        ? "7mm"
-        : "16mm", // acrylic-clamp
-  };
+  const clampPaddingBottom =
+    clampMargin === "none"
+      ? "0mm"
+      : clampMargin === "minimal"
+      ? "3mm"
+      : clampMargin === "standard"
+      ? "7mm"
+      : "16mm";
 
   // Base typography scale factors for large formats
   const isLargeFormat = cardFormat === "museum-large" || cardFormat === "museum-xlarge";
@@ -132,7 +140,7 @@ export function PlacardCard({
       : thumbSize === "large"
       ? isLargeFormat
         ? "w-16 h-16 sm:w-20 sm:h-20"
-        : "w-14 h-14 sm:w-16 sm:h-16"
+        : "w-13 h-13 sm:w-15 sm:h-15"
       : thumbSize === "xlarge"
       ? isLargeFormat
         ? "w-20 h-20 sm:w-24 sm:h-24"
@@ -165,7 +173,33 @@ export function PlacardCard({
   const mediaPlacement = styling.mediaPlacement || "top-right";
   const mediaLayout = styling.mediaLayout || "side-by-side";
 
-  // Default font sizing scales if not overridden per-field
+  // Active field sequence from state
+  const activeFieldOrder = React.useMemo(() => {
+    const defaultOrder = [
+      "header",
+      "title",
+      "medium",
+      "dimensions",
+      "year",
+      "price",
+      "visual_cluster",
+      "notes",
+    ];
+    if (!styling.fieldOrder || styling.fieldOrder.length === 0) return defaultOrder;
+
+    // Expand legacy 'dimensions_year' if present
+    const expanded: string[] = [];
+    for (const key of styling.fieldOrder) {
+      if (key === "dimensions_year") {
+        expanded.push("dimensions", "year");
+      } else {
+        expanded.push(key);
+      }
+    }
+    return expanded;
+  }, [styling.fieldOrder]);
+
+  // Default font sizing scales (unified, no hardcoded monospace/serif)
   const titleClass = cn(
     "card-title leading-snug break-words hyphens-auto",
     !styling.fieldStyles?.title?.fontWeight && "font-bold",
@@ -192,30 +226,169 @@ export function PlacardCard({
   );
 
   const dimensionsClass = cn(
-    "card-dimensions font-mono leading-tight break-words",
-    !styling.fieldStyles?.dimensions?.fontSize && (isLargeFormat ? "text-[9.5px]" : "text-[8px]")
+    "card-dimensions leading-tight break-words",
+    !styling.fieldStyles?.dimensions?.fontSize && (isLargeFormat ? "text-[10px]" : "text-[8.5px]")
+  );
+
+  const yearClass = cn(
+    "card-year leading-tight break-words",
+    !styling.fieldStyles?.year?.fontSize && (isLargeFormat ? "text-[10px]" : "text-[8.5px]")
   );
 
   const priceClass = cn(
     "card-price-value leading-tight",
     styling.priceStyle === "badge"
-      ? "font-mono font-bold text-[9px] px-1.5 py-0.5 rounded border bg-amber-500/10 border-amber-500/30"
-      : "font-sans font-medium",
-    !styling.fieldStyles?.price?.fontSize && (isLargeFormat ? "text-[11px]" : "text-[9.5px]")
+      ? "font-bold text-[9px] px-1.5 py-0.5 rounded border bg-amber-500/10 border-amber-500/30"
+      : "font-semibold",
+    !styling.fieldStyles?.price?.fontSize && (isLargeFormat ? "text-[11.5px]" : "text-[10px]")
   );
 
   const notesClass = cn(
     "card-additional-notes leading-snug break-words",
     !styling.fieldStyles?.notes?.fontStyle && "italic",
-    !styling.fieldStyles?.notes?.fontSize && (isLargeFormat ? "text-[9px]" : "text-[7.5px]")
+    !styling.fieldStyles?.notes?.fontSize && (isLargeFormat ? "text-[9.5px]" : "text-[8px]")
   );
 
-  // Render Visual Media Cluster (Thumbnail + QR)
+  // Field Renderer Helpers
+  const renderHeader = () => {
+    if (!styling.showCategory && !styling.showArtist) return null;
+    return (
+      <div
+        key="field-header"
+        className="relative z-10 flex items-center justify-between border-b pb-0.5 mb-1.5 shrink-0"
+        style={{
+          borderColor: styling.headerColor + "40",
+          color: styling.headerColor,
+          fontFamily: masterFontFamily,
+        }}
+      >
+        <span
+          className="tracking-widest text-[8px] sm:text-[8.5px] uppercase font-bold truncate max-w-[55%]"
+          style={getResolvedFieldStyle("category", styling)}
+        >
+          {styling.showCategory ? itemData.category : ""}
+        </span>
+        <span
+          className="tracking-wide text-[8px] sm:text-[8.5px] font-semibold shrink-0"
+          style={getResolvedFieldStyle("artist", styling)}
+        >
+          {styling.showArtist ? itemData.artistName : ""}
+        </span>
+      </div>
+    );
+  };
+
+  const renderTitle = () => {
+    if (styling.showTitle === false) return null;
+    return (
+      <h4
+        key="field-title"
+        className={titleClass}
+        style={{
+          ...getResolvedFieldStyle("title", styling),
+        }}
+      >
+        {itemData.title || "Untitled Masterwork"}
+      </h4>
+    );
+  };
+
+  const renderMedium = () => {
+    if (styling.showMedium === false || !itemData.medium) return null;
+    return (
+      <p
+        key="field-medium"
+        className={mediumClass}
+        style={{
+          ...getResolvedFieldStyle("medium", styling),
+        }}
+      >
+        {itemData.medium}
+      </p>
+    );
+  };
+
+  const renderDimensions = () => {
+    if (styling.showDimensions === false || !itemData.dimensions) return null;
+    return (
+      <span
+        key="field-dimensions"
+        className={dimensionsClass}
+        style={{
+          ...getResolvedFieldStyle("dimensions", styling),
+        }}
+      >
+        {itemData.dimensions}
+      </span>
+    );
+  };
+
+  const renderYear = () => {
+    if (styling.showYear === false || !itemData.year) return null;
+    return (
+      <span
+        key="field-year"
+        className={yearClass}
+        style={{
+          ...getResolvedFieldStyle("year", styling),
+        }}
+      >
+        Year: {itemData.year}
+      </span>
+    );
+  };
+
+  const renderDimensionsAndYear = () => {
+    const hasDim = styling.showDimensions !== false && !!itemData.dimensions;
+    const hasYr = styling.showYear !== false && !!itemData.year;
+    if (!hasDim && !hasYr) return null;
+
+    return (
+      <div key="field-dimensions-year" className="flex items-center gap-2 flex-wrap">
+        {hasDim && renderDimensions()}
+        {hasDim && hasYr && <span className="opacity-50 text-[8px]">•</span>}
+        {hasYr && renderYear()}
+      </div>
+    );
+  };
+
+  const renderPrice = () => {
+    if (styling.showPrice === false || !itemData.price) return null;
+    return (
+      <div key="field-price" className="card-price-container inline-flex items-center shrink-0">
+        <span
+          className={priceClass}
+          style={{
+            ...getResolvedFieldStyle("price", styling),
+          }}
+        >
+          {formatCurrency(itemData.price, itemData.currency || "INR")}
+        </span>
+      </div>
+    );
+  };
+
+  const renderNotes = () => {
+    if (styling.showNotes === false || !itemData.additionalNotes) return null;
+    return (
+      <p
+        key="field-notes"
+        className={notesClass}
+        style={{
+          ...getResolvedFieldStyle("notes", styling),
+        }}
+      >
+        {itemData.additionalNotes}
+      </p>
+    );
+  };
+
   const renderMediaCluster = (extraClasses: string = "") => {
     if (!styling.showThumbnail && !styling.showQr) return null;
 
     return (
       <div
+        key="field-visual-cluster"
         className={cn(
           "card-media-cluster shrink-0 flex items-center gap-2",
           mediaLayout === "stacked" ? "flex-col items-center" : "flex-row items-center",
@@ -254,8 +427,11 @@ export function PlacardCard({
               />
             </div>
             <span
-              className="text-[6.5px] font-sans text-stone-500 tracking-tight mt-0.5 whitespace-nowrap"
-              style={getResolvedFieldStyle("qrLabel", styling, cardFormat)}
+              className="text-[6.5px] tracking-tight mt-0.5 whitespace-nowrap"
+              style={{
+                fontFamily: masterFontFamily,
+                ...getResolvedFieldStyle("qrLabel", styling),
+              }}
             >
               Scan Provenance
             </span>
@@ -265,28 +441,30 @@ export function PlacardCard({
     );
   };
 
-  // Render Valuation / Price (Unstyled by default or optional badge)
-  const renderPrice = (inline: boolean = false) => {
-    if (styling.showPrice === false || !itemData.price) return null;
-
-    return (
-      <div
-        className={cn(
-          "card-price-container shrink-0",
-          inline ? "inline-flex items-center" : "flex items-center"
-        )}
-      >
-        <span
-          className={priceClass}
-          style={{
-            color: styling.priceStyle === "badge" ? styling.headerColor : styling.textColor,
-            ...getResolvedFieldStyle("price", styling, cardFormat),
-          }}
-        >
-          {formatCurrency(itemData.price, itemData.currency || "INR")}
-        </span>
-      </div>
-    );
+  // Dispatcher for any field key
+  const renderField = (key: string): React.ReactNode => {
+    switch (key) {
+      case "header":
+        return renderHeader();
+      case "title":
+        return renderTitle();
+      case "medium":
+        return renderMedium();
+      case "dimensions":
+        return renderDimensions();
+      case "year":
+        return renderYear();
+      case "dimensions_year":
+        return renderDimensionsAndYear();
+      case "price":
+        return renderPrice();
+      case "visual_cluster":
+        return renderMediaCluster();
+      case "notes":
+        return renderNotes();
+      default:
+        return null;
+    }
   };
 
   return (
@@ -299,7 +477,7 @@ export function PlacardCard({
         maxWidth: `${dim.widthMm}mm`,
         maxHeight: `${dim.heightMm}mm`,
         backgroundColor: styling.cardBgColor,
-        fontFamily: activeFontFamilyCss,
+        fontFamily: masterFontFamily,
         textAlign: styling.textAlign,
         pageBreakInside: "avoid",
         breakInside: "avoid",
@@ -338,392 +516,90 @@ export function PlacardCard({
         </>
       )}
 
-      {/* 3. Header: Category / School on Left, Artist on Right */}
-      {(styling.showCategory || styling.showArtist) && (
-        <div
-          className="relative z-10 flex items-center justify-between border-b pb-0.5 mb-1.5 shrink-0"
-          style={{
-            borderColor: styling.headerColor + "40",
-            color: styling.headerColor,
-          }}
-        >
-          <span
-            className="tracking-widest text-[8px] sm:text-[8.5px] uppercase font-bold truncate max-w-[55%]"
-            style={getResolvedFieldStyle("category", styling, cardFormat)}
-          >
-            {styling.showCategory ? itemData.category : ""}
-          </span>
-          <span
-            className="tracking-wide text-[8px] sm:text-[8.5px] font-semibold shrink-0"
-            style={getResolvedFieldStyle("artist", styling, cardFormat)}
-          >
-            {styling.showArtist ? itemData.artistName : ""}
-          </span>
-        </div>
-      )}
-
-      {/* 4. Orientation-Aware Layout Body */}
-      {orientation === "portrait" ? (
-        /* PORTRAIT ORIENTATION */
-        <div
-          className="relative z-10 flex-1 flex flex-col justify-between overflow-hidden"
-          style={clampPaddingStyle}
-        >
-          {/* Top Section: Title & Medium */}
-          <div className="space-y-1">
-            {styling.showTitle !== false && (
-              <h4
-                className={titleClass}
-                style={{
-                  color: styling.titleColor,
-                  ...getResolvedFieldStyle("title", styling, cardFormat),
-                }}
-              >
-                {itemData.title || "Untitled Masterwork"}
-              </h4>
-            )}
-
-            {styling.showMedium !== false && itemData.medium && (
-              <p
-                className={mediumClass}
-                style={{
-                  color: styling.textColor,
-                  ...getResolvedFieldStyle("medium", styling, cardFormat),
-                }}
-              >
-                {itemData.medium}
-              </p>
-            )}
-
-            {(styling.showDimensions !== false || styling.showYear !== false) && (
-              <p
-                className={dimensionsClass}
-                style={{
-                  color: styling.textColor + "cc",
-                  ...getResolvedFieldStyle("dimensions", styling, cardFormat),
-                }}
-              >
-                {[
-                  styling.showDimensions !== false ? itemData.dimensions : "",
-                  styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
-                ]
-                  .filter(Boolean)
-                  .join(" • ")}
-              </p>
-            )}
+      {/* 3. Card Content Architecture */}
+      <div
+        className="relative z-10 flex-1 flex flex-col justify-between overflow-hidden"
+        style={{ paddingBottom: clampPaddingBottom }}
+      >
+        {orientation === "portrait" ? (
+          /* PORTRAIT ORIENTATION: Continuous vertical flow respecting active field sequence */
+          <div className="flex-1 flex flex-col justify-between overflow-hidden space-y-1">
+            {activeFieldOrder.map((key) => renderField(key))}
           </div>
+        ) : (
+          /* LANDSCAPE ORIENTATION: Spatial bounding box allocation & flow */
+          <div className="flex-1 flex flex-col justify-between overflow-hidden">
+            {/* Header if defined in fieldOrder */}
+            {activeFieldOrder.includes("header") && renderHeader()}
 
-          {/* Middle Section: Media Cluster */}
-          {renderMediaCluster(
-            styling.textAlign === "center"
-              ? "justify-center my-1.5"
-              : styling.textAlign === "right"
-              ? "justify-end my-1.5"
-              : "justify-start my-1.5"
-          )}
-
-          {/* Bottom Section: Unstyled Price & Curatorial Notes */}
-          <div className="space-y-1 mt-auto shrink-0">
-            {renderPrice()}
-
-            {styling.showNotes !== false && itemData.additionalNotes && (
-              <p
-                className={notesClass}
-                style={{
-                  color: styling.textColor,
-                  ...getResolvedFieldStyle("notes", styling, cardFormat),
-                }}
-              >
-                {itemData.additionalNotes}
-              </p>
-            )}
-          </div>
-        </div>
-      ) : (
-        /* LANDSCAPE ORIENTATION: Intelligent Flexible Flow */
-        <div
-          className="relative z-10 flex-1 flex flex-col justify-between overflow-hidden"
-          style={clampPaddingStyle}
-        >
-          {mediaPlacement === "top-right" ? (
-            /* TOP-RIGHT MEDIA PLACEMENT (Default balanced museum style) */
-            <>
-              <div className="flex items-start justify-between gap-3 flex-1 overflow-hidden">
-                {/* Left: Title & Medium with generous wrap space */}
-                <div className="flex-1 space-y-1 overflow-hidden pr-1">
-                  {styling.showTitle !== false && (
-                    <h4
-                      className={titleClass}
-                      style={{
-                        color: styling.titleColor,
-                        ...getResolvedFieldStyle("title", styling, cardFormat),
-                      }}
-                    >
-                      {itemData.title || "Untitled Masterwork"}
-                    </h4>
-                  )}
-
-                  {styling.showMedium !== false && itemData.medium && (
-                    <p
-                      className={mediumClass}
-                      style={{
-                        color: styling.textColor,
-                        ...getResolvedFieldStyle("medium", styling, cardFormat),
-                      }}
-                    >
-                      {itemData.medium}
-                    </p>
-                  )}
+            {mediaPlacement === "top-right" ? (
+              /* TOP-RIGHT MEDIA PLACEMENT (Collision-free top corner coordinate zone) */
+              <div className="flex-1 flex flex-col justify-between overflow-hidden">
+                <div className="flex items-start justify-between gap-3 overflow-hidden">
+                  {/* Left: Title & Medium with dedicated wrap space */}
+                  <div className="flex-1 space-y-1 overflow-hidden pr-1">
+                    {renderTitle()}
+                    {renderMedium()}
+                  </div>
+                  {/* Right: Media Cluster */}
+                  {renderMediaCluster("shrink-0 pt-0.5")}
                 </div>
 
-                {/* Right: Media Cluster */}
-                {renderMediaCluster("shrink-0 pt-0.5")}
-              </div>
-
-              {/* Bottom: Dimensions, Year, Notes, Price */}
-              <div className="flex items-end justify-between gap-2 pt-1.5 mt-auto border-t border-stone-200/40">
-                <div className="space-y-0.5 flex-1 overflow-hidden">
-                  {(styling.showDimensions !== false || styling.showYear !== false) && (
-                    <p
-                      className={dimensionsClass}
-                      style={{
-                        color: styling.textColor + "cc",
-                        ...getResolvedFieldStyle("dimensions", styling, cardFormat),
-                      }}
-                    >
-                      {[
-                        styling.showDimensions !== false ? itemData.dimensions : "",
-                        styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" • ")}
-                    </p>
-                  )}
-
-                  {styling.showNotes !== false && itemData.additionalNotes && (
-                    <p
-                      className={notesClass}
-                      style={{
-                        color: styling.textColor,
-                        ...getResolvedFieldStyle("notes", styling, cardFormat),
-                      }}
-                    >
-                      {itemData.additionalNotes}
-                    </p>
-                  )}
-                </div>
-
-                {/* Clean Unstyled Price */}
-                {renderPrice()}
-              </div>
-            </>
-          ) : mediaPlacement === "bottom-right" ? (
-            /* BOTTOM-RIGHT MEDIA PLACEMENT */
-            <>
-              {/* Full Width Top: Title & Medium */}
-              <div className="space-y-1">
-                {styling.showTitle !== false && (
-                  <h4
-                    className={titleClass}
-                    style={{
-                      color: styling.titleColor,
-                      ...getResolvedFieldStyle("title", styling, cardFormat),
-                    }}
-                  >
-                    {itemData.title || "Untitled Masterwork"}
-                  </h4>
-                )}
-
-                {styling.showMedium !== false && itemData.medium && (
-                  <p
-                    className={mediumClass}
-                    style={{
-                      color: styling.textColor,
-                      ...getResolvedFieldStyle("medium", styling, cardFormat),
-                    }}
-                  >
-                    {itemData.medium}
-                  </p>
-                )}
-              </div>
-
-              {/* Bottom Split: Metadata on Left, Media Cluster on Right */}
-              <div className="flex items-end justify-between gap-3 mt-auto pt-1">
-                <div className="space-y-1 flex-1 overflow-hidden">
-                  {(styling.showDimensions !== false || styling.showYear !== false) && (
-                    <p
-                      className={dimensionsClass}
-                      style={{
-                        color: styling.textColor + "cc",
-                        ...getResolvedFieldStyle("dimensions", styling, cardFormat),
-                      }}
-                    >
-                      {[
-                        styling.showDimensions !== false ? itemData.dimensions : "",
-                        styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" • ")}
-                    </p>
-                  )}
-
+                {/* Trailing Metadata: Dimensions, Year, Notes, Price */}
+                <div className="flex items-end justify-between gap-2 pt-1.5 mt-auto border-t border-stone-200/40">
+                  <div className="space-y-0.5 flex-1 overflow-hidden">
+                    {renderDimensionsAndYear()}
+                    {renderNotes()}
+                  </div>
                   {renderPrice()}
-
-                  {styling.showNotes !== false && itemData.additionalNotes && (
-                    <p
-                      className={notesClass}
-                      style={{
-                        color: styling.textColor,
-                        ...getResolvedFieldStyle("notes", styling, cardFormat),
-                      }}
-                    >
-                      {itemData.additionalNotes}
-                    </p>
-                  )}
                 </div>
-
-                {renderMediaCluster("shrink-0")}
               </div>
-            </>
-          ) : mediaPlacement === "stacked" ? (
-            /* STACKED RIGHT COLUMN (Compact side panel giving 74%+ width to titles) */
-            <div className="flex items-stretch justify-between gap-3 flex-1 overflow-hidden">
-              <div className="flex-1 flex flex-col justify-between overflow-hidden pr-1">
+            ) : mediaPlacement === "bottom-right" ? (
+              /* BOTTOM-RIGHT MEDIA PLACEMENT (Zero dead space between title, medium, and metadata) */
+              <div className="flex-1 flex flex-col justify-between overflow-hidden">
                 <div className="space-y-1">
-                  {styling.showTitle !== false && (
-                    <h4
-                      className={titleClass}
-                      style={{
-                        color: styling.titleColor,
-                        ...getResolvedFieldStyle("title", styling, cardFormat),
-                      }}
-                    >
-                      {itemData.title || "Untitled Masterwork"}
-                    </h4>
-                  )}
-
-                  {styling.showMedium !== false && itemData.medium && (
-                    <p
-                      className={mediumClass}
-                      style={{
-                        color: styling.textColor,
-                        ...getResolvedFieldStyle("medium", styling, cardFormat),
-                      }}
-                    >
-                      {itemData.medium}
-                    </p>
-                  )}
+                  {renderTitle()}
+                  {renderMedium()}
                 </div>
 
-                <div className="space-y-0.5 mt-auto pt-1">
-                  {(styling.showDimensions !== false || styling.showYear !== false) && (
-                    <p
-                      className={dimensionsClass}
-                      style={{
-                        color: styling.textColor + "cc",
-                        ...getResolvedFieldStyle("dimensions", styling, cardFormat),
-                      }}
-                    >
-                      {[
-                        styling.showDimensions !== false ? itemData.dimensions : "",
-                        styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" • ")}
-                    </p>
-                  )}
-
-                  {renderPrice()}
-
-                  {styling.showNotes !== false && itemData.additionalNotes && (
-                    <p
-                      className={notesClass}
-                      style={{
-                        color: styling.textColor,
-                        ...getResolvedFieldStyle("notes", styling, cardFormat),
-                      }}
-                    >
-                      {itemData.additionalNotes}
-                    </p>
-                  )}
+                <div className="flex items-end justify-between gap-3 mt-auto pt-1">
+                  <div className="space-y-1 flex-1 overflow-hidden">
+                    {renderDimensionsAndYear()}
+                    {renderPrice()}
+                    {renderNotes()}
+                  </div>
+                  {renderMediaCluster("shrink-0")}
                 </div>
               </div>
-
-              {renderMediaCluster("shrink-0 justify-center flex-col")}
-            </div>
-          ) : (
-            /* INLINE FLOW (100% Full Width Flow) */
-            <div className="flex-1 flex flex-col justify-between overflow-hidden space-y-1">
-              <div className="space-y-1">
-                {styling.showTitle !== false && (
-                  <h4
-                    className={titleClass}
-                    style={{
-                      color: styling.titleColor,
-                      ...getResolvedFieldStyle("title", styling, cardFormat),
-                    }}
-                  >
-                    {itemData.title || "Untitled Masterwork"}
-                  </h4>
-                )}
-
-                {styling.showMedium !== false && itemData.medium && (
-                  <p
-                    className={mediumClass}
-                    style={{
-                      color: styling.textColor,
-                      ...getResolvedFieldStyle("medium", styling, cardFormat),
-                    }}
-                  >
-                    {itemData.medium}
-                  </p>
-                )}
+            ) : mediaPlacement === "stacked" ? (
+              /* STACKED RIGHT COLUMN (Slim side panel giving 74%+ width to titles and metadata) */
+              <div className="flex items-stretch justify-between gap-3 flex-1 overflow-hidden">
+                <div className="flex-1 flex flex-col justify-between overflow-hidden pr-1 space-y-1">
+                  <div className="space-y-1">
+                    {renderTitle()}
+                    {renderMedium()}
+                  </div>
+                  <div className="space-y-1 mt-auto">
+                    {renderDimensionsAndYear()}
+                    {renderPrice()}
+                    {renderNotes()}
+                  </div>
+                </div>
+                {renderMediaCluster("shrink-0 justify-center flex-col")}
               </div>
-
-              <div className="flex items-center justify-between gap-2 my-1">
-                {(styling.showDimensions !== false || styling.showYear !== false) && (
-                  <p
-                    className={dimensionsClass}
-                    style={{
-                      color: styling.textColor + "cc",
-                      ...getResolvedFieldStyle("dimensions", styling, cardFormat),
-                    }}
-                  >
-                    {[
-                      styling.showDimensions !== false ? itemData.dimensions : "",
-                      styling.showYear !== false && itemData.year ? `Year: ${itemData.year}` : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" • ")}
-                  </p>
-                )}
-
-                {renderMediaCluster()}
+            ) : (
+              /* INLINE FLOW (Strict fieldOrder sequence across full card width) */
+              <div className="flex-1 flex flex-col justify-between overflow-hidden space-y-1">
+                {activeFieldOrder
+                  .filter((k) => k !== "header")
+                  .map((key) => renderField(key))}
               </div>
+            )}
+          </div>
+        )}
+      </div>
 
-              <div className="flex items-center justify-between gap-2 mt-auto">
-                {styling.showNotes !== false && itemData.additionalNotes ? (
-                  <p
-                    className={notesClass}
-                    style={{
-                      color: styling.textColor,
-                      ...getResolvedFieldStyle("notes", styling, cardFormat),
-                    }}
-                  >
-                    {itemData.additionalNotes}
-                  </p>
-                ) : (
-                  <div />
-                )}
-
-                {renderPrice()}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 5. Acrylic Base Margin Indicator (visible in UI guide, hidden when printing) */}
+      {/* 4. Acrylic Base Margin Indicator (visible in UI guide, hidden on print) */}
       {showAcrylicGuide && clampMargin !== "none" && (
         <div
           data-acrylic-guide="true"
