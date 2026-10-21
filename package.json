@@ -1,6 +1,7 @@
 {
-  "name": "savazai-webapps",
+  "name": "@savazar/savazai-webapps-platform",
   "version": "0.1.0",
+  "description": "SavazAI WebApps Platform - Multi-Domain Exhibition, Visual Catalog & Digital Monograph Suite",
   "private": true,
   "scripts": {
     "dev": "prisma db push --accept-data-loss && tsx prisma/seed.ts && next dev --port 3060",

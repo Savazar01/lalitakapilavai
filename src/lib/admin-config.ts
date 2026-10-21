@@ -14,7 +14,7 @@ export interface AdminPortalConfig {
 
 export const DEFAULT_ADMIN_CONFIG: AdminPortalConfig = {
   dashboardTitle: "Archive & Platform Dashboard",
-  sidebarBrandTitle: "SavazAI Atelier",
+  sidebarBrandTitle: "SavazAI WebApps",
   sidebarBrandSubtitle: "Control Center",
   sidebarLabels: {
     overview: "Overview",
@@ -32,7 +32,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminPortalConfig = {
   pageHeadings: {
     overview: {
       badge: "Administrative Overview",
-      title: "Welcome to SavazAI WebApps Atelier",
+      title: "Welcome to SavazAI WebApps Platform",
       subtitle: "Manage your collection catalog, dynamic watermarked assets, exhibitions, physical QR scan leads, and cultural archive.",
     },
     pages: {

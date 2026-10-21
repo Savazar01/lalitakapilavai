@@ -160,6 +160,7 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = React.useState(false);
   const [logoUploading, setLogoUploading] = React.useState(false);
   const [faviconUploading, setFaviconUploading] = React.useState(false);
+  const [adminLogoUploading, setAdminLogoUploading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
 
@@ -254,6 +255,9 @@ export default function AdminSettingsPage() {
     contactPhone: "",
     logoUrl: "",
     faviconUrl: "",
+    adminLoginTitle: "SavazAI WebApps Platform Admin",
+    adminLoginSubtitle: "Sign in with your authorized administrative credentials.",
+    adminLoginLogoUrl: "",
     copyrightNoticeHeader: "Archival Provenance & Copyright Notice",
     copyrightNoticeContent: "",
     defaultCurrency: "INR",
@@ -398,6 +402,9 @@ export default function AdminSettingsPage() {
             pinterestUrl: data.pinterestUrl || "",
             logoUrl: data.logoUrl || "",
             faviconUrl: data.faviconUrl || "",
+            adminLoginTitle: data.adminLoginTitle || "SavazAI WebApps Platform Admin",
+            adminLoginSubtitle: data.adminLoginSubtitle || "Sign in with your authorized administrative credentials.",
+            adminLoginLogoUrl: data.adminLoginLogoUrl || "",
           });
 
           if (data.footerConfig) {
@@ -568,6 +575,34 @@ export default function AdminSettingsPage() {
       toast.error(err instanceof Error ? err.message : "Failed to upload favicon");
     } finally {
       setFaviconUploading(false);
+    }
+  };
+
+  const handleAdminLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAdminLogoUploading(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("mediaType", "logo");
+    body.append("isArtwork", "false");
+
+    try {
+      const res = await fetch("/api/admin/media/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      const url = data.publicUrl || data.watermarkedUrl || data.primaryImageUrl;
+      setForm((prev) => ({ ...prev, adminLoginLogoUrl: url }));
+      toast.success("Admin login logo uploaded successfully!");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload admin login logo");
+    } finally {
+      setAdminLogoUploading(false);
     }
   };
 
@@ -983,6 +1018,105 @@ export default function AdminSettingsPage() {
                         </div>
                         <p className="text-[11px] text-muted-foreground">
                           Upload official website favicon (.ico, .png, or .svg, recommended 32x32px or 64x64px).
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Admin Login Portal Branding */}
+                  <div className="p-4 rounded-lg border border-primary/30 bg-primary/5 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground flex items-center gap-1.5 text-sm">
+                        <Shield className="w-4 h-4 text-primary" />
+                        Admin Login Screen Branding (/admin/login)
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Configure the title, subtitle, and custom logo/emblem displayed on the administrative login portal.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-4 pt-1">
+                      {form.adminLoginLogoUrl ? (
+                        <div className="relative group w-20 h-20 rounded-full border border-border bg-card/80 flex items-center justify-center p-2 shrink-0 overflow-hidden">
+                          <img
+                            src={form.adminLoginLogoUrl}
+                            alt="Admin Login Logo"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setForm((prev) => ({ ...prev, adminLoginLogoUrl: "" }))}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-20 h-20 rounded-full border border-dashed border-border flex flex-col items-center justify-center text-muted-foreground bg-muted/20 shrink-0">
+                          <Shield className="w-6 h-6 opacity-40 mb-1" />
+                          <span className="text-[9px]">Default Shield</span>
+                        </div>
+                      )}
+
+                      <div className="space-y-2 flex-1 w-full">
+                        <div className="space-y-1">
+                          <Label className="text-xs font-medium">Admin Login Logo / Emblem URL</Label>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              value={form.adminLoginLogoUrl}
+                              onChange={(e) => setForm({ ...form, adminLoginLogoUrl: e.target.value })}
+                              placeholder="https://... or upload custom image"
+                              className="text-xs"
+                            />
+                            <label className="cursor-pointer shrink-0">
+                              <input
+                                type="file"
+                                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                                onChange={handleAdminLogoUpload}
+                                disabled={adminLogoUploading}
+                                className="hidden"
+                              />
+                              <div className="inline-flex items-center px-3 py-1.5 rounded-md border border-border bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors">
+                                {adminLogoUploading ? (
+                                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                                ) : (
+                                  <Upload className="w-3.5 h-3.5 mr-1.5" />
+                                )}
+                                Upload
+                              </div>
+                            </label>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">
+                            Optional custom logo or crest. If left blank, the standard platform shield emblem is displayed.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/40">
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Admin Login Title</Label>
+                        <Input
+                          value={form.adminLoginTitle}
+                          onChange={(e) => setForm({ ...form, adminLoginTitle: e.target.value })}
+                          placeholder="SavazAI WebApps Platform Admin"
+                          className="text-xs"
+                        />
+                        <p className="text-[10px] text-muted-foreground">
+                          Main title rendered prominently on the login card and browser tab title.
+                        </p>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="font-semibold text-foreground">Admin Login Subtitle</Label>
+                        <Input
+                          value={form.adminLoginSubtitle}
+                          onChange={(e) => setForm({ ...form, adminLoginSubtitle: e.target.value })}
+                          placeholder="Sign in with your authorized administrative credentials."
+                          className="text-xs"
+                        />
+                        <p className="text-[10px] text-muted-foreground">
+                          Instructional subtitle rendered directly below the login title.
                         </p>
                       </div>
                     </div>

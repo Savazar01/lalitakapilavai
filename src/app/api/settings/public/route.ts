@@ -14,6 +14,9 @@ export async function GET() {
         contactPhone: true,
         logoUrl: true,
         faviconUrl: true,
+        adminLoginTitle: true,
+        adminLoginSubtitle: true,
+        adminLoginLogoUrl: true,
         formSecurityConfig: true,
       },
     });
@@ -24,13 +27,16 @@ export async function GET() {
 
     return NextResponse.json(
       {
-        siteName: settings?.siteName || "SavazAI WebApps",
+        siteName: settings?.siteName || "SavazAI WebApps Platform",
         archiveSubtitle: settings?.archiveSubtitle || "",
         siteDescription: settings?.siteDescription || "",
         contactEmail: settings?.contactEmail || "",
         contactPhone: settings?.contactPhone || "",
         logoUrl: settings?.logoUrl || null,
         faviconUrl: settings?.faviconUrl || null,
+        adminLoginTitle: settings?.adminLoginTitle || "SavazAI WebApps Platform Admin",
+        adminLoginSubtitle: settings?.adminLoginSubtitle || "Sign in with your authorized administrative credentials.",
+        adminLoginLogoUrl: settings?.adminLoginLogoUrl || null,
         formSecurityConfig: {
           contactForm: {
             enableCaptcha: Boolean(contactForm.enableCaptcha),

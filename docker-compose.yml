@@ -1,6 +1,7 @@
 services:
   db:
     image: pgvector/pgvector:pg17
+    container_name: savazai_postgres
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -16,14 +17,22 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - default
-      - coolify
+      default:
+        aliases:
+          - db
+          - savazai_postgres
+      coolify:
+        aliases:
+          - db
+          - savazai_postgres
 
   web:
     build:
       context: .
       dockerfile: Dockerfile
       target: runner
+    container_name: savazai_web
+    image: ${IMAGE_NAME:-savazai-web:latest}
     restart: always
     depends_on:
       db:
@@ -39,14 +48,14 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3060
-      # Inter-container communication uses service name 'db' on internal container port 5432
+      # Inter-container communication supports both 'db' and 'savazai_postgres' service aliases on port 5432
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-lalitakapilavai_prod}?schema=public
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD}
-      ADMIN_NAME: ${ADMIN_NAME:-Lalita Kapilavai Superadmin}
+      ADMIN_NAME: ${ADMIN_NAME:-SavazAI Platform Superadmin}
       STORAGE_PROVIDER: ${STORAGE_PROVIDER:-r2}
       S3_ENDPOINT: ${S3_ENDPOINT}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
@@ -54,7 +63,7 @@ services:
       S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
       S3_PUBLIC_DOMAIN: ${S3_PUBLIC_DOMAIN}
       S3_REGION: ${S3_REGION:-auto}
-      WATERMARK_TEXT: ${WATERMARK_TEXT:-© Lalita Kapilavai | lalitakapilavai.com}
+      WATERMARK_TEXT: ${WATERMARK_TEXT:-© SavazAI WebApps Platform - Archival Masterwork Protection}
       WATERMARK_OPACITY: ${WATERMARK_OPACITY:-0.75}
     volumes:
       - media_uploads:/app/public/media
@@ -64,9 +73,9 @@ services:
 
 volumes:
   postgres_prod_data:
-    name: lalita_postgres_prod_data
+    name: ${POSTGRES_VOLUME_NAME:-lalita_postgres_prod_data}
   media_uploads:
-    name: lalita_media_uploads
+    name: ${MEDIA_VOLUME_NAME:-lalita_media_uploads}
 
 networks:
   default:

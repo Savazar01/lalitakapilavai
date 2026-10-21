@@ -315,7 +315,8 @@ export async function POST(request: NextRequest) {
     const watermarkText =
       customWatermark ||
       systemSettings?.watermarkText ||
-      "© SavazAI WebApps | All Rights Reserved";
+      process.env.WATERMARK_TEXT ||
+      "© SavazAI WebApps Platform - Archival Masterwork Protection";
     const opacity =
       customOpacity !== null && !isNaN(customOpacity)
         ? customOpacity

@@ -69,14 +69,16 @@ async function main() {
   if (!existingSettings) {
     await prisma.systemSetting.create({
       data: {
-        siteName: "SavazAI WebApps — Digital Atelier & Cultural Archive",
+        siteName: "SavazAI WebApps Platform",
         archiveSubtitle: "Digital Exhibition & Cultural Suite",
         siteDescription:
           "Enterprise multi-tenant digital atelier, spatial exhibition corridor, and museum publishing system.",
         adminAlertEmail: adminEmail,
         contactEmail: "contact@savazar.com",
         contactPhone: null,
-        watermarkText: process.env.WATERMARK_TEXT || "© SavazAI WebApps | All Rights Reserved",
+        adminLoginTitle: "SavazAI WebApps Platform Admin",
+        adminLoginSubtitle: "Sign in with your authorized administrative credentials.",
+        watermarkText: process.env.WATERMARK_TEXT || "© SavazAI WebApps Platform - Archival Masterwork Protection",
         watermarkOpacity: parseFloat(process.env.WATERMARK_OPACITY || "0.35"),
         watermarkFontSize: 28,
         storageProvider: "LOCAL",
@@ -127,11 +129,25 @@ async function main() {
     });
     console.log("✅ Provisioned SystemSettings with watermark, storage, footer, and AI configs");
   } else {
-    console.log("🛡️ Existing SystemSetting detected. Skipping configuration overwrite to protect client data.");
+    // Backfill any null admin login branding fields without overwriting customized values
+    const settingsUpdates: Record<string, unknown> = {};
+    if (!existingSettings.adminLoginTitle) settingsUpdates.adminLoginTitle = "SavazAI WebApps Platform Admin";
+    if (!existingSettings.adminLoginSubtitle) settingsUpdates.adminLoginSubtitle = "Sign in with your authorized administrative credentials.";
+    if (Object.keys(settingsUpdates).length > 0) {
+      await prisma.systemSetting.update({
+        where: { id: existingSettings.id },
+        data: settingsUpdates,
+      });
+      console.log("🔧 Synchronized admin login branding defaults on existing SystemSetting");
+    }
+    console.log("🛡️ Existing SystemSetting detected. Preserving configuration to protect client data.");
   }
 
   // 3. Provision Default Art Categories
-  const categories = [
+  const fixturePack = (process.env.TENANT_FIXTURE_PACK || "generic").trim().toLowerCase();
+  console.log(`📦 Active Tenant Fixture Pack: "${fixturePack}"`);
+
+  const lalitaCategories = [
     {
       name: "Tanjore Paintings",
       slug: "tanjore-paintings",
@@ -182,6 +198,35 @@ async function main() {
       displayOrder: 7,
     },
   ];
+
+  const genericCategories = [
+    {
+      name: "Permanent Collection",
+      slug: "permanent-collection",
+      description: "Signature masterworks and historical acquisitions curated in the permanent collection.",
+      displayOrder: 1,
+    },
+    {
+      name: "Special Exhibitions",
+      slug: "special-exhibitions",
+      description: "Thematic exhibitions, international loans, and seasonal retrospectives.",
+      displayOrder: 2,
+    },
+    {
+      name: "Works on Paper & Canvas",
+      slug: "works-on-paper-canvas",
+      description: "Fine art canvas paintings, preparatory studies, and archival prints.",
+      displayOrder: 3,
+    },
+    {
+      name: "Sculpture & Three-Dimensional",
+      slug: "sculpture-3d",
+      description: "Spatial sculptures, bronze casts, reliefs, and installation art.",
+      displayOrder: 4,
+    },
+  ];
+
+  const categories = fixturePack === "lalita" ? lalitaCategories : genericCategories;
 
   for (const cat of categories) {
     const existing = await prisma.artCategory.findUnique({

@@ -81,6 +81,22 @@ export async function PUT(request: NextRequest) {
           : undefined,
       emailLogoUrl: body.emailLogoUrl !== undefined ? (body.emailLogoUrl ? String(body.emailLogoUrl).trim() : null) : undefined,
       emailFooterText: body.emailFooterText !== undefined ? (body.emailFooterText ? String(body.emailFooterText).trim() : null) : undefined,
+      adminLoginTitle:
+        body.adminLoginTitle !== undefined
+          ? (body.adminLoginTitle && String(body.adminLoginTitle).trim() !== ""
+              ? String(body.adminLoginTitle).trim()
+              : "SavazAI WebApps Platform Admin")
+          : undefined,
+      adminLoginSubtitle:
+        body.adminLoginSubtitle !== undefined
+          ? (body.adminLoginSubtitle && String(body.adminLoginSubtitle).trim() !== ""
+              ? String(body.adminLoginSubtitle).trim()
+              : "Sign in with your authorized administrative credentials.")
+          : undefined,
+      adminLoginLogoUrl:
+        body.adminLoginLogoUrl !== undefined
+          ? (body.adminLoginLogoUrl ? String(body.adminLoginLogoUrl).trim() : null)
+          : undefined,
       contactEmail: body.contactEmail !== undefined ? (body.contactEmail ? String(body.contactEmail).trim() : null) : undefined,
       contactPhone: body.contactPhone !== undefined ? (body.contactPhone ? String(body.contactPhone).trim() : null) : undefined,
       watermarkText: body.watermarkText,
@@ -170,6 +186,8 @@ export async function PUT(request: NextRequest) {
       revalidatePath("/artwork/[slug]", "page");
       revalidatePath("/events/[slug]", "page");
       revalidatePath("/admin/settings");
+      revalidatePath("/admin/login");
+      revalidatePath("/api/settings/public");
     } catch (revErr) {
       console.warn("Settings cache revalidation notice:", revErr);
     }

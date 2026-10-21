@@ -26,6 +26,31 @@ function LoginForm() {
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
+  // Dynamic Admin Login Branding
+  const [loginTitle, setLoginTitle] = React.useState("SavazAI WebApps Platform Admin");
+  const [loginSubtitle, setLoginSubtitle] = React.useState("Sign in with your authorized administrative credentials.");
+  const [loginLogoUrl, setLoginLogoUrl] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    fetch("/api/settings/public")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          if (data.adminLoginTitle) setLoginTitle(data.adminLoginTitle);
+          if (data.adminLoginSubtitle) setLoginSubtitle(data.adminLoginSubtitle);
+          if (data.adminLoginLogoUrl) {
+            setLoginLogoUrl(data.adminLoginLogoUrl);
+          } else if (data.logoUrl) {
+            setLoginLogoUrl(data.logoUrl);
+          }
+          if (data.adminLoginTitle) {
+            document.title = `${data.adminLoginTitle} | Restricted Access`;
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -58,17 +83,25 @@ function LoginForm() {
       <div className="h-1.5 w-full bg-slate-900 dark:bg-slate-100" />
 
       <CardHeader className="text-center pb-4 pt-6">
-        <div className="mx-auto w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-border flex items-center justify-center mb-3">
-          <Shield className="w-6 h-6 text-foreground" />
+        <div className="mx-auto w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 border border-border flex items-center justify-center mb-3 overflow-hidden p-1 shadow-2xs">
+          {loginLogoUrl ? (
+            <img
+              src={loginLogoUrl}
+              alt={loginTitle}
+              className="w-full h-full object-contain rounded-full"
+            />
+          ) : (
+            <Shield className="w-6 h-6 text-foreground" />
+          )}
         </div>
         <span className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground font-semibold">
           Restricted Access
         </span>
         <CardTitle className="text-2xl mt-1 text-foreground font-serif">
-          SavazAI Atelier Admin
+          {loginTitle}
         </CardTitle>
         <CardDescription className="text-xs">
-          Sign in with your authorized administrative credentials.
+          {loginSubtitle}
         </CardDescription>
       </CardHeader>
 

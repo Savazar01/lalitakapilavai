@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = isBuilding
     ? null
     : await prisma.systemSetting.findFirst().catch(() => null);
-  const title = settings?.siteName || "SavazAI WebApps — Digital Atelier & Cultural Archive";
+  const title = settings?.siteName || process.env.NEXT_PUBLIC_APP_NAME || "SavazAI WebApps Platform";
   const description =
     settings?.siteDescription ||
     "Enterprise multi-tenant digital atelier, spatial exhibition corridor, and museum publishing system.";

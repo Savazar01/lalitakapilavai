@@ -40,7 +40,11 @@ export function generateWatermarkSvg(options: WatermarkOptions): string {
       ? "REPEAT_DIAGONAL"
       : "REPEAT_DIAGONAL";
 
-  const safeText = escapeXml(text || "© SavazAI WebApps | All Rights Reserved");
+  const safeText = escapeXml(
+    text ||
+      process.env.WATERMARK_TEXT ||
+      "© SavazAI WebApps Platform - Archival Masterwork Protection"
+  );
 
   // Proportional font sizing
   const computedFontSize =

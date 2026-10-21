@@ -98,10 +98,15 @@ model SystemSetting {
   contactPhone      String?
 
   // Email Notification & Outbound Branding
-  emailHeaderTitle    String?  @default("SavazAI Atelier")
+  emailHeaderTitle    String?  @default("SavazAI WebApps Platform")
   emailHeaderSubtitle String?  @default("Fine Art & Cultural Archive")
   emailLogoUrl        String?
   emailFooterText     String?  @default("Inbound atelier inquiry and archival correspondence.")
+
+  // Admin Login Portal Branding
+  adminLoginTitle     String?  @default("SavazAI WebApps Platform Admin")
+  adminLoginSubtitle  String?  @default("Sign in with your authorized administrative credentials.")
+  adminLoginLogoUrl   String?
 
   // Watermark parameters
   watermarkText     String   @default("© SavazAI WebApps | All Rights Reserved")
