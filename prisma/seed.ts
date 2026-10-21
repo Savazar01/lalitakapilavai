@@ -9,11 +9,18 @@ async function main() {
 
   // 1. Provision Superadmin User
   const adminEmail = (process.env.ADMIN_EMAIL || "admin@savazar.com").trim().toLowerCase();
-  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || "AdminPassword2026!";
+  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || (process.env.NODE_ENV === "production" ? "AdminPassword2026!" : "SavazAIPassword2026!");
   const adminName = process.env.ADMIN_NAME || "SavazAI Platform Admin";
+  const adminUsername = (process.env.ADMIN_USERNAME || "SavazAI_Admin").trim();
+  const isDev = process.env.NODE_ENV !== "production";
 
-  let superadmin = await prisma.user.findUnique({
-    where: { email: adminEmail },
+  let superadmin = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: adminEmail },
+        { username: adminUsername },
+      ],
+    },
   });
 
   if (!superadmin) {
@@ -21,9 +28,11 @@ async function main() {
     superadmin = await prisma.user.create({
       data: {
         name: adminName,
+        username: adminUsername,
         email: adminEmail,
         role: Role.SUPER_ADMIN,
         emailVerified: true,
+        mustChangePassword: isDev,
       },
     });
 
@@ -36,8 +45,25 @@ async function main() {
         password: hashedPassword,
       },
     });
-    console.log(`✅ Provisioned new Superadmin account: ${adminEmail}`);
+    console.log(`✅ Provisioned new Superadmin account: ${adminUsername} (${adminEmail}) [mustChangePassword=${isDev}]`);
   } else {
+    // Synchronize username and credentials
+    const updateData: Record<string, unknown> = {};
+    if (!superadmin.username || superadmin.username !== adminUsername) {
+      updateData.username = adminUsername;
+    }
+    if (isDev && superadmin.mustChangePassword === undefined) {
+      updateData.mustChangePassword = true;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      superadmin = await prisma.user.update({
+        where: { id: superadmin.id },
+        data: updateData,
+      });
+      console.log(`🔧 Updated Superadmin user record: username=${adminUsername}`);
+    }
+
     // If account record is missing or password was supplied via env, synchronize it
     const existingAccount = await prisma.account.findFirst({
       where: { userId: superadmin.id, providerId: "credential" },
@@ -59,10 +85,10 @@ async function main() {
         where: { id: existingAccount.id },
         data: { password: hashedPassword },
       });
-      console.log(`🔑 Synchronized Superadmin credentials for: ${adminEmail}`);
+      console.log(`🔑 Synchronized Superadmin credentials for: ${adminUsername} (${adminEmail})`);
     }
   }
-  console.log(`🔑 Superadmin Status -> Email: ${adminEmail}`);
+  console.log(`🔑 Superadmin Status -> Username: ${adminUsername} | Email: ${adminEmail}`);
 
   // 2. Provision Default SystemSetting
   const existingSettings = await prisma.systemSetting.findFirst();

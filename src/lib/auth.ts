@@ -41,6 +41,17 @@ export const auth = betterAuth({
         defaultValue: "ADMIN",
         input: false, // Prevent user role tampering
       },
+      username: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      mustChangePassword: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
     },
   },
 });

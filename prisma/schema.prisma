@@ -23,17 +23,19 @@ enum Role {
 }
 
 model User {
-  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  role          Role      @default(ADMIN)
-  status        String    @default("ACTIVE") // ACTIVE, SUSPENDED
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id                 String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name               String
+  username           String?   @unique
+  email              String    @unique
+  emailVerified      Boolean   @default(false)
+  image              String?
+  role               Role      @default(ADMIN)
+  status             String    @default("ACTIVE") // ACTIVE, SUSPENDED
+  mustChangePassword Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  sessions           Session[]
+  accounts           Account[]
 
   @@map("users")
 }

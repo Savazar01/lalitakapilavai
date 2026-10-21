@@ -271,8 +271,8 @@ SavazAI WebApps Platform
 
 ### Step 1: Clone and Configure Environment
 ```bash
-git clone https://github.com/Savazar01/lalitakapilavai.git
-cd lalitakapilavai
+git clone https://github.com/Savazar01/savazai-webapps-platform.git
+cd savazai-webapps-platform
 cp .env.example .env
 ```
 
@@ -310,7 +310,7 @@ The platform is engineered for **100% zero-touch deployment** on any VPS running
 
 1. **Step 1: Create Resource in Coolify**
    - In Coolify, click **+ New** -> **Git Repository**.
-   - URL: `https://github.com/Savazar01/lalitakapilavai` | Branch: `main`.
+   - URL: `https://github.com/Savazar01/savazai-webapps-platform` | Branch: `main`.
 2. **Step 2: Set Build Pack**
    - Select **Docker Compose** (Coolify detects root `docker-compose.yml`).
 3. **Step 3: Assign Domain & Traefik Routing**

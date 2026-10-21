@@ -9,6 +9,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 <!-- END:nextjs-agent-rules -->
 
 # Operational Context & Architecture: SavazAI WebApps Platform
+Repository: https://github.com/Savazar01/savazai-webapps-platform
 
 ## 1. Platform Vision & Multi-Tenant Atelier Architecture
 - **Platform**: SavazAI WebApps (Engineered & Owned by Savazar).

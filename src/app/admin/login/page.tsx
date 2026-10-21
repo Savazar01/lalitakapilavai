@@ -21,7 +21,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/admin";
 
-  const [email, setEmail] = React.useState("");
+  const [identifier, setIdentifier] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -57,8 +57,30 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
+      let resolvedEmail = identifier.trim();
+
+      // Resolve username to email if identifier doesn't contain '@'
+      if (!resolvedEmail.includes("@")) {
+        const resolveRes = await fetch("/api/auth/resolve-identifier", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier: resolvedEmail }),
+        });
+
+        if (resolveRes.ok) {
+          const resolveData = await resolveRes.json();
+          if (resolveData?.email) {
+            resolvedEmail = resolveData.email;
+          }
+        } else {
+          setError("Invalid username or email address");
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const result = await signIn.email({
-        email,
+        email: resolvedEmail,
         password,
       });
 
@@ -66,6 +88,19 @@ function LoginForm() {
         setError(result.error.message || "Invalid administrative credentials");
         setIsLoading(false);
       } else {
+        // In local development, check if user must change password
+        if (process.env.NODE_ENV === "development") {
+          const meRes = await fetch("/api/admin/me");
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            if (meData?.user?.mustChangePassword) {
+              router.push("/admin/change-password");
+              router.refresh();
+              return;
+            }
+          }
+        }
+
         router.push(redirectUrl);
         router.refresh();
       }
@@ -119,21 +154,21 @@ function LoginForm() {
 
           <div className="space-y-1.5 text-left">
             <label
-              htmlFor="email"
+              htmlFor="identifier"
               className="text-xs font-semibold uppercase tracking-wider text-foreground/80 flex items-center gap-1.5"
             >
               <Mail className="w-3.5 h-3.5 text-primary" />
-              Email Address
+              Username or Email
             </label>
             <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="admin@yourdomain.com"
-              autoComplete="email"
+              id="identifier"
+              name="identifier"
+              type="text"
+              placeholder="SavazAI_Admin"
+              autoComplete="username"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               disabled={isLoading}
             />
           </div>

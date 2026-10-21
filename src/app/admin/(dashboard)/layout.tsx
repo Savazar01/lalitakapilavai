@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   Sheet,
@@ -20,12 +21,27 @@ export default function AdminDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
   const [adminConfig, setAdminConfig] = React.useState<AdminPortalConfig>(DEFAULT_ADMIN_CONFIG);
+  const [mustChangePassword, setMustChangePassword] = React.useState(false);
 
   React.useEffect(() => {
     let ignore = false;
+
+    // Localhost password change guard
+    if (process.env.NODE_ENV === "development") {
+      fetch("/api/admin/me")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (!ignore && data?.user?.mustChangePassword) {
+            setMustChangePassword(true);
+            router.push("/admin/change-password");
+          }
+        })
+        .catch(() => {});
+    }
 
     const fetchPortalSettings = async () => {
       try {
@@ -54,7 +70,7 @@ export default function AdminDashboardLayout({
       ignore = true;
       window.removeEventListener("adminConfigUpdated", handleConfigUpdate);
     };
-  }, []);
+  }, [router]);
 
   const brandTitle = adminConfig.sidebarBrandTitle || DEFAULT_ADMIN_CONFIG.sidebarBrandTitle;
 
