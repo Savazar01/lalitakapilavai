@@ -394,7 +394,19 @@ All code generation and architectural modifications must adhere to the specializ
 ### Q. Mobile QR Scan Onboarding, Safe-Area & Persistent Device Identity
 - **Mobile Viewport Safe-Area Padding**:
   - Physical QR placard scan intake modals and gates must enforce dynamic viewport heights and iOS home indicator insets: `pb-[calc(1.5rem+env(safe-area-inset-bottom))]` with `max-h-[92dvh] sm:max-h-[85dvh]` and `overflow-y-auto`.
-  - Primary action buttons ("Unlock Masterwork Details") must be placed inside sticky action footers (`sticky bottom-0 bg-card/95 backdrop-blur-sm`), ensuring full visibility above mobile browser toolbars on iPhone Safari and Android Chrome.
+  - Primary action buttons must be placed inside sticky action footers (`sticky bottom-0 bg-card/95 backdrop-blur-sm`), ensuring full visibility above mobile browser toolbars on iPhone Safari and Android Chrome.
+- **Configurable Artwork QR Lead-Capture Gate in System Settings**:
+  - Configurable via a dedicated **QR Scan Gate** tab in `/admin/settings` (`value="qr-scan"`):
+    - **Eyebrow / Badge Text**: Customizable badge text alongside the QR emblem (default: `EXHIBITION FLOOR GUIDE`).
+    - **Modal Header Title**: Customizable modal title (default: `Welcome to the Exhibition`).
+    - **Lead Capture Prompt Template**: Dynamic template string supporting `{{artworkName}}` and `{artwork}` placeholders (default: `Enter your details to explore details of the Artwork "{{artworkName}}".`), resolving dynamically per scanned artwork.
+    - **Action Button Label**: Customizable CTA button label (default: `Unlock Masterwork Details`).
+    - **Allow 'Skip & View' Link**: Switch toggle controlling whether visitors can bypass intake without submitting contact details.
+  - Features a real-time **Live Mobile Dialog Preview** displaying interactive token interpolation and layout changes directly in the admin workspace.
+- **Strict Mandatory Email Invariant for CRM Leads**:
+  - Email Address is ALWAYS required (`EMAIL ADDRESS *`, `required: true`, RFC 5322 regex validation) on all physical QR intake gates.
+  - The `(OPTIONAL)` suffix is eradicated.
+  - Server-side validation in `POST /api/leads/qr-scan` rejects non-background submissions without a valid email with `400 Bad Request`, strictly enforced even if CAPTCHA challenge or Email OTP are toggled OFF in System Settings.
 - **Mandatory Phone / WhatsApp**:
   - WhatsApp / Phone Number is marked required (`*`, `required: true`) across physical gallery floor QR scan gates to ensure valid patron outreach and acquisition telemetry.
 - **Frictionless Subsequent Scans via Device Recognition**:

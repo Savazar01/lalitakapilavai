@@ -110,6 +110,13 @@ model SystemSetting {
   adminLoginSubtitle  String?  @default("Sign in with your authorized administrative credentials.")
   adminLoginLogoUrl   String?
 
+  // QR Lead Intake Modal Customization
+  qrGateBadgeText     String?  @default("EXHIBITION FLOOR GUIDE")
+  qrGateHeaderTitle   String?  @default("Welcome to the Exhibition")
+  qrGatePromptText    String?  @default("Enter your details to explore details of the Artwork \"{{artworkName}}\".")
+  qrGateButtonLabel   String?  @default("Unlock Masterwork Details")
+  qrGateAllowSkip     Boolean  @default(true)
+
   // Watermark parameters
   watermarkText     String   @default("© SavazAI WebApps | All Rights Reserved")
   watermarkOpacity  Float    @default(0.4)

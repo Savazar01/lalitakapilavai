@@ -97,6 +97,28 @@ export async function PUT(request: NextRequest) {
         body.adminLoginLogoUrl !== undefined
           ? (body.adminLoginLogoUrl ? String(body.adminLoginLogoUrl).trim() : null)
           : undefined,
+      qrGateBadgeText:
+        body.qrGateBadgeText !== undefined
+          ? (body.qrGateBadgeText ? String(body.qrGateBadgeText).trim() : "EXHIBITION FLOOR GUIDE")
+          : undefined,
+      qrGateHeaderTitle:
+        body.qrGateHeaderTitle !== undefined
+          ? (body.qrGateHeaderTitle ? String(body.qrGateHeaderTitle).trim() : "Welcome to the Exhibition")
+          : undefined,
+      qrGatePromptText:
+        body.qrGatePromptText !== undefined
+          ? (body.qrGatePromptText
+              ? String(body.qrGatePromptText).trim()
+              : 'Enter your details to explore details of the Artwork "{{artworkName}}".')
+          : undefined,
+      qrGateButtonLabel:
+        body.qrGateButtonLabel !== undefined
+          ? (body.qrGateButtonLabel ? String(body.qrGateButtonLabel).trim() : "Unlock Masterwork Details")
+          : undefined,
+      qrGateAllowSkip:
+        body.qrGateAllowSkip !== undefined
+          ? Boolean(body.qrGateAllowSkip)
+          : undefined,
       contactEmail: body.contactEmail !== undefined ? (body.contactEmail ? String(body.contactEmail).trim() : null) : undefined,
       contactPhone: body.contactPhone !== undefined ? (body.contactPhone ? String(body.contactPhone).trim() : null) : undefined,
       watermarkText: body.watermarkText,

@@ -84,6 +84,11 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
       formSecurityConfig: true,
       copyrightNoticeHeader: true,
       copyrightNoticeContent: true,
+      qrGateBadgeText: true,
+      qrGateHeaderTitle: true,
+      qrGatePromptText: true,
+      qrGateButtonLabel: true,
+      qrGateAllowSkip: true,
     },
   });
   const watermarkConfig = (settings?.watermarkConfig as Record<string, unknown>) || {};
@@ -117,6 +122,11 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
           artworkTitle={artwork.title}
           enableCaptcha={enableCaptcha}
           enableEmailOtp={enableEmailOtp}
+          qrGateBadgeText={settings?.qrGateBadgeText || undefined}
+          qrGateHeaderTitle={settings?.qrGateHeaderTitle || undefined}
+          qrGatePromptText={settings?.qrGatePromptText || undefined}
+          qrGateButtonLabel={settings?.qrGateButtonLabel || undefined}
+          qrGateAllowSkip={settings?.qrGateAllowSkip !== false}
         />
       </Suspense>
 

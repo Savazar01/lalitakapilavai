@@ -17,6 +17,11 @@ export async function GET() {
         adminLoginTitle: true,
         adminLoginSubtitle: true,
         adminLoginLogoUrl: true,
+        qrGateBadgeText: true,
+        qrGateHeaderTitle: true,
+        qrGatePromptText: true,
+        qrGateButtonLabel: true,
+        qrGateAllowSkip: true,
         formSecurityConfig: true,
       },
     });
@@ -37,6 +42,13 @@ export async function GET() {
         adminLoginTitle: settings?.adminLoginTitle || "SavazAI WebApps Platform Admin",
         adminLoginSubtitle: settings?.adminLoginSubtitle || "Sign in with your authorized administrative credentials.",
         adminLoginLogoUrl: settings?.adminLoginLogoUrl || null,
+        qrGateBadgeText: settings?.qrGateBadgeText || "EXHIBITION FLOOR GUIDE",
+        qrGateHeaderTitle: settings?.qrGateHeaderTitle || "Welcome to the Exhibition",
+        qrGatePromptText:
+          settings?.qrGatePromptText ||
+          'Enter your details to explore details of the Artwork "{{artworkName}}".',
+        qrGateButtonLabel: settings?.qrGateButtonLabel || "Unlock Masterwork Details",
+        qrGateAllowSkip: settings?.qrGateAllowSkip !== false,
         formSecurityConfig: {
           contactForm: {
             enableCaptcha: Boolean(contactForm.enableCaptcha),

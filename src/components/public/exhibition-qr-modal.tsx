@@ -77,6 +77,11 @@ export interface ExhibitionQrModalProps {
   artworkTitle: string;
   enableCaptcha?: boolean;
   enableEmailOtp?: boolean;
+  qrGateBadgeText?: string;
+  qrGateHeaderTitle?: string;
+  qrGatePromptText?: string;
+  qrGateButtonLabel?: string;
+  qrGateAllowSkip?: boolean;
 }
 
 export function ExhibitionQrModal({
@@ -84,6 +89,11 @@ export function ExhibitionQrModal({
   artworkTitle,
   enableCaptcha = false,
   enableEmailOtp = false,
+  qrGateBadgeText,
+  qrGateHeaderTitle,
+  qrGatePromptText,
+  qrGateButtonLabel,
+  qrGateAllowSkip,
 }: ExhibitionQrModalProps) {
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -93,6 +103,70 @@ export function ExhibitionQrModal({
   const [privacyConsent, setPrivacyConsent] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [unlocked, setUnlocked] = React.useState(false);
+
+  // Dynamic QR Lead Gate Configuration with Public Settings Fallback
+  const [fetchedSettings, setFetchedSettings] = React.useState<{
+    badgeText?: string;
+    headerTitle?: string;
+    promptText?: string;
+    buttonLabel?: string;
+    allowSkip?: boolean;
+  } | null>(null);
+
+  React.useEffect(() => {
+    const hasAllProps =
+      qrGateBadgeText !== undefined &&
+      qrGateHeaderTitle !== undefined &&
+      qrGatePromptText !== undefined &&
+      qrGateButtonLabel !== undefined &&
+      qrGateAllowSkip !== undefined;
+
+    if (hasAllProps) return;
+
+    fetch("/api/settings/public")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          setFetchedSettings({
+            badgeText: data.qrGateBadgeText,
+            headerTitle: data.qrGateHeaderTitle,
+            promptText: data.qrGatePromptText,
+            buttonLabel: data.qrGateButtonLabel,
+            allowSkip: data.qrGateAllowSkip,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [
+    qrGateBadgeText,
+    qrGateHeaderTitle,
+    qrGatePromptText,
+    qrGateButtonLabel,
+    qrGateAllowSkip,
+  ]);
+
+  const effectiveBadgeText =
+    qrGateBadgeText || fetchedSettings?.badgeText || "EXHIBITION FLOOR GUIDE";
+  const effectiveHeaderTitle =
+    qrGateHeaderTitle || fetchedSettings?.headerTitle || "Welcome to the Exhibition";
+  const effectivePromptText =
+    qrGatePromptText ||
+    fetchedSettings?.promptText ||
+    'Enter your details to explore details of the Artwork "{{artworkName}}".';
+  const effectiveButtonLabel =
+    qrGateButtonLabel || fetchedSettings?.buttonLabel || "Unlock Masterwork Details";
+  const effectiveAllowSkip =
+    qrGateAllowSkip !== undefined
+      ? qrGateAllowSkip
+      : fetchedSettings?.allowSkip !== undefined
+      ? fetchedSettings.allowSkip
+      : true;
+
+  const resolvedPrompt = React.useMemo(() => {
+    return effectivePromptText
+      .replace(/\{\{artworkName\}\}/g, artworkTitle)
+      .replace(/\{artwork\}/g, artworkTitle);
+  }, [effectivePromptText, artworkTitle]);
 
   // Form Security & Anti-Bot States
   const [captchaValue, setCaptchaValue] = React.useState<FormCaptchaValue>({ token: "", answer: "" });
@@ -199,8 +273,13 @@ export function ExhibitionQrModal({
       toast.error("Please enter your WhatsApp / phone number.");
       return;
     }
-    if (enableEmailOtp && !email.trim()) {
-      toast.error("Email address is required for verification.");
+    if (!email.trim()) {
+      toast.error("Email address is required to explore this artwork.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast.error("Please enter a valid email address.");
       return;
     }
     if (!privacyConsent) {
@@ -221,7 +300,7 @@ export function ExhibitionQrModal({
       visitorId,
       name: name.trim(),
       phone: phone.trim(),
-      email: email.trim() || undefined,
+      email: email.trim(),
     };
 
     const basePayload = {
@@ -292,10 +371,10 @@ export function ExhibitionQrModal({
             <div className="py-8 text-center space-y-3">
               <CheckCircle className="w-12 h-12 text-primary mx-auto animate-bounce" />
               <DialogTitle className="text-xl font-serif font-bold text-foreground">
-                Welcome to the Exhibition
+                {effectiveHeaderTitle}
               </DialogTitle>
               <p className="text-xs text-muted-foreground">
-                Masterwork commentary, 22k gold relief details, and synesthetic raga links unlocked.
+                Masterwork commentary, curatorial details, and archival provenance unlocked.
               </p>
             </div>
           ) : (
@@ -303,13 +382,13 @@ export function ExhibitionQrModal({
               <DialogHeader className="text-left space-y-2">
                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
                   <QrCode className="w-4 h-4" />
-                  Exhibition Floor Guide
+                  {effectiveBadgeText}
                 </div>
                 <DialogTitle className="text-lg sm:text-xl font-serif font-bold text-foreground">
-                  Welcome to the Exhibition
+                  {effectiveHeaderTitle}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-                  Enter your details to explore this masterpiece, view 22k gold leaf relief details, and access curator commentary for &quot;{artworkTitle}&quot;.
+                  {resolvedPrompt}
                 </DialogDescription>
               </DialogHeader>
 
@@ -343,14 +422,14 @@ export function ExhibitionQrModal({
 
                 <div className="space-y-1">
                   <label className="text-xs font-semibold uppercase tracking-wider text-foreground">
-                    Email Address {enableEmailOtp ? "*" : "(Optional)"}
+                    Email Address *
                   </label>
                   <Input
                     type="email"
                     placeholder="radhika@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required={enableEmailOtp}
+                    required
                     className="text-xs h-9"
                   />
                 </div>
@@ -375,15 +454,17 @@ export function ExhibitionQrModal({
               </div>
 
               <DialogFooter className="flex-col sm:flex-row gap-2 pt-2 border-t border-border/50 sticky bottom-0 bg-card/95 backdrop-blur-sm -mx-2 px-2 pb-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsOpen(false)}
-                  className="text-xs text-muted-foreground order-2 sm:order-1 cursor-pointer"
-                >
-                  Skip &amp; View
-                </Button>
+                {effectiveAllowSkip && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsOpen(false)}
+                    className="text-xs text-muted-foreground order-2 sm:order-1 cursor-pointer"
+                  >
+                    Skip &amp; View
+                  </Button>
+                )}
                 <Button
                   type="submit"
                   variant="gold"
@@ -393,7 +474,7 @@ export function ExhibitionQrModal({
                     !privacyConsent ||
                     !name.trim() ||
                     !phone.trim() ||
-                    (enableEmailOtp && !email.trim()) ||
+                    !email.trim() ||
                     (enableCaptcha && (!captchaValue.token || !captchaValue.answer.trim()))
                   }
                   className="gap-2 font-serif font-bold order-1 sm:order-2 w-full sm:w-auto cursor-pointer"
@@ -406,7 +487,7 @@ export function ExhibitionQrModal({
                   ) : (
                     <>
                       <Sparkles className="w-3.5 h-3.5" />
-                      Unlock Masterwork Details
+                      {effectiveButtonLabel}
                     </>
                   )}
                 </Button>

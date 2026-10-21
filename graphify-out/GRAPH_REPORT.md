@@ -1,16 +1,16 @@
 # Graph Report - lalitakapilavai  (2026-10-21)
 
 ## Corpus Check
-- 241 files · ~284,253 words
+- 241 files · ~285,636 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1532 nodes · 3678 edges · 97 communities (79 shown, 18 thin omitted)
+- 1532 nodes · 3678 edges · 96 communities (79 shown, 17 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f9aa0b8d`
+- Built from commit: `ae924502`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -90,7 +90,6 @@
 - [[_COMMUNITY_Community 78|Community 78]]
 - [[_COMMUNITY_Community 79|Community 79]]
 - [[_COMMUNITY_Community 80|Community 80]]
-- [[_COMMUNITY_Community 81|Community 81]]
 - [[_COMMUNITY_Community 82|Community 82]]
 - [[_COMMUNITY_Community 83|Community 83]]
 - [[_COMMUNITY_Community 85|Community 85]]
@@ -129,7 +128,7 @@
 - `AlternatingTimelineList()` --calls--> `cn()`  [EXTRACTED]
   src/components/public/blocks/timeline-block.tsx → src/lib/utils.ts
 
-## Communities (97 total, 18 thin omitted)
+## Communities (96 total, 17 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.13
@@ -200,8 +199,8 @@ Cohesion: 0.25
 Nodes (7): 1. React Server Component (RSC) Boundaries, 2. Server-Side Data Fetching & Deduplication, 3. Zero-FOUC Theming & Hydration Safeguards, 4. Performance & Re-render Prevention, code:typescript (export async function getDashboardData() {), code:tsx (<ThemeProvider), Skill: Vercel React & Next.js 16 Best Practices
 
 ### Community 18 - "Community 18"
-Cohesion: 0.11
-Nodes (3): fetchThumbnailBuffer(), GET(), globalForPrisma
+Cohesion: 0.10
+Nodes (4): fetchThumbnailBuffer(), GET(), globalForPrisma, RouteParams
 
 ### Community 19 - "Community 19"
 Cohesion: 0.36
@@ -212,7 +211,7 @@ Cohesion: 0.12
 Nodes (26): ArtworkBulkImportModal(), ArtworkBulkImportModalProps, ImportAuditItem, ImportAuditResult, EmailTiptapEditorProps, MediaVaultDialogProps, MediaVaultItem, ECatalogListItem (+18 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.08
+Cohesion: 0.07
 Nodes (4): { GET, POST }, auth, AuthSession, MediaVaultItem
 
 ### Community 31 - "Community 31"
@@ -418,7 +417,7 @@ Nodes (23): DashboardLayoutManager(), DashboardWidgetData, iconRegistry, Metrics
 ## Knowledge Gaps
 - **564 isolated node(s):** `docker-entrypoint.sh script`, `eslintConfig`, `nextConfig`, `name`, `version` (+559 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

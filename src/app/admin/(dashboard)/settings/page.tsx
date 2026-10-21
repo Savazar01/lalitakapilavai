@@ -33,6 +33,7 @@ import {
   Eye,
   EyeOff,
   Server,
+  QrCode,
 } from "lucide-react";
 import {
   DetailedThemeConfig,
@@ -258,6 +259,11 @@ export default function AdminSettingsPage() {
     adminLoginTitle: "SavazAI WebApps Platform Admin",
     adminLoginSubtitle: "Sign in with your authorized administrative credentials.",
     adminLoginLogoUrl: "",
+    qrGateBadgeText: "EXHIBITION FLOOR GUIDE",
+    qrGateHeaderTitle: "Welcome to the Exhibition",
+    qrGatePromptText: 'Enter your details to explore details of the Artwork "{{artworkName}}".',
+    qrGateButtonLabel: "Unlock Masterwork Details",
+    qrGateAllowSkip: true,
     copyrightNoticeHeader: "Archival Provenance & Copyright Notice",
     copyrightNoticeContent: "",
     defaultCurrency: "INR",
@@ -405,6 +411,13 @@ export default function AdminSettingsPage() {
             adminLoginTitle: data.adminLoginTitle || "SavazAI WebApps Platform Admin",
             adminLoginSubtitle: data.adminLoginSubtitle || "Sign in with your authorized administrative credentials.",
             adminLoginLogoUrl: data.adminLoginLogoUrl || "",
+            qrGateBadgeText: data.qrGateBadgeText || "EXHIBITION FLOOR GUIDE",
+            qrGateHeaderTitle: data.qrGateHeaderTitle || "Welcome to the Exhibition",
+            qrGatePromptText:
+              data.qrGatePromptText ||
+              'Enter your details to explore details of the Artwork "{{artworkName}}".',
+            qrGateButtonLabel: data.qrGateButtonLabel || "Unlock Masterwork Details",
+            qrGateAllowSkip: data.qrGateAllowSkip !== false,
           });
 
           if (data.footerConfig) {
@@ -840,6 +853,12 @@ export default function AdminSettingsPage() {
                 className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
               >
                 <Sliders className="w-3.5 h-3.5 mr-1" /> White-Labeling
+              </TabsTrigger>
+              <TabsTrigger
+                value="qr-scan"
+                className="text-xs py-2 rounded-lg font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:border-slate-900 dark:data-[state=active]:bg-slate-100 dark:data-[state=active]:text-slate-900 dark:data-[state=active]:border-slate-100 shadow-2xs transition-all"
+              >
+                <QrCode className="w-3.5 h-3.5 mr-1" /> QR Scan Gate
               </TabsTrigger>
               <TabsTrigger
                 value="watermark"
@@ -1574,6 +1593,276 @@ export default function AdminSettingsPage() {
                         <Save className="w-4 h-4" />
                       )}
                       Save White-Label Configuration
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab: QR Scan Lead Intake Gate */}
+            <TabsContent value="qr-scan">
+              <Card className="border border-border/80 shadow-sm">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="font-serif text-lg flex items-center gap-2">
+                        <QrCode className="w-5 h-5 text-primary" />
+                        Artwork QR Lead-Capture Gate Configuration
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Configure the interactive floor-guide modal displayed to mobile visitors scanning physical gallery & salon wall QR codes.
+                      </CardDescription>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={handleSave}
+                      disabled={saving}
+                      size="sm"
+                      className="text-xs gap-1.5"
+                    >
+                      {saving ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Save className="w-3.5 h-3.5" />
+                      )}
+                      Save QR Gate Settings
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-6 text-xs">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Left Column: Form Configuration Controls */}
+                    <div className="lg:col-span-7 space-y-6">
+                      {/* Modal Text & Dynamic Copy */}
+                      <div className="p-4 rounded-lg border border-border/70 bg-card space-y-4">
+                        <h4 className="font-semibold text-foreground flex items-center gap-1.5 text-sm">
+                          <Sliders className="w-4 h-4 text-primary" />
+                          Floor-Guide Modal Copy &amp; Dynamic Interpolation
+                        </h4>
+
+                        <div className="space-y-3">
+                          <div className="space-y-1.5">
+                            <Label className="font-semibold text-foreground">Eyebrow / Badge Text</Label>
+                            <Input
+                              value={form.qrGateBadgeText}
+                              onChange={(e) => setForm({ ...form, qrGateBadgeText: e.target.value })}
+                              placeholder="e.g. EXHIBITION FLOOR GUIDE"
+                              className="text-xs"
+                            />
+                            <p className="text-[11px] text-muted-foreground">
+                              Appears as the small uppercase badge with QR icon at the top of the modal dialog.
+                            </p>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label className="font-semibold text-foreground">Modal Header Title</Label>
+                            <Input
+                              value={form.qrGateHeaderTitle}
+                              onChange={(e) => setForm({ ...form, qrGateHeaderTitle: e.target.value })}
+                              placeholder="e.g. Welcome to the Exhibition"
+                              className="text-xs"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <Label className="font-semibold text-foreground">Lead Capture Prompt Template</Label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const current = form.qrGatePromptText || "";
+                                  if (!current.includes("{{artworkName}}")) {
+                                    setForm({ ...form, qrGatePromptText: current ? `${current} {{artworkName}}` : 'Enter your details to explore details of the Artwork "{{artworkName}}".' });
+                                  }
+                                }}
+                                className="text-[10px] text-primary hover:underline font-mono cursor-pointer"
+                              >
+                                + Insert {"{{artworkName}}"}
+                              </button>
+                            </div>
+                            <Textarea
+                              value={form.qrGatePromptText}
+                              onChange={(e) => setForm({ ...form, qrGatePromptText: e.target.value })}
+                              rows={3}
+                              placeholder='e.g. Enter your details to explore details of the Artwork "{{artworkName}}".'
+                              className="text-xs font-sans leading-relaxed"
+                            />
+                            <p className="text-[11px] text-muted-foreground">
+                              Use <code className="bg-muted px-1 py-0.5 rounded text-foreground font-mono">{"{{artworkName}}"}</code> or <code className="bg-muted px-1 py-0.5 rounded text-foreground font-mono">{"{artwork}"}</code> as dynamic placeholders. When a visitor scans any physical QR placard, it automatically resolves to that specific artwork&apos;s title.
+                            </p>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label className="font-semibold text-foreground">Action Button Label</Label>
+                            <Input
+                              value={form.qrGateButtonLabel}
+                              onChange={(e) => setForm({ ...form, qrGateButtonLabel: e.target.value })}
+                              placeholder="e.g. Unlock Masterwork Details"
+                              className="text-xs"
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/50">
+                            <div className="space-y-0.5">
+                              <Label className="font-semibold text-foreground">Enable &apos;Skip &amp; View&apos; Option</Label>
+                              <p className="text-[11px] text-muted-foreground">
+                                When enabled, visitors can bypass lead intake and directly view the artwork. Disable to require lead capture before viewing.
+                              </p>
+                            </div>
+                            <Switch
+                              checked={form.qrGateAllowSkip}
+                              onCheckedChange={(val) => setForm({ ...form, qrGateAllowSkip: val })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Security & Verification Settings */}
+                      <div className="p-4 rounded-lg border border-border/70 bg-card space-y-4">
+                        <h4 className="font-semibold text-foreground flex items-center gap-1.5 text-sm">
+                          <ShieldCheck className="w-4 h-4 text-primary" />
+                          Anti-Bot Challenge &amp; Email Verification
+                        </h4>
+
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="space-y-0.5">
+                              <Label className="text-xs font-medium text-foreground">Require CAPTCHA on QR Intake</Label>
+                              <p className="text-[11px] text-muted-foreground">
+                                Stateless arithmetic challenge to prevent scripted fake QR scans from skewing exhibition telemetry
+                              </p>
+                            </div>
+                            <Switch
+                              checked={formSecurityConfig.qrScanGate.enableCaptcha}
+                              onCheckedChange={(val) =>
+                                setFormSecurityConfig((prev) => ({
+                                  ...prev,
+                                  qrScanGate: { ...prev.qrScanGate, enableCaptcha: val },
+                                }))
+                              }
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/40">
+                            <div className="space-y-0.5">
+                              <Label className="text-xs font-medium text-foreground">Require Email OTP on QR Intake</Label>
+                              <p className="text-[11px] text-muted-foreground">
+                                Dispatches 6-digit verification code. Verified returning users on recognized devices bypass automatically.
+                              </p>
+                            </div>
+                            <Switch
+                              checked={formSecurityConfig.qrScanGate.enableEmailOtp}
+                              onCheckedChange={(val) =>
+                                setFormSecurityConfig((prev) => ({
+                                  ...prev,
+                                  qrScanGate: { ...prev.qrScanGate, enableEmailOtp: val },
+                                }))
+                              }
+                            />
+                          </div>
+
+                          <div className="p-3 rounded-md bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-400 space-y-1">
+                            <div className="font-semibold text-[11px] flex items-center gap-1.5">
+                              <Shield className="w-3.5 h-3.5" />
+                              Strict CRM Lead Invariant
+                            </div>
+                            <p className="text-[10px] leading-relaxed">
+                              A valid email address is strictly required on all QR lead submissions, regardless of whether CAPTCHA or Email OTP are enabled or disabled. This guarantees complete contact attribution for gallery CRM follow-ups.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Live Mobile Dialog Preview */}
+                    <div className="lg:col-span-5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="font-semibold text-foreground flex items-center gap-1.5">
+                          <Eye className="w-3.5 h-3.5 text-primary" />
+                          Live Mobile Dialog Preview
+                        </Label>
+                        <span className="text-[10px] text-muted-foreground">Interactive Mock</span>
+                      </div>
+
+                      <div className="rounded-2xl border-2 border-primary/50 bg-card/95 backdrop-blur-xl p-5 shadow-xl space-y-4 max-w-sm mx-auto">
+                        <div className="space-y-2">
+                          <div className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-primary uppercase tracking-widest">
+                            <QrCode className="w-3.5 h-3.5" />
+                            {form.qrGateBadgeText || "EXHIBITION FLOOR GUIDE"}
+                          </div>
+                          <h3 className="text-base font-serif font-bold text-foreground">
+                            {form.qrGateHeaderTitle || "Welcome to the Exhibition"}
+                          </h3>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed">
+                            {(form.qrGatePromptText || 'Enter your details to explore details of the Artwork "{{artworkName}}".')
+                              .replace(/\{\{artworkName\}\}/g, "Dhanvantari (2025)")
+                              .replace(/\{artwork\}/g, "Dhanvantari (2025)")}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2.5 pt-1 text-left opacity-95">
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground">
+                              Your Full Name *
+                            </div>
+                            <div className="h-8 rounded border border-border/70 bg-muted/30 px-2.5 flex items-center text-[11px] text-muted-foreground">
+                              e.g. Smt. Radhika Sharma
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground">
+                              WhatsApp / Phone Number *
+                            </div>
+                            <div className="h-8 rounded border border-border/70 bg-muted/30 px-2.5 flex items-center text-[11px] text-muted-foreground">
+                              +91 98450 00000
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground flex items-center justify-between">
+                              <span>Email Address *</span>
+                              <span className="text-[9px] font-bold text-primary uppercase">Required</span>
+                            </div>
+                            <div className="h-8 rounded border border-primary/40 bg-muted/30 px-2.5 flex items-center text-[11px] text-muted-foreground">
+                              radhika@example.com
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-1 text-[10px] text-muted-foreground">
+                            <div className="w-3.5 h-3.5 rounded border border-primary bg-primary flex items-center justify-center text-primary-foreground text-[8px] font-bold">✓</div>
+                            <span>I have read and agree to the Privacy Policy.</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
+                          <div className="h-9 rounded-md bg-primary text-primary-foreground font-serif font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            {form.qrGateButtonLabel || "Unlock Masterwork Details"}
+                          </div>
+                          {form.qrGateAllowSkip && (
+                            <div className="text-center text-[11px] text-muted-foreground py-0.5">
+                              Skip &amp; View
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-border flex justify-end">
+                    <Button
+                      type="button"
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="gap-2 text-xs"
+                    >
+                      {saving ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
+                      Save QR Gate Settings
                     </Button>
                   </div>
                 </CardContent>

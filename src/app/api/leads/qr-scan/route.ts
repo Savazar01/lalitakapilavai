@@ -31,11 +31,23 @@ export async function POST(request: NextRequest) {
     const trimmedName = (name || "").toString().trim();
     const trimmedEmail = (email || "").toString().trim();
 
+    const isBackground = Boolean(body.isBackgroundTelemetry);
+
     if (!trimmedPhone && !trimmedName) {
       return NextResponse.json(
         { error: "Visitor name and contact phone number are required." },
         { status: 400 }
       );
+    }
+
+    // Email is strictly mandatory for CRM lead capture on all active QR gates
+    if (!isBackground) {
+      if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        return NextResponse.json(
+          { error: "A valid email address is required to explore this artwork." },
+          { status: 400 }
+        );
+      }
     }
 
     const userAgent = deviceInfo || request.headers.get("user-agent") || "Mobile Browser";
@@ -47,7 +59,6 @@ export async function POST(request: NextRequest) {
 
     const requiresCaptcha = Boolean(qrSecurity.enableCaptcha);
     const requiresEmailOtp = Boolean(qrSecurity.enableEmailOtp);
-    const isBackground = Boolean(body.isBackgroundTelemetry);
 
     let isVerifiedUser = false;
 

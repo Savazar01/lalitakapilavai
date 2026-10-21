@@ -2436,7 +2436,7 @@
       "label": "LegalLinkItem",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L78",
+      "source_location": "L79",
       "id": "settings_page_legallinkitem",
       "community": 82,
       "norm_label": "legallinkitem"
@@ -2445,7 +2445,7 @@
       "label": "SocialLinkItem",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L84",
+      "source_location": "L85",
       "id": "settings_page_sociallinkitem",
       "community": 82,
       "norm_label": "sociallinkitem"
@@ -2454,7 +2454,7 @@
       "label": "FooterConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L90",
+      "source_location": "L91",
       "id": "settings_page_footerconfig",
       "community": 82,
       "norm_label": "footerconfig"
@@ -2463,7 +2463,7 @@
       "label": "EmailConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L99",
+      "source_location": "L100",
       "id": "settings_page_emailconfig",
       "community": 82,
       "norm_label": "emailconfig"
@@ -2472,7 +2472,7 @@
       "label": "AiConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L110",
+      "source_location": "L111",
       "id": "settings_page_aiconfig",
       "community": 82,
       "norm_label": "aiconfig"
@@ -2481,7 +2481,7 @@
       "label": "GoogleServicesConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L118",
+      "source_location": "L119",
       "id": "settings_page_googleservicesconfig",
       "community": 82,
       "norm_label": "googleservicesconfig"
@@ -2490,7 +2490,7 @@
       "label": "NextcloudConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L128",
+      "source_location": "L129",
       "id": "settings_page_nextcloudconfig",
       "community": 82,
       "norm_label": "nextcloudconfig"
@@ -2499,7 +2499,7 @@
       "label": "FormSecurityConfig",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L136",
+      "source_location": "L137",
       "id": "settings_page_formsecurityconfig",
       "community": 82,
       "norm_label": "formsecurityconfig"
@@ -2508,7 +2508,7 @@
       "label": "DEFAULT_FORM_SECURITY_CONFIG",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L147",
+      "source_location": "L148",
       "id": "settings_page_default_form_security_config",
       "community": 82,
       "norm_label": "default_form_security_config"
@@ -2517,7 +2517,7 @@
       "label": "AdminSettingsPage()",
       "file_type": "code",
       "source_file": "src/app/admin/(dashboard)/settings/page.tsx",
-      "source_location": "L158",
+      "source_location": "L159",
       "id": "settings_page_adminsettingspage",
       "community": 82,
       "norm_label": "adminsettingspage()"
@@ -3104,7 +3104,7 @@
       "source_file": "src/app/api/admin/events/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_events_id_route_ts",
-      "community": 32,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -3113,7 +3113,7 @@
       "source_file": "src/app/api/admin/events/[id]/route.ts",
       "source_location": "L6",
       "id": "src_app_api_admin_events_id_route_ts_id_route_get",
-      "community": 32,
+      "community": 18,
       "norm_label": "get()"
     },
     {
@@ -3122,7 +3122,7 @@
       "source_file": "src/app/api/admin/events/[id]/route.ts",
       "source_location": "L49",
       "id": "src_app_api_admin_events_id_route_ts_id_route_put",
-      "community": 32,
+      "community": 18,
       "norm_label": "put()"
     },
     {
@@ -3131,7 +3131,7 @@
       "source_file": "src/app/api/admin/events/[id]/route.ts",
       "source_location": "L174",
       "id": "src_app_api_admin_events_id_route_ts_id_route_delete",
-      "community": 32,
+      "community": 18,
       "norm_label": "delete()"
     },
     {
@@ -3653,7 +3653,7 @@
       "source_file": "src/app/api/admin/users/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_users_route_ts",
-      "community": 18,
+      "community": 29,
       "norm_label": "route.ts"
     },
     {
@@ -3662,7 +3662,7 @@
       "source_file": "src/app/api/admin/users/route.ts",
       "source_location": "L7",
       "id": "users_route_get",
-      "community": 18,
+      "community": 29,
       "norm_label": "get()"
     },
     {
@@ -3671,7 +3671,7 @@
       "source_file": "src/app/api/admin/users/route.ts",
       "source_location": "L52",
       "id": "users_route_post",
-      "community": 18,
+      "community": 29,
       "norm_label": "post()"
     },
     {
@@ -3698,7 +3698,7 @@
       "source_file": "src/app/api/admin/users/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_users_id_route_ts",
-      "community": 18,
+      "community": 29,
       "norm_label": "route.ts"
     },
     {
@@ -3707,7 +3707,7 @@
       "source_file": "src/app/api/admin/users/[id]/route.ts",
       "source_location": "L7",
       "id": "src_app_api_admin_users_id_route_ts_id_route_patch",
-      "community": 18,
+      "community": 29,
       "norm_label": "patch()"
     },
     {
@@ -3716,7 +3716,7 @@
       "source_file": "src/app/api/admin/users/[id]/route.ts",
       "source_location": "L82",
       "id": "src_app_api_admin_users_id_route_ts_id_route_delete",
-      "community": 18,
+      "community": 29,
       "norm_label": "delete()"
     },
     {
@@ -3761,7 +3761,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L1",
       "id": "src_app_api_admin_widgets_id_route_ts",
-      "community": 81,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -3770,7 +3770,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L7",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_routeparams",
-      "community": 81,
+      "community": 18,
       "norm_label": "routeparams"
     },
     {
@@ -3779,7 +3779,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L11",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_patch",
-      "community": 81,
+      "community": 18,
       "norm_label": "patch()"
     },
     {
@@ -3788,7 +3788,7 @@
       "source_file": "src/app/api/admin/widgets/[id]/route.ts",
       "source_location": "L52",
       "id": "src_app_api_admin_widgets_id_route_ts_id_route_delete",
-      "community": 81,
+      "community": 18,
       "norm_label": "delete()"
     },
     {
@@ -6243,7 +6243,7 @@
       "label": "ExhibitionQrModal()",
       "file_type": "code",
       "source_file": "src/components/public/exhibition-qr-modal.tsx",
-      "source_location": "L82",
+      "source_location": "L87",
       "id": "public_exhibition_qr_modal_exhibitionqrmodal",
       "community": 39,
       "norm_label": "exhibitionqrmodal()"
@@ -13867,9 +13867,9 @@
       "source_file": "package.json",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_json",
-      "target": "lalitakapilavai_package_repository",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_package_repository"
     },
     {
       "relation": "contains",
@@ -13877,9 +13877,9 @@
       "source_file": "package.json",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_json",
-      "target": "lalitakapilavai_package_homepage",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_package_homepage"
     },
     {
       "relation": "contains",
@@ -13937,9 +13937,9 @@
       "source_file": "package.json",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_package_repository",
-      "target": "lalitakapilavai_package_repository_type",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_package_repository_type"
     },
     {
       "relation": "contains",
@@ -13947,9 +13947,9 @@
       "source_file": "package.json",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "lalitakapilavai_package_repository",
-      "target": "lalitakapilavai_package_repository_url",
-      "confidence_score": 1.0
+      "target": "lalitakapilavai_package_repository_url"
     },
     {
       "relation": "contains",
@@ -26219,9 +26219,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "src_components_ui_button_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_button_tsx"
     },
     {
       "relation": "imports",
@@ -26230,9 +26230,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_button_button",
-      "confidence_score": 1.0
+      "target": "ui_button_button"
     },
     {
       "relation": "imports_from",
@@ -26241,9 +26241,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "src_components_ui_input_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_input_tsx"
     },
     {
       "relation": "imports",
@@ -26252,9 +26252,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_input_input",
-      "confidence_score": 1.0
+      "target": "ui_input_input"
     },
     {
       "relation": "imports_from",
@@ -26263,9 +26263,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "src_components_ui_card_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_card_tsx"
     },
     {
       "relation": "imports",
@@ -26274,9 +26274,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_card_card",
-      "confidence_score": 1.0
+      "target": "ui_card_card"
     },
     {
       "relation": "imports",
@@ -26285,9 +26285,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_card_cardheader",
-      "confidence_score": 1.0
+      "target": "ui_card_cardheader"
     },
     {
       "relation": "imports",
@@ -26296,9 +26296,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_card_cardtitle",
-      "confidence_score": 1.0
+      "target": "ui_card_cardtitle"
     },
     {
       "relation": "imports",
@@ -26307,9 +26307,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_card_carddescription",
-      "confidence_score": 1.0
+      "target": "ui_card_carddescription"
     },
     {
       "relation": "imports",
@@ -26318,9 +26318,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_card_cardcontent",
-      "confidence_score": 1.0
+      "target": "ui_card_cardcontent"
     },
     {
       "relation": "imports",
@@ -26329,9 +26329,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_card_cardfooter",
-      "confidence_score": 1.0
+      "target": "ui_card_cardfooter"
     },
     {
       "relation": "imports_from",
@@ -26340,9 +26340,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "src_components_ui_theme_toggle_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_ui_theme_toggle_tsx"
     },
     {
       "relation": "imports",
@@ -26351,9 +26351,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "ui_theme_toggle_themetoggle",
-      "confidence_score": 1.0
+      "target": "ui_theme_toggle_themetoggle"
     },
     {
       "relation": "contains",
@@ -26361,9 +26361,9 @@
       "source_file": "src/app/admin/change-password/page.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_admin_change_password_page_tsx",
-      "target": "change_password_page_changepasswordpage",
-      "confidence_score": 1.0
+      "target": "change_password_page_changepasswordpage"
     },
     {
       "relation": "imports_from",
@@ -28333,9 +28333,9 @@
       "source_file": "src/app/api/admin/me/route.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_me_route_ts",
-      "target": "src_lib_auth_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_auth_ts"
     },
     {
       "relation": "imports",
@@ -28344,9 +28344,9 @@
       "source_file": "src/app/api/admin/me/route.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_me_route_ts",
-      "target": "lib_auth_auth",
-      "confidence_score": 1.0
+      "target": "lib_auth_auth"
     },
     {
       "relation": "imports_from",
@@ -28355,9 +28355,9 @@
       "source_file": "src/app/api/admin/me/route.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_me_route_ts",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "contains",
@@ -28365,9 +28365,9 @@
       "source_file": "src/app/api/admin/me/route.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_me_route_ts",
-      "target": "me_route_get",
-      "confidence_score": 1.0
+      "target": "me_route_get"
     },
     {
       "relation": "imports_from",
@@ -29614,9 +29614,9 @@
       "source_file": "src/app/api/admin/users/change-password/route.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_users_change_password_route_ts",
-      "target": "src_lib_auth_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_auth_ts"
     },
     {
       "relation": "imports",
@@ -29625,9 +29625,9 @@
       "source_file": "src/app/api/admin/users/change-password/route.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_users_change_password_route_ts",
-      "target": "lib_auth_auth",
-      "confidence_score": 1.0
+      "target": "lib_auth_auth"
     },
     {
       "relation": "imports_from",
@@ -29636,9 +29636,9 @@
       "source_file": "src/app/api/admin/users/change-password/route.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_users_change_password_route_ts",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "contains",
@@ -29646,9 +29646,9 @@
       "source_file": "src/app/api/admin/users/change-password/route.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_admin_users_change_password_route_ts",
-      "target": "change_password_route_post",
-      "confidence_score": 1.0
+      "target": "change_password_route_post"
     },
     {
       "relation": "imports_from",
@@ -29857,9 +29857,9 @@
       "source_file": "src/app/api/auth/resolve-identifier/route.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_auth_resolve_identifier_route_ts",
-      "target": "src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "src_lib_prisma_ts"
     },
     {
       "relation": "contains",
@@ -29867,9 +29867,9 @@
       "source_file": "src/app/api/auth/resolve-identifier/route.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_api_auth_resolve_identifier_route_ts",
-      "target": "resolve_identifier_route_post",
-      "confidence_score": 1.0
+      "target": "resolve_identifier_route_post"
     },
     {
       "relation": "imports_from",
@@ -52936,5 +52936,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f9aa0b8da1162705466c1ceb93aa3ebc8acf2eea"
+  "built_at_commit": "ae9245025b02f38654b2ac30b8a8e456b7db7fd9"
 }
